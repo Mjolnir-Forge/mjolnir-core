@@ -1,0 +1,3 @@
+include(functions/extract_sources_definitions_dependencies)
+include(functions/add_generic_executeable)
+include(functions/add_mjolnir_executeable)
