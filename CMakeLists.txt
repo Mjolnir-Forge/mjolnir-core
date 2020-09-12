@@ -4,11 +4,15 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 
 # Set directories -----------------------------------------------------------------------------------------------------
-set(MJOLNIR_CORE_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(NOT DEFINED MJOLNIR_CORE_ROOT_DIR)
+    set(MJOLNIR_CORE_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
 set(MJOLNIR_CORE_SOURCE_DIR ${MJOLNIR_CORE_ROOT_DIR}/core)
 
 
 # Perform setup -------------------------------------------------------------------------------------------------------
+
 set(CMAKE_MODULE_PATH
     ${MJOLNIR_CORE_ROOT_DIR}/cmake
     ${CMAKE_MODULE_PATH})
