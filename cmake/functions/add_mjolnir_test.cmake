@@ -1,7 +1,7 @@
 #[==[
 Create a test for this library and add all sources, definitions and dependencies passed as a list of items.
 
-The tests cpp-file does't need to be passed. It is added automatically.
+The tests cpp-file doesn't need to be passed. It is added automatically.
 
 PARAMETERS:
 -----------
