@@ -19,8 +19,10 @@ set(CMAKE_MODULE_PATH
 
 include(compiler_setup)
 include(include_cmake_functions)
+include(resolve_dependencies)
 
 
 # Add subdirectories --------------------------------------------------------------------------------------------------
 
 add_subdirectory(core)
+add_subdirectory(tests)
