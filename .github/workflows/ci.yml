@@ -14,5 +14,5 @@ jobs:
       run: |
         mkdir build
         cd build
-      	cmake ..
+      	cmake ../
       	
