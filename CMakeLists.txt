@@ -2,7 +2,6 @@ project(Mjolnir-Core)
 cmake_minimum_required(VERSION 3.9)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
-message("CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
 
 # Set directories -----------------------------------------------------------------------------------------------------
 
