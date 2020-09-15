@@ -19,4 +19,4 @@ jobs:
     - name: Run tests
       run: |
         cd build  
-        ctest
+        ctest -C ${{matrix.build_type}}
