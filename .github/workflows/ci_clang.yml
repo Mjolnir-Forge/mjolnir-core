@@ -1,4 +1,4 @@
-name: GCC Ubuntu
+name: Clang Ubuntu
 
 on: [push]
 
