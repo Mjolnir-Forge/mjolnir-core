@@ -6,7 +6,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: window-latest
+    runs-on: windows-latest
     strategy:
       matrix:
         build_type: [DEBUG, RELEASE]
