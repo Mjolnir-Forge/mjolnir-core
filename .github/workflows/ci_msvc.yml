@@ -15,7 +15,7 @@ jobs:
     - name: Run CMake
       run: cmake -DCMAKE_C_COMPILER=MSVC -DCMAKE_CXX_COMPILER=MSVC -S . -B build
     - name: Build
-      run: cmake --build build --config ${{matrix.build_type}}
+      run: cmake --build build --config ${{matrix.build_type}} -j 2
     - name: Run tests
       run: |
         cd build  
