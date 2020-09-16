@@ -1,5 +1,6 @@
+cmake_minimum_required(VERSION 3.13...3.18)
+
 project(Mjolnir-Core)
-cmake_minimum_required(VERSION 3.9)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 
