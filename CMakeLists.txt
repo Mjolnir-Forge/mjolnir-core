@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13...3.18)
+cmake_minimum_required(VERSION 3.15...3.18)
 
 project(Mjolnir-Core VERSION 0.0.1
     DESCRIPTION "Core module of the Mjolnir Game Development Kit"

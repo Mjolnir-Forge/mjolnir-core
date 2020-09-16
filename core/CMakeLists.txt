@@ -1,3 +1,5 @@
 add_generic_executable(hello_world
-    ${MJOLNIR_CORE_ROOT_DIR}/core
-    hello_world.cpp)
+                       hello_world.cpp
+                       SOURCE_DIRECTORY
+                           ${MJOLNIR_CORE_ROOT_DIR}/core
+                       )
