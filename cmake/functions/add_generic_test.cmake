@@ -17,7 +17,7 @@ KEYWORDS
 --------
 
     SOURCE_DIRECTORY:
-        The root directory of the source files. If none is specified, the curren CMake source directory is taken.
+        The root directory of the source files. If none is specified, the current CMake source directory is taken.
 
     SOURCES:
         List of source files. The filepath must be given in relation to the specified root directory
