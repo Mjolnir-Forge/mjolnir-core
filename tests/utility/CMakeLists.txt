@@ -7,7 +7,8 @@ add_generic_test(example_test
                  SOURCE_DIRECTORY
                      ${CMAKE_CURRENT_SOURCE_DIR}
                  SOURCES
-                     test_example.cpp
+                     PRIVATE
+                         test_example.cpp
                  DEFINITIONS
                      PRIVATE
                          TestIsABadName

@@ -54,21 +54,36 @@ function(target_apply_setup target)
                           )
 
 
-    # handle source directory -----------------------------------------------------------------------------------------
-
-    if(NOT DEFINED ARG_SOURCE_DIRECTORY)
-        set(ARG_SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    endif()
-
-
     # handle sources --------------------------------------------------------------------------------------------------
 
     set(scope_keywords PUBLIC PRIVATE INTERFACE)
+    cmake_parse_arguments(SOURCE_SCOPE
+                          ""
+                          ""
+                          "${scope_keywords}"
+                          ${ARG_SOURCES}
+                          )
+    if(DEFINED ARG_UNPARSED_ARGUMENTS OR DEFINED SOURCE_SCOPE_PRIVATE)
+        set(tmp_sources PRIVATE ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_SCOPE_PRIVATE})
+    endif()
 
-    set(ARG_SOURCES ${ARG_UNPARSED_ARGUMENTS} ${ARG_SOURCES})
-    foreach(source ${ARG_SOURCES})
-        set(sources "${ARG_SOURCE_DIRECTORY}/${source}" ${sources})
-    endforeach()
+    if(DEFINED SOURCE_SCOPE_PUBLIC)
+        set(tmp_sources ${tmp_sources} PUBLIC ${SOURCE_SCOPE_PUBLIC})
+    endif()
+
+    if(DEFINED SOURCE_SCOPE_INTERFACE)
+        set(tmp_sources ${tmp_sources} INTERFACE ${SOURCE_SCOPE_INTERFACE})
+    endif()
+
+    if(DEFINED ARG_SOURCE_DIRECTORY)
+        foreach(source ${tmp_sources})
+            if(NOT source IN_LIST scope_keywords)
+                set(sources ${sources} "${ARG_SOURCE_DIRECTORY}/${source}")
+            else()
+                set(sources ${sources} ${source})
+            endif()
+        endforeach()
+    endif()
 
 
     # handle definitions ----------------------------------------------------------------------------------------------
@@ -84,9 +99,9 @@ function(target_apply_setup target)
     endif()
 
 
-    # create executable -----------------------------------------------------------------------------------------------
+    # apply setup -----------------------------------------------------------------------------------------------------
 
-    target_sources(${target} PRIVATE ${sources})
+    target_sources(${target} ${sources})
 
     if(DEFINED definitions)
         target_compile_definitions(${target} ${definitions})
