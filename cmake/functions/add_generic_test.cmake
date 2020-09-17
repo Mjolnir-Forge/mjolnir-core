@@ -16,9 +16,6 @@ PARAMETERS:
 KEYWORDS
 --------
 
-    SOURCE_DIRECTORY:
-        The root directory of the source files. If none is specified, the current CMake source directory is taken.
-
     SOURCES:
         List of source files. The filepath must be given in relation to the specified root directory
 
@@ -27,6 +24,15 @@ KEYWORDS
 
     LIBRARIES:
         Libraries that should be linked
+
+    SOURCE_DIRECTORY:
+        The root directory of the source files. If none is specified, the current CMake source directory is taken.
+
+    INCLUDE_DIRECTORIES:
+        Additional directories that should be searched for the included header files (uses target_include_directories)
+
+    LINK_DIRECTORIES:
+        Additional directories that should be searched for the linked libraries (uses target_link_libraries)
 
 #]==]
 function(add_generic_test target test_name)
