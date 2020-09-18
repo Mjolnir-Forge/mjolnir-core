@@ -3,6 +3,7 @@
 
 int add(int lhs, int rhs)
 {
+    int unused;
     return lhs + rhs;
 }
 

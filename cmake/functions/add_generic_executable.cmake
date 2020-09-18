@@ -32,6 +32,12 @@ KEYWORDS
         Additional directories that should be searched for the linked libraries (uses target_link_libraries)
 
 
+    COMPILE_FEATURES:
+        Compile features that should be added (target_compile_features)
+
+    COMPILE_OPTIONS:
+        Compile options that should be added (target_compile_options)
+
 #]==]
 function(add_generic_executable target)
     add_executable(${target})

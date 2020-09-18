@@ -5,13 +5,13 @@ PARAMETERS:
 -----------
 
     target:
-        Name of the CMake target that should be used. The prefix "test_" is added automatically.
+        Name of the CMake target that should be used.
 
     test_name:
         The name of the test that is shown when running ctest
 
-        ARGN:
-            A list containing all necessary data of arbitrary length separated by keywords.
+    ARGN:
+        A list containing all necessary data of arbitrary length separated by keywords.
 
 KEYWORDS
 --------
@@ -33,6 +33,12 @@ KEYWORDS
 
     LINK_DIRECTORIES:
         Additional directories that should be searched for the linked libraries (uses target_link_libraries)
+
+    COMPILE_FEATURES:
+        Compile features that should be added (target_compile_features)
+
+    COMPILE_OPTIONS:
+        Compile options that should be added (target_compile_options)
 
 #]==]
 function(add_generic_test target test_name)

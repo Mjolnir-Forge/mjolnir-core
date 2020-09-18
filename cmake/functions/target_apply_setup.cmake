@@ -22,7 +22,6 @@ KEYWORDS
     LIBRARIES:
         Libraries that should be linked
 
-
     SOURCE_DIRECTORY:
         The root directory of the source files. If none is specified, the current CMake source directory is taken.
 
@@ -31,6 +30,12 @@ KEYWORDS
 
     LINK_DIRECTORIES:
         Additional directories that should be searched for the linked libraries (uses target_link_libraries)
+
+    COMPILE_FEATURES:
+        Compile features that should be added (target_compile_features)
+
+    COMPILE_OPTIONS:
+        Compile options that should be added (target_compile_options)
 
 
 #]==]
@@ -45,6 +50,8 @@ function(target_apply_setup target)
                        LIBRARIES
                        INCLUDE_DIRECTORIES
                        LINK_DIRECTORIES
+                       COMPILE_FEATURES
+                       COMPILE_OPTIONS
                        )
     cmake_parse_arguments(ARG
                           "${options}"
@@ -113,6 +120,14 @@ function(target_apply_setup target)
 
     if(DEFINED ARG_LINK_DIRECTORIES)
         target_link_directories(${target} ${ARG_LINK_DIRECTORIES})
+    endif()
+
+    if(DEFINED ARG_COMPILE_FEATURES)
+        target_compile_features(${target} ${ARG_COMPILE_FEATURES})
+    endif()
+
+    if(DEFINED ARG_COMPILE_OPTIONS)
+        target_compile_options(${target} ${ARG_COMPILE_OPTIONS})
     endif()
 
     target_link_libraries(${target} ${ARG_LIBRARIES})
