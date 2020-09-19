@@ -41,6 +41,9 @@ KEYWORDS
 #]==]
 function(target_apply_setup target)
 
+    set(scope_keywords PUBLIC PRIVATE INTERFACE)
+
+
     # extract arguments -----------------------------------------------------------------------------------------------
 
     set(options "")
@@ -63,24 +66,7 @@ function(target_apply_setup target)
 
     # handle sources --------------------------------------------------------------------------------------------------
 
-    set(scope_keywords PUBLIC PRIVATE INTERFACE)
-    cmake_parse_arguments(SOURCE_SCOPE
-                          ""
-                          ""
-                          "${scope_keywords}"
-                          ${ARG_SOURCES}
-                          )
-    if(DEFINED ARG_UNPARSED_ARGUMENTS OR DEFINED SOURCE_SCOPE_PRIVATE)
-        set(tmp_sources PRIVATE ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_SCOPE_PRIVATE})
-    endif()
-
-    if(DEFINED SOURCE_SCOPE_PUBLIC)
-        set(tmp_sources ${tmp_sources} PUBLIC ${SOURCE_SCOPE_PUBLIC})
-    endif()
-
-    if(DEFINED SOURCE_SCOPE_INTERFACE)
-        set(tmp_sources ${tmp_sources} INTERFACE ${SOURCE_SCOPE_INTERFACE})
-    endif()
+    process_scopes(PRIVATE tmp_sources ${ARG_UNPARSED_ARGUMENTS} ${ARG_SOURCES})
 
     if(DEFINED ARG_SOURCE_DIRECTORY)
         foreach(source ${tmp_sources})
@@ -92,43 +78,62 @@ function(target_apply_setup target)
         endforeach()
     endif()
 
+    target_sources(${target} ${sources})
+
 
     # handle definitions ----------------------------------------------------------------------------------------------
 
     if(DEFINED ARG_DEFINITIONS)
-        foreach(item ${ARG_DEFINITIONS})
+        process_scopes(PRIVATE tmp_definitions ${ARG_DEFINITIONS})
+
+        foreach(item ${tmp_definitions})
             if(NOT item IN_LIST scope_keywords)
                 set(definitions ${definitions} "-D${item}")
             else()
                 set(definitions ${definitions} ${item})
             endif()
         endforeach()
-    endif()
 
-
-    # apply setup -----------------------------------------------------------------------------------------------------
-
-    target_sources(${target} ${sources})
-
-    if(DEFINED definitions)
         target_compile_definitions(${target} ${definitions})
     endif()
 
+
+    # include directories ---------------------------------------------------------------------------------------------
+
     if(DEFINED ARG_INCLUDE_DIRECTORIES)
-        target_include_directories(${target} ${ARG_INCLUDE_DIRECTORIES})
+        process_scopes(PRIVATE directories ${ARG_INCLUDE_DIRECTORIES})
+        target_include_directories(${target} ${directories})
     endif()
+
+
+    # link directories ------------------------------------------------------------------------------------------------
 
     if(DEFINED ARG_LINK_DIRECTORIES)
-        target_link_directories(${target} ${ARG_LINK_DIRECTORIES})
+        process_scopes(PRIVATE directories ${ARG_LINK_DIRECTORIES})
+        target_link_directories(${target} ${directories})
     endif()
+
+
+    # compile features ------------------------------------------------------------------------------------------------
 
     if(DEFINED ARG_COMPILE_FEATURES)
-        target_compile_features(${target} ${ARG_COMPILE_FEATURES})
+        process_scopes(PRIVATE features ${ARG_COMPILE_FEATURES})
+        target_compile_features(${target} ${features})
     endif()
+
+
+    # compile options -------------------------------------------------------------------------------------------------
 
     if(DEFINED ARG_COMPILE_OPTIONS)
-        target_compile_options(${target} ${ARG_COMPILE_OPTIONS})
+        process_scopes(PRIVATE options ${ARG_COMPILE_OPTIONS})
+        target_compile_options(${target} ${options})
     endif()
 
-    target_link_libraries(${target} ${ARG_LIBRARIES})
+    # link libraries --------------------------------------------------------------------------------------------------
+
+    if(DEFINED ARG_LIBRARIES)
+        process_scopes(PRIVATE libraries ${ARG_LIBRARIES})
+        target_link_libraries(${target} ${libraries})
+    endif()
+
 endfunction()

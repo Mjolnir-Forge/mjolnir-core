@@ -3,6 +3,7 @@ Include all cmake functions from the "cmake/functions" folder.
 #]==]
 
 include(functions/add_to_list_after_keyword)
+include(functions/process_scopes)
 include(functions/target_apply_setup)
 
 include(functions/add_generic_executable)
