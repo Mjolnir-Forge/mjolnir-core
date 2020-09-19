@@ -15,4 +15,4 @@ add_generic_test(example_test
                      PUBLIC
                          LOOOFT
                  )
-add_mjolnir_test(example)
+add_mjolnir_test(example CORE)

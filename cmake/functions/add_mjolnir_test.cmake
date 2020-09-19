@@ -11,8 +11,8 @@ PARAMETERS:
     target:
         Name of the CMake target that should be used. The prefix "test_" is added automatically.
 
-    test_name:
-        The name of the test that is shown when running ctest
+    module:
+        Name of the Mjolnir module the test belongs to.
 
     ARGN:
         A list containing all necessary data of arbitrary length separated by keywords.
@@ -46,11 +46,11 @@ KEYWORDS
         The root directory of the source files. If none is specified, the current CMake source directory is taken.
 
 #]==]
-function(add_mjolnir_test target)
+function(add_mjolnir_test target module)
     set(test_name ${target})
     set(target "test_${target}")
 
-    string(REPLACE "${MJOLNIR_ROOT_DIR}/tests/"
+    string(REPLACE "${MJOLNIR_${module}_ROOT_DIR}/tests/"
            ""
            relative_path
            ${CMAKE_CURRENT_SOURCE_DIR}
@@ -66,13 +66,13 @@ function(add_mjolnir_test target)
     set(ctest_test_name "${test_prefix}::${test_name}")
 
     add_to_list_after_keyword("${ARGN}" arguments LINK_LIBRARIES PRIVATE gtest_main)
-    add_to_list_after_keyword("${arguments}" arguments COMPILE_FEATURES PRIVATE ${MJOLNIR_COMPILE_FEATURES})
-    add_to_list_after_keyword("${arguments}" arguments COMPILE_OPTIONS PRIVATE ${MJOLNIR_COMPILE_OPTIONS})
+    add_to_list_after_keyword("${arguments}" arguments COMPILE_FEATURES PRIVATE ${MJOLNIR_${module}_COMPILE_FEATURES})
+    add_to_list_after_keyword("${arguments}" arguments COMPILE_OPTIONS PRIVATE ${MJOLNIR_${module}_COMPILE_OPTIONS})
 
     add_generic_executable(${target}
                            ${test_source}
                            SOURCE_DIRECTORY
-                               ${MJOLNIR_ROOT_DIR}
+                               ${MJOLNIR_${module}_ROOT_DIR}
                            ${arguments}
                            )
 
