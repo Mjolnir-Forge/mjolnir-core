@@ -14,6 +14,7 @@ PARAMETERS:
     ARGN:
         A list containing all necessary data of arbitrary length separated by keywords.
 
+
 KEYWORDS
 --------
 
@@ -61,16 +62,15 @@ function(add_mjolnir_test target)
     set(test_source "/tests/${relative_path}/${target}.cpp")
     set(ctest_test_name "${test_prefix}::${test_name}")
 
-    append_keyword_list("${ARGN}" LIBRARIES gtest_main)
-
-    append_keyword_list("${keyword_list}" COMPILE_FEATURES PRIVATE ${MJOLNIR_COMPILE_FEATURES})
-    append_keyword_list("${keyword_list}" COMPILE_OPTIONS PRIVATE ${MJOLNIR_COMPILE_OPTIONS})
+    add_to_list_after_keyword("${ARGN}" arguments LIBRARIES gtest_main)
+    add_to_list_after_keyword("${arguments}" arguments COMPILE_FEATURES PRIVATE ${MJOLNIR_COMPILE_FEATURES})
+    add_to_list_after_keyword("${arguments}" arguments COMPILE_OPTIONS PRIVATE ${MJOLNIR_COMPILE_OPTIONS})
 
     add_generic_executable(${target}
                            ${test_source}
                            SOURCE_DIRECTORY
                                ${MJOLNIR_CORE_ROOT_DIR}
-                           ${keyword_list}
+                           ${arguments}
                            )
 
     add_test(${ctest_test_name} ${target})

@@ -1,6 +1,7 @@
 #[==[
 Create a test and add all sources, definitions and dependencies passed as a list of items.
 
+
 PARAMETERS:
 -----------
 
@@ -42,9 +43,9 @@ KEYWORDS
 
 #]==]
 function(add_generic_test target test_name)
-    append_keyword_list("${ARGN}" LIBRARIES gtest_main)
+    add_to_list_after_keyword("${ARGN}" arguments LIBRARIES  gtest_main)
     add_generic_executable(${target}
-                           ${keyword_list}
+                           ${arguments}
                            )
     add_test(${test_name} ${target})
 endfunction()
