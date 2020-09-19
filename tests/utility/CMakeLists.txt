@@ -9,7 +9,7 @@ add_generic_test(example_test
                  SOURCES
                      PRIVATE
                          test_example.cpp
-                 DEFINITIONS
+                 COMPILE_DEFINITIONS
                      PRIVATE
                          TestIsABadName
                      PUBLIC

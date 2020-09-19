@@ -10,10 +10,14 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # Set directories -----------------------------------------------------------------------------------------------------
 
-if(NOT DEFINED MJOLNIR_CORE_ROOT_DIR)
-    set(MJOLNIR_CORE_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+if(NOT DEFINED MJOLNIR_ROOT_DIR)
+    set(MJOLNIR_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
-set(MJOLNIR_CORE_SOURCE_DIR ${MJOLNIR_CORE_ROOT_DIR}/core)
+
+if(NOT DEFINED MJOLNIR_CORE_ROOT_DIR)
+    set(MJOLNIR_CORE_ROOT_DIR ${MJOLNIR_ROOT_DIR})
+endif()
+set(MJOLNIR_CORE_SOURCE_DIR ${MJOLNIR_CORE_ROOT_DIR}/mjolnir/core)
 
 
 # Perform setup -------------------------------------------------------------------------------------------------------

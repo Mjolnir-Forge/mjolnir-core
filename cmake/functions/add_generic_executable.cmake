@@ -1,5 +1,9 @@
 #[==[
-Create an executable and add all sources, definitions and dependencies passed as a keyword list of items.
+Create an executable and and perform the necessary setup using a keyword list.
+
+A list of accepted keywords and their purpose is given below. Always use scope keywords (PUBLIC, PRIVATE, INTERFACE)
+directly after one of these keywords, otherwise the scope of the new items is undefined.
+
 
 PARAMETERS:
 -----------
@@ -10,20 +14,18 @@ PARAMETERS:
     ARGN:
         A list containing all necessary data separated by keywords.
 
+
 KEYWORDS
 --------
 
-    SOURCES:
-        List of source files. The filepath must be given in relation to the specified root directory
-
-    DEFINITIONS:
+    COMPILE_DEFINITIONS:
         Definitions that should be added
 
-    LIBRARIES:
-        Libraries that should be linked
+    COMPILE_FEATURES:
+        Compile features that should be added (target_compile_features)
 
-    SOURCE_DIRECTORY:
-        The root directory of the source files. If none is specified, the current CMake source directory is taken.
+    COMPILE_OPTIONS:
+        Compile options that should be added (target_compile_options)
 
     INCLUDE_DIRECTORIES:
         Additional directories that should be searched for the included header files (uses target_include_directories)
@@ -31,12 +33,14 @@ KEYWORDS
     LINK_DIRECTORIES:
         Additional directories that should be searched for the linked libraries (uses target_link_libraries)
 
+    LINK_LIBRARIES:
+        Libraries that should be linked
 
-    COMPILE_FEATURES:
-        Compile features that should be added (target_compile_features)
+    SOURCES:
+        List of source files. The filepath must be given in relation to the specified root directory
 
-    COMPILE_OPTIONS:
-        Compile options that should be added (target_compile_options)
+    SOURCE_DIRECTORY:
+        The root directory of the source files. If none is specified, the current CMake source directory is taken.
 
 #]==]
 function(add_generic_executable target)
