@@ -1,19 +1,89 @@
+# base setup ----------------------------------------------
+
 BasedOnStyle: LLVM
+
+
+# classes -------------------------------------------------
+
+AccessModifierOffset: -4
+AllowAllConstructorInitializersOnNextLine: false
+
+
+# comments ------------------------------------------------
+AlignTrailingComments: true
+
+
+# functions -----------------------------------------------
+
+# declaration
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortFunctionsOnASingleLine: None
+AllowShortLambdasOnASingleLine: None
+AlwaysBreakAfterReturnType: None
+BinPackParameters: false
+
+# calling
+AlignAfterOpenBracket: Align
+AllowAllArgumentsOnNextLine: true
+BinPackArguments: false
+
+# if ------------------------------------------------------
+
+AllowShortIfStatementsOnASingleLine: Never
+
+
+# loops ---------------------------------------------------
+
+AllowShortBlocksOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+# macros --------------------------------------------------
+
+AlignConsecutiveMacros: false
+AlignEscapedNewlines: Right
+BreakBeforeBinaryOperators: NonAssignment
+
+
+# operators -----------------------------------------------
+
+AlignConsecutiveAssignments: false
+AlignOperands: true
+
+
+# templates -----------------------------------------------
+
+AlwaysBreakTemplateDeclarations: Yes
+
+# strings -------------------------------------------------
+
+AlwaysBreakBeforeMultilineStrings: false
+
+# switch --------------------------------------------------
+
+AllowShortCaseLabelsOnASingleLine: true
+
+
+# variables -----------------------------------------------
+
+AlignConsecutiveDeclarations: false
+
+
+# other ---------------------------------------------------
+
+BreakBeforeBraces: Allman
+
+# old
+
 Language: Cpp
 
-AlignAfterOpenBracket: Align
-AlignOperands: true
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
-AlignTrailingComments: false
-AlwaysBreakTemplateDeclarations: true
-AllowShortFunctionsOnASingleLine: true
-AccessModifierOffset: -4
-BreakBeforeBraces: Allman
+
+
+
+
+
+
+
 ColumnLimit: 120
-AllowShortIfStatementsOnASingleLine: false
-AllowShortBlocksOnASingleLine: true
-AllowShortFunctionsOnASingleLine: false
 ContinuationIndentWidth: 8
 DerivePointerAlignment: false
 IndentWidth: 4
