@@ -107,6 +107,22 @@ function(target_apply_setup target)
     endif()
 
 
+    # compile features ------------------------------------------------------------------------------------------------
+
+    if(DEFINED ARG_COMPILE_FEATURES)
+        process_scopes(PRIVATE features ${ARG_COMPILE_FEATURES})
+        target_compile_features(${target} ${features})
+    endif()
+
+
+    # compile options -------------------------------------------------------------------------------------------------
+
+    if(DEFINED ARG_COMPILE_OPTIONS)
+        process_scopes(PRIVATE options ${ARG_COMPILE_OPTIONS})
+        target_compile_options(${target} ${options})
+    endif()
+
+
     # include directories ---------------------------------------------------------------------------------------------
 
     if(DEFINED ARG_INCLUDE_DIRECTORIES)
@@ -122,21 +138,6 @@ function(target_apply_setup target)
         target_link_directories(${target} ${directories})
     endif()
 
-
-    # compile features ------------------------------------------------------------------------------------------------
-
-    if(DEFINED ARG_COMPILE_FEATURES)
-        process_scopes(PRIVATE features ${ARG_COMPILE_FEATURES})
-        target_compile_features(${target} ${features})
-    endif()
-
-
-    # compile options -------------------------------------------------------------------------------------------------
-
-    if(DEFINED ARG_COMPILE_OPTIONS)
-        process_scopes(PRIVATE options ${ARG_COMPILE_OPTIONS})
-        target_compile_options(${target} ${options})
-    endif()
 
     # link libraries --------------------------------------------------------------------------------------------------
 
