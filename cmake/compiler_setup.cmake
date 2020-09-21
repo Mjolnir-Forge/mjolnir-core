@@ -57,7 +57,7 @@ set(MJOLNIR_CORE_COMPILE_OPTIONS
 include(CheckIPOSupported)
 check_ipo_supported(RESULT lto_supported)
 if(lto_supported)
-    option(MJOLNIR_CORE_ENABLE_LTO "Enables link time optimizations" TRUE)
+    option(MJOLNIR_CORE_ENABLE_LTO "Enables link time optimizations" FALSE)
 endif()
 
 
