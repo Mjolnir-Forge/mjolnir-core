@@ -1,15 +1,20 @@
 # base setup ----------------------------------------------
 
 BasedOnStyle: LLVM
+ColumnLimit: 120
 
 
 # classes -------------------------------------------------
 
 AccessModifierOffset: -4
 AllowAllConstructorInitializersOnNextLine: false
-
+BreakConstructorInitializersBeforeComma: BeforeComma
+BreakInheritanceList: BeforeComma
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 4
 
 # comments ------------------------------------------------
+
 AlignTrailingComments: true
 
 
@@ -22,10 +27,12 @@ AllowShortLambdasOnASingleLine: None
 AlwaysBreakAfterReturnType: None
 BinPackParameters: false
 
+
 # calling
 AlignAfterOpenBracket: Align
 AllowAllArgumentsOnNextLine: true
 BinPackArguments: false
+
 
 # if ------------------------------------------------------
 
@@ -37,6 +44,7 @@ AllowShortIfStatementsOnASingleLine: Never
 AllowShortBlocksOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 
+
 # macros --------------------------------------------------
 
 AlignConsecutiveMacros: false
@@ -44,10 +52,15 @@ AlignEscapedNewlines: Right
 BreakBeforeBinaryOperators: NonAssignment
 
 
+# namespaces ----------------------------------------------
+
+CompactNamespaces: false
+
 # operators -----------------------------------------------
 
 AlignConsecutiveAssignments: false
 AlignOperands: true
+BreakBeforeTernaryOperators: true
 
 
 # templates -----------------------------------------------
@@ -57,6 +70,8 @@ AlwaysBreakTemplateDeclarations: Yes
 # strings -------------------------------------------------
 
 AlwaysBreakBeforeMultilineStrings: false
+BreakStringLiterals: true
+
 
 # switch --------------------------------------------------
 
@@ -71,6 +86,13 @@ AlignConsecutiveDeclarations: false
 # other ---------------------------------------------------
 
 BreakBeforeBraces: Allman
+ContinuationIndentWidth: 8
+Cpp11BracedListStyle: true
+
+
+# undefined -----------------------------------------------
+
+# CommentPragmas
 
 # old
 
@@ -83,14 +105,13 @@ Language: Cpp
 
 
 
-ColumnLimit: 120
-ContinuationIndentWidth: 8
+
+
 DerivePointerAlignment: false
 IndentWidth: 4
 PointerAlignment: Left
 ReflowComments: true
 MaxEmptyLinesToKeep: 2
-BreakConstructorInitializersBeforeComma: true
 SpaceBeforeParens: ControlStatements
 SortIncludes: true
 Standard: Cpp11
