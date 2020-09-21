@@ -52,3 +52,15 @@ set(MJOLNIR_CORE_COMPILE_OPTIONS
 #    endif()
 #endif()
 
+# Link time optimizations ---------------------------------------------------------------------------------------------
+
+include(CheckIPOSupported)
+check_ipo_supported(RESULT lto_supported)
+if(lto_supported)
+    option(MJOLNIR_CORE_ENABLE_LTO "Enables link time optimizations" TRUE)
+endif()
+
+
+set(MJOLNIR_CORE_TARGET_PROPERTIES INTERPROCEDURAL_OPTIMIZATION ${MJOLNIR_CORE_ENABLE_LTO})
+
+

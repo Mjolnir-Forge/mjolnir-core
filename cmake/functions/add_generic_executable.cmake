@@ -36,6 +36,9 @@ KEYWORDS
     LINK_LIBRARIES:
         Libraries that should be linked
 
+    PROPERTIES:
+        List of properties (set_target_properties).
+
     SOURCES:
         List of source files. The filepath must be given in relation to the specified root directory
 

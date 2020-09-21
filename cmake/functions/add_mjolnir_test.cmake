@@ -39,6 +39,9 @@ KEYWORDS
     LINK_LIBRARIES:
         Libraries that should be linked
 
+    PROPERTIES:
+        List of properties (set_target_properties).
+
     SOURCES:
         List of source files. The filepath must be given in relation to the specified root directory
 
@@ -68,6 +71,7 @@ function(add_mjolnir_test target module)
     add_to_list_after_keyword("${ARGN}" arguments LINK_LIBRARIES PRIVATE gtest_main)
     add_to_list_after_keyword("${arguments}" arguments COMPILE_FEATURES PRIVATE ${MJOLNIR_${module}_COMPILE_FEATURES})
     add_to_list_after_keyword("${arguments}" arguments COMPILE_OPTIONS PRIVATE ${MJOLNIR_${module}_COMPILE_OPTIONS})
+    add_to_list_after_keyword("${arguments}" arguments PROPERTIES ${MJOLNIR_${module}_TARGET_PROPERTIES})
 
     add_generic_executable(${target}
                            ${test_source}

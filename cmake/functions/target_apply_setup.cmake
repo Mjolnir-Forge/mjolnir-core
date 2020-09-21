@@ -36,6 +36,9 @@ KEYWORDS
     LINK_LIBRARIES:
         Libraries that should be linked
 
+    PROPERTIES:
+    List of properties (set_target_properties).
+
     SOURCES:
         List of source files. The filepath must be given in relation to the specified root directory
 
@@ -58,6 +61,7 @@ function(target_apply_setup target)
                        INCLUDE_DIRECTORIES
                        LINK_DIRECTORIES
                        LINK_LIBRARIES
+                       PROPERTIES
                        SOURCES
                        )
     cmake_parse_arguments(ARG
@@ -139,6 +143,13 @@ function(target_apply_setup target)
     if(DEFINED ARG_LINK_LIBRARIES)
         process_scopes(PRIVATE libraries ${ARG_LINK_LIBRARIES})
         target_link_libraries(${target} ${libraries})
+    endif()
+
+
+    # properties ------------------------------------------------------------------------------------------------------
+
+    if(DEFINED ARG_PROPERTIES)
+        set_target_properties(${target} PROPERTIES ${ARG_PROPERTIES})
     endif()
 
 endfunction()
