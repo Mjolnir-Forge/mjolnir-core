@@ -4,8 +4,9 @@ Set all compiler related cmake variables, if they are not already set.
 
 # options ------------------------------------------------------------------------------------------------------------
 
-option(MJOLNIR_CORE_ENABLE_LTO "Enables link time optimizations" FALSE)
+option(MJOLNIR_CORE_ENABLE_TESTS "Enable the tests" TRUE)
 option(MJOLNIR_CORE_ENABLE_COMPILER_EXTENSIONS "Enables compiler extensions" FALSE)
+option(MJOLNIR_CORE_ENABLE_LTO "Enables link time optimizations" FALSE)
 
 
 # Set compile features ------------------------------------------------------------------------------------------------
