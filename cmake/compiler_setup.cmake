@@ -2,6 +2,11 @@
 Set all compiler related cmake variables, if they are not already set.
 #]==]
 
+# options ------------------------------------------------------------------------------------------------------------
+
+option(MJOLNIR_CORE_ENABLE_LTO "Enables link time optimizations" FALSE)
+option(MJOLNIR_CORE_ENABLE_COMPILER_EXTENSIONS "Enables compiler extensions" FALSE)
+
 
 # Set compile features ------------------------------------------------------------------------------------------------
 
@@ -52,15 +57,23 @@ set(MJOLNIR_CORE_COMPILE_OPTIONS
 #    endif()
 #endif()
 
+# Compiler extensions -------------------------------------------------------------------------------------------------
+
+
+if(${MJOLNIR_CORE_ENABLE_COMPILER_EXTENSIONS})
+    set(MJOLNIR_CORE_TARGET_PROPERTIES ${MJOLNIR_CORE_TARGET_PROPERTIES} CXX_EXTENSIONS ON)
+else()
+    set(MJOLNIR_CORE_TARGET_PROPERTIES ${MJOLNIR_CORE_TARGET_PROPERTIES} CXX_EXTENSIONS OFF)
+endif()
+
+
 # Link time optimizations ---------------------------------------------------------------------------------------------
 
 include(CheckIPOSupported)
 check_ipo_supported(RESULT lto_supported)
 if(lto_supported)
-    option(MJOLNIR_CORE_ENABLE_LTO "Enables link time optimizations" FALSE)
+    set(MJOLNIR_CORE_TARGET_PROPERTIES
+        ${MJOLNIR_CORE_TARGET_PROPERTIES}
+        INTERPROCEDURAL_OPTIMIZATION
+        ${MJOLNIR_CORE_ENABLE_LTO})
 endif()
-
-
-set(MJOLNIR_CORE_TARGET_PROPERTIES INTERPROCEDURAL_OPTIMIZATION ${MJOLNIR_CORE_ENABLE_LTO})
-
-
