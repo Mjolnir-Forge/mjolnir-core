@@ -14,5 +14,5 @@ jobs:
         echo "Pull request's base branch is: ${{ github.base_ref }}"
     - name: Step that prints name of the current branch
       run: |
-        echo "Current branch is: ${{ github.ref }}"
+        echo "Current branch is: ${{ github.head_ref }}"
 
