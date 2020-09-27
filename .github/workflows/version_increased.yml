@@ -11,6 +11,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Step that prints name of pull request's base branch
       run: |
-        echo "Pull request's base branch is: ${BASE_BRANCH}"
-      env:
-        BASE_BRANCH: ${{ github.base_ref }}
+        echo "Pull request's base branch is: ${{ github.base_ref }}"
+        
+      #echo "Pull request's base branch is: ${BASE_BRANCH}"
+      #env:
+      #  BASE_BRANCH: ${{ github.base_ref }}
