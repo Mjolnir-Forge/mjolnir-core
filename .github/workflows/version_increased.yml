@@ -10,14 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Update remote branches
-      run: git remote update origin --prune  
-    - name: Step that prints name of pull request's base branch
       run: |
-        echo "Pull request's base branch is: ${{ github.base_ref }}"
-    - name: Step that prints name of the current branch
-      run: |
-        echo "Current branch is: ${{ github.head_ref }}"
+          git remote update origin --prune  
     - name: Check version number update
       run: |
-         python3 scripts/python/check_version_update.py core ${{ github.head_ref }} ${{ github.base_ref }}
+          python3 scripts/python/check_version_update.py core ${{ github.head_ref }} ${{ github.base_ref }}
 
