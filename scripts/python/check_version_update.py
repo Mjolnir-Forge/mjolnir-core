@@ -37,13 +37,20 @@ target_version = get_version_number(module_name)
 subprocess.run(f"git checkout {source_branch}", stdout=FNULL, shell=True)
 
 print(f"Source branch: {source_branch}")
+print(f"Target branch: {target_branch}")
+if target_version is None:
+    if source_version is None:
+        raise Exception("Both branches have no version header. Please add one.")
+    for i in [0, 1, 2, 3]:
+        if source_version[i] != 0:
+            raise ValueError("The target branch has no version header. The first version number must be 0.0.0.0")
+
 print("Source version number is: "
       f"{source_version[0]}."
       f"{source_version[1]}."
       f"{source_version[2]}."
       f"{source_version[3]}"
       )
-print(f"Target branch: {target_branch}")
 print("Target version number is: "
      f"{target_version[0]}."
      f"{target_version[1]}."
