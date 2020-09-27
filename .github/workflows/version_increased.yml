@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
+    - name: Update remote branches
+      run: git remote update origin --prune  
     - name: Step that prints name of pull request's base branch
       run: |
         echo "Pull request's base branch is: ${{ github.base_ref }}"
