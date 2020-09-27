@@ -44,6 +44,7 @@ if target_version is None:
     for i in [0, 1, 2, 3]:
         if source_version[i] != 0:
             raise ValueError("The target branch has no version header. The first version number must be 0.0.0.0")
+    sys.exit()
 
 print("Source version number is: "
       f"{source_version[0]}."
