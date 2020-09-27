@@ -1,3 +1,27 @@
+#[==[
+Process scope keywords (PRIVATE, PUBLIC, INTERFACE) in a list.
+
+Duplicate keywords will be merged and members without scope are added to the specified default scope.
+
+PARAMETERS:
+-----------
+
+    default_scope:
+        The default scope for all list elements that are not assigned to any scope
+
+    returned_list_name:
+        Name of the returned list
+
+    ARGN:
+        All list items that should be processed
+
+RETURNS
+-------
+
+    ${returned_list_name}:
+        The updated list
+
+#]==]
 function(process_scopes default_scope returned_list_name)
     set(scope_keywords INTERFACE PRIVATE PUBLIC)
 
