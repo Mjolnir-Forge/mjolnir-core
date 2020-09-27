@@ -15,6 +15,12 @@ excluded_words:
   - typoci
   # commands
   - ctest
+  - pthread
+  - werror
+  - wextra
+  - wmissing-braces
+  - wpedantic
+  - wshadow
   # common variable names
   - rhs
   
