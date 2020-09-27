@@ -14,7 +14,11 @@ def get_version_number_item(data, module, item):
     return int(data[pos_start:pos_end])
 
 def get_version_number(module):
-    with open(f"mjolnir/{module}/version.h", "r") as file:
+    file_path = f"mjolnir/{module}/version.h"
+    if not os.path.exists(file_path):
+        return None
+
+    with open(file_path, "r") as file:
         data = file.read()
 
         module_upper = module.upper()
