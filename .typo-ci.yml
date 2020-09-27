@@ -9,6 +9,7 @@ spellcheck_filenames: true
 
 excluded_words:
   # names
+  - devnull
   - gtest
   - mjolnir
   - msvc
