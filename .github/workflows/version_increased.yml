@@ -1,0 +1,16 @@
+name: Version updated
+
+on: [pull_request]
+
+
+jobs:
+  check_version_updated:
+
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Step that prints name of pull request's base branch
+      run: |
+        echo "Pull request's base branch is: ${BASE_BRANCH}"
+      env:
+        BASE_BRANCH: ${{ github.base_ref }}
