@@ -15,4 +15,7 @@ jobs:
     - name: Step that prints name of the current branch
       run: |
         echo "Current branch is: ${{ github.head_ref }}"
+    - name: Check version number update
+      run: |
+         python3 scripts/python/check_version_update.py core ${{ github.head_ref }} ${{ github.base_ref }}
 
