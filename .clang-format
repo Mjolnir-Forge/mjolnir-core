@@ -2,20 +2,35 @@
 
 BasedOnStyle: LLVM
 ColumnLimit: 120
+IndentWidth: 4
+Language: Cpp
 
 
 # classes -------------------------------------------------
 
 AccessModifierOffset: -4
 AllowAllConstructorInitializersOnNextLine: false
-BreakConstructorInitializersBeforeComma: BeforeComma
+BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeComma
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
 
+
 # comments ------------------------------------------------
 
 AlignTrailingComments: true
+
+
+# includes ------------------------------------------------
+
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '"[[:alnum:].]+"'
+    Priority:        2
+  - Regex:           '<[[:alnum:].]+>'
+    Priority:        3
+# IncludeIsMainRegex: ''
+# IncludeIsMainSourceRegex: ''
 
 
 # functions -----------------------------------------------
@@ -26,6 +41,7 @@ AllowShortFunctionsOnASingleLine: None
 AllowShortLambdasOnASingleLine: None
 AlwaysBreakAfterReturnType: None
 BinPackParameters: false
+IndentWrappedFunctionNames: false
 
 
 # calling
@@ -50,11 +66,13 @@ AllowShortLoopsOnASingleLine: false
 AlignConsecutiveMacros: false
 AlignEscapedNewlines: Right
 BreakBeforeBinaryOperators: NonAssignment
+# ForEachMacros: []
 
 
 # namespaces ----------------------------------------------
 
 CompactNamespaces: false
+FixNamespaceComments: true
 
 # operators -----------------------------------------------
 
@@ -67,6 +85,7 @@ BreakBeforeTernaryOperators: true
 
 AlwaysBreakTemplateDeclarations: Yes
 
+
 # strings -------------------------------------------------
 
 AlwaysBreakBeforeMultilineStrings: false
@@ -76,7 +95,7 @@ BreakStringLiterals: true
 # switch --------------------------------------------------
 
 AllowShortCaseLabelsOnASingleLine: true
-
+IndentCaseLabels: true
 
 # variables -----------------------------------------------
 
@@ -88,7 +107,12 @@ AlignConsecutiveDeclarations: false
 BreakBeforeBraces: Allman
 ContinuationIndentWidth: 8
 Cpp11BracedListStyle: true
-
+DeriveLineEnding: false
+DerivePointerAlignment: false
+DisableFormat: false
+IndentGotoLabels: false
+IndentPPDirectives: None
+KeepEmptyLinesAtTheStartOfBlocks: false
 
 # undefined -----------------------------------------------
 
@@ -96,7 +120,6 @@ Cpp11BracedListStyle: true
 
 # old
 
-Language: Cpp
 
 
 
@@ -107,8 +130,9 @@ Language: Cpp
 
 
 
-DerivePointerAlignment: false
-IndentWidth: 4
+
+
+
 PointerAlignment: Left
 ReflowComments: true
 MaxEmptyLinesToKeep: 2
