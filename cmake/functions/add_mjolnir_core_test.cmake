@@ -1,5 +1,5 @@
 #[==[
-Create an executable and and perform the necessary setup using a keyword list.
+Create a test for the mjolnir core module and perform the necessary setup using a keyword list.
 
 A list of accepted keywords and their purpose is given below. Always use scope keywords (PUBLIC, PRIVATE, INTERFACE)
 directly after one of these keywords, otherwise the scope of the new items is undefined.
@@ -9,10 +9,13 @@ PARAMETERS:
 -----------
 
     target:
-        Name of the CMake target that should be used
+        Name of the CMake target that should be used. The prefix "test_" is added automatically.
+
+    module:
+        Name of the Mjolnir module the test belongs to.
 
     ARGN:
-        A list containing all necessary data separated by keywords.
+        A list containing all necessary data of arbitrary length separated by keywords.
 
 
 KEYWORDS
@@ -46,7 +49,9 @@ KEYWORDS
         The root directory of the source files. If none is specified, the current CMake source directory is taken.
 
 #]==]
-function(add_generic_executable target)
-    add_executable(${target})
-    target_apply_setup(${target} ${ARGN})
+function(add_mjolnir_core_test target)
+    add_mjolnir_test(${target}
+        CORE
+        ${ARGN}
+        )
 endfunction()

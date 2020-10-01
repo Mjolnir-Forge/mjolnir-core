@@ -1,0 +1,20 @@
+name: Version updated
+
+on:
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  check_version_updated:
+
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Update remote branches
+      run: |
+          git remote update origin --prune  
+    - name: Check version number update
+      run: |
+          python3 scripts/python/check_version_update.py core ${{ github.head_ref }} ${{ github.base_ref }}
+

@@ -9,12 +9,19 @@ spellcheck_filenames: true
 
 excluded_words:
   # names
+  - devnull
   - gtest
   - mjolnir
   - msvc
   - typoci
   # commands
   - ctest
+  - pthread
+  - werror
+  - wextra
+  - wmissing-braces
+  - wpedantic
+  - wshadow
   # common variable names
   - rhs
   
