@@ -1,4 +1,4 @@
-name: clang-format
+name: Clang-Format
 
 on: [push]
 
@@ -15,3 +15,6 @@ jobs:
         extensions: 'h,cpp'
         clangFormatVersion: 11
         style: file
+    - name: git status
+      run: |
+        git status
