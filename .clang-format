@@ -1,9 +1,12 @@
-# base setup ----------------------------------------------
+# general -------------------------------------------------
 
 BasedOnStyle: LLVM
 ColumnLimit: 120
 IndentWidth: 4
 Language: Cpp
+MaxEmptyLinesToKeep: 2
+Standard: Latest
+TabWidth: 4
 
 
 # classes -------------------------------------------------
@@ -14,11 +17,15 @@ BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeComma
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
 
 
 # comments ------------------------------------------------
 
 AlignTrailingComments: true
+ReflowComments: true
+SpacesBeforeTrailingComments: 1
 
 
 # includes ------------------------------------------------
@@ -31,6 +38,7 @@ IncludeCategories:
     Priority:        3
 # IncludeIsMainRegex: ''
 # IncludeIsMainSourceRegex: ''
+SortIncludes: true
 
 
 # functions -----------------------------------------------
@@ -53,6 +61,7 @@ BinPackArguments: false
 # if ------------------------------------------------------
 
 AllowShortIfStatementsOnASingleLine: Never
+SpacesInConditionalStatement: false
 
 
 # loops ---------------------------------------------------
@@ -67,12 +76,19 @@ AlignConsecutiveMacros: false
 AlignEscapedNewlines: Right
 BreakBeforeBinaryOperators: NonAssignment
 # ForEachMacros: []
+# MacroBlockBegin: ''
+# MacroBlockEnd: ''
+# StatementMacros: ''
+# TypenameMacros: ''
 
 
 # namespaces ----------------------------------------------
 
 CompactNamespaces: false
 FixNamespaceComments: true
+NamespaceIndentation: None
+# NamespaceMacros: ''
+
 
 # operators -----------------------------------------------
 
@@ -84,6 +100,8 @@ BreakBeforeTernaryOperators: true
 # templates -----------------------------------------------
 
 AlwaysBreakTemplateDeclarations: Yes
+SpaceAfterTemplateKeyword: true
+SpacesInAngles: false
 
 
 # strings -------------------------------------------------
@@ -96,6 +114,7 @@ BreakStringLiterals: true
 
 AllowShortCaseLabelsOnASingleLine: true
 IndentCaseLabels: true
+
 
 # variables -----------------------------------------------
 
@@ -113,29 +132,35 @@ DisableFormat: false
 IndentGotoLabels: false
 IndentPPDirectives: AfterHash
 KeepEmptyLinesAtTheStartOfBlocks: false
+PointerAlignment: Left
+SortUsingDeclarations: true
+SpaceAfterCStyleCast: true
+SpaceAfterLogicalNot: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+UseTab: Never
 
-# undefined -----------------------------------------------
+
+# unspecified ---------------------------------------------
 
 # CommentPragmas
+# PenaltyBreakAssignment
+# PenaltyBreakBeforeFirstCallParameter
+# PenaltyBreakComment
+# PenaltyBreakFirstLessLess
+# PenaltyBreakString
+# PenaltyBreakTemplateDeclaration
+# PenaltyExcessCharacter
+# PenaltyReturnTypeOnItsOwnLine
+# RawStringFormats
+# UseCRLF
 
-# old
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-PointerAlignment: Left
-ReflowComments: true
-MaxEmptyLinesToKeep: 2
-SpaceBeforeParens: ControlStatements
-SortIncludes: true
-Standard: Cpp11
