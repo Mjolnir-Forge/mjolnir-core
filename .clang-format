@@ -1,26 +1,166 @@
-BasedOnStyle: LLVM
-Language: Cpp
+# general -------------------------------------------------
 
-AlignAfterOpenBracket: Align
-AlignOperands: true
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
-AlignTrailingComments: false
-AlwaysBreakTemplateDeclarations: true
-AllowShortFunctionsOnASingleLine: true
-AccessModifierOffset: -4
-BreakBeforeBraces: Allman
+BasedOnStyle: LLVM
 ColumnLimit: 120
-AllowShortIfStatementsOnASingleLine: false
-AllowShortBlocksOnASingleLine: true
-AllowShortFunctionsOnASingleLine: false
-ContinuationIndentWidth: 8
-DerivePointerAlignment: false
 IndentWidth: 4
-PointerAlignment: Left
-ReflowComments: true
+Language: Cpp
 MaxEmptyLinesToKeep: 2
-BreakConstructorInitializersBeforeComma: true
-SpaceBeforeParens: ControlStatements
+Standard: Latest
+TabWidth: 4
+
+
+# classes -------------------------------------------------
+
+AccessModifierOffset: -4
+AllowAllConstructorInitializersOnNextLine: false
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 4
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+
+
+# comments ------------------------------------------------
+
+AlignTrailingComments: true
+ReflowComments: true
+SpacesBeforeTrailingComments: 1
+
+
+# includes ------------------------------------------------
+
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '"[[:alnum:].]+"'
+    Priority:        2
+  - Regex:           '<[[:alnum:].]+>'
+    Priority:        3
+# IncludeIsMainRegex: ''
+# IncludeIsMainSourceRegex: ''
 SortIncludes: true
-Standard: Cpp11
+
+
+# functions -----------------------------------------------
+
+# declaration
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortFunctionsOnASingleLine: None
+AllowShortLambdasOnASingleLine: None
+AlwaysBreakAfterReturnType: None
+BinPackParameters: false
+IndentWrappedFunctionNames: false
+
+
+# calling
+AlignAfterOpenBracket: Align
+AllowAllArgumentsOnNextLine: true
+BinPackArguments: false
+
+
+# if ------------------------------------------------------
+
+AllowShortIfStatementsOnASingleLine: Never
+SpacesInConditionalStatement: false
+
+
+# loops ---------------------------------------------------
+
+AllowShortBlocksOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+
+# macros --------------------------------------------------
+
+AlignConsecutiveMacros: false
+AlignEscapedNewlines: Right
+BreakBeforeBinaryOperators: NonAssignment
+# ForEachMacros: []
+# MacroBlockBegin: ''
+# MacroBlockEnd: ''
+# StatementMacros: ''
+# TypenameMacros: ''
+
+
+# namespaces ----------------------------------------------
+
+CompactNamespaces: false
+FixNamespaceComments: true
+NamespaceIndentation: None
+# NamespaceMacros: ''
+
+
+# operators -----------------------------------------------
+
+AlignConsecutiveAssignments: false
+AlignOperands: true
+BreakBeforeTernaryOperators: true
+
+
+# templates -----------------------------------------------
+
+AlwaysBreakTemplateDeclarations: Yes
+SpaceAfterTemplateKeyword: true
+SpacesInAngles: false
+
+
+# strings -------------------------------------------------
+
+AlwaysBreakBeforeMultilineStrings: false
+BreakStringLiterals: true
+
+
+# switch --------------------------------------------------
+
+AllowShortCaseLabelsOnASingleLine: true
+IndentCaseLabels: true
+
+
+# variables -----------------------------------------------
+
+AlignConsecutiveDeclarations: false
+
+
+# other ---------------------------------------------------
+
+BreakBeforeBraces: Allman
+ContinuationIndentWidth: 8
+Cpp11BracedListStyle: true
+DeriveLineEnding: false
+DerivePointerAlignment: false
+DisableFormat: false
+IndentGotoLabels: false
+IndentPPDirectives: AfterHash
+KeepEmptyLinesAtTheStartOfBlocks: false
+PointerAlignment: Left
+SortUsingDeclarations: true
+SpaceAfterCStyleCast: true
+SpaceAfterLogicalNot: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+UseTab: Never
+
+
+# unspecified ---------------------------------------------
+
+# CommentPragmas
+# PenaltyBreakAssignment
+# PenaltyBreakBeforeFirstCallParameter
+# PenaltyBreakComment
+# PenaltyBreakFirstLessLess
+# PenaltyBreakString
+# PenaltyBreakTemplateDeclaration
+# PenaltyExcessCharacter
+# PenaltyReturnTypeOnItsOwnLine
+# RawStringFormats
+# UseCRLF
+

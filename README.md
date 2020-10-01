@@ -10,3 +10,6 @@ Consists core functionalities that are used by all other modules
 ![MSVC Windows](https://github.com/Mjolnir-Forge/mjolnir-core/workflows/MSVC%20Windows/badge.svg)
 ![MinGW Windows](https://github.com/Mjolnir-Forge/mjolnir-core/workflows/MinGW%20Windows/badge.svg)
 
+## Code Status
+
+![Clang-Format](https://github.com/Mjolnir-Forge/mjolnir-core/workflows/Clang-Format/badge.svg)

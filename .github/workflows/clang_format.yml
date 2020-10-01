@@ -1,0 +1,20 @@
+name: Clang-Format
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: DoozyX/clang-format-lint-action@v0.10
+      with:
+        source: '.'
+        # exclude: ''
+        extensions: 'h,cpp'
+        clangFormatVersion: 11
+        style: file
+    - name: Check result
+      run: |
+        python3 scripts/python/check_clang_format_result.py
