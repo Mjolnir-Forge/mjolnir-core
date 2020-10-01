@@ -9,4 +9,4 @@ if result:
     for filename in modified_files:
         err_msg+= f"- {filename}\n"
     sys.exit(err_msg)
-print("SUCCESS - all files formatted correctly")
+print("SUCCESS - all files are formatted correctly")
