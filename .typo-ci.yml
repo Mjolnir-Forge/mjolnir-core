@@ -23,5 +23,7 @@ excluded_words:
   - wpedantic
   - wshadow
   # common variable names
+  - argc
   - rhs
-  
+  # clang-format
+  - CommentPragmas
