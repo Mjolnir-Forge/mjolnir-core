@@ -15,6 +15,6 @@ jobs:
         extensions: 'h,cpp'
         clangFormatVersion: 11
         style: file
-    - name: git status
+    - name: Check result
       run: |
-        git status
+        python3 scripts/python/check_clang_format_result.py
