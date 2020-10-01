@@ -111,7 +111,7 @@ DeriveLineEnding: false
 DerivePointerAlignment: false
 DisableFormat: false
 IndentGotoLabels: false
-IndentPPDirectives: None
+IndentPPDirectives: AfterHash
 KeepEmptyLinesAtTheStartOfBlocks: false
 
 # undefined -----------------------------------------------
