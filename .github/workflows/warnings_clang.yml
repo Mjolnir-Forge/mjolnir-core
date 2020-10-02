@@ -1,4 +1,4 @@
-name: Warnings Clang Ubuntu
+name: No Warnings Clang Ubuntu
 
 on:
   push:

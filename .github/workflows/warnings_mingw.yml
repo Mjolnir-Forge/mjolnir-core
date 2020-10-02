@@ -1,4 +1,4 @@
-name: Warnings MinGW Windows
+name: No Warnings MinGW Windows
 
 on:
   push:

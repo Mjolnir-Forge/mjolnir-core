@@ -1,4 +1,4 @@
-name: Warnings MSVC Windows
+name: No Warnings MSVC Windows
 
 on:
   push:
