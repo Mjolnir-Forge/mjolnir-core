@@ -11,6 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
+      shell: bash -l {0}
       run: |
         cmake \
         -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
