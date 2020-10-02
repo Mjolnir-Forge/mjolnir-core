@@ -19,4 +19,4 @@ jobs:
     - name: Run clang-tidy
       run: |
         cd build
-        run-clang-tidy-9 -extra-arg='-warnings-as-errors=*'
+        run-clang-tidy-9 -config='-warnings-as-errors=*'
