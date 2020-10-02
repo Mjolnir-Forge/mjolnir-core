@@ -18,4 +18,4 @@ jobs:
         cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_CLANG_TIDY="clang-tidy;-warnings-as-errors;-header-filter=$(realpath ..)" ..
     - name: Run clang-tidy
       run: |
-        run-clang-tidy
+        run-clang-tidy-9
