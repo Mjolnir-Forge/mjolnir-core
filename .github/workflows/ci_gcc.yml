@@ -12,8 +12,6 @@ jobs:
         build_type: [DEBUG, RELEASE]
     steps:
     - uses: actions/checkout@v2
-    - name: Print
-      run: echo ${{github.ref}}
     - name: Run CMake
       run: cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -S . -B build
     - name: Build
