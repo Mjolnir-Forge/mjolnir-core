@@ -1,4 +1,4 @@
-name: Clang-Tidy
+name: Clang-Tidy V9
 
 on: [push]
 
