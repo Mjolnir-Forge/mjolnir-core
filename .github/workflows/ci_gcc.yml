@@ -1,6 +1,6 @@
 name: GCC Ubuntu
 
-on: [push]
+on: [push, pull_request]
 
 
 jobs:
