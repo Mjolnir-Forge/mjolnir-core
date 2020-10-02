@@ -10,7 +10,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install clang-tidy
       run: |
-        apt-get install clang-tidy
+        sudo apt-get install clang-tidy
     - name: Run CMake
       run: |
         mkdir build
