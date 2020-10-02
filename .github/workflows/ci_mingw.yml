@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   build:
-    if: github.event.pull_request.draft == false
     runs-on: windows-latest
     strategy:
       matrix:
@@ -12,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
-      run:
+      run: |
         cmake \
         -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
         -G "MinGW Makefiles" -S . -B build

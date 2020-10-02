@@ -1,9 +1,17 @@
-name: CI MSVC Windows
+name: Warnings MSVC Windows
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    #branches:
+    #  - master
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   build:
+    if: github.event.pull_request.draft == false
     runs-on: windows-latest
     strategy:
       matrix:
@@ -18,7 +26,4 @@ jobs:
         -S . -B build
     - name: Build
       run: cmake --build build --config ${{matrix.build_type}} -j 2
-    - name: Run tests
-      run: |
-        cd build  
-        ctest -C ${{matrix.build_type}}
+
