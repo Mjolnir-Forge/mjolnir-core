@@ -13,16 +13,13 @@ jobs:
   build:
     if: github.event.pull_request.draft == false
     runs-on: windows-latest
-    strategy:
-      matrix:
-        build_type: [DEBUG, RELEASE]
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
       shell: bash -l {0}
       run: |
         cmake \
-        -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
+        -DCMAKE_BUILD_TYPE=RELEASE \
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-Werror" \
         -G "MinGW Makefiles" -S . -B build
     - name: Build
