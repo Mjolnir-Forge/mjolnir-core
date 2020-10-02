@@ -3,12 +3,12 @@
 
 class TestClass
 {
-    int haha = 0;
+    int m_haha = 0;
 
 public:
     int get_haha()
     {
-        return haha;
+        return m_haha;
     }
 };
 
