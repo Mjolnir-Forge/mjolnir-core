@@ -1,0 +1,18 @@
+name: Clang-Tidy
+
+on: [push]
+
+jobs:
+  clang_tidy:
+
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_CLANG_TIDY="clang-tidy;-warnings-as-errors;-header-filter=$(realpath ..)" ..
+    - name: Run Clang-Tidy
+      run: |
+        run-clang-tidy
