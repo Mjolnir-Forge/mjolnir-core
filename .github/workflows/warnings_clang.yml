@@ -1,11 +1,17 @@
-name: Clang Ubuntu
+name: Clang Warnings Ubuntu
 
-on: [push]
-
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    #branches:
+    #  - master
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   build:
-
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -13,15 +19,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
-      run:
+      run: |
         cmake \
         -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
         -DCMAKE_C_COMPILER=clang \
         -DCMAKE_CXX_COMPILER=clang++ \
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-Werror" \
         -S . -B build
     - name: Build
       run: cmake --build build -j 2
-    - name: Run tests
-      run: |
-        cd build  
-        ctest
