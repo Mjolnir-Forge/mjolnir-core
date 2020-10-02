@@ -1,4 +1,4 @@
-name: Clang Ubuntu
+name: CI Clang Ubuntu
 
 on: [push]
 

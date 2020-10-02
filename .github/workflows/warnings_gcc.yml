@@ -1,4 +1,4 @@
-name: GCC Warnings Ubuntu
+name: Warnings GCC Ubuntu
 
 on:
   push:
