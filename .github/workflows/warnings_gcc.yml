@@ -1,13 +1,12 @@
-name: No Warnings GCC Ubuntu
+name: Warnings GCC Ubuntu
 
 on:
   push:
     branches:
       - master
   pull_request:
-    #branches:
-    #  - master
-    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - master
 
 jobs:
   build:
