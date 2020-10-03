@@ -1,4 +1,9 @@
-Checks: 'readability-identifier-naming'
+Checks: >
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  readability-*
 WarningsAsErrors: '*'
 CheckOptions:
   # Naming conventions ------------------------------------------------------------------------------------------------
