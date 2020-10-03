@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 
-int add(int lhs, int rhs)
+auto add(int lhs, int rhs) -> int
 {
     return lhs + rhs;
 }

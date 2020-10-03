@@ -1,6 +1,5 @@
-# disabled checks because of googletest:
-# - cppcoreguidelines-pro-type-vararg
-# - hicpp-vararg
+# portability is probably going to be removed or disabled since it would trigger a lot of warnings for all x86
+# implementations
 Checks: >
   bugprone-*,
   cert-*,
@@ -10,9 +9,9 @@ Checks: >
   llvmlibc-*,
   misc-*,
   modernize-*,
-  readability-*,
-  -cppcoreguidelines-pro-type-vararg,
-  -hicpp-vararg
+  performance-*,
+  portability-*,
+  readability-*
 
 WarningsAsErrors: '*'
 
