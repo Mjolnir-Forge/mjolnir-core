@@ -1,11 +1,9 @@
-name: MSVC Windows
+name: CI MSVC Windows
 
 on: [push]
 
-
 jobs:
   build:
-
     runs-on: windows-latest
     strategy:
       matrix:
@@ -13,7 +11,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
-      run: cmake -DCMAKE_C_COMPILER=MSVC -DCMAKE_CXX_COMPILER=MSVC -S . -B build
+      shell: bash -l {0}
+      run: |
+        cmake \
+        -DCMAKE_C_COMPILER=MSVC \
+        -DCMAKE_CXX_COMPILER=MSVC \
+        -S . -B build
     - name: Build
       run: cmake --build build --config ${{matrix.build_type}} -j 2
     - name: Run tests

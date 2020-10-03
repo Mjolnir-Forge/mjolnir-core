@@ -1,13 +1,12 @@
 #include <gtest/gtest.h>
 
 
-int add(int lhs, int rhs)
+auto add(int lhs, int rhs) -> int
 {
-    int unused;
     return lhs + rhs;
 }
 
-TEST(test, add)
+TEST(test, add) // NOLINT cert-err58-cpp
 {
     EXPECT_EQ(add(1, 2), 3);
 }

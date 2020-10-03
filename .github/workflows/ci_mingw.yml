@@ -1,11 +1,9 @@
-name: MinGW Windows
+name: CI MinGW Windows
 
 on: [push]
 
-
 jobs:
   build:
-
     runs-on: windows-latest
     strategy:
       matrix:
@@ -13,7 +11,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
-      run: cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -G "MinGW Makefiles" -S . -B build
+      shell: bash -l {0}
+      run: |
+        cmake \
+        -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
+        -G "MinGW Makefiles" -S . -B build
     - name: Build
       run: cmake --build build -j 2
     - name: Run tests

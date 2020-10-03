@@ -92,7 +92,7 @@ NamespaceIndentation: None
 
 # operators -----------------------------------------------
 
-AlignConsecutiveAssignments: false
+AlignConsecutiveAssignments: true
 AlignOperands: true
 BreakBeforeTernaryOperators: true
 
@@ -118,7 +118,7 @@ IndentCaseLabels: true
 
 # variables -----------------------------------------------
 
-AlignConsecutiveDeclarations: false
+AlignConsecutiveDeclarations: true
 
 
 # other ---------------------------------------------------

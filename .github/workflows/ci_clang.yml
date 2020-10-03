@@ -1,4 +1,4 @@
-name: Clang Ubuntu
+name: CI Clang Ubuntu
 
 on: [push]
 
@@ -13,7 +13,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
-      run: cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -S . -B build
+      run:
+        cmake \
+        -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
+        -DCMAKE_C_COMPILER=clang \
+        -DCMAKE_CXX_COMPILER=clang++ \
+        -S . -B build
     - name: Build
       run: cmake --build build -j 2
     - name: Run tests
