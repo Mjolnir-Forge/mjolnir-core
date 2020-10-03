@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
 
-const int global_constant = 0;                // GlobalConstant
+const int  global_constant         = 0;       // GlobalConstant
 int* const global_constant_pointer = nullptr; // GlobalConstantPointer
-int* global_pointer = nullptr;                // GlobalPointer
-int global_variable = 0;                      // GlobalVariable + Variable
+int*       global_pointer          = nullptr; // GlobalPointer
+int        global_variable         = 0;       // GlobalVariable + Variable
 
 [[maybe_unused]] static int const static_constant = 2; // GlobalConstant + StaticConstant
 
@@ -17,7 +17,7 @@ enum GlobalEnum // Enum
 
 union GlobalUnion // Union
 {
-    int a;
+    int   a;
     float b;
 };
 
@@ -29,9 +29,9 @@ class AbstractClass // AbstractClass
 
 class RegularClass // ClassCase
 {
-    static const int class_constant = 0; // ClassConstant
-    int m_private_member = 0;            // PrivateMember + Member
-    int private_method()                 // PrivateMethod + Method
+    static const int class_constant   = 0; // ClassConstant
+    int              m_private_member = 0; // PrivateMember + Member
+    int              private_method()      // PrivateMethod + Method
     {
         return 0;
     }
@@ -46,8 +46,8 @@ protected:
 public:
     int public_member = 42; // PublicMember + Member
 
-    const int constant_member = 0; // ConstantMember
-    static int class_member;       // ClassMember
+    const int  constant_member = 0; // ConstantMember
+    static int class_member;        // ClassMember
 
     int public_method(int* const constant_pointer_parameter) // PublicMember + Method --- ConstantPointerParameter
     {
@@ -63,13 +63,13 @@ public:
         return constant_parameter;
     }
 
-    constexpr int constant_expression_method(int method_parameter,   // ConstexprMethod --- Parameter
+    constexpr int constant_expression_method(int  method_parameter,  // ConstexprMethod --- Parameter
                                              int* pointer_parameter) // PointerParameter
     {
-        const int local_constant = 0;                         // LocalConstant + Constant
-        int* const local_constant_pointer = &global_variable; // LocalConstantPointer
-        int* local_pointer = pointer_parameter;               // LocalPointer
-        int local_variable = 2;                               // LocalVariable + Variable
+        const int  local_constant         = 0;                 // LocalConstant + Constant
+        int* const local_constant_pointer = &global_variable;  // LocalConstantPointer
+        int*       local_pointer          = pointer_parameter; // LocalPointer
+        int        local_variable         = 2;                 // LocalVariable + Variable
 
         return method_parameter + local_constant + *local_constant_pointer + *local_pointer + local_variable;
     }
