@@ -27,3 +27,6 @@ excluded_words:
   - rhs
   # clang-format
   - CommentPragmas
+  # keywords
+  - constexpr
+  - nullptr
