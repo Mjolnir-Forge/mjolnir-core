@@ -24,4 +24,4 @@ jobs:
     - name: Run clang-tidy
       run: |
         cd build
-        run-clang-tidy-9 -quiet
+        run-clang-tidy-9 "(mjolnir/core|tests)" -quiet
