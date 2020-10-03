@@ -2,21 +2,28 @@ Checks: 'readability-identifier-naming'
 WarningsAsErrors: '*'
 CheckOptions:
   # Naming conventions ------------------------------------------------------------------------------------------------
+  # Case
   - {key: readability-identifier-naming.AbstractClassCase, value: CamelCase}
-  # - {key: readability-identifier-naming.AbstractClassPrefix, value: pre_}
-  # - {key: readability-identifier-naming.AbstractClassSuffix, value: _post}
   - {key: readability-identifier-naming.AggressiveDependentMemberLookup, value: 0}
   - {key: readability-identifier-naming.ClassCase, value: CamelCase}
-  # - {key: readability-identifier-naming.ClassPrefix, value: pre_}
-  # - {key: readability-identifier-naming.ClassSuffix, value: _post}
   - {key: readability-identifier-naming.ClassConstantCase, value: lower_case}
-  # - {key: readability-identifier-naming.ClassConstantPrefix, value: pre_}
-  # - {key: readability-identifier-naming.ClassConstantSuffix, value: _post}
   - {key: readability-identifier-naming.ClassMemberCase, value: lower_case}
-  # - {key: readability-identifier-naming.ClassMemberPrefix, value: pre_}
-  # - {key: readability-identifier-naming.ClassMemberSuffix, value: _post}
   - {key: readability-identifier-naming.ClassMethodCase, value: lower_case}
-  # - {key: readability-identifier-naming.ClassMethodPrefix, value: pre_}
-  # - {key: readability-identifier-naming.ClassMethodSuffix, value: _post}
+  - {key: readability-identifier-naming.ConstantCase, value: lower_case}
+  - {key: readability-identifier-naming.ConstantMemberCase, value: lower_case}
+  - {key: readability-identifier-naming.ConstantParameterCase, value: lower_case}
+  - {key: readability-identifier-naming.ConstantPointerParameterCase, value: lower_case}
+  - {key: readability-identifier-naming.ConstexprFunctionCase, value: lower_case}
+  - {key: readability-identifier-naming.ConstexprMethodCase, value: lower_case}
+  - {key: readability-identifier-naming.ConstexprVariableCase, value: lower_case}
+  - {key: readability-identifier-naming.EnumCase, value: CamelCase}
+  - {key: readability-identifier-naming.EnumConstantCase, value: UPPER_CASE}
+  - {key: readability-identifier-naming.FunctionCase, value: lower_case}
+  - {key: readability-identifier-naming.GlobalConstantCase, value: UPPER_CASE}
+
   - {key: readability-identifier-naming.PrivateMemberCase, value: lower_case}
+
+  # Prefix
   - {key: readability-identifier-naming.PrivateMemberPrefix, value: m_ }
+
+  # Suffix

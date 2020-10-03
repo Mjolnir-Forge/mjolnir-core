@@ -1,31 +1,61 @@
 #include <gtest/gtest.h>
 
-
-class TestClass
+enum AnEnum // Enum
 {
-    static const int class_constat = 0;
+    ONE,  // EnumConstantCase
+    TWO,  // EnumConstantCase
+    THREE // EnumConstantCase
+};
+
+class AnAbstractClass // AbstractClass
+{
+    virtual int a_method() = 0;
+};
+
+class RegularClass // ClassCase
+{
+    static const int class_constant = 0; // ClassConstant
     int m_haha = 0;
 
-
 public:
-    int get_haha()
+    const int constant_member = 0; // ConstantMember
+    static int ne_ne;              // ClassMember
+
+    int get_haha(int* const constant_pointer_parameter) // ConstantPointerParameter
     {
-        return m_haha;
+        constexpr int constant_expression_variable = 0; // ConstexprVariable
+        return m_haha + constant_member + *constant_pointer_parameter + constant_expression_variable;
     }
 
 
-    static bool is_it_correct()
+    static bool class_method(const bool constant_parameter) // ClassMethod + ConstantParameter
     {
-        return false;
+        const bool return_me = constant_parameter; // Constant
+        return return_me;
     }
 
-    static int ne_ne;
+    constexpr int constant_expression_method(int a) // ConstexprMethod
+    {
+        return a + 4;
+    }
 };
+
+
+constexpr int constant_expression_function(int a) // ConstexprFunction
+{
+    return a + 4;
+}
+
+int global_function()
+{
+    return 5;
+}
+
 
 int add(int lhs, int rhs)
 {
-    TestClass test_class;
-    return lhs + rhs + test_class.get_haha();
+    RegularClass test_class;
+    return lhs + rhs + test_class.constant_member;
 }
 
 TEST(test, add)
