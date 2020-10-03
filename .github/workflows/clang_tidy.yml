@@ -20,7 +20,7 @@ jobs:
         ..
     - name: List all checks
       run: |
-        clang-tidy --list-checks
+        clang-tidy-9 --list-checks
     - name: Run clang-tidy
       run: |
         cd build

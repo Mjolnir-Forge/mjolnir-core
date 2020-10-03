@@ -1,6 +1,6 @@
-# removed checks because of gtest:
-# cppcoreguidelines-pro-type-vararg
-# hicpp-vararg
+# disabled checks because of googletest:
+# - cppcoreguidelines-pro-type-vararg
+# - hicpp-vararg
 Checks: >
   bugprone-*,
   cert-*,
@@ -9,10 +9,13 @@ Checks: >
   hicpp-*,
   llvmlibc-*,
   misc-*,
+  modernize-*,
   readability-*,
   -cppcoreguidelines-pro-type-vararg,
   -hicpp-vararg
+
 WarningsAsErrors: '*'
+
 CheckOptions:
   # Naming conventions ------------------------------------------------------------------------------------------------
 
