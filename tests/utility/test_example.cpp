@@ -4,18 +4,27 @@
 const int global_constant = 0;                // GlobalConstant
 int* const global_constant_pointer = nullptr; // GlobalConstantPointer
 int* global_pointer = nullptr;                // GlobalPointer
-int global_variable = 0;                      // GlobalVariable
+int global_variable = 0;                      // GlobalVariable + Variable
 
-enum AnEnum // Enum
+[[maybe_unused]] static int const static_constant = 2; // GlobalConstant + StaticConstant
+
+enum GlobalEnum // Enum
 {
     ONE,  // EnumConstantCase
     TWO,  // EnumConstantCase
     THREE // EnumConstantCase
 };
 
-class AnAbstractClass // AbstractClass
+union GlobalUnion // Union
 {
-    virtual int private_method() = 0; // PrivateMethod + Method
+    int a;
+    float b;
+};
+
+
+class AbstractClass // AbstractClass
+{
+    virtual int private_method() = 0; // VirtualMethod + PrivateMethod + Method
 };
 
 class RegularClass // ClassCase
@@ -60,12 +69,16 @@ public:
         const int local_constant = 0;                         // LocalConstant + Constant
         int* const local_constant_pointer = &global_variable; // LocalConstantPointer
         int* local_pointer = pointer_parameter;               // LocalPointer
-        int local_variable = 2;                               // LocalVariable
+        int local_variable = 2;                               // LocalVariable + Variable
 
         return method_parameter + local_constant + *local_constant_pointer + *local_pointer + local_variable;
     }
 };
 
+
+struct RegularStruct // Struct
+{
+};
 
 constexpr int constant_expression_function(int function_parameter) // ConstexprFunction --- Parameter
 {
@@ -79,11 +92,25 @@ int* global_function() // Function + GlobalFunction
 }
 
 
-template <typename... TYPE_parameters>
-bool template_function([[maybe_unused]] TYPE_parameters... parameter_pack) // Function --- ParameterPack
+template <int t_value_template_parameter,   // ValueTemplateParameterCase + TemplateParameter
+          typename T_TypeTemplateParameter> // TypeTemplateParameter + TemplateParameter
+bool template_function_1()
 {
     return true;
 };
+
+
+template <typename... T_TypeTemplateParameter> // TypeTemplateParameter + TemplateParameter
+bool template_function_1([[maybe_unused]] T_TypeTemplateParameter... parameter_pack) // Function --- ParameterPack
+{
+    return true;
+};
+
+template <template <typename> class T_TemplateTemplateParameter> // TemplateTemplateParameter
+bool template_function_2()
+{
+    return true;
+}
 
 
 namespace some_namespace // Namespace
@@ -92,6 +119,10 @@ inline namespace some_inline_namespace // InlineNamespace
 {
 }
 } // namespace some_namespace
+
+
+using RegularClassAlias = RegularClass;     // TypeAlias
+typedef RegularStruct RegularStructTypedef; // Typedef
 
 
 int add(int lhs, int rhs)
