@@ -3,8 +3,7 @@ name: Clang-Tidy V9
 on: [push]
 
 jobs:
-  clang_tidy:
-
+  run:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
@@ -19,7 +18,10 @@ jobs:
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
         -DCMAKE_BUILD_TYPE=DEBUG \
         ..
+    - name: List all checks
+      run: |
+        clang-tidy --list-checks
     - name: Run clang-tidy
       run: |
         cd build
-        run-clang-tidy-9
+        run-clang-tidy-9 -quiet

@@ -8,6 +8,7 @@ Checks: >
   cppcoreguidelines-*,
   hicpp-*,
   llvmlibc-*,
+  misc-*,
   readability-*,
   -cppcoreguidelines-pro-type-vararg,
   -hicpp-vararg
