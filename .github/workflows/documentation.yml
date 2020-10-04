@@ -19,4 +19,4 @@ jobs:
         sudo apt-get install doxygen graphviz
     - name: Run doxygen
       run: |
-        doxygen doxyfile
+        doxygen .doxyfile
