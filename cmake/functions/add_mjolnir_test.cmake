@@ -72,28 +72,28 @@ function(add_mjolnir_test target module)
         add_to_list_after_keyword("${ARGN}"
                                   arguments
                                   LINK_LIBRARIES
-                                  PRIVATE
-                                      gtest_main
+                                      PRIVATE gtest_main
                                   )
 
         add_to_list_after_keyword("${arguments}"
                                   arguments
                                   COMPILE_FEATURES
-                                  PRIVATE
-                                      ${MJOLNIR_${module}_COMPILE_FEATURES}
+                                      PRIVATE ${MJOLNIR_${module}_COMPILE_FEATURES}
                                   )
 
         add_to_list_after_keyword("${arguments}"
                                   arguments
                                   COMPILE_OPTIONS
-                                  PRIVATE
-                                      ${MJOLNIR_${module}_COMPILE_OPTIONS}
+                                      PRIVATE ${MJOLNIR_${module}_COMPILE_OPTIONS}
+                                  )
+        add_to_list_after_keyword("${arguments}"
+                                  arguments
+                                      INCLUDE_DIRECTORIES ${MJOLNIR_${module}_SOURCE_DIR}
                                   )
 
         add_to_list_after_keyword("${arguments}"
                                   arguments
-                                  PROPERTIES
-                                  ${MJOLNIR_${module}_TARGET_PROPERTIES}
+                                      PROPERTIES ${MJOLNIR_${module}_TARGET_PROPERTIES}
                                   )
 
         add_generic_executable(${target}

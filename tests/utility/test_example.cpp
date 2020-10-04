@@ -1,5 +1,5 @@
+#include "mjolnir/core/test_header.h"
 #include <gtest/gtest.h>
-
 
 auto add(int lhs, int rhs) -> int
 {
