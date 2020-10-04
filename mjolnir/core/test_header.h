@@ -10,6 +10,8 @@ auto a_function() -> int
     return 5;
 }
 
+//! @brief A function that was initially undocumented.
+//! @return Always false
 auto undocumented_function() -> bool
 {
     return false;
