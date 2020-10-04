@@ -1,0 +1,19 @@
+name: Warnings Clang Ubuntu
+
+on: [push]
+#  push:
+#    branches:
+#      - master
+#  pull_request:
+#    branches:
+#      - master
+
+jobs:
+  build:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run doxygen
+      run: |
+        doxygen doxyfile
