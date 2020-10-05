@@ -6,14 +6,15 @@ namespace mjolnir
 //! @brief a function that returns 5
 //! @details this is the detailed description
 //! @return The number 5
-auto a_function() -> int
+inline auto a_function() -> int
 {
-    return 5;
+    constexpr int returned_number = 5;
+    return returned_number;
 }
 
 //! @brief A function that was initially undocumented.
 //! @return Always false
-auto undocumented_function() -> bool
+inline auto undocumented_function() -> bool
 {
     return false;
 }
@@ -22,9 +23,9 @@ auto undocumented_function() -> bool
 //! @brief Some class.
 //!
 //! @details Not much more to say.
-class test_class
+class TestClass
 {
 public:
-    int this_is_a_member = 1; //! < Some nice member
+    int this_is_a_member = 1; //!< Some nice member
 };
 } // namespace mjolnir
