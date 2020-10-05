@@ -25,7 +25,20 @@ inline auto undocumented_function() -> bool
 //! @details Not much more to say.
 class TestClass
 {
+    int m_private_member = 2; //!< shouldn't show up in the official documentation
+
 public:
-    int this_is_a_member = 1; //!< Some nice member
+    //! @brief Do something funny.
+    //!
+    //! @details Well... it's not so funny at all...
+    //!
+    //! @param [in] a: The first parameter
+    //! @param [in] b: The second parameter
+    //!
+    //! @return The funny result
+    [[nodiscard]] auto some_funny_function(int a, int b) const -> int
+    {
+        return m_private_member + a + b;
+    }
 };
 } // namespace mjolnir
