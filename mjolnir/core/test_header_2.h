@@ -8,7 +8,6 @@
 //! @{
 
 
-
 //! @brief
 //! Just another class
 class AnotherClass
@@ -22,11 +21,10 @@ public:
     //!
     //! @return
     //! `true` if the number is larger than 4
-    static auto another_function(int arg)->bool
+    static auto another_function(int arg) -> bool
     {
         return arg > 4;
     }
-
 };
 
 //! @}
