@@ -99,8 +99,6 @@ public:
     //! @details
     //!  This function is boring and doesn't do much at all
     //!
-    //! @return
-    //! A boring result
     //!
     //! @bug
     //! Is there a bug somewhere?
