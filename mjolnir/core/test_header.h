@@ -67,6 +67,17 @@ public:
     //! int b = 3 - a;
     //! ~~~
     //!
+    //! Here is the same as LaTeX formula:
+    //!
+    //! $$
+    //! \\begin{matrix}
+    //! a =& 3 \\\\
+    //! b =& 3 - a
+    //! \\end{matrix}
+    //! $$
+    //!
+    //! As you can see, \f$b\f$ depends on \f$a\f$!
+    //!
     //! -# some enumeration
     //! -# enumeration item 2
     //!

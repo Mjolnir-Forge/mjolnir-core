@@ -14,8 +14,9 @@ excluded_words:
   - mjolnir
   - msvc
   - typoci
-  # commands
+  # cmake
   - ctest
+  # compiler
   - pthread
   - werror
   - wextra
@@ -27,6 +28,9 @@ excluded_words:
   - rhs
   # clang-format
   - CommentPragmas
+  # doxygen
+  - addtogroup
+  - doxygen
   # keywords
   - constexpr
   - nullptr
