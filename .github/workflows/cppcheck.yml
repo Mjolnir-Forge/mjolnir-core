@@ -12,7 +12,7 @@ jobs:
         sudo apt-get install cppcheck
     - name: Run cppcheck with manual commands
       run: |
-        cppcheck -I. --enable=all --suppress=missingIncludeSystem --error-exitcode tests mjolnir
+        cppcheck -I. --enable=all --suppress=missingIncludeSystem tests mjolnir
     - name: Run cppcheck with config file
       run: |
-        cppcheck --project=.cppcheck --error-exitcode
+        cppcheck --project=.cppcheck --error-exitcode=1
