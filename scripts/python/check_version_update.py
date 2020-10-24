@@ -14,7 +14,7 @@ def get_version_number_item(data, module, item):
     return int(data[pos_start:pos_end])
 
 def get_version_number(module):
-    file_path = f"mjolnir/{module}/version.h"
+    file_path = f"src/mjolnir/{module}/version.h"
     if not os.path.exists(file_path):
         return None
 
