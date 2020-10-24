@@ -1,0 +1,18 @@
+name: Cppcheck
+
+on: [push]
+
+jobs:
+  run:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cppcheck
+      run: |
+        sudo apt-get install cppcheck
+    - name: Run cppcheck with manual commands
+      run: |
+        cppcheck -I. --enable=all --suppress=missingIncludeSystem tests mjolnir
+    - name: Run cppcheck with config file
+      run: |
+        cppcheck --project=.cppcheck
