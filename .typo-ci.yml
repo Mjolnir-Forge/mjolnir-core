@@ -14,6 +14,15 @@ excluded_words:
   - mjolnir
   - msvc
   - typoci
+  # common variable names
+  - argc
+  - rhs
+  # keywords
+  - constexpr
+  - nullptr
+  # program and tool specific -------------------------------------------------
+  # clang-format
+  - CommentPragmas
   # cmake
   - ctest
   # compiler
@@ -23,14 +32,11 @@ excluded_words:
   - wmissing-braces
   - wpedantic
   - wshadow
-  # common variable names
-  - argc
-  - rhs
-  # clang-format
-  - CommentPragmas
+  # cppcheck
+  - cppcheck
+  - cppcheck-dir
+  - isrc
+  - max-ctu-depth
   # doxygen
   - addtogroup
   - doxygen
-  # keywords
-  - constexpr
-  - nullptr
