@@ -11,7 +11,7 @@ if(NOT DEFINED MJOLNIR_CORE_ROOT_DIR)
     set(MJOLNIR_CORE_ROOT_DIR ${MJOLNIR_ROOT_DIR})
 endif()
 
-set(MJOLNIR_CORE_SOURCE_DIR ${MJOLNIR_CORE_ROOT_DIR})
+set(MJOLNIR_CORE_SOURCE_DIR ${MJOLNIR_CORE_ROOT_DIR}/src)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MJOLNIR_CORE_ROOT_DIR}/cmake)
 
@@ -20,7 +20,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MJOLNIR_CORE_ROOT_DIR}/cmake)
 
 include(include_cmake_functions)
 
-extract_mjolnir_version_number("${MJOLNIR_CORE_ROOT_DIR}/mjolnir/core/version.h"
+extract_mjolnir_version_number("${MJOLNIR_CORE_ROOT_DIR}/src/mjolnir/core/version.h"
     CORE
     version_number
     )
@@ -43,5 +43,5 @@ include(resolve_dependencies)
 
 # Add subdirectories --------------------------------------------------------------------------------------------------
 
-add_subdirectory(mjolnir/core)
+add_subdirectory(src/mjolnir/core)
 add_subdirectory(tests)

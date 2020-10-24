@@ -1,5 +1,6 @@
 # Mjolnir Core Module
 
-## Installation
+## Content
 
-Coming soon
+- Installation
+- [Developers Documentation](docs/src/dev_doc.md)
