@@ -26,13 +26,17 @@ public:
         return arg > 4;
     }
 
-
+    //! @brief
+    //! A function that contains an error that should be found by cppcheck
+    //!
+    //! @return
+    //! Some crap
     static auto cpp_check_error() -> char*
     {
         // static char a[10];
         // a[10] = 0;
         // return a;
-           return nullptr;
+        return nullptr;
     }
 };
 
