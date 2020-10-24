@@ -7,10 +7,10 @@
     <check-unused-templates>true</check-unused-templates>
     <max-ctu-depth>10</max-ctu-depth>
     <includedir>
-        <dir name="."/>
+        <dir name="src"/>
     </includedir>
     <paths>
-        <dir name="mjolnir"/>
+        <dir name="src"/>
         <dir name="tests"/>
     </paths>
     <exclude>
