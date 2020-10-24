@@ -33,9 +33,10 @@ public:
     //! Some crap
     static auto cpp_check_error() -> char*
     {
-        static char a[10];
-        a[10] = 0;
-        return a;
+        // static char a[10];
+        // a[10] = 0;
+        // return a;
+        return nullptr;
     }
 };
 
