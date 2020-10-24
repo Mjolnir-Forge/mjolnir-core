@@ -13,9 +13,10 @@ jobs:
     - name: Print cppcheck version
       run: |
         cppcheck --version
-    - name: Run cppcheck with manual commands
-      run: |
-        cppcheck -I. --enable=all --suppress=missingIncludeSystem --error-exitcode=0 --std=c++17 tests mjolnir
     - name: Run cppcheck with config file
       run: |
         cppcheck --project=.cppcheck --dump --error-exitcode=1
+    - name: Run cppcheck with manual commands (temporary backup to test if the config file is set up correctly)
+      run: |
+        cppcheck -I. --enable=all --suppress=missingIncludeSystem --error-exitcode=1 --std=c++17 tests mjolnir
+
