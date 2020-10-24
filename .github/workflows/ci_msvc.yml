@@ -22,4 +22,4 @@ jobs:
     - name: Run tests
       run: |
         cd build  
-        ctest -C ${{matrix.build_type}}
+        ctest -C ${{matrix.build_type}} --output-on-failure
