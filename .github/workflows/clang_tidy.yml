@@ -1,9 +1,9 @@
-name: Clang-Tidy V9
+name: Clang Tools
 
 on: [push]
 
 jobs:
-  run:
+  clang_tidy_v9:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
@@ -25,3 +25,23 @@ jobs:
       run: |
         cd build
         run-clang-tidy-9 "(src/mjolnir/core|tests)" -header-filter "(src/mjolnir/core|tests)" -quiet
+
+  undefined_behavior_sanitizer:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run CMake
+      run:
+        cmake \
+        -DCMAKE_BUILD_TYPE=DEBUG \
+        -DCMAKE_C_COMPILER=clang \
+        -DCMAKE_CXX_COMPILER=clang++ \
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=undefined" \
+        -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=undefined" \
+        -S . -B build
+    - name: Build
+      run: cmake --build build -j 2
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure

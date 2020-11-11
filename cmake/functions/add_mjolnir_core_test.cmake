@@ -39,6 +39,9 @@ KEYWORDS
     LINK_LIBRARIES:
         Libraries that should be linked
 
+    LINK_OPTIONS:
+        Linker options that should be added (target_link_options)
+
     PROPERTIES:
         List of properties (set_target_properties).
 
