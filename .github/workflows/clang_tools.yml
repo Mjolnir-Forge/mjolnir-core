@@ -36,7 +36,7 @@ jobs:
         -DCMAKE_BUILD_TYPE=DEBUG 
         -DCMAKE_C_COMPILER=clang 
         -DCMAKE_CXX_COMPILER=clang++ 
-        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=undefined" 
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=undefined;-fno-sanitize-recover=undefined"
         -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=undefined" 
         -S . -B build
     - name: Build
