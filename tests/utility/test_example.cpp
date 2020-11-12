@@ -12,8 +12,8 @@ TEST(test, add) // NOLINT cert-err58-cpp
 {
     // char a[10];
     // a[10] = 0;
-    int k = 0x7fffffff;
-    k += 2000;
+    // int k = 0x7fffffff;
+    // k += 2000;
     AnotherClass::cpp_check_error();
     EXPECT_EQ(add(1, 2), 3);
 }
