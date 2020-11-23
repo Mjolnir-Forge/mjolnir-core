@@ -23,8 +23,8 @@ TEST(test, add) // NOLINT cert-err58-cpp
     // EXPECT_EQ(add(array[2], 2), 3);
 
     // leak sanitizer
-    void* p = malloc(7);
-    p       = 0;
+    // void* p = malloc(7);
+    // p       = 0;
 
     EXPECT_EQ(add(1, 2), 3);
 }
