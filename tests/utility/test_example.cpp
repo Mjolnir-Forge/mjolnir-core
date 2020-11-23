@@ -18,10 +18,13 @@ TEST(test, add) // NOLINT cert-err58-cpp
     // AnotherClass::cpp_check_error();
 
     // address sanitizer
-    int* array = new int[100];
-    delete[] array;
+    // int* array = new int[100];
+    // delete[] array;
+    // EXPECT_EQ(add(array[2], 2), 3);
 
-    EXPECT_EQ(add(array[2], 2), 3);
+    // leak sanitizer
+    void* p = malloc(7);
+    p       = 0;
 
     EXPECT_EQ(add(1, 2), 3);
 }
