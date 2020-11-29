@@ -1,32 +1,8 @@
-name: Code analysis
+name: Build and runtime analysis
 
 on: [push]
 
 jobs:
-  clang_tidy_v9:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install clang-tidy
-      run: |
-        sudo apt-get install clang-tidy-9
-    - name: Run CMake
-      run: |
-        mkdir build
-        cd build
-        cmake \
-        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-        -DCMAKE_BUILD_TYPE=DEBUG \
-        ..
-    - name: List all checks
-      run: |
-        clang-tidy-9 --list-checks
-    - name: Run clang-tidy
-      run: |
-        cd build
-        run-clang-tidy-9 "(src/mjolnir/core|tests)" -header-filter "(src/mjolnir/core|tests)" -quiet
-
-
   address_and_leak_sanitizer:
     runs-on: ubuntu-20.04
     steps:
