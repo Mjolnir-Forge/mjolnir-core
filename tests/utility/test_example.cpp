@@ -17,7 +17,7 @@ std::mutex global_mutex;
 
 auto print() -> void
 {
-    // const std::lock_guard<std::mutex> lock(global_mutex);
+    const std::lock_guard<std::mutex> lock(global_mutex);
     global_var += 2;
     std::cout << global_var << std::endl;
 }
