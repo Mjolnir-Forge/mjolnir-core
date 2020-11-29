@@ -52,7 +52,7 @@ TEST(test, add) // NOLINT cert-err58-cpp
     // void* p = malloc(7);
     // p       = 0;
 
-    test(0);
+    test(1);
 
     a.join();
     b.join();
