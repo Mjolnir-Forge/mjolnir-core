@@ -9,8 +9,8 @@
 
 auto test(int z) -> int
 {
-    // if (z == 0)
-    //    return 1 / z; // warn
+     if (z == 0)
+        return 1 / z; // warn
     return z;
 }
 
@@ -52,7 +52,7 @@ TEST(test, add) // NOLINT cert-err58-cpp
     // void* p = malloc(7);
     // p       = 0;
 
-    test(1);
+    test(0);
 
     a.join();
     b.join();
