@@ -9,9 +9,9 @@
 
 auto test(int z) -> int
 {
-    if (z == 0)
-        return 1 / z; // warn
-    return 2;
+    // if (z == 0)
+    //    return 1 / z; // warn
+    return z;
 }
 
 
