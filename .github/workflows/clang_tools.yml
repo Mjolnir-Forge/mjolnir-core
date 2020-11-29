@@ -1,4 +1,4 @@
-name: Runtime analysis / Sanitizer
+name: Code analysis
 
 on: [push]
 
@@ -88,5 +88,20 @@ jobs:
       run: |
         cd build
         ctest --output-on-failure
+
+  clang_static_analyzer:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run CMake
+      run: |
+        mkdir build
+        cd build
+        scan-build-10 --status-bugs cmake -DCMAKE_BUILD_TYPE=DEBUG ..
+    - name: Build / Check
+      run: |
+        cd build
+        scan-build-10 --status-bugs make -j2
+
 
 # cmake -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=memory;-fPIE;-pie;-fsanitize-memory-track-origins=2;-fno-omit-frame-pointer" -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=memory;-fPIE;-pie"  ../../code/

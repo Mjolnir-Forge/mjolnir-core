@@ -6,6 +6,15 @@
 #include <mutex>
 #include <thread>
 
+
+auto test(int z) -> int
+{
+    if (z == 0)
+        return 1 / z; // warn
+    return 2;
+}
+
+
 auto add(int lhs, int rhs) -> int
 {
     return lhs + rhs;
@@ -42,6 +51,8 @@ TEST(test, add) // NOLINT cert-err58-cpp
     // leak sanitizer
     // void* p = malloc(7);
     // p       = 0;
+
+    test(0);
 
     a.join();
     b.join();
