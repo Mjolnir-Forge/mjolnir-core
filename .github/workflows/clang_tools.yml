@@ -1,4 +1,4 @@
-name: Clang Tools
+name: Runtime analysis / Sanitizer
 
 on: [push]
 
@@ -26,6 +26,7 @@ jobs:
         cd build
         run-clang-tidy-9 "(src/mjolnir/core|tests)" -header-filter "(src/mjolnir/core|tests)" -quiet
 
+
   address_and_leak_sanitizer:
     runs-on: ubuntu-20.04
     steps:
@@ -45,6 +46,28 @@ jobs:
       run: |
         cd build
         ctest --output-on-failure
+
+
+  thread_sanitizer:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run CMake
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=DEBUG
+        -DCMAKE_C_COMPILER=clang
+        -DCMAKE_CXX_COMPILER=clang++
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=thread"
+        -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=thread"
+        -S . -B build
+    - name: Build
+      run: cmake --build build -j 2
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
+
 
   undefined_behavior_sanitizer:
     runs-on: ubuntu-20.04

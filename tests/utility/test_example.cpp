@@ -2,17 +2,34 @@
 #include "mjolnir/core/test_header_2.h"
 #include <gtest/gtest.h>
 
+#include <iostream>
+#include <mutex>
+#include <thread>
 
 auto add(int lhs, int rhs) -> int
 {
     return lhs + rhs;
 }
 
+int        global_var = 0;
+std::mutex global_mutex;
+
+
+auto print() -> void
+{
+    // const std::lock_guard<std::mutex> lock(global_mutex);
+    global_var += 2;
+    std::cout << global_var << std::endl;
+}
+
 
 TEST(test, add) // NOLINT cert-err58-cpp
 {
+    auto a = std::thread(print);
+    auto b = std::thread(print);
+
     // char a[10];
-    // a[10] = 0;
+    // a[10] = 0;auto a = std::thread(print);
     // int k = 0x7fffffff;
     // k += 2000;
     // AnotherClass::cpp_check_error();
@@ -26,5 +43,7 @@ TEST(test, add) // NOLINT cert-err58-cpp
     // void* p = malloc(7);
     // p       = 0;
 
+    a.join();
+    b.join();
     EXPECT_EQ(add(1, 2), 3);
 }
