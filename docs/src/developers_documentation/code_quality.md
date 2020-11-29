@@ -3,6 +3,21 @@
 
 ## External tools
 
+### Clang Static Analyzer
+
+To run this tool create a new build directory and run:
+
+~~~ shell
+scan-build-10 --status-bugs cmake -DCMAKE_BUILD_TYPE=DEBUG $PATH_TO_SOURCE
+scan-build-10 --status-bugs make -j2
+~~~
+
+Note that you might need to use a different version number of the tool.
+
+IMPORTANT: Always clear the directory (`rm -rf *`) and run both commands.
+It seems like the tool doesn't find any bugs after the first run for some reason.
+
+
 ### Cppcheck
 
 The root directory contains a cppcheck project file named `.cppcheck`.
