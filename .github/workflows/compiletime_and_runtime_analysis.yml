@@ -1,4 +1,4 @@
-name: Build and runtime analysis
+name: Compiletime / runtime analysis
 
 on: [push]
 

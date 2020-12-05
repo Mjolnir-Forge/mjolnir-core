@@ -21,8 +21,12 @@ excluded_words:
   - constexpr
   - nullptr
   # program and tool specific -------------------------------------------------
-  # clang-format
+  # clang
   - CommentPragmas
+  - fno-omit-frame-pointer
+  - fno-sanitize-recover
+  - fsanitize
+  - fsanitize-memory-track-origins
   # cmake
   - ctest
   # compiler
