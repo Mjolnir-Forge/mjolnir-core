@@ -10,5 +10,6 @@ matrix:
           env: BUILD_TYPE=Debug
 
 script:
+  - cmake --version
   - cmake -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_BUILD_TYPE=$BUILD_TYPE -S . -B build
   - cmake --build build -j 2
