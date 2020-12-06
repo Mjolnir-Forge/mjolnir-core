@@ -1,0 +1,14 @@
+language: cpp
+sudo: false
+
+
+matrix:
+    include:
+        - compiler: g++
+          env: BUILD_TYPE=Release
+        - compiler: g++
+          env: BUILD_TYPE=Debug
+
+script:
+  - cmake -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_BUILD_TYPE=$BUILD_TYPE -S . -B build
+  - cmake --build build -j 2
