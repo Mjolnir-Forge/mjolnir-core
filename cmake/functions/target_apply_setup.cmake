@@ -36,6 +36,9 @@ KEYWORDS
     LINK_LIBRARIES:
         Libraries that should be linked
 
+    LINK_OPTIONS:
+        Linker options that should be added (target_link_options)
+
     PROPERTIES:
     List of properties (set_target_properties).
 
@@ -61,6 +64,7 @@ function(target_apply_setup target)
                        INCLUDE_DIRECTORIES
                        LINK_DIRECTORIES
                        LINK_LIBRARIES
+                       LINK_OPTIONS
                        PROPERTIES
                        SOURCES
                        )
@@ -146,6 +150,12 @@ function(target_apply_setup target)
         target_link_libraries(${target} ${libraries})
     endif()
 
+    # link options ----------------------------------------------------------------------------------------------------
+
+    if(DEFINED ARG_LINK_OPTIONS)
+        process_scopes(PRIVATE options ${ARG_LINK_OPTIONS})
+        target_link_options(${target} ${options})
+    endif()
 
     # properties ------------------------------------------------------------------------------------------------------
 

@@ -78,6 +78,7 @@ endif()
 # Linker --------------------------------------------------------------------------------------------------------------
 
 # Link time optimizations
+set(MJOLNIR_CORE_LINK_OPTIONS ${MJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS})
 
 include(CheckIPOSupported)
 check_ipo_supported(RESULT lto_supported)

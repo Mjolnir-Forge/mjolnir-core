@@ -39,6 +39,9 @@ KEYWORDS
     LINK_LIBRARIES:
         Libraries that should be linked
 
+    LINK_OPTIONS:
+        Linker options that should be added (target_link_options)
+
     PROPERTIES:
         List of properties (set_target_properties).
 
@@ -73,28 +76,37 @@ function(add_mjolnir_test target module)
                                   arguments
                                   LINK_LIBRARIES
                                       PRIVATE gtest_main
-                                  )
+                                 )
 
         add_to_list_after_keyword("${arguments}"
                                   arguments
                                   COMPILE_FEATURES
                                       PRIVATE ${MJOLNIR_${module}_COMPILE_FEATURES}
-                                  )
+                                 )
 
         add_to_list_after_keyword("${arguments}"
                                   arguments
                                   COMPILE_OPTIONS
                                       PRIVATE ${MJOLNIR_${module}_COMPILE_OPTIONS}
-                                  )
+                                 )
+
         add_to_list_after_keyword("${arguments}"
                                   arguments
                                       INCLUDE_DIRECTORIES ${MJOLNIR_${module}_SOURCE_DIR}
-                                  )
+                                 )
+
+        if(NOT "${MJOLNIR_${module}_LINK_OPTIONS}" STREQUAL "")
+            add_to_list_after_keyword("${arguments}"
+                                       arguments
+                                       LINK_OPTIONS
+                                           PRIVATE ${MJOLNIR_${module}_LINK_OPTIONS}
+                                     )
+        endif()
 
         add_to_list_after_keyword("${arguments}"
                                   arguments
                                       PROPERTIES ${MJOLNIR_${module}_TARGET_PROPERTIES}
-                                  )
+                                 )
 
         add_generic_executable(${target}
                                ${test_source}
