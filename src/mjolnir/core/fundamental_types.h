@@ -34,9 +34,11 @@ using UST = std::size_t;
 using F32 = float;
 using F64 = double;
 
-
+// NOLINTNEXTLINE: intentional use of magic number
 static_assert(sizeof(float) * CHAR_BIT == 32,
               "float size is not 32 bit for this architecture, fix the F32 type definition.");
+
+// NOLINTNEXTLINE: intentional use of magic number
 static_assert(sizeof(double) * CHAR_BIT == 64,
               "double size is not 64 bit for this architecture, fix the F64 type definition.");
 
