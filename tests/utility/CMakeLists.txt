@@ -1,1 +1,2 @@
+add_mjolnir_core_test(alignment)
 add_mjolnir_core_test(example)

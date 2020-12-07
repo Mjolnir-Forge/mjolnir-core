@@ -4,7 +4,7 @@
 //! @brief
 //! A second test header
 //!
-//! \addtogroup another
+//! \addtogroup core
 //! @{
 
 
