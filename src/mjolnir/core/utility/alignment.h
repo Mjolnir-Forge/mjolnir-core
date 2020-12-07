@@ -34,7 +34,7 @@ inline auto is_aligned(const volatile void* pointer, UST alignment) -> bool;
 
 // ====================================================================================================================
 
-#include <stdint.h>
+#include <cstdint>
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ inline auto is_aligned(const volatile void* pointer, UST alignment) -> bool
 
 inline auto misalignment(const volatile void* pointer, UST alignment) -> UST
 {
-    return reinterpret_cast<std::uintptr_t>(pointer) % alignment;
+    return reinterpret_cast<std::uintptr_t>(pointer) % alignment; // NOLINT: intentional use of reinterpret_cast
 }
 
 
