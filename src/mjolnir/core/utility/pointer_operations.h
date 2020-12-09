@@ -1,10 +1,9 @@
 //! @file
-//! alignment.h
+//! pointer_operations.h
 //!
 //!
 //! @brief
-//! A second test header
-//!
+//! Contains multiple utility functions for pointers
 
 
 #pragma once
