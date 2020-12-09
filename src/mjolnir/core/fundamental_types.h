@@ -14,8 +14,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#define FLOAT_NUM_BITS 32  //!< Required size of a `float` in bits
-#define DOUBLE_NUM_BITS 64 //!< Required size of a `double` in bits
 
 namespace mjolnir
 {
@@ -32,8 +30,11 @@ using F32 = float;         //!< 32 bit floating point type
 using F64 = double;        //!< 64 bit floating point type
 
 
-static_assert(sizeof(float) * CHAR_BIT == FLOAT_NUM_BITS, "Incopatible architecture, 'float' size isn't 32 bit");
-static_assert(sizeof(double) * CHAR_BIT == DOUBLE_NUM_BITS, "Incopatible architecture, 'double' size isn't 64 bit");
+constexpr UST float_bit_size  = 32; //!< Required size of a `float` in bits
+constexpr UST double_bit_size = 64; //!< Required size of a `double` in bits
+
+static_assert(sizeof(float) * CHAR_BIT == float_bit_size, "Incopatible architecture, 'float' size isn't 32 bit");
+static_assert(sizeof(double) * CHAR_BIT == double_bit_size, "Incopatible architecture, 'double' size isn't 64 bit");
 
 } // namespace mjolnir
 
