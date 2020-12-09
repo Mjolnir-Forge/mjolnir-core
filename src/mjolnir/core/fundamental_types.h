@@ -14,33 +14,26 @@
 #include <cstddef>
 #include <cstdint>
 
+#define FLOAT_NUM_BITS 32  //!< Required size of a `float` in bits
+#define DOUBLE_NUM_BITS 64 //!< Required size of a `double` in bits
+
 namespace mjolnir
 {
-// integers
-// --------
-using I8  = std::int8_t;
-using I16 = std::int16_t;
-using I32 = std::int32_t;
-using I64 = std::int64_t;
-
-using U8  = std::uint8_t;
-using U16 = std::uint16_t;
-using U32 = std::uint32_t;
-using U64 = std::uint64_t;
-
-using UST = std::size_t;
+using I8  = std::int8_t;   //!< 8 bit signed integer type
+using I16 = std::int16_t;  //!< 16 bit signed integer type
+using I32 = std::int32_t;  //!< 32 bit signed integer type
+using I64 = std::int64_t;  //!< 64 bit signed integer type
+using U8  = std::uint8_t;  //!< 8 bit unsigned integer type
+using U16 = std::uint16_t; //!< 16 bit unsigned integer type
+using U32 = std::uint32_t; //!< 32 bit unsigned integer type
+using U64 = std::uint64_t; //!< 64 bit unsigned integer type
+using UST = std::size_t;   //!< Unsigned integer type that is returned by `sizeof` operations
+using F32 = float;         //!< 32 bit floating point type
+using F64 = double;        //!< 64 bit floating point type
 
 
-using F32 = float;
-using F64 = double;
-
-// NOLINTNEXTLINE: intentional use of magic number
-static_assert(sizeof(float) * CHAR_BIT == 32,
-              "float size is not 32 bit for this architecture, fix the F32 type definition.");
-
-// NOLINTNEXTLINE: intentional use of magic number
-static_assert(sizeof(double) * CHAR_BIT == 64,
-              "double size is not 64 bit for this architecture, fix the F64 type definition.");
+static_assert(sizeof(float) * CHAR_BIT == FLOAT_NUM_BITS, "Incopatible architecture, 'float' size isn't 32 bit");
+static_assert(sizeof(double) * CHAR_BIT == DOUBLE_NUM_BITS, "Incopatible architecture, 'double' size isn't 64 bit");
 
 } // namespace mjolnir
 

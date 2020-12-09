@@ -8,6 +8,10 @@
 //! @{
 
 
+#pragma once
+
+#include "mjolnir/core/fundamental_types.h"
+
 //! @brief
 //! Just another class
 class AnotherClass
@@ -39,5 +43,14 @@ public:
         return nullptr;
     }
 };
+namespace mjolnir
+{
+//! @brief
+//! Just another free function
+//!
+//! @return
+//! Some crap
+auto tiny() -> UST;
+} // namespace mjolnir
 
 //! @}

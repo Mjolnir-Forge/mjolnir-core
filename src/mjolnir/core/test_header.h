@@ -1,5 +1,3 @@
-//! @defgroup core Mjolnir Core Module
-//!
 //! @file
 //! test_header.h
 //!
@@ -7,6 +5,7 @@
 //! A test header
 
 #pragma once
+
 
 namespace mjolnir
 {
