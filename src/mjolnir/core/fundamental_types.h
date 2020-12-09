@@ -30,11 +30,11 @@ using F32 = float;         //!< 32 bit floating point type
 using F64 = double;        //!< 64 bit floating point type
 
 
-constexpr const UST float_bit_size  = 32; //!< Required size of a `float` in bits
-constexpr const UST double_bit_size = 64; //!< Required size of a `double` in bits
+constexpr UST float_bit_size  = 32; //!< Required size of a `float` in bits
+constexpr UST double_bit_size = 64; //!< Required size of a `double` in bits
 
-static_assert(sizeof(float) * CHAR_BIT == float_bit_size, "Incopatible architecture, 'float' size isn't 32 bit");
-static_assert(sizeof(double) * CHAR_BIT == double_bit_size, "Incopatible architecture, 'double' size isn't 64 bit");
+static_assert(sizeof(float) * CHAR_BIT == float_bit_size, "Incompatible architecture, 'float' size isn't 32 bit");
+static_assert(sizeof(double) * CHAR_BIT == double_bit_size, "Incompatible architecture, 'double' size isn't 64 bit");
 
 } // namespace mjolnir
 

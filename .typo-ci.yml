@@ -20,6 +20,10 @@ excluded_words:
   # keywords
   - constexpr
   - nullptr
+  # std header
+  - climits
+  - cstddef
+  - cstdint
   # program and tool specific -------------------------------------------------
   # clang
   - CommentPragmas
