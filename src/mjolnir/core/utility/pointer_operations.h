@@ -67,7 +67,7 @@ inline auto is_aligned(const volatile void* pointer, UST alignment) -> bool
 
 inline auto misalignment(const volatile void* pointer, UST alignment) -> UST
 {
-    return static_cast<UST>(pointer_to_integer(pointer) % alignment); // NOLINT: intentional use of reinterpret_cast
+    return static_cast<UST>(pointer_to_integer(pointer) % alignment);
 }
 
 
@@ -76,7 +76,7 @@ inline auto misalignment(const volatile void* pointer, UST alignment) -> UST
 inline auto pointer_to_integer(const volatile void* pointer) -> std::uintptr_t
 {
     // https://stackoverflow.com/a/26586211
-    return reinterpret_cast<std::uintptr_t>(pointer);
+    return reinterpret_cast<std::uintptr_t>(pointer); // NOLINT: intentional use of reinterpret_cast
 }
 
 
