@@ -19,51 +19,115 @@ namespace mjolnir
 //! @{
 
 
-//! @brief Check if a passed pointer is aligned.
+//! @brief
+//! Check if a passed pointer is aligned.
 //!
-//! @tparam t_alignment: Required alignment
+//! @tparam t_alignment:
+//! Required alignment
 //!
-//! @param [in] pointer: Pointer that should be checked
+//! @param [in] pointer:
+//! Pointer that should be checked
 //!
-//! @return `true` or `false`
+//! @return
+//! `true` or `false`
 template <UST t_alignment>
 [[nodiscard]] inline auto is_aligned(const volatile void* pointer) noexcept -> bool;
 
 
-//! @brief Check if a passed pointer is aligned.
+//! @brief
+//! Check if a passed pointer is aligned.
 //!
-//! @param [in] pointer: Pointer that should be checked
-//! @param [in] alignment: Required alignment
+//! @remark
+//! Use the template version if the required alignment is known at compile-time. It is usually faster.
+//! Clang 10 with `-O3` genarates the following assembly for this function:
+//! ~~~ asm
+//! is_aligned(void const volatile*, unsigned long):
+//!     mov     rax, rdi
+//!     xor     edx, edx
+//!     div     rsi
+//!     test    rdx, rdx
+//!     sete    al
+//!     ret
+//! ~~~
+//! @remark
+//! The output for the template version with 4 byte alignment looks like this:
+//! ~~~ asm
+//! bool is_aligned<4ul>(void const volatile*):
+//!     test    dil, 3
+//!     sete    al
+//!     ret
+//! ~~~
+//! @remark
+//! Note that it consists of less instructions and that the expensive `div` instruction is removed.
 //!
-//! @return `true` or `false`
+//! @param [in] pointer:
+//! Pointer that should be checked
+//! @param [in] alignment:
+//! Required alignment
+//!
+//! @return
+//! `true` or `false`
 [[nodiscard]] inline auto is_aligned(const volatile void* pointer, UST alignment) noexcept -> bool;
 
 
-//! @brief Calculate the misalignment of a pointer.
+//! @brief
+//! Calculate the misalignment of a pointer.
 //!
-//! @tparam t_alignment: Required alignment
+//! @tparam t_alignment:
+//! Required alignment
 //!
-//! @param [in] pointer: Pointer that should be checked
+//! @param [in] pointer:
+//! Pointer that should be checked
 //!
-//! @return Misalignment of the pointer in bytes
+//! @return
+//! Misalignment of the pointer in bytes
 template <UST t_alignment>
 [[nodiscard]] inline auto misalignment(const volatile void* pointer) noexcept -> UST;
 
 
-//! @brief Calculate the misalignment of a pointer.
+//! @brief
+//! Calculate the misalignment of a pointer.
 //!
-//! @param [in] pointer: Pointer that should be checked
-//! @param [in] alignment: Required alignment
+//! @remark
+//! Use the template version if the required alignment is known at compile-time. It is usually faster.
+//! Clang 10 with `-O3` genarates the following assembly for this function:
+//! ~~~ asm
+//! misalignment(void const volatile*, unsigned long):
+//!     mov     rax, rdi
+//!     xor     edx, edx
+//!     div     rsi
+//!     mov     rax, rdx
+//!     ret
+//! ~~~
+//! @remark
+//! The output for the template version with 4 byte alignment looks like this:
+//! ~~~ asm
+//! unsigned long misalignment<4ul>(void const volatile*):
+//!     mov     rax, rdi
+//!     and     eax, 3
+//!     ret
+//! ~~~
+//! @remark
+//! Note that it consists of less instructions and that the expensive `div` instruction is removed.
 //!
-//! @return Misalignment of the pointer in bytes
+//! @param [in] pointer:
+//! Pointer that should be checked
+//! @param [in] alignment:
+//! Required alignment
+//!
+//! @return
+//! Misalignment of the pointer in bytes
 [[nodiscard]] inline auto misalignment(const volatile void* pointer, UST alignment) noexcept -> UST;
 
 
-//! @brief Turn a pointer into an integer.
+//! @brief
+//! Turn a pointer into an integer.
 //!
-//! @param [in] pointer: Pointer that should be converted
+//! @param [in] pointer:
+//! Pointer that should be converted
 //!
-//! @return Integer representation of the pointer
+//! @return
+//! Integer representation of the pointer
 [[nodiscard]] inline auto pointer_to_integer(const volatile void* pointer) noexcept -> std::uintptr_t;
 
 
