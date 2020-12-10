@@ -48,3 +48,4 @@ excluded_words:
   # doxygen
   - addtogroup
   - doxygen
+  - tparam
