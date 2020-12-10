@@ -14,6 +14,14 @@ excluded_words:
   - mjolnir
   - msvc
   - typoci
+  # assembly
+  - dil
+  - eax
+  - edx
+  - rax
+  - rdi
+  - rdx
+  - sete
   # common variable names
   - argc
   - rhs

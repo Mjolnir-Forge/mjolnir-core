@@ -39,7 +39,7 @@ template <UST t_alignment>
 //!
 //! @remark
 //! Use the template version if the required alignment is known at compile-time. It is usually faster.
-//! Clang 10 with `-O3` genarates the following assembly for this function:
+//! Clang 10 with `-O3` generates the following assembly for this function:
 //! ~~~ asm
 //! is_aligned(void const volatile*, unsigned long):
 //!     mov     rax, rdi
@@ -90,7 +90,7 @@ template <UST t_alignment>
 //!
 //! @remark
 //! Use the template version if the required alignment is known at compile-time. It is usually faster.
-//! Clang 10 with `-O3` genarates the following assembly for this function:
+//! Clang 10 with `-O3` generates the following assembly for this function:
 //! ~~~ asm
 //! misalignment(void const volatile*, unsigned long):
 //!     mov     rax, rdi
