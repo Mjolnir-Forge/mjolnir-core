@@ -179,7 +179,7 @@ template <UST t_alignment>
 [[nodiscard]] inline auto pointer_to_integer(const volatile void* pointer) noexcept -> std::uintptr_t
 {
     // https://stackoverflow.com/a/26586211
-    return reinterpret_cast<std::uintptr_t>(pointer); // uNOLINT: intentional use of reinterpret_cast
+    return reinterpret_cast<std::uintptr_t>(pointer); // OLINT: intentional use of reinterpret_cast
 }
 
 

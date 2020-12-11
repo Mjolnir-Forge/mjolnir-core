@@ -17,8 +17,8 @@ TEST(alignment, is_aligned_and_misalignment) // NOLINT
     EXPECT_TRUE(is_aligned(&val, alignment));
 
 
-    U8* misaligned_pointer = reinterpret_cast<U8*>(&val); // OLINT: intentional use of reinterpret_cast
-    misaligned_pointer += 2;                              // OLINT: intentional use of pointer arithmetic
+    U8* misaligned_pointer = reinterpret_cast<U8*>(&val); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    misaligned_pointer += 2;                              // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
 
     EXPECT_EQ(misalignment<alignment>(misaligned_pointer), 2);
@@ -42,9 +42,9 @@ TEST_P(IsAlignedTests, test_is_aligned) // NOLINT
 
     alignas(alignment) U64 instance;
 
-    U8* misaligned_pointer =
-            reinterpret_cast<U8*>(&instance); // OLINT: intentional type punning to apply byte sized misalignments
-    misaligned_pointer += misalignment;       // OLINT: intentional use of pointer arithmetic
+
+    U8* misaligned_pointer = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    misaligned_pointer += misalignment; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
     EXPECT_EQ(expected, is_aligned(misaligned_pointer, alignment));
 }
