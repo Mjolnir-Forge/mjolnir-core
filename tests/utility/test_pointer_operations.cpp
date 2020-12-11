@@ -1,6 +1,8 @@
 #include "mjolnir/core/utility/pointer_operations.h"
 #include <gtest/gtest.h>
 
+#include <array>
+
 
 using namespace mjolnir;
 
@@ -37,7 +39,7 @@ TEST_P(TestIsAligned, test_is_aligned) // NOLINT
 
     constexpr UST alignment = 4;
 
-    alignas(alignment) U32 instance[2];
+    alignas(alignment) std::array<U32, 2> instance;
 
 
     U8* misaligned_pointer = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -74,7 +76,7 @@ TEST_P(TestMisalignment, test_misalignment) // NOLINT
 
     constexpr UST alignment = 4;
 
-    alignas(alignment) U32 instance[2];
+    alignas(alignment) std::array<U32, 2> instance;
 
 
     U8* misaligned_pointer = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -95,3 +97,7 @@ INSTANTIATE_TEST_SUITE_P(alignment,
                                            std::make_tuple(5, 1),
                                            std::make_tuple(6, 2),
                                            std::make_tuple(7, 3)));
+
+
+// TODO: parametrize template tests:
+// https://stackoverflow.com/questions/48669279/create-gtest-value-parametrized-test-for-a-template-class
