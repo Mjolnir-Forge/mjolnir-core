@@ -4,8 +4,8 @@
 
 using namespace mjolnir;
 
-// NOLINTNEXTLINE(cert-err58-cpp, cppcoreguidelines-special-member-functions, cppcoreguidelines-owning-memory)
-TEST(alignment, is_aligned_and_misalignment)
+
+TEST(alignment, is_aligned_and_misalignment) // NOLINT
 {
     constexpr UST alignment = alignof(U32);
 
@@ -33,7 +33,7 @@ class IsAlignedTests : public ::testing::TestWithParam<std::tuple<UST, bool>>
 };
 
 
-TEST_P(IsAlignedTests, test_is_aligned) // OLINT
+TEST_P(IsAlignedTests, test_is_aligned) // NOLINT
 {
     UST  misalignment = std::get<0>(GetParam());
     bool expected     = std::get<1>(GetParam());
@@ -50,7 +50,7 @@ TEST_P(IsAlignedTests, test_is_aligned) // OLINT
 }
 
 
-// OLINTNEXTLINE
+// NOLINTNEXTLINE
 INSTANTIATE_TEST_SUITE_P(test_is_alignedT,
                          IsAlignedTests,
                          ::testing::Values(std::make_tuple(0, true),
