@@ -16,8 +16,8 @@ TEST(alignment, is_aligned_and_misalignment) // NOLINT(cert-err58-cpp)
     EXPECT_TRUE(is_aligned(&val, alignment));
 
 
-    U8* misaligned_pointer = reinterpret_cast<U8*>(&val); // NOLINT: intentional use of reinterpret_cast
-    misaligned_pointer += 2;                              // NOLINT: intentional use of pointer arithmetic
+    U8* misaligned_pointer = reinterpret_cast<U8*>(&val); // uNOLINT: intentional use of reinterpret_cast
+    misaligned_pointer += 2;                              // uNOLINT: intentional use of pointer arithmetic
 
 
     EXPECT_EQ(misalignment<alignment>(misaligned_pointer), 2);
@@ -32,7 +32,7 @@ class IsAlignedTests : public ::testing::TestWithParam<std::tuple<UST, bool>>
 };
 
 
-TEST_P(IsAlignedTests, test_is_aligned) // NOLINT
+TEST_P(IsAlignedTests, test_is_aligned) // uNOLINT
 {
     UST  misalignment = std::get<0>(GetParam());
     bool expected     = std::get<1>(GetParam());
@@ -42,14 +42,14 @@ TEST_P(IsAlignedTests, test_is_aligned) // NOLINT
     alignas(alignment) U64 instance;
 
     U8* misaligned_pointer =
-            reinterpret_cast<U8*>(&instance); // NOLINT: intentional type punning to apply byte sized misalignments
-    misaligned_pointer += misalignment;       // NOLINT: intentional use of pointer arithmetic
+            reinterpret_cast<U8*>(&instance); // uNOLINT: intentional type punning to apply byte sized misalignments
+    misaligned_pointer += misalignment;       // uNOLINT: intentional use of pointer arithmetic
 
     EXPECT_EQ(expected, is_aligned(misaligned_pointer, alignment));
 }
 
 
-// NOLINTNEXTLINE
+// uNOLINTNEXTLINE
 INSTANTIATE_TEST_SUITE_P(test_is_alignedT,
                          IsAlignedTests,
                          ::testing::Values(std::make_tuple(0, true),
