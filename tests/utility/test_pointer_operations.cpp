@@ -12,9 +12,7 @@ TEST(alignment, is_aligned_and_misalignment) // NOLINT
     U32 val = 0;
 
     EXPECT_EQ(misalignment<alignment>(&val), 0);
-    EXPECT_EQ(misalignment(&val, alignment), 0);
     EXPECT_TRUE(is_aligned<alignment>(&val));
-    EXPECT_TRUE(is_aligned(&val, alignment));
 
 
     U8* misaligned_pointer = reinterpret_cast<U8*>(&val); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -22,42 +20,78 @@ TEST(alignment, is_aligned_and_misalignment) // NOLINT
 
 
     EXPECT_EQ(misalignment<alignment>(misaligned_pointer), 2);
-    EXPECT_EQ(misalignment(misaligned_pointer, alignment), 2);
     EXPECT_FALSE(is_aligned<alignment>(misaligned_pointer));
-    EXPECT_FALSE(is_aligned(misaligned_pointer, alignment));
 }
 
+// test_is_aligned ----------------------------------------------------------------------------------------------------
 
-class IsAlignedTests : public ::testing::TestWithParam<std::tuple<UST, bool>>
+class TestIsAligned : public ::testing::TestWithParam<std::tuple<UST, bool>>
 {
 };
 
 
-TEST_P(IsAlignedTests, test_is_aligned) // NOLINT
+TEST_P(TestIsAligned, test_is_aligned) // NOLINT
 {
-    UST  misalignment = std::get<0>(GetParam());
-    bool expected     = std::get<1>(GetParam());
+    UST  ptr_misalignment = std::get<0>(GetParam());
+    bool expected         = std::get<1>(GetParam());
 
-    constexpr UST alignment = 8;
+    constexpr UST alignment = 4;
 
-    alignas(alignment) U64 instance;
+    alignas(alignment) U32 instance[2];
 
 
     U8* misaligned_pointer = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    misaligned_pointer += misalignment; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    misaligned_pointer += ptr_misalignment; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
     EXPECT_EQ(expected, is_aligned(misaligned_pointer, alignment));
 }
 
 
 // NOLINTNEXTLINE
-INSTANTIATE_TEST_SUITE_P(test_is_alignedT,
-                         IsAlignedTests,
+INSTANTIATE_TEST_SUITE_P(alignment,
+                         TestIsAligned,
                          ::testing::Values(std::make_tuple(0, true),
                                            std::make_tuple(1, false),
                                            std::make_tuple(2, false),
                                            std::make_tuple(3, false),
-                                           std::make_tuple(4, false),
+                                           std::make_tuple(4, true),
                                            std::make_tuple(5, false),
                                            std::make_tuple(6, false),
                                            std::make_tuple(7, false)));
+
+
+// test_misalignment --------------------------------------------------------------------------------------------------
+
+class TestMisalignment : public ::testing::TestWithParam<std::tuple<UST, UST>>
+{
+};
+
+
+TEST_P(TestMisalignment, test_misalignment) // NOLINT
+{
+    UST ptr_misalignment = std::get<0>(GetParam());
+    UST expected         = std::get<1>(GetParam());
+
+    constexpr UST alignment = 4;
+
+    alignas(alignment) U32 instance[2];
+
+
+    U8* misaligned_pointer = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    misaligned_pointer += ptr_misalignment; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
+    EXPECT_EQ(expected, misalignment(misaligned_pointer, alignment));
+}
+
+
+// NOLINTNEXTLINE
+INSTANTIATE_TEST_SUITE_P(alignment,
+                         TestMisalignment,
+                         ::testing::Values(std::make_tuple(0, 0),
+                                           std::make_tuple(1, 1),
+                                           std::make_tuple(2, 2),
+                                           std::make_tuple(3, 3),
+                                           std::make_tuple(4, 0),
+                                           std::make_tuple(5, 1),
+                                           std::make_tuple(6, 2),
+                                           std::make_tuple(7, 3)));

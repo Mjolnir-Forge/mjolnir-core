@@ -40,6 +40,9 @@ excluded_words:
   - fno-sanitize-recover
   - fsanitize
   - fsanitize-memory-track-origins
+  # clang-tidy
+  - cppcoreguidelines-pro-bounds-pointer-arithmetic
+  - cppcoreguidelines-pro-type-reinterpret-cast
   # cmake
   - ctest
   # compiler
