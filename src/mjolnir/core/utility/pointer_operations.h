@@ -170,6 +170,9 @@ template <UST t_alignment>
 
 [[nodiscard]] inline auto misalignment(const volatile void* pointer, UST alignment) noexcept -> UST
 {
+    int buf[3];
+    if (alignment == 4)
+        buf[alignment] = 0;
     return static_cast<UST>(pointer_to_integer(pointer) % alignment);
 }
 

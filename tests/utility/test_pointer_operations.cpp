@@ -39,10 +39,6 @@ TEST_P(IsAlignedTests, test_is_aligned) // NOLINT
 
     constexpr UST alignment = 8;
 
-    int buf[3];
-    if (misalignment == 4)
-        buf[misalignment] = 0;
-
     alignas(alignment) U64 instance;
 
     U8* misaligned_pointer =
