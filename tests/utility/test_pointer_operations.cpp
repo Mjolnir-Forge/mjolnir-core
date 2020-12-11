@@ -4,7 +4,7 @@
 
 using namespace mjolnir;
 
-TEST(alignment, is_aligned_and_misalignment) // NOLINT cert-err58-cpp
+TEST(alignment, is_aligned_and_misalignment) // NOLINT(cert-err58-cpp)
 {
     constexpr UST alignment = alignof(U32);
 
