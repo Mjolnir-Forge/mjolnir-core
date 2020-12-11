@@ -25,3 +25,42 @@ TEST(alignment, is_aligned_and_misalignment) // NOLINT cert-err58-cpp
     EXPECT_FALSE(is_aligned<alignment>(misaligned_pointer));
     EXPECT_FALSE(is_aligned(misaligned_pointer, alignment));
 }
+
+
+class IsAlignedTests : public ::testing::TestWithParam<std::tuple<UST, bool>>
+{
+};
+
+
+TEST_P(IsAlignedTests, test_is_aligned)
+{
+    UST  misalignment = std::get<0>(GetParam());
+    bool expected     = std::get<1>(GetParam());
+
+    constexpr UST alignment = 8;
+
+    struct alignas(alignment) TestClass
+    {
+        U64 m_member = 0;
+    };
+
+    TestClass instance;
+
+    U8* misaligned_pointer =
+            reinterpret_cast<U8*>(&instance); // NOLINT: intentional type punning to apply byte sized misalignments
+    misaligned_pointer += misalignment;       // NOLINT: intentional use of pointer arithmetic
+
+    EXPECT_EQ(expected, is_aligned(misaligned_pointer, alignment));
+}
+
+
+INSTANTIATE_TEST_SUITE_P(test_is_alignedT,
+                         IsAlignedTests,
+                         ::testing::Values(std::make_tuple(0, true),
+                                           std::make_tuple(1, false),
+                                           std::make_tuple(2, false),
+                                           std::make_tuple(3, false),
+                                           std::make_tuple(4, false),
+                                           std::make_tuple(5, false),
+                                           std::make_tuple(6, false),
+                                           std::make_tuple(7, false)));

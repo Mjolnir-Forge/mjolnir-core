@@ -1,7 +1,6 @@
 //! @file
 //! pointer_operations.h
 //!
-//!
 //! @brief
 //! Contains multiple utility functions for pointers
 
@@ -37,6 +36,14 @@ template <UST t_alignment>
 //! @brief
 //! Check if a passed pointer is aligned.
 //!
+//! @param [in] pointer:
+//! Pointer that should be checked
+//! @param [in] alignment:
+//! Required alignment
+//!
+//! @return
+//! `true` or `false`
+//!
 //! @remark
 //! Use the template version if the required alignment is known at compile-time. It is usually faster.
 //! Clang 10 with `-O3` generates the following assembly for this function:
@@ -59,14 +66,6 @@ template <UST t_alignment>
 //! ~~~
 //! @remark
 //! Note that it consists of less instructions and that the expensive `div` instruction is removed.
-//!
-//! @param [in] pointer:
-//! Pointer that should be checked
-//! @param [in] alignment:
-//! Required alignment
-//!
-//! @return
-//! `true` or `false`
 [[nodiscard]] inline auto is_aligned(const volatile void* pointer, UST alignment) noexcept -> bool;
 
 
@@ -87,6 +86,14 @@ template <UST t_alignment>
 
 //! @brief
 //! Calculate the misalignment of a pointer.
+//!
+//! @param [in] pointer:
+//! Pointer that should be checked
+//! @param [in] alignment:
+//! Required alignment
+//!
+//! @return
+//! Misalignment of the pointer in bytes
 //!
 //! @remark
 //! Use the template version if the required alignment is known at compile-time. It is usually faster.
@@ -109,14 +116,6 @@ template <UST t_alignment>
 //! ~~~
 //! @remark
 //! Note that it consists of less instructions and that the expensive `div` instruction is removed.
-//!
-//! @param [in] pointer:
-//! Pointer that should be checked
-//! @param [in] alignment:
-//! Required alignment
-//!
-//! @return
-//! Misalignment of the pointer in bytes
 [[nodiscard]] inline auto misalignment(const volatile void* pointer, UST alignment) noexcept -> UST;
 
 
