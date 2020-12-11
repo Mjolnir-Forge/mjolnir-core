@@ -32,19 +32,14 @@ class IsAlignedTests : public ::testing::TestWithParam<std::tuple<UST, bool>>
 };
 
 
-TEST_P(IsAlignedTests, test_is_aligned)
+TEST_P(IsAlignedTests, test_is_aligned) // NOLINT
 {
     UST  misalignment = std::get<0>(GetParam());
     bool expected     = std::get<1>(GetParam());
 
     constexpr UST alignment = 8;
 
-    struct alignas(alignment) TestClass
-    {
-        U64 m_member = 0;
-    };
-
-    TestClass instance;
+    alignas(alignment) U64 instance;
 
     U8* misaligned_pointer =
             reinterpret_cast<U8*>(&instance); // NOLINT: intentional type punning to apply byte sized misalignments
