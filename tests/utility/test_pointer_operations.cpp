@@ -49,6 +49,7 @@ TEST_P(IsAlignedTests, test_is_aligned) // NOLINT
 }
 
 
+// NOLINTNEXTLINE
 INSTANTIATE_TEST_SUITE_P(test_is_alignedT,
                          IsAlignedTests,
                          ::testing::Values(std::make_tuple(0, true),
@@ -58,4 +59,4 @@ INSTANTIATE_TEST_SUITE_P(test_is_alignedT,
                                            std::make_tuple(4, false),
                                            std::make_tuple(5, false),
                                            std::make_tuple(6, false),
-                                           std::make_tuple(7, false))); // NOLINT
+                                           std::make_tuple(7, false))); 
