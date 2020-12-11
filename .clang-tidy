@@ -12,7 +12,8 @@ Checks: >
   performance-*,
   portability-*,
   readability-*,
-  -hicpp-braces-around-statements
+  -hicpp-braces-around-statements,
+  -readability-braces-around-statements
 
 WarningsAsErrors: '*'
 
