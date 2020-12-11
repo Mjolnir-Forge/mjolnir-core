@@ -39,7 +39,7 @@ TEST_P(TestIsAligned, test_is_aligned) // NOLINT
 
     constexpr UST alignment = 4;
 
-    alignas(alignment) std::array<U32, 2> instance;
+    alignas(alignment) std::array<U32, 2> instance = {0};
 
 
     U8* misaligned_pointer = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -76,7 +76,7 @@ TEST_P(TestMisalignment, test_misalignment) // NOLINT
 
     constexpr UST alignment = 4;
 
-    alignas(alignment) std::array<U32, 2> instance;
+    alignas(alignment) std::array<U32, 2> instance = {0};
 
 
     U8* misaligned_pointer = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
