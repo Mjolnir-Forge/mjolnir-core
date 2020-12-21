@@ -8,7 +8,7 @@ platform: x64
 
 build_script:
   - cmake -DCMAKE_C_COMPILER=MSVC -DCMAKE_CXX_COMPILER=MSVC -S . -B build
-  - cmake --build build --config debug -j 2
+  - cmake --build build --config Debug -j 2
 
 test_script:
   - ctest
