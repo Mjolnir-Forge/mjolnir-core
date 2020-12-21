@@ -9,6 +9,8 @@ spellcheck_filenames: true
 
 excluded_words:
   # names
+  - appveyor
+  - conda-forge 
   - devnull
   - gtest
   - mjolnir
@@ -44,3 +46,6 @@ excluded_words:
   # doxygen
   - addtogroup
   - doxygen
+  # python
+  - isort 
+  - pydocstyle
