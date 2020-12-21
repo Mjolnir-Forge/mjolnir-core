@@ -6,7 +6,7 @@ configuration:
 
 platform: x64
 
-build:
+build_script:
   - cmake -DCMAKE_C_COMPILER=MSVC -DCMAKE_CXX_COMPILER=MSVC -S . -B build
   - cmake --build build --config $(configuration) -j 2
 
