@@ -1,0 +1,9 @@
+//! @defgroup core Core
+//!
+//! @brief
+//! This module contains the core functionality of the Mjolnir API.
+
+//! @defgroup core_utility Core Utility
+//!
+//! @brief
+//! This submodule of the core module contains various utility functions.

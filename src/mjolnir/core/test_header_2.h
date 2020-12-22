@@ -4,9 +4,13 @@
 //! @brief
 //! A second test header
 //!
-//! \addtogroup another
+//! \addtogroup core
 //! @{
 
+
+#pragma once
+
+#include "mjolnir/core/fundamental_types.h"
 
 //! @brief
 //! Just another class
@@ -39,5 +43,14 @@ public:
         return nullptr;
     }
 };
+namespace mjolnir
+{
+//! @brief
+//! Just another free function
+//!
+//! @return
+//! Some crap
+auto tiny() -> UST;
+} // namespace mjolnir
 
 //! @}

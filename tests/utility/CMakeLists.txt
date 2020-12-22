@@ -1,1 +1,2 @@
+add_mjolnir_core_test(pointer_operations)
 add_mjolnir_core_test(example)
