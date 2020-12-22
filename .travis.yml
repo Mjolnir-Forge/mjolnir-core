@@ -1,5 +1,5 @@
 language: cpp
-sudo: false
+sudo: true
 dist: focal
 
 matrix:
@@ -8,6 +8,9 @@ matrix:
       env: BUILD_TYPE=Release
     - compiler: g++
       env: BUILD_TYPE=Debug COVERAGE=--coverage
+      
+before_install:
+  - sudo apt-get install lcov
 
 script:
   - cmake --version
