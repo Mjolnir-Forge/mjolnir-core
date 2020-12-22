@@ -1,0 +1,51 @@
+dictionaries:
+  - en
+  - en_GB
+
+excluded_files:
+  - ".typo-ci.yml"
+
+spellcheck_filenames: true
+
+excluded_words:
+  # names
+  - appveyor
+  - conda-forge 
+  - devnull
+  - gtest
+  - mjolnir
+  - msvc
+  - typoci
+  # common variable names
+  - argc
+  - rhs
+  # keywords
+  - constexpr
+  - nullptr
+  # program and tool specific -------------------------------------------------
+  # clang
+  - CommentPragmas
+  - fno-omit-frame-pointer
+  - fno-sanitize-recover
+  - fsanitize
+  - fsanitize-memory-track-origins
+  # cmake
+  - ctest
+  # compiler
+  - pthread
+  - werror
+  - wextra
+  - wmissing-braces
+  - wpedantic
+  - wshadow
+  # cppcheck
+  - cppcheck
+  - cppcheck-dir
+  - isrc
+  - max-ctu-depth
+  # doxygen
+  - addtogroup
+  - doxygen
+  # python
+  - isort 
+  - pydocstyle

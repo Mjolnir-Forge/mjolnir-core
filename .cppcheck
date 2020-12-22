@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="1">
+    <builddir>cppcheck-dir</builddir>
+    <platform>native</platform>
+    <analyze-all-vs-configs>false</analyze-all-vs-configs>
+    <check-headers>true</check-headers>
+    <check-unused-templates>true</check-unused-templates>
+    <max-ctu-depth>10</max-ctu-depth>
+    <includedir>
+        <dir name="src"/>
+    </includedir>
+    <paths>
+        <dir name="src"/>
+        <dir name="tests"/>
+    </paths>
+    <exclude>
+        <path name="build/"/>
+    </exclude>
+    <addons>
+        <addon>threadsafety</addon>
+        <addon>y2038</addon>
+        <addon>cert</addon>
+    </addons>
+</project>
