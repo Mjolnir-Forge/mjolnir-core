@@ -19,7 +19,7 @@ script:
   - cmake --build build -j 2
   - cd build  
   - ctest --output-on-failure
-  - if [[ "$COVERAGE" == "--coverage" ]]; then lcov --directory . --capture --output-file ../code/coverage.info; fi
-  - if [[ "$COVERAGE" == "--coverage" ]]; then lcov --remove ../code/coverage.info 'usr/*' --output-file ../code/coverage.info; fi
-  - if [[ "$COVERAGE" == "--coverage" ]]; then lcov --remove ../code/coverage.info '*/tests/*' --output-file ../code/coverage.info; fi
+  - if [[ "$COVERAGE" == "--coverage" ]]; then lcov --directory . --capture --output-file ../coverage.info; fi
+  - if [[ "$COVERAGE" == "--coverage" ]]; then lcov --remove ../coverage.info 'usr/*' --output-file ../coverage.info; fi
+  - if [[ "$COVERAGE" == "--coverage" ]]; then lcov --remove ../coverage.info '*/tests/*' --output-file ../coverage.info; fi
   - if [[ "$COVERAGE" == "--coverage" ]]; then bash <(curl -s https://codecov.io/bash); fi
