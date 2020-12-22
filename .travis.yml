@@ -7,12 +7,16 @@ matrix:
     - compiler: g++
       env: BUILD_TYPE=Release
     - compiler: g++
-      env: BUILD_TYPE=Debug
+      env: BUILD_TYPE=Debug COVERAGE=--coverage
 
 script:
   - cmake --version
   - mkdir build
-  - cmake -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_BUILD_TYPE=$BUILD_TYPE -S . -B build
+  - cmake -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_FLAGS="$COVERAGE" -S . -B build
   - cmake --build build -j 2
   - cd build  
   - ctest --output-on-failure
+  - if [[ "$COVERAGE" == "--coverage" ]]; then lcov --directory . --capture --output-file ../code/coverage.info; fi
+  - if [[ "$COVERAGE" == "--coverage" ]]; then lcov --remove ../code/coverage.info 'usr/*' --output-file ../code/coverage.info; fi
+  - if [[ "$COVERAGE" == "--coverage" ]]; then lcov --remove ../code/coverage.info '*/tests/*' --output-file ../code/coverage.info; fi
+  - if [[ "$COVERAGE" == "--coverage" ]]; then bash <(curl -s https://codecov.io/bash); fi
