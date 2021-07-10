@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15...3.18)
 
-# Set directories --------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Set directories
+# ------------------------------------------------------------------------------
 
 if(NOT DEFINED MJOLNIR_ROOT_DIR)
     set(MJOLNIR_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -14,7 +16,9 @@ set(MJOLNIR_CORE_SOURCE_DIR ${MJOLNIR_CORE_ROOT_DIR}/src)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MJOLNIR_CORE_ROOT_DIR}/cmake)
 
-# project setting --------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Project setting
+# ------------------------------------------------------------------------------
 
 include(include_cmake_functions)
 
@@ -31,12 +35,16 @@ project(
 
 message("Mjolnir-Core version ${version_number}")
 
-# Perform setup ----------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Perform setup
+# ------------------------------------------------------------------------------
 
 include(configure_core_module)
 include(resolve_dependencies)
 
-# Add subdirectories -----------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Add subdirectories
+# ------------------------------------------------------------------------------
 
 add_subdirectory(src/mjolnir/core)
 add_subdirectory(tests)
