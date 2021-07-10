@@ -27,7 +27,7 @@ jobs:
         pip install cmakelang
     - name: Run cmake-format
       run: |
-        python3 scripts/python/run_cmake_format.py
+        python3 scripts/python/check_cmake_format.py
 
 
   clang_tidy:
