@@ -47,7 +47,7 @@ format:
   _help_max_pargs_hwrap:
   - If a positional argument group contains more than this many
   - arguments, then force it to a vertical layout.
-  max_pargs_hwrap: 6
+  max_pargs_hwrap: 2
 
   _help_max_rows_cmdline:
   - If a cmdline positional group consumes more than this many
@@ -67,7 +67,7 @@ format:
   _help_dangle_parens:
   - If a statement is wrapped to more than one line, than dangle
   - the closing parenthesis on its own line.
-  dangle_parens: false
+  dangle_parens: true
 
   _help_dangle_align:
   - If the trailing parenthesis must be 'dangled' on its on
@@ -92,7 +92,7 @@ format:
   _help_max_lines_hwrap:
   - If a candidate layout is wrapped horizontally but it exceeds
   - this many lines, then reject the layout.
-  max_lines_hwrap: 2
+  max_lines_hwrap: 1
 
   _help_line_ending:
   - What style line endings to use in the output.
@@ -104,7 +104,7 @@ format:
 
   _help_keyword_case:
   - Format keywords consistently as 'lower' or 'upper' case
-  keyword_case: unchanged
+  keyword_case: upper
 
   _help_always_wrap:
   - A list of command names which should always be wrapped
