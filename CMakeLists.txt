@@ -23,15 +23,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${MJOLNIR_CORE_ROOT_DIR}/cmake)
 include(include_cmake_functions)
 
 extract_mjolnir_version_number(
-    "${MJOLNIR_CORE_ROOT_DIR}/src/mjolnir/core/version.h" CORE version_number
-)
+    "${MJOLNIR_CORE_ROOT_DIR}/src/mjolnir/core/version.h" CORE version_number)
 
 project(
     Mjolnir-Core
     VERSION ${version_number}
     DESCRIPTION "Core module of the Mjolnir Game Development Kit"
-    LANGUAGES CXX
-)
+    LANGUAGES CXX)
 
 message("Mjolnir-Core version ${version_number}")
 
