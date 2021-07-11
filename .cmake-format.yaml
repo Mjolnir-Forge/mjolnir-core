@@ -52,7 +52,7 @@ format:
   _help_max_rows_cmdline:
   - If a cmdline positional group consumes more than this many
   - lines without nesting, then invalidate the layout (and nest)
-  max_rows_cmdline: 2
+  max_rows_cmdline: 1
 
   _help_separate_ctrl_name_with_space:
   - If true, separate flow control names from their parentheses
@@ -67,7 +67,7 @@ format:
   _help_dangle_parens:
   - If a statement is wrapped to more than one line, than dangle
   - the closing parenthesis on its own line.
-  dangle_parens: true
+  dangle_parens: false
 
   _help_dangle_align:
   - If the trailing parenthesis must be 'dangled' on its on
