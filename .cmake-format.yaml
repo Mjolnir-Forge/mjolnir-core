@@ -112,7 +112,7 @@ format:
 
   _help_enable_sort:
   - If true, the argument lists which are known to be sortable
-  - will be sorted lexicographicall
+  - will be sorted lexicographical
   enable_sort: true
 
   _help_autosort:
