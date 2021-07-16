@@ -39,6 +39,7 @@ parse:
         LINK_OPTIONS: '*'
         PROPERTIES: '*'
         SOURCES: '*'
+        SOURCE_DIRECTORY: '*'
 
     add_generic_test:
       kwargs:
@@ -51,7 +52,33 @@ parse:
         LINK_OPTIONS: '*'
         PROPERTIES: '*'
         SOURCES: '*'
+        SOURCE_DIRECTORY: '*'
 
+    add_mjolnir_test:
+      kwargs:
+        COMPILE_DEFINITIONS: '*'
+        COMPILE_FEATURES: '*'
+        COMPILE_OPTIONS: '*'
+        INCLUDE_DIRECTORIES: '*'
+        LINK_DIRECTORIES: '*'
+        LINK_LIBRARIES: '*'
+        LINK_OPTIONS: '*'
+        PROPERTIES: '*'
+        SOURCES: '*'
+        SOURCE_DIRECTORY: '*'
+
+    add_mjolnir_core_test:
+      kwargs:
+        COMPILE_DEFINITIONS: '*'
+        COMPILE_FEATURES: '*'
+        COMPILE_OPTIONS: '*'
+        INCLUDE_DIRECTORIES: '*'
+        LINK_DIRECTORIES: '*'
+        LINK_LIBRARIES: '*'
+        LINK_OPTIONS: '*'
+        PROPERTIES: '*'
+        SOURCES: '*'
+        SOURCE_DIRECTORY: '*'
 
   _help_override_spec:
   - Override configurations per-command where available

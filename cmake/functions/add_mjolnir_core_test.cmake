@@ -53,8 +53,5 @@ KEYWORDS
 
 #]==]
 function(add_mjolnir_core_test target)
-    add_mjolnir_test(${target}
-        CORE
-        ${ARGN}
-        )
+    add_mjolnir_test(${target} CORE ${ARGN})
 endfunction()
