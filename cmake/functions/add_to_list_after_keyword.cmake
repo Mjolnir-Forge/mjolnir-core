@@ -1,7 +1,8 @@
 #[==[
 Add values after a specific keyword in a list and return the result.
 
-If the passed keyword isn't found, it is added together with the new values at the end of the list.
+If the passed keyword isn't found, it is added together with the new values at the end
+of the list.
 
 PARAMETERS:
 -----------
@@ -25,13 +26,30 @@ RETURNS
         The updated list
 
 #]==]
-function(add_to_list_after_keyword original_list returned_list_name keyword)
-    list(FIND original_list ${keyword} idx_find)
+function(
+    add_to_list_after_keyword
+    original_list
+    returned_list_name
+    keyword)
+
+    list(
+        FIND
+        original_list
+        ${keyword}
+        idx_find)
+
     if(idx_find GREATER -1)
-      MATH(EXPR index_next "${idx_find} + 1")
-      list(INSERT original_list ${index_next} ${ARGN})
+        math(EXPR index_next "${idx_find} + 1")
+        list(
+            INSERT
+            original_list
+            ${index_next}
+            ${ARGN})
     else()
         set(original_list ${original_list} ${keyword} ${ARGN})
     endif()
-    set(${returned_list_name} ${original_list} PARENT_SCOPE)
+
+    set(${returned_list_name}
+        ${original_list}
+        PARENT_SCOPE)
 endfunction()
