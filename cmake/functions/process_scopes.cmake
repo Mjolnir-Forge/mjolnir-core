@@ -1,7 +1,8 @@
 #[==[
 Process scope keywords (PRIVATE, PUBLIC, INTERFACE) in a list.
 
-Duplicate keywords will be merged and members without scope are added to the specified default scope.
+Duplicate keywords will be merged and members without scope are added to the specified
+default scope.
 
 PARAMETERS:
 -----------
@@ -25,8 +26,14 @@ RETURNS
 function(process_scopes default_scope returned_list_name)
     set(scope_keywords INTERFACE PRIVATE PUBLIC)
 
-    if(NOT ${default_scope} IN_LIST scope_keywords)
-        message(FATAL_ERROR "'${default_scope}' is not a valid scope keyword and can't be used as default scope.")
+    if(NOT
+       ${default_scope}
+       IN_LIST
+       scope_keywords)
+        message(
+            FATAL_ERROR
+                "'${default_scope}' is not a valid scope keyword and can't be used as default scope."
+        )
     endif()
 
     set(current_scope ${default_scope})
@@ -47,8 +54,7 @@ function(process_scopes default_scope returned_list_name)
 
     endforeach()
 
-    set(${returned_list_name} ${PUBLIC_ITEMS} ${PRIVATE_ITEMS} ${INTERFACE_ITEMS} PARENT_SCOPE)
+    set(${returned_list_name}
+        ${PUBLIC_ITEMS} ${PRIVATE_ITEMS} ${INTERFACE_ITEMS}
+        PARENT_SCOPE)
 endfunction()
-
-
-
