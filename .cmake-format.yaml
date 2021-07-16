@@ -28,6 +28,30 @@ parse:
         PROPERTIES: '*'
         SOURCES: '*'
 
+    add_generic_executable:
+      kwargs:
+        COMPILE_DEFINITIONS: '*'
+        COMPILE_FEATURES: '*'
+        COMPILE_OPTIONS: '*'
+        INCLUDE_DIRECTORIES: '*'
+        LINK_DIRECTORIES: '*'
+        LINK_LIBRARIES: '*'
+        LINK_OPTIONS: '*'
+        PROPERTIES: '*'
+        SOURCES: '*'
+
+    add_generic_test:
+      kwargs:
+        COMPILE_DEFINITIONS: '*'
+        COMPILE_FEATURES: '*'
+        COMPILE_OPTIONS: '*'
+        INCLUDE_DIRECTORIES: '*'
+        LINK_DIRECTORIES: '*'
+        LINK_LIBRARIES: '*'
+        LINK_OPTIONS: '*'
+        PROPERTIES: '*'
+        SOURCES: '*'
+
 
   _help_override_spec:
   - Override configurations per-command where available
