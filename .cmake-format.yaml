@@ -16,6 +16,19 @@ parse:
         SOURCES: '*'
         DEPENDS: '*'
 
+    target_apply_setup:
+      kwargs:
+        COMPILE_DEFINITIONS: '*'
+        COMPILE_FEATURES: '*'
+        COMPILE_OPTIONS: '*'
+        INCLUDE_DIRECTORIES: '*'
+        LINK_DIRECTORIES: '*'
+        LINK_LIBRARIES: '*'
+        LINK_OPTIONS: '*'
+        PROPERTIES: '*'
+        SOURCES: '*'
+
+
   _help_override_spec:
   - Override configurations per-command where available
   override_spec: {}
