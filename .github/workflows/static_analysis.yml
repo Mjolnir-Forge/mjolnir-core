@@ -16,7 +16,7 @@ jobs:
         style: file
     - name: Check result
       run: |
-        python3 scripts/python/check_clang_format_result.py
+        python3 python/check_clang_format_result.py
 
   cmake_format:
     runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ jobs:
         pip install cmakelang
     - name: Run cmake-format
       run: |
-        python3 scripts/python/check_cmake_format.py
+        python3 python/check_cmake_format.py
 
 
   clang_tidy:
