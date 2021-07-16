@@ -3,8 +3,8 @@
 from subprocess import DEVNULL, run
 from sys import exit
 
-from python.mjolnir.definitions import CMAKE_CONFIG_FILE_PATH
-from python.mjolnir.files import get_cmake_files
+from mjolnir.definitions import CMAKE_CONFIG_FILE_PATH
+from mjolnir.files import get_cmake_files
 
 err_msg = ""
 for file in get_cmake_files():
