@@ -124,11 +124,8 @@ function(add_mjolnir_test target module)
             ${MJOLNIR_${module}_TARGET_PROPERTIES})
 
         add_generic_executable(
-            ${target}
-            ${test_source}
-            SOURCE_DIRECTORY
-            ${MJOLNIR_${module}_ROOT_DIR}
-            ${arguments})
+            ${target} ${test_source}
+            SOURCE_DIRECTORY ${MJOLNIR_${module}_ROOT_DIR} ${arguments})
 
         add_test(${ctest_test_name} ${target})
     endif()
