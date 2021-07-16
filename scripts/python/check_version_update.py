@@ -3,7 +3,7 @@
 import os
 import subprocess
 import sys
-from typing import List
+from typing import List, Union
 
 module_name = str(sys.argv[1])
 source_branch = str(sys.argv[2])
@@ -34,7 +34,7 @@ def get_version_number_item(version_header_content: str, module: str, item: str)
     return int(version_header_content[pos_start:pos_end])
 
 
-def get_version_number(module: str) -> List[int]:
+def get_version_number(module: str) -> Union[List[int], None]:
     """Get the version number of a Mjolnir module.
 
     Parameters
@@ -62,41 +62,6 @@ def get_version_number(module: str) -> List[int]:
         tweak = get_version_number_item(data, module_upper, "TWEAK")
 
         return [major, minor, patch, tweak]
-
-
-FNULL = open(os.devnull, "w")
-source_version = get_version_number(module_name)
-subprocess.run(f"git checkout {target_branch}", stdout=FNULL, shell=True)
-target_version = get_version_number(module_name)
-subprocess.run(f"git checkout {source_branch}", stdout=FNULL, shell=True)
-
-print(f"Source branch: {source_branch}")
-print(f"Target branch: {target_branch}")
-if target_version is None:
-    if source_version is None:
-        raise Exception("Both branches have no version header. Please add one.")
-    for i in [0, 1, 2, 3]:
-        if source_version[i] != 0:
-            raise ValueError(
-                "The target branch has no version header. The first version number"
-                + " must be 0.0.0.0"
-            )
-    sys.exit()
-
-print(
-    "Source version number is: "
-    f"{source_version[0]}."
-    f"{source_version[1]}."
-    f"{source_version[2]}."
-    f"{source_version[3]}"
-)
-print(
-    "Target version number is: "
-    f"{target_version[0]}."
-    f"{target_version[1]}."
-    f"{target_version[2]}."
-    f"{target_version[3]}"
-)
 
 
 def check_version_number_item(
@@ -135,11 +100,64 @@ def check_version_number_item(
             )
 
 
-if source_version[0] != target_version[0]:
-    check_version_number_item(source_version, target_version, "Major", 0)
-elif source_version[1] != target_version[1]:
-    check_version_number_item(source_version, target_version, "Minor", 1)
-elif source_version[2] != target_version[2]:
-    check_version_number_item(source_version, target_version, "Patch", 2)
+def get_version_string(version: Union[None, List[int]]) -> str:
+    """Get the version number as string.
+
+    Parameters
+    ----------
+    version :
+        A list containing major, minor, patch and tweak version numbers
+
+    Returns
+    -------
+    str :
+        The version number as string
+
+    """
+    if version is not None:
+        return f"{version[0]}.{version[1]}.{version[2]}.{version[3]}"
+    return "None"
+
+
+FNULL = open(os.devnull, "w")
+source_version = get_version_number(module_name)
+subprocess.run(f"git checkout {target_branch}", stdout=FNULL, shell=True)
+target_version = get_version_number(module_name)
+subprocess.run(f"git checkout {source_branch}", stdout=FNULL, shell=True)
+
+print(f"Source branch: {source_branch}")
+print(f"Target branch: {target_branch}")
+if target_version is None:
+    if source_version is None:
+        raise Exception("Both branches have no version header. Please add one.")
+    for i in [0, 1, 2, 3]:
+        if source_version[i] != 0:
+            raise ValueError(
+                "The target branch has no version header. The first version number"
+                + " must be 0.0.0.0"
+            )
+    sys.exit()
+
+if source_version is not None:
+    source_version_str = (
+        f"{source_version[0]}.{source_version[1]}.{source_version[2]}."
+        "{source_version[3]}"
+    )
 else:
-    check_version_number_item(source_version, target_version, "Tweak", 3)
+    "None"
+
+print(f"Source version number is: {get_version_string(source_version)}")
+print(f"Target version number is: {get_version_string(target_version)}.")
+
+
+if source_version is not None and target_version is not None:
+    if source_version[0] != target_version[0]:
+        check_version_number_item(source_version, target_version, "Major", 0)
+    elif source_version[1] != target_version[1]:
+        check_version_number_item(source_version, target_version, "Minor", 1)
+    elif source_version[2] != target_version[2]:
+        check_version_number_item(source_version, target_version, "Patch", 2)
+    else:
+        check_version_number_item(source_version, target_version, "Tweak", 3)
+else:
+    raise ValueError("Missing version number for comparison.")
