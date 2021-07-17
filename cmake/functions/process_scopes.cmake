@@ -26,10 +26,7 @@ RETURNS
 function(process_scopes default_scope returned_list_name)
     set(scope_keywords INTERFACE PRIVATE PUBLIC)
 
-    if(NOT
-       ${default_scope}
-       IN_LIST
-       scope_keywords)
+    if(NOT ${default_scope} IN_LIST scope_keywords)
         message(
             FATAL_ERROR
                 "'${default_scope}' is not a valid scope keyword and can't be used as default scope."

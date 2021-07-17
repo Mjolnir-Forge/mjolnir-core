@@ -58,12 +58,8 @@ KEYWORDS
 
 #]==]
 function(add_generic_test target test_name)
-    add_to_list_after_keyword(
-        "${ARGN}"
-        arguments
-        LINK_LIBRARIES
-        PRIVATE
-        gtest_main)
+    add_to_list_after_keyword("${ARGN}" arguments LINK_LIBRARIES PRIVATE
+                              gtest_main)
 
     add_generic_executable(${target} ${arguments})
 

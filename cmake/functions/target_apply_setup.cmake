@@ -75,29 +75,18 @@ function(target_apply_setup target)
         PROPERTIES
         SOURCES)
 
-    cmake_parse_arguments(
-        ARG
-        "${options}"
-        "${oneValueArgs}"
-        "${multiValueArgs}"
-        ${ARGN})
+    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}"
+                          "${multiValueArgs}" ${ARGN})
 
     # ----------------------------------------------------------------------------------
     # sources
     # ----------------------------------------------------------------------------------
 
-    process_scopes(
-        PRIVATE
-        tmp_sources
-        ${ARG_UNPARSED_ARGUMENTS}
-        ${ARG_SOURCES})
+    process_scopes(PRIVATE tmp_sources ${ARG_UNPARSED_ARGUMENTS} ${ARG_SOURCES})
 
     if(DEFINED ARG_SOURCE_DIRECTORY)
         foreach(source ${tmp_sources})
-            if(NOT
-               source
-               IN_LIST
-               scope_keywords)
+            if(NOT source IN_LIST scope_keywords)
                 set(sources ${sources} "${ARG_SOURCE_DIRECTORY}/${source}")
             else()
                 set(sources ${sources} ${source})
@@ -116,14 +105,7 @@ function(target_apply_setup target)
 
         foreach(item ${tmp_definitions})
             string(FIND ${item} "-D" find_pos)
-            if(NOT
-               item
-               IN_LIST
-               scope_keywords
-               AND NOT
-                   ${find_pos}
-                   EQUAL
-                   0)
+            if(NOT item IN_LIST scope_keywords AND NOT ${find_pos} EQUAL 0)
                 set(definitions ${definitions} "-D${item}")
             else()
                 set(definitions ${definitions} ${item})

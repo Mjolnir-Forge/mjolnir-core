@@ -63,65 +63,33 @@ function(add_mjolnir_test target module)
         set(test_name ${target})
         set(target "test_${target}")
 
-        string(
-            REPLACE "${MJOLNIR_${module}_ROOT_DIR}/tests/"
-                    ""
-                    relative_path
-                    ${CMAKE_CURRENT_SOURCE_DIR})
+        string(REPLACE "${MJOLNIR_${module}_ROOT_DIR}/tests/" "" relative_path
+                       ${CMAKE_CURRENT_SOURCE_DIR})
 
-        string(
-            REPLACE "/"
-                    "::"
-                    test_prefix
-                    ${relative_path})
+        string(REPLACE "/" "::" test_prefix ${relative_path})
 
         set(test_source "/tests/${relative_path}/${target}.cpp")
         set(ctest_test_name "${test_prefix}::${test_name}")
 
-        add_to_list_after_keyword(
-            "${ARGN}"
-            arguments
-            LINK_LIBRARIES
-            PRIVATE
-            gtest_main)
+        add_to_list_after_keyword("${ARGN}" arguments LINK_LIBRARIES PRIVATE
+                                  gtest_main)
 
-        add_to_list_after_keyword(
-            "${arguments}"
-            arguments
-            COMPILE_FEATURES
-            PRIVATE
-            ${MJOLNIR_${module}_COMPILE_FEATURES})
+        add_to_list_after_keyword("${arguments}" arguments COMPILE_FEATURES
+                                  PRIVATE ${MJOLNIR_${module}_COMPILE_FEATURES})
 
-        add_to_list_after_keyword(
-            "${arguments}"
-            arguments
-            COMPILE_OPTIONS
-            PRIVATE
-            ${MJOLNIR_${module}_COMPILE_OPTIONS})
+        add_to_list_after_keyword("${arguments}" arguments COMPILE_OPTIONS
+                                  PRIVATE ${MJOLNIR_${module}_COMPILE_OPTIONS})
 
-        add_to_list_after_keyword(
-            "${arguments}"
-            arguments
-            INCLUDE_DIRECTORIES
-            ${MJOLNIR_${module}_SOURCE_DIR})
+        add_to_list_after_keyword("${arguments}" arguments INCLUDE_DIRECTORIES
+                                  ${MJOLNIR_${module}_SOURCE_DIR})
 
-        if(NOT
-           "${MJOLNIR_${module}_LINK_OPTIONS}"
-           STREQUAL
-           "")
-            add_to_list_after_keyword(
-                "${arguments}"
-                arguments
-                LINK_OPTIONS
-                PRIVATE
-                ${MJOLNIR_${module}_LINK_OPTIONS})
+        if(NOT "${MJOLNIR_${module}_LINK_OPTIONS}" STREQUAL "")
+            add_to_list_after_keyword("${arguments}" arguments LINK_OPTIONS
+                                      PRIVATE ${MJOLNIR_${module}_LINK_OPTIONS})
         endif()
 
-        add_to_list_after_keyword(
-            "${arguments}"
-            arguments
-            PROPERTIES
-            ${MJOLNIR_${module}_TARGET_PROPERTIES})
+        add_to_list_after_keyword("${arguments}" arguments PROPERTIES
+                                  ${MJOLNIR_${module}_TARGET_PROPERTIES})
 
         add_generic_executable(
             ${target} ${test_source}
