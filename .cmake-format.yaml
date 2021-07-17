@@ -265,7 +265,7 @@ _help_lint: Options affecting the linter
 lint:
   _help_disabled_codes:
   - a list of lint codes to disable
-  disabled_codes: []
+  disabled_codes: [R0912, R0915]
 
   _help_function_pattern:
   - regular expression pattern describing valid function names
