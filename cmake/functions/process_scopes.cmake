@@ -31,8 +31,7 @@ function(process_scopes default_scope returned_list_name)
     if(NOT ${default_scope} IN_LIST scope_keywords)
         message(
             FATAL_ERROR
-                "'${default_scope}' is not a valid default scope key word."
-        )
+                "'${default_scope}' is not a valid default scope key word.")
     endif()
 
     set(current_scope ${default_scope})
@@ -45,7 +44,6 @@ function(process_scopes default_scope returned_list_name)
             string(TOLOWER "${current_scope}_items" list_name)
             continue()
         endif()
-
 
         # Add item to correct list
         if(NOT DEFINED ${list_name})
