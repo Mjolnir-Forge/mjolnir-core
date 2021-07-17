@@ -90,6 +90,9 @@ To reformat all files run:
 python python/format_cmake_files.py 
 ~~~
 
+The official documentation can be
+found [here](https://cmake-format.readthedocs.io/en/latest/)
+
 ### cmake-lint
 
 `cmake-lint` comes together with `cmake-format` when installing `cmakelang`. Its usage
@@ -105,3 +108,6 @@ runs `cmake-lint` for all files can be executed with:
 ~~~ shell
 python python/check_cmake_lint.py
 ~~~
+
+The official documentation can be
+found [here](https://cmake-format.readthedocs.io/en/latest/)
