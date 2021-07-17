@@ -1,8 +1,8 @@
-#[==[
+#[[
 Extract the version number of a mjolnir module from its c++ header.
 
-The returned format is MAJOR.MINOR.PATCH.TWEAK. The tweak version number is omitted
-if it is 0.
+The returned format is MAJOR.MINOR.PATCH.TWEAK. The tweak version number is
+omitted if it is 0.
 
 PARAMETERS:
 -----------
@@ -19,7 +19,8 @@ RETURNS
     ${return_variable_name}:
         Version number
 
-#]==]
+]]
+# silence [C0112]
 function(extract_mjolnir_version_number version_header_path module
          return_variable_name)
     set(VERSION_REGEX
