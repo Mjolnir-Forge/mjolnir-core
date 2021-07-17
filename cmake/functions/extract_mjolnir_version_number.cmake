@@ -23,10 +23,10 @@ RETURNS
 # silence [C0112]
 function(extract_mjolnir_version_number version_header_path module
          return_variable_name)
-    set(VERSION_REGEX
+    set(version_regex
         "#define MJOLNIR_${module}_VERSION_(MAJOR|MINOR|PATCH|TWEAK)")
 
-    file(STRINGS ${version_header_path} version_data REGEX ${VERSION_REGEX})
+    file(STRINGS ${version_header_path} version_data REGEX ${version_regex})
 
     string(REGEX MATCH "VERSION_MAJOR ([0-9]*)" _ ${version_data})
     set(version_major ${CMAKE_MATCH_1})

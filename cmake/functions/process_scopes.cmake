@@ -31,29 +31,34 @@ function(process_scopes default_scope returned_list_name)
     if(NOT ${default_scope} IN_LIST scope_keywords)
         message(
             FATAL_ERROR
-                "'${default_scope}' is not a valid scope keyword and can't be used as default scope."
+                "'${default_scope}' is not a valid default scope key word."
         )
     endif()
 
     set(current_scope ${default_scope})
+    string(TOLOWER "${current_scope}_items" list_name)
 
     foreach(item ${ARGN})
         # Handle scope keywords
         if(${item} IN_LIST scope_keywords)
             set(current_scope ${item})
+            string(TOLOWER "${current_scope}_items" list_name)
             continue()
         endif()
 
+
         # Add item to correct list
-        if(NOT DEFINED "${current_scope}_ITEMS")
-            set("${current_scope}_ITEMS" ${current_scope} ${item})
+        if(NOT DEFINED ${list_name})
+            # cmake-lint: disable=C0103
+            set(${list_name} ${current_scope} ${item})
         else()
-            set("${current_scope}_ITEMS" ${${current_scope}_ITEMS} ${item})
+            # cmake-lint: disable=C0103
+            set(${list_name} ${${list_name}} ${item})
         endif()
 
     endforeach()
 
     set(${returned_list_name}
-        ${PUBLIC_ITEMS} ${PRIVATE_ITEMS} ${INTERFACE_ITEMS}
+        ${public_items} ${private_items} ${interface_items}
         PARENT_SCOPE)
 endfunction()
