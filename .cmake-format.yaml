@@ -236,7 +236,7 @@ markup:
 
   _help_explicit_trailing_pattern:
   - If a comment line matches starts with this pattern then it
-  - is explicitly a trailing comment for the preceeding
+  - is explicitly a trailing comment for the preceding
   - argument. Default is '#<'
   explicit_trailing_pattern: '#<'
 
