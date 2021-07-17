@@ -29,6 +29,17 @@ jobs:
       run: |
         python3 python/check_cmake_format.py
 
+  cmake_lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cmakelang
+      run: |
+        pip install cmakelang
+    - name: Run cmake-lint
+      run: |
+        python3 python/check_cmake_lint.py
+
 
   clang_tidy:
     runs-on: ubuntu-20.04
