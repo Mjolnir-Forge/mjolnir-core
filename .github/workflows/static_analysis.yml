@@ -5,7 +5,6 @@ on: [push]
 jobs:
   clang_format:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - uses: DoozyX/clang-format-lint-action@v0.10
@@ -17,7 +16,29 @@ jobs:
         style: file
     - name: Check result
       run: |
-        python3 scripts/python/check_clang_format_result.py
+        python3 python/check_clang_format_result.py
+
+  cmake_format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cmakelang
+      run: |
+        pip install cmakelang
+    - name: Run cmake-format
+      run: |
+        python3 python/check_cmake_format.py
+
+  cmake_lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cmakelang
+      run: |
+        pip install cmakelang
+    - name: Run cmake-lint
+      run: |
+        python3 python/check_cmake_lint.py
 
 
   clang_tidy:

@@ -22,6 +22,8 @@ excluded_words:
   # keywords
   - constexpr
   - nullptr
+  # other
+  - cmdline
   # program and tool specific -------------------------------------------------
   # clang
   - CommentPragmas
@@ -30,6 +32,7 @@ excluded_words:
   - fsanitize
   - fsanitize-memory-track-origins
   # cmake
+  - cmakelang
   - ctest
   # compiler
   - pthread
@@ -49,3 +52,4 @@ excluded_words:
   # python
   - isort 
   - pydocstyle
+  - rglob
