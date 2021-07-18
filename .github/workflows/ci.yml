@@ -66,26 +66,26 @@ jobs:
         cd build
         ctest -C ${{matrix.build_type}} --output-on-failure
 
-  MinGW_Windows:
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        build_type: [DEBUG, RELEASE]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Reinstall latest MinGW
-      shell: bash -l {0}
-      run: 
-        choco install mingw --force
-    - name: Run CMake
-      shell: bash -l {0}
-      run:
-        cmake
-        -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
-        -G "MinGW Makefiles" -S . -B build
-    - name: Build
-      run: cmake --build build -j 2
-    - name: Run tests
-      run: |
-        cd build
-        ctest  --output-on-failure
+#  MinGW_Windows:
+#    runs-on: windows-latest
+#    strategy:
+#      matrix:
+#        build_type: [DEBUG, RELEASE]
+#    steps:
+#    - uses: actions/checkout@v2
+#    - name: Reinstall latest MinGW
+#      shell: bash -l {0}
+#      run: 
+#        choco install mingw --force
+#    - name: Run CMake
+#      shell: bash -l {0}
+#      run:
+#        cmake
+#        -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+#        -G "MinGW Makefiles" -S . -B build
+#    - name: Build
+#      run: cmake --build build -j 2
+#    - name: Run tests
+#      run: |
+#        cd build
+#        ctest  --output-on-failure
