@@ -34,9 +34,8 @@ auto print() -> void
 
 TEST(test, add) // NOLINT cert-err58-cpp
 {
-    int  unused = 1;
-    auto a      = std::thread(print);
-    auto b      = std::thread(print);
+    auto a = std::thread(print);
+    auto b = std::thread(print);
 
     // char a[10];
     // a[10] = 0;auto a = std::thread(print);
