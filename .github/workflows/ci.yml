@@ -19,7 +19,7 @@ jobs:
         cmake \
         -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
         -DCMAKE_C_COMPILER=gcc-10 \
-        -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 \
+        -DCMAKE_CXX_COMPILER=clang++-10 \
         -S . -B build
     - name: Build
       run: cmake --build build -j 2
