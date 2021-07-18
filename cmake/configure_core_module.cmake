@@ -47,7 +47,6 @@ set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_17
 if(MSVC)
     set(MJOLNIR_CORE_COMPILE_OPTIONS /W4
                                      ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
-    message(${MJOLNIR_CORE_COMPILE_OPTIONS})
 else()
     set(MJOLNIR_CORE_COMPILE_OPTIONS
         -Wall
@@ -58,10 +57,6 @@ else()
         -pthread
         ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
 endif()
-
-# if(DEFINED TREAT_WARNING_AS_ERROR) if (MSVC) set(MJOLNIR_COMPILE_OPTIONS
-# ${MJOLNIR_COMPILE_OPTIONS} /WX) else() set(MJOLNIR_COMPILE_OPTIONS
-# ${MJOLNIR_COMPILE_OPTIONS} -Werror) endif() endif()
 
 # Compiler extensions
 
