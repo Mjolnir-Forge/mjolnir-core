@@ -36,6 +36,7 @@ TEST(test, add) // NOLINT cert-err58-cpp
 {
     auto a = std::thread(print);
     auto b = std::thread(print);
+    int* e = new int;
 
     // char a[10];
     // a[10] = 0;auto a = std::thread(print);
