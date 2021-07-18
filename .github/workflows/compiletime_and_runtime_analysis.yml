@@ -76,7 +76,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        scan-build-11 --status-bugs cmake -DCMAKE_C_COMPILER=clang-11 -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_BUILD_TYPE=DEBUG ..
+        scan-build-11 --status-bugs cmake -DCMAKE_C_COMPILER=clang-11 -DCMAKE_CXX_COMPILER=clang++-11 -DCMAKE_BUILD_TYPE=DEBUG ..
     - name: Build / Check
       run: |
         cd build
