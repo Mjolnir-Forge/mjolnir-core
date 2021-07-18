@@ -12,8 +12,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install g++-10
       run: |
-        sudo apt-get update
-        sudo apt-get install g++-10
+        g++-10 -v
     - name: Run CMake
       run:
         cmake \
