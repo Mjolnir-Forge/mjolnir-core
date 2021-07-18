@@ -76,7 +76,7 @@ jobs:
     - name: Upgrade MinGW
       shell: bash -l {0}
       run: 
-        choco upgrade mingw
+        choco install mingw
     - name: Run CMake
       shell: bash -l {0}
       run:
