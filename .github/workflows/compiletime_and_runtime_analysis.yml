@@ -4,15 +4,15 @@ on: [push]
 
 jobs:
   address_and_leak_sanitizer:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
       run:
         cmake
         -DCMAKE_BUILD_TYPE=DEBUG
-        -DCMAKE_C_COMPILER=clang
-        -DCMAKE_CXX_COMPILER=clang++
+        -DCMAKE_C_COMPILER=clang-10
+        -DCMAKE_CXX_COMPILER=clang++-10
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=address;-fno-omit-frame-pointer"
         -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=address"
         -S . -B build
@@ -25,15 +25,15 @@ jobs:
 
 
   thread_sanitizer:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
       run:
         cmake
         -DCMAKE_BUILD_TYPE=DEBUG
-        -DCMAKE_C_COMPILER=clang
-        -DCMAKE_CXX_COMPILER=clang++
+        -DCMAKE_C_COMPILER=clang-10
+        -DCMAKE_CXX_COMPILER=clang++-10
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=thread"
         -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=thread"
         -S . -B build
@@ -46,15 +46,15 @@ jobs:
 
 
   undefined_behavior_sanitizer:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
       run:
         cmake 
         -DCMAKE_BUILD_TYPE=DEBUG 
-        -DCMAKE_C_COMPILER=clang 
-        -DCMAKE_CXX_COMPILER=clang++ 
+        -DCMAKE_C_COMPILER=clang-10
+        -DCMAKE_CXX_COMPILER=clang++-10
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=undefined;-fno-sanitize-recover=undefined"
         -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=undefined" 
         -S . -B build
@@ -66,7 +66,7 @@ jobs:
         ctest --output-on-failure
 
   clang_static_analyzer:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Install clang-tools
