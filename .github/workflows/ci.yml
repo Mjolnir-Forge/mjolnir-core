@@ -10,10 +10,6 @@ jobs:
         build_type: [DEBUG, RELEASE]
     steps:
     - uses: actions/checkout@v2
-    - name: Install g++-10
-      run: |
-        cd /usr/bin
-        ls
     - name: Run CMake
       run:
         cmake
@@ -82,6 +78,8 @@ jobs:
       run:
         cmake
         -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+        -DCMAKE_C_COMPILER=gcc-10
+        -DCMAKE_CXX_COMPILER=g++-10
         -G "MinGW Makefiles" -S . -B build
     - name: Build
       run: cmake --build build -j 2
