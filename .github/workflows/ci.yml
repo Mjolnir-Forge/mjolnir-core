@@ -36,7 +36,7 @@ jobs:
         cmake
         -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
         -DCMAKE_C_COMPILER=clang-12
-        -DCMAKE_CXX_COMPILER=clang-12++
+        -DCMAKE_CXX_COMPILER=clang++-12
         -S . -B build
     - name: Build
       run: cmake --build build -j 2
