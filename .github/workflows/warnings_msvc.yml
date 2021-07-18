@@ -10,7 +10,7 @@ jobs:
   build:
     if: |
       github.event_name == 'push' ||      
-      contains(github.event.pull_request.labels.*.name, 'CIrunerroronwarnings') ||
+      contains(github.event.pull_request.labels.*.name, 'CI_run_error_on_warnings') ||
       (github.event.pull_request.draft == false && github.base_ref == 'master')
     runs-on: windows-latest
     steps:
