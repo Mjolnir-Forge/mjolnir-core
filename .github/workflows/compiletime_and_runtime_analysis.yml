@@ -71,16 +71,16 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install clang-tools
       run: |
-        sudo apt-get install clang-tools-11
+        sudo apt-get install clang-tools-9
     - name: Run CMake
       run: |
         mkdir build
         cd build
-        scan-build-11 --status-bugs cmake -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12 -DCMAKE_BUILD_TYPE=DEBUG ..
+        scan-build-9 --status-bugs cmake -DCMAKE_BUILD_TYPE=DEBUG ..
     - name: Build / Check
       run: |
         cd build
-        scan-build-11 --status-bugs make -j2
+        scan-build-9 --status-bugs make -j2
 
 
 # cmake -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=memory;-fPIE;-pie;-fsanitize-memory-track-origins=2;-fno-omit-frame-pointer" -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=memory;-fPIE;-pie"  ../../code/
