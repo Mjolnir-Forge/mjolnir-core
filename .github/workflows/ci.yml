@@ -73,6 +73,11 @@ jobs:
         build_type: [DEBUG, RELEASE]
     steps:
     - uses: actions/checkout@v2
+    - name: list binaries
+      shell: bash -l {0}
+      run: |
+        cd C:/ProgramData/chocolatey/bin
+        dir
     - name: Run CMake
       shell: bash -l {0}
       run:
