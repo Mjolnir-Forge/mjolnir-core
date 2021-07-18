@@ -46,7 +46,6 @@ jobs:
     - name: Build
       run: cmake --build build -j 2
 
-
   MSVC_Windows:
     if: |
       github.event_name == 'push' ||      
