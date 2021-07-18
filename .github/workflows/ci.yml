@@ -10,10 +10,10 @@ jobs:
         build_type: [DEBUG, RELEASE]
     steps:
     - uses: actions/checkout@v2
-    - name: Install gcc-10
+    - name: Install g++-10
       run: |
         sudo apt-get update
-        sudo apt-get install gcc-10
+        sudo apt-get install g++-10
     - name: Run CMake
       run:
         cmake \
