@@ -3,7 +3,7 @@ name: Warnings MSVC Windows
 on:
   push:
     branches:
-      - 1_update_ci
+      - master
   pull_request:
 
 jobs:
