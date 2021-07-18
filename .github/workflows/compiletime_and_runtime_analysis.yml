@@ -11,8 +11,8 @@ jobs:
       run:
         cmake
         -DCMAKE_BUILD_TYPE=DEBUG
-        -DCMAKE_C_COMPILER=clang-10
-        -DCMAKE_CXX_COMPILER=clang++-10
+        -DCMAKE_C_COMPILER=clang-12
+        -DCMAKE_CXX_COMPILER=clang++-12
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=address;-fno-omit-frame-pointer"
         -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=address"
         -S . -B build
@@ -32,8 +32,8 @@ jobs:
       run:
         cmake
         -DCMAKE_BUILD_TYPE=DEBUG
-        -DCMAKE_C_COMPILER=clang-10
-        -DCMAKE_CXX_COMPILER=clang++-10
+        -DCMAKE_C_COMPILER=clang-12
+        -DCMAKE_CXX_COMPILER=clang++-12
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=thread"
         -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=thread"
         -S . -B build
@@ -53,8 +53,8 @@ jobs:
       run:
         cmake 
         -DCMAKE_BUILD_TYPE=DEBUG 
-        -DCMAKE_C_COMPILER=clang-10
-        -DCMAKE_CXX_COMPILER=clang++-10
+        -DCMAKE_C_COMPILER=clang-12
+        -DCMAKE_CXX_COMPILER=clang++-12
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=undefined;-fno-sanitize-recover=undefined"
         -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=undefined" 
         -S . -B build
