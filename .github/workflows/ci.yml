@@ -58,7 +58,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Run CMake
       shell: bash -l {0}
-      run: |
+      run:
         cmake
         -DCMAKE_C_COMPILER=MSVC
         -DCMAKE_CXX_COMPILER=MSVC
