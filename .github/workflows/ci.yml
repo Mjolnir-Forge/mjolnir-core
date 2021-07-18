@@ -31,6 +31,10 @@ jobs:
         build_type: [DEBUG, RELEASE]
     steps:
     - uses: actions/checkout@v2
+    - name: Install clang 12
+      run: |
+        sudo apt-get update
+        sudo apt-get install clang-12
     - name: Run CMake
       run:
         cmake
