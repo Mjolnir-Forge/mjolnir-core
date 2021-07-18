@@ -15,7 +15,7 @@ option(MJOLNIR_CORE_ENABLE_LTO "Enables link time optimizations" FALSE)
 # CMake setup
 # ------------------------------------------------------------------------------
 
-set(CMAKE_VERBOSE_MAKEFILE OFF)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Require out-of-source builds
 
@@ -45,7 +45,7 @@ set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_17
 # Set compile options
 
 if(MSVC)
-    set(MJOLNIR_CORE_COMPILE_OPTIONS /W4 /WX
+    set(MJOLNIR_CORE_COMPILE_OPTIONS /W4
                                      ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
     message(${MJOLNIR_CORE_COMPILE_OPTIONS})
 else()
