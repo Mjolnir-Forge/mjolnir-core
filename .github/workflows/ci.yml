@@ -73,18 +73,15 @@ jobs:
         build_type: [DEBUG, RELEASE]
     steps:
     - uses: actions/checkout@v2
-    - name: list binaries
+    - name: Upgrade MinGW
       shell: bash -l {0}
-      run: |
-        cd C:/ProgramData/chocolatey/bin
-        dir
+      run: 
+        choco upgrade mingw
     - name: Run CMake
       shell: bash -l {0}
       run:
         cmake
         -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
-        -DCMAKE_C_COMPILER=C:/ProgramData/chocolatey/bin/gcc-10.exe
-        -DCMAKE_CXX_COMPILER=C:/ProgramData/chocolatey/bin/g++-10.exe
         -G "MinGW Makefiles" -S . -B build
     - name: Build
       run: cmake --build build -j 2
