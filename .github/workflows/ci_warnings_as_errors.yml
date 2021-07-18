@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  MSVC Windows:
+  MSVC_Windows:
     if: |
       github.event_name == 'push' ||      
       contains(github.event.pull_request.labels.*.name, 'CI_run_warnings_as_errors') ||
