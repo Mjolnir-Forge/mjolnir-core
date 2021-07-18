@@ -73,10 +73,10 @@ jobs:
         build_type: [DEBUG, RELEASE]
     steps:
     - uses: actions/checkout@v2
-    - name: Upgrade MinGW
+    - name: Reinstall latest MinGW
       shell: bash -l {0}
       run: 
-        choco install mingw
+        choco install mingw --force
     - name: Run CMake
       shell: bash -l {0}
       run:
