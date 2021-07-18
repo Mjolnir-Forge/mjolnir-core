@@ -12,7 +12,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install g++-10
       run: |
-        g++-10 -v
+        cd /usr/bin
+        ls
     - name: Run CMake
       run:
         cmake \
