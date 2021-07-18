@@ -76,7 +76,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        pdate-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10
+        update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10
         scan-build-11 --status-bugs cmake -DCMAKE_BUILD_TYPE=DEBUG ..
     - name: Build / Check
       run: |
