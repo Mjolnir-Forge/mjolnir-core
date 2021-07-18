@@ -7,7 +7,7 @@ on:
   pull_request:
 
 
-build:
+jobs:
   GCC_Ubuntu:
     if: |
       github.event_name == 'push' ||
@@ -27,7 +27,6 @@ build:
     - name: Build
       run: cmake --build build -j 2
 
-jobs:
   Clang_Ubuntu:
     if: |
       github.event_name == 'push' ||
