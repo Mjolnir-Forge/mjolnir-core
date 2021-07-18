@@ -9,8 +9,9 @@
 
 auto test(int z) -> int
 {
-    if (z == 0)
-        return 1 / z; // warn
+    // triggers clang-static-analyzer
+    // if (z == 0)
+    //    return 1 / z; // warn
     return z;
 }
 
