@@ -26,13 +26,13 @@ jobs:
 
   Clang_Ubuntu:
     runs-on: ubuntu-latest
-    include:
-       - runs-on: ubuntu-latest
-         compiler: clang
-         clang: 12
     strategy:
       matrix:
         build_type: [DEBUG, RELEASE]
+        include:
+         - runs-on: ubuntu-latest
+           compiler: clang
+           clang: 12
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
