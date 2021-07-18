@@ -47,6 +47,7 @@ set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_17
 if(MSVC)
     set(MJOLNIR_CORE_COMPILE_OPTIONS /W4
                                      ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
+    message(${MJOLNIR_CORE_COMPILE_OPTIONS})
 else()
     set(MJOLNIR_CORE_COMPILE_OPTIONS
         -Wall
