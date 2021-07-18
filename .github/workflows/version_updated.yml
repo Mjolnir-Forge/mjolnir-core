@@ -1,9 +1,6 @@
 name: Version updated
 
-on:
-  pull_request:
-    branches:
-    - master
+on: [pull_request]
 
 jobs:
   check_version_updated:
