@@ -72,12 +72,14 @@ jobs:
     - name: Install clang-tools
       run: |
         sudo apt-get install clang-tools-11
+    - name: Update default compiler
+      run : |
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 50
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 50
     - name: Run CMake
       run: |
         mkdir build
         cd build
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 50
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 50
         scan-build-11 --status-bugs cmake -DCMAKE_BUILD_TYPE=DEBUG ..
     - name: Build / Check
       run: |
