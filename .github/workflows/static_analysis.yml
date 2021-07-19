@@ -40,7 +40,7 @@ jobs:
     - name: Run clang-tidy
       run: |
         cd build
-        run-clang-tidy-11 "(src/mjolnir/core|tests)" --line-filter='["name":"gtest.h"]'  -quiet
+        run-clang-tidy-11 "(src/mjolnir/core|tests)" -line-filter='["name":"gtest.h"]'  -quiet
 
   cppcheck:
     runs-on: ubuntu-latest
