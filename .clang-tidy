@@ -11,7 +11,7 @@ Checks: >
   modernize-*,
   performance-*,
   portability-*,
-  readability-*
+  readability-*,
   -llvm-header-guard
 
 WarningsAsErrors: '*'
