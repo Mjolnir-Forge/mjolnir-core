@@ -7,16 +7,57 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: DoozyX/clang-format-lint-action@v0.10
+    - uses: DoozyX/clang-format-lint-action@v0.12
       with:
         source: '.'
         # exclude: ''
         extensions: 'h,cpp'
-        clangFormatVersion: 11
+        clangFormatVersion: 12
         style: file
     - name: Check result
       run: |
         python3 python/check_clang_format_result.py
+
+
+  clang_tidy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install clang-tidy
+      run: |
+        sudo apt-get install clang-tidy-11
+    - name: Run CMake
+      run: |
+        mkdir build
+        cd build
+        cmake \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+        -DCMAKE_BUILD_TYPE=DEBUG \
+        ..
+    - name: List all checks
+      run: |
+        clang-tidy-11 --list-checks
+    - name: Run clang-tidy
+      run: |
+        cd build
+        run-clang-tidy-11 "(src/mjolnir/core|tests)" -header-filter="(src/mjolnir/core|tests)" -quiet
+
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cppcheck
+      run: |
+        sudo apt-get install cppcheck
+    - name: Print cppcheck version
+      run: |
+        cppcheck --version
+    - name: Run cppcheck with config file
+      run: |
+        cppcheck --project=.cppcheck --dump --std=c++20 --error-exitcode=1
+    - name: Run cppcheck with manual commands (temporary backup to test if the config file is set up correctly)
+      run: |
+        cppcheck -Isrc --enable=all --suppress=missingIncludeSystem --error-exitcode=1 --std=c++20 tests src
 
   cmake_format:
     runs-on: ubuntu-latest
@@ -39,45 +80,3 @@ jobs:
     - name: Run cmake-lint
       run: |
         python3 python/check_cmake_lint.py
-
-
-  clang_tidy:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install clang-tidy
-      run: |
-        sudo apt-get install clang-tidy-9
-    - name: Run CMake
-      run: |
-        mkdir build
-        cd build
-        cmake \
-        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-        -DCMAKE_BUILD_TYPE=DEBUG \
-        ..
-    - name: List all checks
-      run: |
-        clang-tidy-9 --list-checks
-    - name: Run clang-tidy
-      run: |
-        cd build
-        run-clang-tidy-9 "(src/mjolnir/core|tests)" -header-filter "(src/mjolnir/core|tests)" -quiet
-
-
-  cppcheck:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install cppcheck
-      run: |
-        sudo apt-get install cppcheck
-    - name: Print cppcheck version
-      run: |
-        cppcheck --version
-    - name: Run cppcheck with config file
-      run: |
-        cppcheck --project=.cppcheck --dump --std=c++17 --error-exitcode=1
-    - name: Run cppcheck with manual commands (temporary backup to test if the config file is set up correctly)
-      run: |
-        cppcheck -Isrc --enable=all --suppress=missingIncludeSystem --error-exitcode=1 --std=c++17 tests src

@@ -6,12 +6,13 @@ Checks: >
   clang-analyzer-*,
   cppcoreguidelines-*,
   hicpp-*,
-  llvmlibc-*,
+  llvm-*,
   misc-*,
   modernize-*,
   performance-*,
   portability-*,
-  readability-*
+  readability-*,
+  -llvm-header-guard
 
 WarningsAsErrors: '*'
 

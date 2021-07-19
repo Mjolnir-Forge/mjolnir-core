@@ -39,7 +39,7 @@ set(GTEST_MINIMAL_VERSION 1.10.0)
 
 # Set compile features
 
-set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_17
+set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_20
                                   ${MJOLNIR_CORE_ADDITIONAL_COMPILE_FEATURES})
 
 # Set compile options
@@ -57,10 +57,6 @@ else()
         -pthread
         ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
 endif()
-
-# if(DEFINED TREAT_WARNING_AS_ERROR) if (MSVC) set(MJOLNIR_COMPILE_OPTIONS
-# ${MJOLNIR_COMPILE_OPTIONS} /WX) else() set(MJOLNIR_COMPILE_OPTIONS
-# ${MJOLNIR_COMPILE_OPTIONS} -Werror) endif() endif()
 
 # Compiler extensions
 
