@@ -6,7 +6,7 @@ Checks: >
   clang-analyzer-*,
   cppcoreguidelines-*,
   hicpp-*,
-  llvmlibc-*,
+  llvm-*,
   misc-*,
   modernize-*,
   performance-*,
@@ -14,6 +14,7 @@ Checks: >
   readability-*,
   -hicpp-braces-around-statements,
   -readability-braces-around-statements
+  -llvm-header-guard
 
 WarningsAsErrors: '*'
 

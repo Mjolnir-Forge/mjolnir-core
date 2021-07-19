@@ -9,6 +9,7 @@
 
 auto test(int z) -> int
 {
+    // triggers clang-static-analyzer
     // if (z == 0)
     //    return 1 / z; // warn
     return z;
@@ -20,8 +21,8 @@ auto add(int lhs, int rhs) -> int
     return lhs + rhs;
 }
 
-int        global_var = 0;
-std::mutex global_mutex;
+int        global_var = 0; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+std::mutex global_mutex;   // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 
 auto print() -> void
