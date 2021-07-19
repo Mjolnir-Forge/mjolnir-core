@@ -6,7 +6,7 @@ Checks: >
   clang-analyzer-*,
   cppcoreguidelines-*,
   hicpp-*,
-  llvmlibc-*,
+  llvm-*,
   misc-*,
   modernize-*,
   performance-*,
