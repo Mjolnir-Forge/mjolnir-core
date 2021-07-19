@@ -33,7 +33,7 @@ auto print() -> void
 }
 
 
-TEST(test, add) // NOLINT cert-err58-cpp
+TEST(test, add) // NOLINT
 {
     auto a = std::thread(print);
     auto b = std::thread(print);
