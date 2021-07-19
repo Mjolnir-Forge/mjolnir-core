@@ -20,12 +20,12 @@ jobs:
 
 
   clang_tidy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Install clang-tidy
       run: |
-        sudo apt-get install clang-tidy-9
+        sudo apt-get install clang-tidy-12
     - name: Run CMake
       run: |
         mkdir build
@@ -36,11 +36,11 @@ jobs:
         ..
     - name: List all checks
       run: |
-        clang-tidy-9 --list-checks
+        clang-tidy-12 --list-checks
     - name: Run clang-tidy
       run: |
         cd build
-        run-clang-tidy-9 "(src/mjolnir/core|tests)" -header-filter "(src/mjolnir/core|tests)" -quiet
+        run-clang-tidy-12 "(src/mjolnir/core|tests)" -header-filter "(src/mjolnir/core|tests)" -quiet
 
   cppcheck:
     runs-on: ubuntu-20.04
