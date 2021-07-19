@@ -13,7 +13,7 @@ Checks: >
   portability-*,
   readability-*,
   -hicpp-braces-around-statements,
-  -readability-braces-around-statements
+  -readability-braces-around-statements,
   -llvm-header-guard
 
 WarningsAsErrors: '*'
