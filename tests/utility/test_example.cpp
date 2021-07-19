@@ -32,30 +32,3 @@ auto print() -> void
     std::cout << global_var << std::endl;
 }
 
-
-TEST(test, add) // NOLINT
-{
-    auto a = std::thread(print);
-    auto b = std::thread(print);
-
-    // char a[10];
-    // a[10] = 0;auto a = std::thread(print);
-    // int k = 0x7fffffff;
-    // k += 2000;
-    // AnotherClass::cpp_check_error();
-
-    // address sanitizer
-    // int* array = new int[100];
-    // delete[] array;
-    // EXPECT_EQ(add(array[2], 2), 3);
-
-    // leak sanitizer
-    // void* p = malloc(7);
-    // p       = 0;
-
-    test(0);
-
-    a.join();
-    b.join();
-    EXPECT_EQ(add(1, 2), 3);
-}
