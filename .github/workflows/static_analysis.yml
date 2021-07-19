@@ -12,33 +12,11 @@ jobs:
         source: '.'
         # exclude: ''
         extensions: 'h,cpp'
-        clangFormatVersion: 11
+        clangFormatVersion: 12
         style: file
     - name: Check result
       run: |
         python3 python/check_clang_format_result.py
-
-  cmake_format:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install cmakelang
-      run: |
-        pip install cmakelang
-    - name: Run cmake-format
-      run: |
-        python3 python/check_cmake_format.py
-
-  cmake_lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install cmakelang
-      run: |
-        pip install cmakelang
-    - name: Run cmake-lint
-      run: |
-        python3 python/check_cmake_lint.py
 
 
   clang_tidy:
@@ -64,7 +42,6 @@ jobs:
         cd build
         run-clang-tidy-9 "(src/mjolnir/core|tests)" -header-filter "(src/mjolnir/core|tests)" -quiet
 
-
   cppcheck:
     runs-on: ubuntu-20.04
     steps:
@@ -81,3 +58,25 @@ jobs:
     - name: Run cppcheck with manual commands (temporary backup to test if the config file is set up correctly)
       run: |
         cppcheck -Isrc --enable=all --suppress=missingIncludeSystem --error-exitcode=1 --std=c++17 tests src
+
+  cmake_format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cmakelang
+      run: |
+        pip install cmakelang
+    - name: Run cmake-format
+      run: |
+        python3 python/check_cmake_format.py
+
+  cmake_lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cmakelang
+      run: |
+        pip install cmakelang
+    - name: Run cmake-lint
+      run: |
+        python3 python/check_cmake_lint.py
