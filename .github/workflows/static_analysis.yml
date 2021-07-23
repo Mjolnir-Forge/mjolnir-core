@@ -54,7 +54,7 @@ jobs:
         cppcheck --version
     - name: Run cppcheck with config file
       run: |
-        cppcheck --project=.cppcheck --dump --std=c++20 --error-exitcode=1
+        cppcheck --project=.cppcheck --dump ---inline-suppr -std=c++20 --error-exitcode=1
     - name: Run cppcheck with manual commands (temporary backup to test if the config file is set up correctly)
       run: |
         cppcheck -Isrc --inline-suppr --enable=all --suppress=missingIncludeSystem --error-exitcode=1 --std=c++20 tests src
