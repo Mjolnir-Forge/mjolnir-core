@@ -140,7 +140,7 @@ function(target_apply_setup target)
 
     if(DEFINED ARG_INCLUDE_DIRECTORIES)
         process_scopes(PRIVATE directories ${ARG_INCLUDE_DIRECTORIES})
-        target_include_directories(${target} ${directories})
+        target_include_directories(${target} SYSTEM ${directories})
     endif()
 
     # --------------------------------------------------------------------------

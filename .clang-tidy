@@ -16,7 +16,9 @@ Checks: >
   -readability-braces-around-statements,
   -llvm-header-guard
 
-WarningsAsErrors: '*'
+WarningsAsErrors: >
+  '*',
+  -readability-identifier-naming
 
 CheckOptions:
   # Naming conventions ------------------------------------------------------------------------------------------------
