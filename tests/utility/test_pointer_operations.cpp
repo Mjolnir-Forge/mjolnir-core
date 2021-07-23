@@ -77,7 +77,7 @@ using alignment_testcase_types = ::testing::Types<std::integral_constant<UST, 0>
                                                   std::integral_constant<UST, 6>,  // NOLINT
                                                   std::integral_constant<UST, 7>>; // NOLINT
 
-TYPED_TEST_SUITE(AlignmentTester, alignment_testcase_types, );
+TYPED_TEST_SUITE(AlignmentTester, alignment_testcase_types, ); // cppcheck-suppress syntaxError
 
 TYPED_TEST(AlignmentTester, is_aligned) // NOLINT
 {
