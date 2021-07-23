@@ -6,131 +6,98 @@
 
 using namespace mjolnir;
 
+// create test suites --------------------------------------------------------------------------------------------------
 
-TEST(alignment, is_aligned_and_misalignment) // NOLINT
+class PointerOperationTester : public ::testing::TestWithParam<UST>
 {
-    constexpr UST alignment = alignof(U32);
+};
 
-    U32 val = 0;
-
-    EXPECT_EQ(misalignment<alignment>(&val), 0);
-    EXPECT_TRUE(is_aligned<alignment>(&val));
+// NOLINTNEXTLINE
+INSTANTIATE_TEST_SUITE_P(pointer_operations, PointerOperationTester, ::testing::Values(0, 1, 2, 3, 4, 5, 6, 7));
 
 
-    U8* misaligned_pointer = reinterpret_cast<U8*>(&val); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    misaligned_pointer += 2;                              // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+template <typename T_PointerShift>
+class PointerOperationTemplateTester : public ::testing::Test
+{
+};
 
 
-    EXPECT_EQ(misalignment<alignment>(misaligned_pointer), 2);
-    EXPECT_FALSE(is_aligned<alignment>(misaligned_pointer));
+using pointer_operation_template_testcases = ::testing::Types<std::integral_constant<UST, 0>,  // NOLINT
+                                                              std::integral_constant<UST, 1>,  // NOLINT
+                                                              std::integral_constant<UST, 2>,  // NOLINT
+                                                              std::integral_constant<UST, 3>,  // NOLINT
+                                                              std::integral_constant<UST, 4>,  // NOLINT
+                                                              std::integral_constant<UST, 5>,  // NOLINT
+                                                              std::integral_constant<UST, 6>,  // NOLINT
+                                                              std::integral_constant<UST, 7>>; // NOLINT
+
+
+// cppcheck-suppress syntaxError
+TYPED_TEST_SUITE(PointerOperationTemplateTester, pointer_operation_template_testcases, );
+
+
+// support functions ---------------------------------------------------------------------------------------------------
+
+constexpr UST alignment = 4;
+
+auto get_offset_pointer(U32 offset) -> U8*
+{
+    alignas(alignment) static std::array<U32, 2> instance = {0};
+
+    U8* ptr = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    ptr += offset;                              // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
+    return ptr;
 }
+
 
 // test_is_aligned -----------------------------------------------------------------------------------------------------
 
-class TestIsAligned : public ::testing::TestWithParam<std::tuple<UST, bool>>
+TEST_P(PointerOperationTester, test_is_aligned) // NOLINT cert-err58-cpp
 {
-};
+    const UST  pointer_offset = GetParam();
+    const bool expected       = (pointer_offset % alignment) == 0;
 
+    const U8* ptr = get_offset_pointer(pointer_offset);
 
-TEST_P(TestIsAligned, test_is_aligned) // NOLINT cert-err58-cpp
-{
-    UST  ptr_misalignment = std::get<0>(GetParam());
-    bool expected         = std::get<1>(GetParam());
-
-    constexpr UST alignment = 4;
-
-    alignas(alignment) std::array<U32, 2> instance = {0};
-
-    U8* misaligned_pointer = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    misaligned_pointer += ptr_misalignment; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-
-
-    EXPECT_EQ(expected, is_aligned(misaligned_pointer, alignment));
+    EXPECT_EQ(expected, is_aligned(ptr, alignment));
 }
 
-
-// NOLINTNEXTLINE
-INSTANTIATE_TEST_SUITE_P(alignment,
-                         TestIsAligned,
-                         ::testing::Values(std::make_tuple(0, true),
-                                           std::make_tuple(1, false),
-                                           std::make_tuple(2, false),
-                                           std::make_tuple(3, false),
-                                           std::make_tuple(4, true),
-                                           std::make_tuple(5, false),
-                                           std::make_tuple(6, false),
-                                           std::make_tuple(7, false)));
 
 // test_is_aligned_template --------------------------------------------------------------------------------------------
 
-template <typename T_PointerShift>
-class AlignmentTester : public ::testing::Test
+TYPED_TEST(PointerOperationTemplateTester, is_aligned) // NOLINT
 {
-};
+    static constexpr UST pointer_offset = TypeParam::value;
+    constexpr bool       expected       = (pointer_offset % alignment) == 0;
 
-using alignment_testcase_types = ::testing::Types<std::integral_constant<UST, 0>,  // NOLINT
-                                                  std::integral_constant<UST, 1>,  // NOLINT
-                                                  std::integral_constant<UST, 2>,  // NOLINT
-                                                  std::integral_constant<UST, 3>,  // NOLINT
-                                                  std::integral_constant<UST, 4>,  // NOLINT
-                                                  std::integral_constant<UST, 5>,  // NOLINT
-                                                  std::integral_constant<UST, 6>,  // NOLINT
-                                                  std::integral_constant<UST, 7>>; // NOLINT
+    const U8* ptr = get_offset_pointer(pointer_offset);
 
-// cppcheck-suppress syntaxError
-TYPED_TEST_SUITE(AlignmentTester, alignment_testcase_types, );
-
-TYPED_TEST(AlignmentTester, is_aligned) // NOLINT
-{
-    static constexpr UST ptr_misalignment = TypeParam::value;
-    constexpr UST        alignment        = 4;
-    constexpr bool       expected         = (ptr_misalignment % alignment) == 0;
-
-    alignas(alignment) std::array<U32, 2> instance = {0};
-
-    U8* misaligned_pointer = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    misaligned_pointer += ptr_misalignment; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-
-
-    EXPECT_EQ(expected, is_aligned<alignment>(misaligned_pointer));
+    EXPECT_EQ(expected, is_aligned<alignment>(ptr));
 }
+
 
 // test_misalignment ---------------------------------------------------------------------------------------------------
 
-class TestMisalignment : public ::testing::TestWithParam<std::tuple<UST, UST>>
+TEST_P(PointerOperationTester, test_misalignment) // NOLINT
 {
-};
+    const UST pointer_offset = GetParam();
+    const UST expected       = pointer_offset % alignment;
 
+    const U8* ptr = get_offset_pointer(pointer_offset);
 
-TEST_P(TestMisalignment, test_misalignment) // NOLINT
-{
-    UST ptr_misalignment = std::get<0>(GetParam());
-    UST expected         = std::get<1>(GetParam());
-
-    constexpr UST alignment = 4;
-
-    alignas(alignment) std::array<U32, 2> instance = {0};
-
-
-    U8* misaligned_pointer = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    misaligned_pointer += ptr_misalignment; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-
-    EXPECT_EQ(expected, misalignment(misaligned_pointer, alignment));
+    EXPECT_EQ(expected, misalignment(ptr, alignment));
 }
 
 
-// NOLINTNEXTLINE
-INSTANTIATE_TEST_SUITE_P(alignment,
-                         TestMisalignment,
-                         ::testing::Values(std::make_tuple(0, 0),
-                                           std::make_tuple(1, 1),
-                                           std::make_tuple(2, 2),
-                                           std::make_tuple(3, 3),
-                                           std::make_tuple(4, 0),
-                                           std::make_tuple(5, 1),
-                                           std::make_tuple(6, 2),
-                                           std::make_tuple(7, 3)));
+// test misalignment (template version) --------------------------------------------------------------------------------
 
+TYPED_TEST(PointerOperationTemplateTester, misalignment) // NOLINT
+{
+    static constexpr UST pointer_offset = TypeParam::value;
+    constexpr UST        expected       = pointer_offset % alignment;
 
-// TODO: parametrize template tests:
-// https://stackoverflow.com/questions/48669279/create-gtest-value-parametrized-test-for-a-template-class
+    const U8* ptr = get_offset_pointer(pointer_offset);
+
+    EXPECT_EQ(expected, misalignment<alignment>(ptr));
+}

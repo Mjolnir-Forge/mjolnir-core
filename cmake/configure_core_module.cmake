@@ -39,7 +39,7 @@ set(GTEST_MINIMAL_VERSION 1.10.0)
 
 # Set compile features
 
-set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_20
+set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_17
                                   ${MJOLNIR_CORE_ADDITIONAL_COMPILE_FEATURES})
 
 # Set compile options

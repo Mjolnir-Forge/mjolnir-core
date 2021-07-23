@@ -35,6 +35,7 @@ jobs:
         -DCMAKE_BUILD_TYPE=DEBUG \
         ..
     - name: List all checks
+      # clang-tidy-12 tests/utility/test_pointer_operations.cpp  -header-filter=.* --extra-arg="-std=gnu++20" --extra-arg="-pthread" -- -I src -isystem build_tidy/_deps/googletest-src/googletest/include
       run: |
         clang-tidy-11 --list-checks
     - name: Run clang-tidy
