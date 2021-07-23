@@ -16,12 +16,25 @@ excluded_words:
   - mjolnir
   - msvc
   - typoci
+  # assembly
+  - dil
+  - eax
+  - edx
+  - rax
+  - rdi
+  - rdx
+  - sete
   # common variable names
   - argc
   - rhs
   # keywords
+  - alignas
   - constexpr
   - nullptr
+  # std header
+  - climits
+  - cstddef
+  - cstdint
   # other
   - cmdline
   # program and tool specific -------------------------------------------------
@@ -31,6 +44,9 @@ excluded_words:
   - fno-sanitize-recover
   - fsanitize
   - fsanitize-memory-track-origins
+  # clang-tidy
+  - cppcoreguidelines-pro-bounds-pointer-arithmetic
+  - cppcoreguidelines-pro-type-reinterpret-cast
   # cmake
   - cmakelang
   - ctest
@@ -49,6 +65,7 @@ excluded_words:
   # doxygen
   - addtogroup
   - doxygen
+  - tparam
   # python
   - isort 
   - pydocstyle

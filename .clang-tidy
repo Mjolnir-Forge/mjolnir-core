@@ -12,9 +12,13 @@ Checks: >
   performance-*,
   portability-*,
   readability-*,
+  -hicpp-braces-around-statements,
+  -readability-braces-around-statements,
   -llvm-header-guard
 
-WarningsAsErrors: '*'
+WarningsAsErrors: >
+  '*',
+  -readability-identifier-naming
 
 CheckOptions:
   # Naming conventions ------------------------------------------------------------------------------------------------
