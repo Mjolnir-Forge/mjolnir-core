@@ -6,7 +6,11 @@
 
 using namespace mjolnir;
 
-// create test suites --------------------------------------------------------------------------------------------------
+// ====================================================================================================================
+// Setup
+// ====================================================================================================================
+
+// create test suites -------------------------------------------------------------------------------------------------
 
 class PointerOperationTester : public ::testing::TestWithParam<UST>
 {
@@ -36,7 +40,7 @@ using pointer_operation_template_testcases = ::testing::Types<std::integral_cons
 TYPED_TEST_SUITE(PointerOperationTemplateTester, pointer_operation_template_testcases, );
 
 
-// support functions ---------------------------------------------------------------------------------------------------
+// support functions --------------------------------------------------------------------------------------------------
 
 constexpr UST alignment = 4;
 
@@ -51,7 +55,12 @@ auto get_offset_pointer(U32 offset) -> U8*
 }
 
 
-// test_is_aligned -----------------------------------------------------------------------------------------------------
+// ====================================================================================================================
+// Tests
+// ====================================================================================================================
+
+
+// test_is_aligned ----------------------------------------------------------------------------------------------------
 
 TEST_P(PointerOperationTester, test_is_aligned) // NOLINT cert-err58-cpp
 {
@@ -64,7 +73,7 @@ TEST_P(PointerOperationTester, test_is_aligned) // NOLINT cert-err58-cpp
 }
 
 
-// test_is_aligned_template --------------------------------------------------------------------------------------------
+// test_is_aligned_template -------------------------------------------------------------------------------------------
 
 TYPED_TEST(PointerOperationTemplateTester, is_aligned) // NOLINT
 {
@@ -77,7 +86,7 @@ TYPED_TEST(PointerOperationTemplateTester, is_aligned) // NOLINT
 }
 
 
-// test_misalignment ---------------------------------------------------------------------------------------------------
+// test_misalignment --------------------------------------------------------------------------------------------------
 
 TEST_P(PointerOperationTester, test_misalignment) // NOLINT
 {
@@ -90,7 +99,7 @@ TEST_P(PointerOperationTester, test_misalignment) // NOLINT
 }
 
 
-// test misalignment (template version) --------------------------------------------------------------------------------
+// test misalignment (template version) -------------------------------------------------------------------------------
 
 TYPED_TEST(PointerOperationTemplateTester, misalignment) // NOLINT
 {
