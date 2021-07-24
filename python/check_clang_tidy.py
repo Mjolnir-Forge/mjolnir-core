@@ -1,12 +1,14 @@
-"""Checks all cmake files if they are correctly formatted."""
+"""Checks if all cpp files pass the clang-tidy tests."""
 
 from argparse import ArgumentParser
-from subprocess import DEVNULL, run
+from subprocess import run
 from sys import exit, stdout
 
 from mjolnir.files import get_cpp_files
 
 parser = ArgumentParser()
+
+
 parser.add_argument("--version", help="Clang-tidy version", type=int, default=12)
 parser.add_argument(
     "--gtest_dir",
@@ -16,8 +18,8 @@ parser.add_argument(
 )
 parser.add_argument(
     "--build_dir",
-    help="The build directory (Can be used to automatically find dependencies fetched"
-    " py CMake)",
+    help="The build directory (Can be used to automatically find dependencies fetched "
+    "by CMake)",
     type=str,
     default="build",
 )

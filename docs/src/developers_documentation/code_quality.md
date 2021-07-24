@@ -12,6 +12,36 @@ consider opening an issue to request an update of this documentation.
 
 ## C++ tools
 
+### Clang Tidy
+
+Clang tidy checks that the code follows several guidelines. It also checks the coding
+style, which is defined in the file `.clang-tidy`. It only runs on `.cpp` files and
+can check just a single file per execution. You can run it like this:
+
+~~~ shell
+clang-tidy-<VERSION> <FILE> 
+~~~
+
+However, this will most likely produce unwanted errors because of missing includes or
+ignore the code of the included headers. 
+This can be solved by additional parameters that are explained in the 
+[official documentation](https://clang.llvm.org/extra/clang-tidy/) (check for newer 
+versions). 
+There is a special python script to run clang-tidy on all project files with the correct
+setup.
+It can be executed with:
+
+~~~ shell
+python python/check_clang_tidy.py
+~~~
+
+You can specify which clang-tidy version should by adding `--version <VERSION>`. To list
+all other available options, use:
+
+~~~ shell
+python python/check_clang_tidy.py -h
+~~~
+
 ### Clang Static Analyzer
 
 To run this tool, create a new build directory and run:
