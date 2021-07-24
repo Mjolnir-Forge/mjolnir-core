@@ -44,9 +44,9 @@ TYPED_TEST_SUITE(PointerOperationTemplateTester, pointer_operation_template_test
 
 constexpr UST alignment = 4;
 
-auto get_offset_pointer(U32 offset) -> U8*
+auto get_offset_pointer(UST offset) -> U8*
 {
-    alignas(alignment) static std::array<U32, 2> instance = {0};
+    alignas(alignment) static std::array<U32, 2> instance = {{0}};
 
     U8* ptr = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     ptr += offset;                              // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)

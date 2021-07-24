@@ -41,7 +41,7 @@ def get_file_paths(
 
 
 def get_cmake_files() -> List[str]:
-    """Get all list of all cmake files.
+    """Get a list of all cmake files.
 
     Returns
     -------
@@ -53,4 +53,20 @@ def get_cmake_files() -> List[str]:
         PATH_MJOLNIR_ROOT_DIR,
         file_patterns=["*.cmake", "*CMakeLists.txt"],
         ignore_patterns=["build"],
+    )
+
+
+def get_cpp_files() -> List[str]:
+    """Get a list of all cpp files.
+
+    Returns
+    -------
+    List[str] :
+        List of all cpp files
+
+    """
+    return get_file_paths(
+        PATH_MJOLNIR_ROOT_DIR,
+        file_patterns=["*.cpp"],
+        ignore_patterns=["build", "cmake", "docs"],
     )
