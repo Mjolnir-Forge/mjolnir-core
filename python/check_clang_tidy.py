@@ -12,9 +12,20 @@ parser.add_argument(
     "--gtest_dir",
     help="Directory containing the gtest header",
     type=str,
-    default="build/_deps/googletest-src/googletest/include",
+    default=None,
+)
+parser.add_argument(
+    "--build_dir",
+    help="The build directory (Can be used to automatically find dependencies fetched"
+    " py CMake)",
+    type=str,
+    default="build",
 )
 args = parser.parse_args()
+
+if args.gtest_dir is None:
+    args.gtest_dir = f"{args.build_dir}/_deps/googletest-src/googletest/include"
+
 
 cmd = f"clang-tidy-{args.version}"
 print(f"Running {cmd}\n")
