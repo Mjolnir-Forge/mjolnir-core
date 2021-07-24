@@ -8,6 +8,12 @@ from mjolnir.files import get_cpp_files
 
 parser = ArgumentParser()
 parser.add_argument("--version", help="Clang-tidy version", type=int, default=12)
+parser.add_argument(
+    "--gtest_dir",
+    help="Directory containing the gtest header",
+    type=str,
+    default="build/_deps/googletest-src/googletest/include",
+)
 args = parser.parse_args()
 
 cmd = f"clang-tidy-{args.version}"
@@ -28,7 +34,7 @@ for file in get_cpp_files():
             "-I",
             "src",
             "-isystem",
-            "build_tidy/_deps/googletest-src/googletest/include",
+            args.gtest_dir,
         ],
     )
     if r.returncode != 0:
