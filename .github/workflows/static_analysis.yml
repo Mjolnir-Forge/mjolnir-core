@@ -26,22 +26,13 @@ jobs:
     - name: Install clang-tidy
       run: |
         sudo apt-get install clang-tidy-11
-    - name: Run CMake
-      run: |
-        mkdir build
-        cd build
-        cmake \
-        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-        -DCMAKE_BUILD_TYPE=DEBUG \
-        ..
     - name: List all checks
       # clang-tidy-12 tests/utility/test_pointer_operations.cpp  -header-filter=.* --extra-arg="-std=gnu++20" --extra-arg="-pthread" -- -I src -isystem build_tidy/_deps/googletest-src/googletest/include
       run: |
         clang-tidy-11 --list-checks
     - name: Run clang-tidy
       run: |
-        cd build
-        run-clang-tidy-11 "(src/mjolnir/core|tests)" -header-filter="(src/mjolnir/core|tests)" -quiet
+        python python/check_clang_tidy.py --version 11
 
   cppcheck:
     runs-on: ubuntu-latest
