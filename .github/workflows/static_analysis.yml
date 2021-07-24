@@ -26,6 +26,11 @@ jobs:
     - name: Install clang-tidy
       run: |
         sudo apt-get install clang-tidy-11
+    - name: Run CMake to fetch googletest
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=DEBUG
+        -S . -B build
     - name: List all checks
       # clang-tidy-12 tests/utility/test_pointer_operations.cpp  -header-filter=.* --extra-arg="-std=gnu++20" --extra-arg="-pthread" -- -I src -isystem build_tidy/_deps/googletest-src/googletest/include
       run: |
