@@ -60,6 +60,7 @@ read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
 if read_the_docs_build:
 
-    subprocess.call("cd ../..; doxygen .doxyfile", shell=True)
+    return_code = subprocess.call("cd ../..; doxygen .doxyfile", shell=True)
+    print(f"RETURNCODE ----- {return_code}")
 
 # sphinx-build source build_sphinx -b html -Dbreathe_projects.MjolnirCore=../build/xml
