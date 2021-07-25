@@ -60,8 +60,12 @@ breathe_projects = dict(mjolnir_core="../build/xml/")
 
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
-if read_the_docs_build:
-    return_code = subprocess.call("cd ../..; doxygen .doxyfile", shell=True)
+if True:  # read_the_docs_build:
+    wd = os.getcwd()
+    os.chdir("../..")
+    return_code = subprocess.run(["doxygen", ".doxyfile"])
+    os.chdir(wd)
 
+    print(return_code)
 
-# sphinx-build source build_sphinx -b html -Dbreathe_projects.MjolnirCore=../build/xml
+# sphinx-build source build_sphinx -b html
