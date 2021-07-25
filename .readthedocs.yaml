@@ -2,6 +2,11 @@
 
 version: 2
 
+# available images:
+# https://github.com/readthedocs/readthedocs-docker-images
+build:
+  image: testing
+
 # Build from the docs/ directory with Sphinx
 sphinx:
   configuration: docs/source/conf.py
