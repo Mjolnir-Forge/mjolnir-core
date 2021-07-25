@@ -67,9 +67,9 @@ if True:  # read_the_docs_build:
     with open(".doxyfile", "a") as file:
         file.write("WARN_AS_ERROR = NO")
 
-    return_code = subprocess.run(["doxygen", ".doxyfile"])
+    subprocess.run(["doxygen", "-v"])
+    subprocess.run(["doxygen", ".doxyfile"])
     os.chdir(wd)
 
-    print(return_code)
 
 # sphinx-build source build_sphinx -b html
