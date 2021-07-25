@@ -64,7 +64,7 @@ if True:  # read_the_docs_build:
     wd = os.getcwd()
 
     os.chdir("../..")
-    with open(".doxyfile.txt", "a") as file:
+    with open(".doxyfile", "a") as file:
         file.write("WARN_AS_ERROR = NO")
 
     return_code = subprocess.run(["doxygen", ".doxyfile"])
