@@ -69,7 +69,7 @@ if read_the_docs_build:
 
     subprocess.run(["doxygen", "-v"])
     r = subprocess.run(["doxygen", ".doxyfile"])
-    if r:
+    if r.returncode:
         raise Exception("The doxygen build failed")
     os.chdir(wd)
 
