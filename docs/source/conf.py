@@ -60,15 +60,17 @@ breathe_projects = dict(mjolnir_core="../build/xml/")
 
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
-if True:  # read_the_docs_build:
+if read_the_docs_build:
     wd = os.getcwd()
-
     os.chdir("../..")
+
     with open(".doxyfile", "a") as file:
         file.write("WARN_AS_ERROR = NO")
 
     subprocess.run(["doxygen", "-v"])
-    subprocess.run(["doxygen", ".doxyfile"])
+    r = subprocess.run(["doxygen", ".doxyfile"])
+    if r:
+        raise Exception("The doxygen build failed")
     os.chdir(wd)
 
 
