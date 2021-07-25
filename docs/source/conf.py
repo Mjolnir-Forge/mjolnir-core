@@ -54,13 +54,14 @@ html_theme = "alabaster"
 html_static_path = ["_static"]
 
 # Breathe Configuration
-breathe_default_project = "MjolnirCore"
+breathe_default_project = "mjolnir_core"
+breathe_projects = dict(mjolnir_core="../build/xml/")
+
 
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
 if read_the_docs_build:
-
     return_code = subprocess.call("cd ../..; doxygen .doxyfile", shell=True)
-    print(f"RETURNCODE ----- {return_code}")
+
 
 # sphinx-build source build_sphinx -b html -Dbreathe_projects.MjolnirCore=../build/xml
