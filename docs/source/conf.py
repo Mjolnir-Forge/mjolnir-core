@@ -15,6 +15,9 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 
+import os
+import subprocess
+
 # -- Project information -----------------------------------------------------
 
 project = "Mjolnir-Core"
@@ -53,5 +56,10 @@ html_static_path = ["_static"]
 # Breathe Configuration
 breathe_default_project = "MjolnirCore"
 
+read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
+
+if read_the_docs_build:
+
+    subprocess.call("cd ../..; doxygen .doxyfile", shell=True)
 
 # sphinx-build source build_sphinx -b html -Dbreathe_projects.MjolnirCore=../build/xml
