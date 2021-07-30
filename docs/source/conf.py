@@ -60,20 +60,20 @@ html_static_path = ["_static"]
 # breathe_projects = dict(mjolnir_core="../build/xml/")
 
 
-read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
+# read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
-if read_the_docs_build:
-    wd = os.getcwd()
-    os.chdir("../..")
+# if read_the_docs_build:
+wd = os.getcwd()
+os.chdir("../..")
 
-    with open(".doxyfile", "a") as file:
-        file.write("WARN_AS_ERROR = NO")
+with open(".doxyfile", "a") as file:
+    file.write("WARN_AS_ERROR = NO")
 
-    subprocess.run(["doxygen", "-v"])
-    r = subprocess.run(["doxygen", ".doxyfile"])
-    if r.returncode:
-        raise Exception("The doxygen build failed")
-    os.chdir(wd)
+subprocess.run(["doxygen", "-v"])
+r = subprocess.run(["doxygen", ".doxyfile"])
+if r.returncode:
+    raise Exception("The doxygen build failed")
+os.chdir(wd)
 
 html_extra_path = ["../build/html"]
 
