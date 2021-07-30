@@ -74,8 +74,9 @@ r = subprocess.run(["doxygen", ".doxyfile"])
 if r.returncode:
     raise Exception("The doxygen build failed")
 r = subprocess.run(["ls", "docs/build/html"])
+r = subprocess.run(["ls", "docs/build_sphinx"])
 os.chdir(wd)
 
 html_extra_path = ["../build/html"]
-
+r = subprocess.run(["ls"])
 # sphinx-build source build_sphinx -b html
