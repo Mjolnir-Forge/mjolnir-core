@@ -16,6 +16,11 @@ Docs
 .. doxygenclass:: AnotherClass
    :members:
 
+.. doxygengroup:: core_utility
+   :members:
+   :outline:
+
+
 Indices and tables
 ==================
 

@@ -30,7 +30,9 @@ author = "Mjolnir-Forge"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["breathe"]
+extensions = [
+    #    "breathe",
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -54,8 +56,8 @@ html_theme = "alabaster"
 html_static_path = ["_static"]
 
 # Breathe Configuration
-breathe_default_project = "mjolnir_core"
-breathe_projects = dict(mjolnir_core="../build/xml/")
+# breathe_default_project = "mjolnir_core"
+# breathe_projects = dict(mjolnir_core="../build/xml/")
 
 
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
@@ -73,5 +75,6 @@ if read_the_docs_build:
         raise Exception("The doxygen build failed")
     os.chdir(wd)
 
+html_extra_path = ["../build/html"]
 
 # sphinx-build source build_sphinx -b html
