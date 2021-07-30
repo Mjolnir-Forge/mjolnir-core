@@ -2,4 +2,4 @@
 
 ## Content {#DevelopersDocumentationContent}
 
-- [Code quality](.developers_documentation/code_quality.md)
+- [Code quality](@ref md_developers_documentation_code_quality)
