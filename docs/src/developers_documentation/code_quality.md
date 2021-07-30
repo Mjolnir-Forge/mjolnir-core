@@ -1,4 +1,4 @@
-# Code Quality
+# Code Quality {#CodeQuality}
 
 ## Introduction
 
