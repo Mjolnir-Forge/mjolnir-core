@@ -3,5 +3,3 @@
 ## Content
 
 - [Code quality](@ref CodeQuality)
-
-a
