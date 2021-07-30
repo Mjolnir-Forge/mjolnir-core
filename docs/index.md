@@ -1,6 +1,6 @@
 # Mjolnir Core Module {#MjolnirCoreModule}
 
-## Content
+## Content {#MjolnirCoreModuleContent}
 
 - Installation
 - [Developers Documentation](@ref DevelopersDocumentation)

@@ -1,5 +1,5 @@
 # Developers documentation {#DevelopersDocumentation}
 
-## Content
+## Content {#DevelopersDocumentationContent}
 
 - [Code quality](@ref CodeQuality)
