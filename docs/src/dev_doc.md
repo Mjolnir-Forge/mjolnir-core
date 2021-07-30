@@ -1,7 +1,5 @@
 # Developers documentation {#DevelopersDocumentation}
 
-test if this helps
-
-## Content
+## Content {#DevelopersDocumentationContent}
 
 - [Code quality](docs/src/developers_documentation/code_quality.md)

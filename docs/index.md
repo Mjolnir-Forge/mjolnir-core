@@ -1,8 +1,6 @@
-# Mjolnir Core Module
+# Mjolnir Core Module {#MjolnirCoreModule}
 
-test if this helps
-
-## Content
+## Content {#MjolnirCoreModuleContent}
 
 - Installation
 - [Developers Documentation](@ref DevelopersDocumentation)
