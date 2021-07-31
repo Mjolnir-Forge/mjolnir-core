@@ -1,4 +1,6 @@
-@page CodeQuality some name
+@page CodeQuality Developers documentation - Code Quality
+@brief Describes the tools that are used to maintain a good code quality
+
 # Code Quality 
 
 ## Introduction
