@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
     - name: Setup Conda
       uses: conda-incubator/setup-miniconda@v2
       with:
@@ -21,9 +22,10 @@ jobs:
         activate-environment: RTD
         auto-activate-base: false
 
-    - name: conda info
+    - name: Print doxygen version
       shell: bash -l {0}
-      run: conda info
+      run: |
+        doxygen -v
 
     - name: Run doxygen
       shell: bash -l {0}
