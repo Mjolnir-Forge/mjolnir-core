@@ -3,4 +3,4 @@
 ## Content
 
 - Installation
-- [Developers Documentation](docs/src/dev_doc.md)
+- [Developers Documentation](@ref DevelopersDocumentation)

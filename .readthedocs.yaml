@@ -1,0 +1,20 @@
+# File: .readthedocs.yaml
+
+version: 2
+
+# available images:
+# https://github.com/readthedocs/readthedocs-docker-images
+build:
+  image: latest
+
+# Build from the docs/ directory with Sphinx
+sphinx:
+  configuration: docs/rtd/conf.py
+
+conda:
+  environment: docs/environment.yml
+
+# Explicitly set the version of Python and its requirements
+python:
+  version: 3.8
+

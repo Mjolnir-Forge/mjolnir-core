@@ -1,4 +1,4 @@
-# Code Quality
+# Code Quality {#CodeQuality}
 
 ## Introduction
 
@@ -56,7 +56,7 @@ Note that you might need to use a different version number of the tool.
 IMPORTANT: Always clear the directory (`rm -rf *`) and run both commands. It seems like
 the tool doesn't find any bugs after the first run for some reason.
 
-### Cppcheck
+### CppCheck
 
 The root directory contains a cppcheck project file named `.cppcheck`. If you have
 cppcheck installed, run the following command to perform the checks on your local

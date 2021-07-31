@@ -10,11 +10,14 @@ spellcheck_filenames: true
 excluded_words:
   # names
   - appveyor
-  - conda-forge 
+  - conda
+  - conda-forge
   - devnull
   - gtest
   - mjolnir
   - msvc
+  - readthedocs
+  - rtd
   - typoci
   # assembly
   - dil
@@ -70,3 +73,5 @@ excluded_words:
   - isort 
   - pydocstyle
   - rglob
+  # sphinx
+  - toctree
