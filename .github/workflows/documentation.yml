@@ -21,6 +21,7 @@ jobs:
         environment-file: docs/environment.yml
         activate-environment: RTD
         auto-activate-base: false
+        mamba-version: "*"
 
     - name: Print doxygen version
       shell: bash -l {0}
