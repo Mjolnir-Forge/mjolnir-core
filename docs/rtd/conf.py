@@ -62,7 +62,7 @@ html_static_path = ["_static"]
 
 # read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
-# if read_the_docs_build:
+
 wd = os.getcwd()
 os.chdir("../..")
 
@@ -73,10 +73,9 @@ subprocess.run(["doxygen", "-v"])
 r = subprocess.run(["doxygen", ".doxyfile"])
 if r.returncode:
     raise Exception("The doxygen build failed")
-r = subprocess.run(["ls", "docs/build/html"])
-r = subprocess.run(["ls"])
+
 os.chdir(wd)
 
 html_extra_path = ["../build/html"]
-r = subprocess.run(["ls"])
+
 # sphinx-build source build_sphinx -b html
