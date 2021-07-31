@@ -1,5 +1,6 @@
-# Developers documentation {#DevelopersDocumentation}
+@page DevelopersDocumentation Developers documentation
+# Developers documentation
 
-## Content {#DevelopersDocumentationContent}
+## Content
 
 - [Code quality](@ref CodeQuality)
