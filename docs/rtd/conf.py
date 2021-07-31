@@ -66,8 +66,8 @@ html_static_path = ["_static"]
 wd = os.getcwd()
 os.chdir("../..")
 
-with open(".doxyfile", "a") as file:
-    file.write("WARN_AS_ERROR = NO")
+# with open(".doxyfile", "a") as file:
+#    file.write("WARN_AS_ERROR = NO")
 
 subprocess.run(["doxygen", "-v"])
 r = subprocess.run(["doxygen", ".doxyfile"])
