@@ -37,6 +37,8 @@ set(GTEST_MINIMAL_VERSION 1.10.0)
 # Compiler
 # ------------------------------------------------------------------------------
 
+message("Compiler: ${CMAKE_CXX_COMPILER_ID} - ${CMAKE_CXX_COMPILER_VERSION}")
+
 # Set compile features
 
 set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_17
