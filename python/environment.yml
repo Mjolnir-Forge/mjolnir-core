@@ -10,6 +10,5 @@ dependencies:
   - pydocstyle
   - pyyaml
   - pip
-  - doxygen=1.9.1
   - pip:
     - cmakelang
