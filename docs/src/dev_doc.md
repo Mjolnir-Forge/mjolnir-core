@@ -1,5 +1,4 @@
-@page DevelopersDocumentation Developers documentation
-# Developers documentation
+# Developers documentation {#DevelopersDocumentation}
 
 ## Content
 

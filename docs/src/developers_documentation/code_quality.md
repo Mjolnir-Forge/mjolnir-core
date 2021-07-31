@@ -1,6 +1,4 @@
-@page CodeQuality Developers documentation - code quality
-
-# Code Quality 
+# Code Quality {#CodeQuality}
 
 ## Introduction
 
