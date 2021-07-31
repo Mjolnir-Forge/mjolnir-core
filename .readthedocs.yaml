@@ -9,7 +9,7 @@ build:
 
 # Build from the docs/ directory with Sphinx
 sphinx:
-  configuration: docs/src/conf.py
+  configuration: docs/rtd/conf.py
 
 conda:
   environment: python/environment.yml
@@ -18,4 +18,4 @@ conda:
 python:
   version: 3.8
   install:
-    - requirements: docs/src/requirements.txt
+    - requirements: docs/rtd/requirements.txt
