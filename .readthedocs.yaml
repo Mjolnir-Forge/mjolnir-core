@@ -5,7 +5,7 @@ version: 2
 # available images:
 # https://github.com/readthedocs/readthedocs-docker-images
 build:
-  image: testing
+  image: latest
 
 # Build from the docs/ directory with Sphinx
 sphinx:
