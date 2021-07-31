@@ -20,6 +20,12 @@ jobs:
         environment-file: docs/environment.yml
         activate-environment: RTD
         auto-activate-base: false
+
+    - name: conda info
+      shell: bash -l {0}
+      run: conda info
+
     - name: Run doxygen
+      shell: bash -l {0}
       run: |
         doxygen .doxyfile
