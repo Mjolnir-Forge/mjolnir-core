@@ -11,6 +11,9 @@ build:
 sphinx:
   configuration: docs/src/conf.py
 
+conda:
+  environment: python/environment.yml
+
 # Explicitly set the version of Python and its requirements
 python:
   version: 3.8
