@@ -12,7 +12,7 @@ sphinx:
   configuration: docs/rtd/conf.py
 
 conda:
-  environment: python/environment.yml
+  environment: docs/environment.yml
 
 # Explicitly set the version of Python and its requirements
 python:
