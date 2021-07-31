@@ -37,15 +37,30 @@ set(GTEST_MINIMAL_VERSION 1.10.0)
 # Compiler
 # ------------------------------------------------------------------------------
 
-message("Compiler: ${CMAKE_CXX_COMPILER_ID} - ${CMAKE_CXX_COMPILER_VERSION}")
+# Set minimal compiler versions
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(minimal_compiler_version "10.0")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set(minimal_compiler_version "12.0")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    set(minimal_compiler_version "19.28")
+else()
+    message(WARNING "Compiler is not supported. Builds might fail!")
+endif()
+
+# Check compiler version
+if(${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${minimal_compiler_version})
+    message(FATAL_ERROR "The required minimal version for compiler"
+        " '${CMAKE_CXX_COMPILER_ID}' is ${minimal_compiler_version}."
+        " Your version is ${CMAKE_CXX_COMPILER_VERSION}")
+endif()
+
 
 # Set compile features
-
 set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_17
                                   ${MJOLNIR_CORE_ADDITIONAL_COMPILE_FEATURES})
 
 # Set compile options
-
 if(MSVC)
     set(MJOLNIR_CORE_COMPILE_OPTIONS /W4
                                      ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
@@ -60,13 +75,14 @@ else()
         ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
 endif()
 
-# Compiler extensions
 
+# Compiler extensions
 if(${MJOLNIR_CORE_ENABLE_COMPILER_EXTENSIONS})
     set(MJOLNIR_CORE_TARGET_PROPERTIES CXX_EXTENSIONS ON)
 else()
     set(MJOLNIR_CORE_TARGET_PROPERTIES CXX_EXTENSIONS OFF)
 endif()
+
 
 # ------------------------------------------------------------------------------
 # Linker
