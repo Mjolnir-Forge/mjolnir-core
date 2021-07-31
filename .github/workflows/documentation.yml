@@ -14,9 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install doxygen
-      run: |
-        sudo apt-get install doxygen graphviz
+    - name: Setup Conda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        environment-file: docs/rtd/environment.yml
+        activate-environment: RTD
+        auto-activate-base: false
     - name: Run doxygen
       run: |
         doxygen .doxyfile
