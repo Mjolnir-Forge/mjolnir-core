@@ -37,7 +37,7 @@ Adding `-j N` will accelerate the build process by using `N` processor cores.
 The following list collects additional parameters that can be passed to CMake via the
 command line in the form `-D<PARAMETER_NAME>=`:
 
-**`IGNORE_CXX_COMPILER_COMPATIBILITY`:**
+`IGNORE_CXX_COMPILER_COMPATIBILITY`:
 
 If the parameters content is evaluates to `True`, errors due to incompatible compiler 
 versions will be downgraded to warnings
