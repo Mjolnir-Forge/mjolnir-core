@@ -2,5 +2,5 @@
 
 ## Content
 
-- Installation
+- [Installation](@ref Installation)
 - [Developers Documentation](@ref DevelopersDocumentation)

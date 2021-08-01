@@ -37,13 +37,46 @@ set(GTEST_MINIMAL_VERSION 1.10.0)
 # Compiler
 # ------------------------------------------------------------------------------
 
-# Set compile features
+# define minimal compiler versions
 
+set(MINIMAL_CLANG_CXX_VERSION "12.0")
+set(MINIMAL_GNU_CXX_VERSION "10.0")
+set(MINIMAL_MSVC_CXX_VERSION "19.28")
+
+# Set minimal version for detected compiler
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(MINIMAL_CXX_COMPILER_VERSION ${MINIMAL_GNU_CXX_VERSION})
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set(MINIMAL_CXX_COMPILER_VERSION ${MINIMAL_CLANG_CXX_VERSION})
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    set(MINIMAL_CXX_COMPILER_VERSION ${MINIMAL_MSVC_CXX_VERSION})
+else()
+    message(WARNING "Compiler is not supported. Builds might fail!")
+endif()
+
+# Check compiler version
+if(${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${MINIMAL_CXX_COMPILER_VERSION})
+    if(NOT DEFINED IGNORE_CXX_COMPILER_COMPATIBILITY
+       OR NOT ${IGNORE_CXX_COMPILER_COMPATIBILITY})
+        message(
+            FATAL_ERROR
+                "The required minimal version for compiler "
+                "'${CMAKE_CXX_COMPILER_ID}' is "
+                "${MINIMAL_CXX_COMPILER_VERSION}."
+                " Your version is ${CMAKE_CXX_COMPILER_VERSION}")
+    else()
+        message(
+            WARNING
+                "You are using an unsupported compiler version. Builds might "
+                "fail.")
+    endif()
+endif()
+
+# Set compile features
 set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_17
                                   ${MJOLNIR_CORE_ADDITIONAL_COMPILE_FEATURES})
 
 # Set compile options
-
 if(MSVC)
     set(MJOLNIR_CORE_COMPILE_OPTIONS /W4
                                      ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
@@ -59,7 +92,6 @@ else()
 endif()
 
 # Compiler extensions
-
 if(${MJOLNIR_CORE_ENABLE_COMPILER_EXTENSIONS})
     set(MJOLNIR_CORE_TARGET_PROPERTIES CXX_EXTENSIONS ON)
 else()
