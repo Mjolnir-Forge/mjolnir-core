@@ -30,6 +30,7 @@ jobs:
       run:
         cmake
         -DCMAKE_BUILD_TYPE=DEBUG
+        -DIGNORE_CXX_COMPILER_COMPATABILITY=True
         -S . -B build
     - name: List all checks
       run:
