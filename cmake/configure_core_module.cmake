@@ -37,24 +37,40 @@ set(GTEST_MINIMAL_VERSION 1.10.0)
 # Compiler
 # ------------------------------------------------------------------------------
 
-# Set minimal compiler versions
+# define minimal compiler versions
+
+set(MINIMAL_CLANG_CXX_VERSION "12.0")
+set(MINIMAL_GNU_CXX_VERSION "10.0")
+set(MINIMAL_MSVC_CXX_VERSION "19.28")
+
+# Set minimal version for detected compiler
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(minimal_compiler_version "10.0")
+    set(MINIMAL_CXX_COMPILER_VERSION ${MINIMAL_GNU_CXX_VERSION})
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(minimal_compiler_version "12.0")
+    set(MINIMAL_CXX_COMPILER_VERSION ${MINIMAL_CLANG_CXX_VERSION})
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    set(minimal_compiler_version "19.28")
+    set(MINIMAL_CXX_COMPILER_VERSION ${MINIMAL_MSVC_CXX_VERSION})
 else()
     message(WARNING "Compiler is not supported. Builds might fail!")
 endif()
 
 # Check compiler version
-if(${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${minimal_compiler_version})
-    message(FATAL_ERROR "The required minimal version for compiler"
-        " '${CMAKE_CXX_COMPILER_ID}' is ${minimal_compiler_version}."
-        " Your version is ${CMAKE_CXX_COMPILER_VERSION}")
+if(${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${MINIMAL_CXX_COMPILER_VERSION})
+    if(NOT DEFINED IGNORE_CXX_COMPILER_COMPATABILITY
+       OR NOT ${IGNORE_CXX_COMPILER_COMPATABILITY})
+        message(
+            FATAL_ERROR
+                "The required minimal version for compiler "
+                "'${CMAKE_CXX_COMPILER_ID}' is "
+                "${MINIMAL_CXX_COMPILER_VERSION}."
+                " Your version is ${CMAKE_CXX_COMPILER_VERSION}")
+    else()
+        message(
+            WARNING
+                "You are using an unsupported compiler version. Builds might "
+                "fail.")
+    endif()
 endif()
-
 
 # Set compile features
 set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_17
@@ -75,14 +91,12 @@ else()
         ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
 endif()
 
-
 # Compiler extensions
 if(${MJOLNIR_CORE_ENABLE_COMPILER_EXTENSIONS})
     set(MJOLNIR_CORE_TARGET_PROPERTIES CXX_EXTENSIONS ON)
 else()
     set(MJOLNIR_CORE_TARGET_PROPERTIES CXX_EXTENSIONS OFF)
 endif()
-
 
 # ------------------------------------------------------------------------------
 # Linker
