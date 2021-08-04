@@ -12,9 +12,29 @@ consider opening an issue to request an update of this documentation.
 
 ## C++ tools
 
-### Clang Tidy
+### Clang-Format
 
-Clang tidy checks that the code follows several guidelines. It also checks the coding
+Clang-format automatically refactors your code to match a specified format.
+It is possible to run it from the command line, for example with:
+
+~~~
+clang-format -i <FILE>
+~~~
+
+However, most IDEs support clang-format so that your code gets formatted everytime the 
+file is saved.
+If you use QtCreator, enable the beautifier plugin in the C++ section.
+This generates a new submenu in the Options where you can select and configure 
+clang-format.
+The configuration file `.clang-format` is located in the root directory.
+
+Every time you push to the GitHub repository, all files are checked.
+In case that a file is not formatted correctly, the corresponding action fails and 
+pull requests can't be merged into the master branch until all issues are fixed.
+
+### Clang-Tidy
+
+Clang-tidy checks that the code follows several guidelines. It also checks the coding
 style, which is defined in the file `.clang-tidy`. It only runs on `.cpp` files and
 can check just a single file per execution. You can run it like this:
 
