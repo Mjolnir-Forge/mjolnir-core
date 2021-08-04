@@ -77,8 +77,8 @@ Run CMake as follows:
 cmake -DCMAKE_BUILD_TYPE=DEBUG \
       -DCMAKE_C_COMPILER=clang \
       -DCMAKE_CXX_COMPILER=clang++ \
-      -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=<TOOL>"
-      -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=<TOOL>"
+      -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=<TOOL>" \
+      -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=<TOOL>" \
       -S . -B <BUILD_DIR>
 ~~~
 
