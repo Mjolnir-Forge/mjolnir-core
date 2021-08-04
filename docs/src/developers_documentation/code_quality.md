@@ -62,6 +62,47 @@ all other available options, use:
 python python/check_clang_tidy.py -h
 ~~~
 
+### Clang Sanitizer
+
+Clang comes with different sanitizer tools that can be activated with additional 
+compiler and linker commands.
+When the compiled code is executed it generates extra warnings and errors if problems 
+are detected.
+Have a look into the file `.github/workflows/compiletime_and_runtime_analysis.yml` to
+get an overview which tools are currently used to maintain a good code quality.
+The basic usage is mostly the same.
+Run CMake as follows:
+
+~~~
+cmake -DCMAKE_BUILD_TYPE=DEBUG \
+      -DCMAKE_C_COMPILER=clang \
+      -DCMAKE_CXX_COMPILER=clang++ \
+      -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=<TOOL>"
+      -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=<TOOL>"
+      -S . -B <BUILD_DIR>
+~~~
+
+The CMake variables `MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS` and 
+`MJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS` are used to build all library files with the
+specified options.
+Now run the following command to build:
+
+~~~
+cmake --build <BUILD_DIR> -j <NUM_THREADS>
+~~~
+
+Finally, run the compiled code to see if there are any issues.
+In the GitHub actions, all tests are build and run with different tools:
+
+~~~
+ ctest --output-on-failure
+~~~
+
+You can always have a look into `compiletime_and_runtime_analysis.yml` if you are not 
+sure how to run a specific tool that runs on the GitHub repository.
+
+
+
 ### Clang Static Analyzer
 
 To run this tool, create a new build directory and run:
