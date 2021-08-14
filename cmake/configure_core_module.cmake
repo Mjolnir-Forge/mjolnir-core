@@ -73,7 +73,7 @@ if(${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${MINIMAL_CXX_COMPILER_VERSION})
 endif()
 
 # Set compile features
-set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_17
+set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_20
                                   ${MJOLNIR_CORE_ADDITIONAL_COMPILE_FEATURES})
 
 # Set compile options
@@ -102,9 +102,9 @@ endif()
 # Linker
 # ------------------------------------------------------------------------------
 
-# Link time optimizations
 set(MJOLNIR_CORE_LINK_OPTIONS ${MJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS})
 
+# Link time optimizations
 include(CheckIPOSupported)
 check_ipo_supported(RESULT lto_supported)
 if(lto_supported)

@@ -32,14 +32,27 @@ cmake --build <BUILD_DIR>
 
 Adding `-j N` will accelerate the build process by using `N` processor cores.
 
+## Build options
+
+The following options can be used to customize the build:
+
+
+- `MJOLNIR_CORE_ENABLE_TESTS`: Enables the tests of the core module
+- `MJOLNIR_CORE_ENABLE_COMPILER_EXTENSIONS`: Enables compiler extensions for the core module
+- `MJOLNIR_CORE_ENABLE_LTO`: Enables link time optimizations for the core module
+
 ## Additional CMake parameters
 
 The following list collects additional parameters that can be passed to CMake via the
 command line in the form `-D<PARAMETER_NAME>=`:
 
-`IGNORE_CXX_COMPILER_COMPATIBILITY`:
-
-If the parameters content is evaluates to `True`, errors due to incompatible compiler 
-versions will be downgraded to warnings
-
-
+- `IGNORE_CXX_COMPILER_COMPATIBILITY`: If the parameters content is evaluates to `True`, 
+  errors due to incompatible compiler versions will be downgraded to warnings
+- `MJOLNIR_CORE_ADDITIONAL_COMPILE_FEATURES`: Lets you specify additional CMake compile 
+  features that should be used during the build process of the core library
+- `MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS`: Lets you specify additional compiler 
+  options that should be used during the build process of the core library
+- `MJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS`: Lets you specify additional linker 
+  options that should be used during the build process of the core library
+- `MJOLNIR_ROOT_DIR`: Specifies the root directory of the full library
+- `MJOLNIR_CORE_ROOT_DIR`: Specifies the root directory of the core library
