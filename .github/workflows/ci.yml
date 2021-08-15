@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        build_type: [DEBUG, RELEASE]
+        build_type: [RELEASE]
     steps:
     - uses: actions/checkout@v2
     - name: Run CMake
@@ -23,6 +23,38 @@ jobs:
       run: |
         cd build  
         ctest  --output-on-failure
+
+  GCC_Ubuntu_Coverage:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_type: [DEBUG]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Intstall lcov
+      run:
+        sudo apt-get install lcov
+    - name: Run CMake
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+        -DCMAKE_C_COMPILER=gcc-10
+        -DCMAKE_CXX_COMPILER=g++-10
+        -DCMAKE_CXX_FLAGS="--coverage"
+        -S . -B build
+    - name: Build
+      run: cmake --build build -j 2
+    - name: Run tests
+      run: |
+        cd build
+        ctest  --output-on-failure
+    - name: Create coverage report
+      run: |
+        lcov --directory . --capture --output-file ../coverage.info
+        lcov --remove ../coverage.info 'usr/*' --output-file ../coverage.info
+        lcov --remove ../coverage.info '*/tests/*' --output-file ../coverage.info
+        bash <(curl -s https://codecov.io/bash)
+
 
   Clang_Ubuntu:
     runs-on: ubuntu-latest
