@@ -20,10 +20,24 @@ namespace mjolnir
 class Exception : public std::runtime_error
 {
 public:
-    Exception()                       = delete;
+    Exception() = delete;
+
+    //! @brief Copy contstructor
+    //! @param[in] other: Other instance that should be copied
     Exception(const Exception& other) = default;
-    Exception(Exception&& other)      = default;
+
+    //! @brief Move constructor
+    //! @param[in, out] other: Other instance that should be moved
+    Exception(Exception&& other) = default;
+
+    //! @brief Copy assignment operator
+    //! @param[in] other: Other instance that should be copied
+    //! @return Reference to class instance
     auto operator=(const Exception& other) -> Exception& = default;
+
+    //! @brief Move assignment operator
+    //! @param[in, out] other: Other instance that should be moved
+    //! @return Reference to class instance
     auto operator=(Exception&& other) -> Exception& = default;
     virtual ~Exception()                            = default;
 
