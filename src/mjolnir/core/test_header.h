@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "mjolnir/core/exception.h"
+
 
 namespace mjolnir
 {
