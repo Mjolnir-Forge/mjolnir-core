@@ -20,8 +20,8 @@ namespace mjolnir
 class Exception : public std::runtime_error
 {
 public:
-    Exception()                   = delete;
-    virtual ~Exception() override = default;
+    Exception()           = delete;
+    ~Exception() override = default;
 
     //! @brief Copy contstructor
     //! @param[in] other: Other instance that should be copied
