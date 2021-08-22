@@ -19,14 +19,13 @@ namespace mjolnir
 //! @brief Stores origion and message of an exception
 class Exception : public std::runtime_error
 {
-
 public:
-    Exception() = delete;
+    Exception()                       = delete;
     Exception(const Exception& other) = default;
-    Exception(Exception&& other) = default;
-    auto operator=(const Exception& other) ->Exception& = default;
-    auto operator=(Exception&& other)->Exception& = default;
-    virtual ~Exception() = default;
+    Exception(Exception&& other)      = default;
+    auto operator=(const Exception& other) -> Exception& = default;
+    auto operator=(Exception&& other) -> Exception& = default;
+    virtual ~Exception()                            = default;
 
     //! @brief Constructor
     //! @param origin: Name of the function that caused the exception
