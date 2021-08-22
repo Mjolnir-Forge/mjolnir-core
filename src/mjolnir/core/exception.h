@@ -45,10 +45,7 @@ public:
     //! @brief Constructor
     //! @param origin: Name of the function that caused the exception
     //! @param message: Exception message
-    Exception(const std::string& origin, const std::string& message)
-        : std::runtime_error{std::string("[") + origin + std::string("] ") + message}
-    {
-    }
+    Exception(const std::string& origin, const std::string& message);
 };
 
 //! @}
@@ -56,3 +53,15 @@ public:
 
 
 // ====================================================================================================================
+
+
+namespace mjolnir
+{
+// --------------------------------------------------------------------------------------------------------------------
+
+Exception::Exception(const std::string& origin, const std::string& message)
+    : std::runtime_error{std::string("[") + origin + std::string("] ") + message}
+{
+}
+
+} // namespace mjolnir
