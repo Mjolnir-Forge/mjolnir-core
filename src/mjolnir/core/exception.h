@@ -20,7 +20,8 @@ namespace mjolnir
 class Exception : public std::runtime_error
 {
 public:
-    Exception() = delete;
+    Exception()                   = delete;
+    virtual ~Exception() override = default;
 
     //! @brief Copy contstructor
     //! @param[in] other: Other instance that should be copied
@@ -39,12 +40,12 @@ public:
     //! @param[in, out] other: Other instance that should be moved
     //! @return Reference to class instance
     auto operator=(Exception&& other) -> Exception& = default;
-    virtual ~Exception()                            = default;
+
 
     //! @brief Constructor
     //! @param origin: Name of the function that caused the exception
     //! @param message: Exception message
-    Exception(std::string origin, std::string message)
+    Exception(const std::string& origin, const std::string& message)
         : std::runtime_error{std::string("[") + origin + std::string("] ") + message}
     {
     }
