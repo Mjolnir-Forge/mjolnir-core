@@ -19,6 +19,13 @@
 //! @param[in] message: The exception message
 #define THROW_EXCEPTION(message) throw mjolnir::Exception(__PRETTY_FUNCTION__, message)
 
+//! @brief Throw an exception if the passed condition is met.
+//! @param[in] condition: If the passed condition validates as `true`, the exception is thrown.
+//! @param[in] message: The exception message
+#define THROW_EXCEPTION_IF(condition, message)                                                                         \
+    if (condition)                                                                                                     \
+    THROW_EXCEPTION(message)
+
 //! @}
 
 // ====================================================================================================================
