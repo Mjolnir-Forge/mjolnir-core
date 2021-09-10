@@ -10,6 +10,19 @@
 #include <cstring>
 #include <stdexcept>
 
+// ====================================================================================================================
+
+//! \addtogroup core
+//! @{
+
+//! @brief Throw an exception and automatically add the function that caused it.
+//! @param[in] message: The exception message
+#define THROW_EXCEPTION(message) throw mjolnir::Exception(__PRETTY_FUNCTION__, message)
+
+//! @}
+
+// ====================================================================================================================
+
 
 namespace mjolnir
 {
@@ -43,8 +56,8 @@ public:
 
 
     //! @brief Constructor
-    //! @param origin: Name of the function that caused the exception
-    //! @param message: Exception message
+    //! @param[in] origin: Name of the function that caused the exception
+    //! @param[in] message: Exception message
     Exception(const std::string& origin, const std::string& message);
 };
 
