@@ -15,7 +15,7 @@ namespace mjolnir
 
 //! @brief Return a register with the absolute values of the input register.
 //! @tparam T_RegisterType: The register type
-//! @param val[in]: The initial values
+//! @param[in] val: The initial values
 //! @return Register containing the absolute values
 //! @remark source:
 //! https://stackoverflow.com/q/23847377/6700329
