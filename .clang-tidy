@@ -19,6 +19,7 @@ Checks: >
 WarningsAsErrors: '*, -readability-identifier-naming'
 
 CheckOptions:
+  - {key: cppcoreguidelines-macro-usage.AllowedRegexp,                   value: DEBUG*|THROW*}
   # Naming conventions ------------------------------------------------------------------------------------------------
 
   # Case
