@@ -7,3 +7,8 @@
 //!
 //! @brief
 //! This submodule of the core module contains various utility functions.
+
+//! @defgroup core_x86 Core x86
+//!
+//! @brief
+//! This submodule of the core module provides x86 related functions and classes.
