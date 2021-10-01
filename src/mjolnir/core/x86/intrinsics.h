@@ -5,22 +5,7 @@
 //! Contains generalized/template versions of the x86 intrinsics
 
 
-#pragma once
-
-#if defined __GNUC__ && __GNUC__ >= 6
-#    pragma GCC diagnostic ignored "-Wignored-attributes"
-#endif
-
-
-// see https://stackoverflow.com/a/22291538/6700329
-#if defined(_MSC_VER)
-#    include <intrin.h>
-#elif defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__))
-#    include <x86intrin.h>
-#else
-static_assert(false, "Incompatible processor architecture or compiler");
-#endif
-
+#include "mjolnir/core/x86/x86.h"
 
 namespace mjolnir
 {
@@ -29,4 +14,32 @@ namespace mjolnir
 
 
 //! @}
+} // namespace mjolnir
+
+
+// ====================================================================================================================
+
+namespace mjolnir
+{
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename _registerType, typename _type>
+inline _registerType mm_set1(_type value)
+{
+    /*
+        using namespace GDL::simd;
+        static_assert(IsRegisterType<_registerType>, "Function can only be used with compatible register types.");
+
+        if constexpr (Is__m128<_registerType>)
+            return _mm_set1_ps(static_cast<F32>(value));
+        else if constexpr (Is__m128d<_registerType>)
+            return _mm_set1_pd(static_cast<F64>(value));
+    #ifdef __AVX2__
+        else if constexpr (Is__m256<_registerType>)
+            return _mm256_set1_ps(static_cast<F32>(value));
+        else
+            return _mm256_set1_pd(static_cast<F64>(value));
+    #endif // __AVX2__
+    */
+}
 } // namespace mjolnir
