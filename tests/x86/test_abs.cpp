@@ -32,4 +32,5 @@ TEST_P(AbsTester, test_abs) // NOLINT cert-err58-cpp
 
     __m128 a = _mm_set1_ps(pointer_offset);
     __m128 b = abs(a);
+    std::cout << alignment_bytes<__m128> << std::endl;
 }

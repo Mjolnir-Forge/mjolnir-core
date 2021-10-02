@@ -5,6 +5,7 @@
 //! Contains generalized/template versions of the x86 intrinsics
 
 
+#include "mjolnir/core/x86/constants.h"
 #include "mjolnir/core/x86/x86.h"
 
 namespace mjolnir

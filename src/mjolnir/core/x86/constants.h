@@ -6,9 +6,10 @@
 
 
 #pragma once
-
-#include "mjolnir/core/x86/x86.h"
 #include "mjolnir/core/fundamental_types.h"
+#include "mjolnir/core/utility/type.h"
+#include "mjolnir/core/x86/x86.h"
+#include <type_traits>
 
 namespace mjolnir
 {
@@ -16,29 +17,34 @@ namespace mjolnir
 //! @{
 
 //! @brief Alignment of an SSE register in bytes
+inline constexpr const UST alignment_bytes_default = 4;
+
+//! @brief Alignment of an SSE register in bytes
 inline constexpr const UST alignment_bytes_sse = 16;
 
 //! @brief Alignment of an AVX register in bytes
 inline constexpr const UST alignment_bytes_avx = 32;
 
+namespace internal
+{
+template <typename T_RegisterType>
+inline consteval auto get_alignment_bytes() -> UST
+{
+    if constexpr (is_one_of<T_RegisterType, __m128, __m128d, __m128i>())
+        return alignment_bytes_sse;
+    if constexpr (is_one_of<T_RegisterType, __m256, __m256d, __m256i>())
+        return alignment_bytes_avx;
+    else
+        return alignment_bytes_default;
+}
+
+} // namespace internal
+
+
 //! @brief Register type dependent alignment in bytes.
 //! @tparam _registerType: RegisterType
 template <typename T_RegisterType>
-inline constexpr const U32 alignment_bytes = 0;
-template <>
-inline constexpr const U32 alignment_bytes<__m128> = alignment_bytes_sse;
-template <>
-inline constexpr const U32 alignment_bytes<__m128d> = alignment_bytes_sse;
-template <>
-inline constexpr const U32 alignment_bytes<__m128i> = alignment_bytes_sse;
-#ifdef __AVX2__
-template <>
-inline constexpr const U32 alignment_bytes<__m256> = alignment_bytes_avx;
-template <>
-inline constexpr const U32 alignment_bytes<__m256d> = alignment_bytes_avx;
-template <>
-inline constexpr const U32 alignment_bytes<__m256i> = alignment_bytes_avx;
-#endif // __AVX2__
+inline constexpr const U32 alignment_bytes = internal::get_alignment_bytes<T_RegisterType>();
 
 //! @}
 } // namespace mjolnir
