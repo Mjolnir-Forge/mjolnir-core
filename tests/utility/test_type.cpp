@@ -41,4 +41,5 @@ const bool TestIsAnyOf<T_Type>::expected_result =
 
 // define test cases
 using IsAnyOfTestCases = ::testing::Types<I8, I32, I64, U32, U64, UST, F32, F64>;
+// cppcheck-suppress syntaxError
 INSTANTIATE_TYPED_TEST_SUITE_P(is_any_of_test_suite, TestIsAnyOf, IsAnyOfTestCases, ); // NOLINT
