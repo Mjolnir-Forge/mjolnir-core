@@ -24,7 +24,7 @@
 //! @param[in] message: The exception message
 #define THROW_EXCEPTION_IF(condition, message)                                                                         \
     if (condition)                                                                                                     \
-    THROW_EXCEPTION(message)
+    [[unlikely]] THROW_EXCEPTION(message)
 
 //! @}
 
