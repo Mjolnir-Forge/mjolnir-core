@@ -24,8 +24,8 @@ namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename _registerType, typename _type>
-inline _registerType mm_set1(_type value)
+template <typename T_RegisterType, typename T_Type>
+inline auto mm_set1(T_Type value) -> T_RegisterType
 {
     /*
         using namespace GDL::simd;

@@ -28,9 +28,9 @@ INSTANTIATE_TEST_SUITE_P(abs, AbsTester, ::testing::Values(0, 1, 2, 3, 4, 5, 6, 
 
 TEST_P(AbsTester, test_abs) // NOLINT cert-err58-cpp
 {
-    const UST pointer_offset = GetParam();
+    // const UST pointer_offset = GetParam();
 
-    __m128 a = _mm_set1_ps(pointer_offset);
-    __m128 b = abs(a);
-    std::cout << alignment_bytes<__m128> << std::endl;
+    //__m128 a = _mm_set1_ps(pointer_offset);
+    //__m128 b = abs(a);
+    // std::cout << alignment_bytes<__m128> << std::endl;
 }
