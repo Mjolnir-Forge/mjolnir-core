@@ -23,8 +23,8 @@
 //! @param[in] condition: If the passed condition validates as `true`, the exception is thrown.
 //! @param[in] message: The exception message
 #define THROW_EXCEPTION_IF(condition, message)                                                                         \
-    if (condition)                                                                                                     \
-    [[unlikely]] THROW_EXCEPTION(message)
+    if (condition) [[unlikely]]                                                                                        \
+    THROW_EXCEPTION(message)
 
 //! @}
 
