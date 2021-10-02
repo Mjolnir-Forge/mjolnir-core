@@ -16,23 +16,19 @@ namespace mjolnir
 //! \addtogroup core_x86
 //! @{
 
-//! @brief Alignment of an SSE register in bytes
-inline constexpr const UST alignment_bytes_default = 4;
-
-//! @brief Alignment of an SSE register in bytes
-inline constexpr const UST alignment_bytes_sse = 16;
-
-//! @brief Alignment of an AVX register in bytes
-inline constexpr const UST alignment_bytes_avx = 32;
 
 namespace internal
 {
+inline constexpr const UST alignment_bytes_default = 4;
+inline constexpr const UST alignment_bytes_sse     = 16;
+inline constexpr const UST alignment_bytes_avx     = 32;
+
 template <typename T_RegisterType>
 inline consteval auto get_alignment_bytes() -> UST
 {
-    if constexpr (is_one_of<T_RegisterType, __m128, __m128d, __m128i>())
+    if constexpr (is_any_of<T_RegisterType, __m128, __m128d, __m128i>())
         return alignment_bytes_sse;
-    if constexpr (is_one_of<T_RegisterType, __m256, __m256d, __m256i>())
+    if constexpr (is_any_of<T_RegisterType, __m256, __m256d, __m256i>())
         return alignment_bytes_avx;
     else
         return alignment_bytes_default;

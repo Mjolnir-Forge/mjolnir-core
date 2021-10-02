@@ -22,7 +22,7 @@ namespace mjolnir
 //! @tparam T_TypeList: An arbitrary number of additional types that should be compared to `T_Type`
 //! @return `true` if `T_Type` is identical to `T_OtherType` or any of the types in `T_TypeList` and `false` otherwise.
 template <typename T_Type, typename T_OtherType, typename... T_TypeList>
-consteval auto is_any_of() -> bool;
+inline consteval auto is_any_of() -> bool;
 
 
 //! @}
@@ -39,7 +39,7 @@ namespace mjolnir
 
 
 template <typename T_Type, typename T_OtherType, typename... T_TypeList>
-consteval auto is_any_of() -> bool
+inline consteval auto is_any_of() -> bool
 {
     if constexpr (not std::is_same<T_Type, T_OtherType>::value)
     {
