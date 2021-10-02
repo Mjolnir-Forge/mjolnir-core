@@ -16,28 +16,28 @@ using namespace mjolnir;
 
 // define support class for expected results
 template <class T_Type>
-struct test_is_any_of : public ::testing::Test
+struct TestIsAnyOf : public ::testing::Test
 {
     static bool expected_result;
 };
 
 
 // define test
-TYPED_TEST_SUITE_P(test_is_any_of);
-TYPED_TEST_P(test_is_any_of, IsAnyOf)
+TYPED_TEST_SUITE_P(TestIsAnyOf);
+TYPED_TEST_P(TestIsAnyOf, test_case)
 {
     bool result = mjolnir::is_any_of<TypeParam, I32, UST, F64>();
-    EXPECT_EQ(result, test_is_any_of<TypeParam>::expected_result);
+    EXPECT_EQ(result, TestIsAnyOf<TypeParam>::expected_result);
 }
-REGISTER_TYPED_TEST_SUITE_P(test_is_any_of, IsAnyOf);
+REGISTER_TYPED_TEST_SUITE_P(TestIsAnyOf, test_case);
 
 
 // define expected results
 template <typename T_Type>
-bool test_is_any_of<T_Type>::expected_result =
+bool TestIsAnyOf<T_Type>::expected_result =
         std::is_same<T_Type, I32>::value || std::is_same<T_Type, UST>::value || std::is_same<T_Type, F64>::value;
 
 
 // define test cases
-typedef ::testing::Types<I8, I32, I64, U32, U64, UST, F32, F64> tested_types;
-INSTANTIATE_TYPED_TEST_SUITE_P(IsAnyOfTestSuite, test_is_any_of, tested_types);
+using is_any_of_test_ceses = ::testing::Types<I8, I32, I64, U32, U64, UST, F32, F64>;
+INSTANTIATE_TYPED_TEST_SUITE_P(is_any_of_test_suite, TestIsAnyOf, is_any_of_test_ceses);
