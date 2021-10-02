@@ -20,4 +20,3 @@
 #else
 static_assert(false, "Incompatible processor architecture or compiler");
 #endif
-
