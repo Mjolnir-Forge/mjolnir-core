@@ -13,14 +13,23 @@ namespace mjolnir
 //! @{
 
 
-//! @brief Return `true` if the tested type is identical to any of a list of types.
-//! @details The first template parameter is the type that should be tested. All additional types passed as template
+//! @brief
+//! Return `true` if the tested type is identical to any of a list of types.
+//!
+//! @details
+//! The first template parameter is the type that should be tested. All additional types passed as template
 //! parameters are compared to the first one. If any of them is identical, the funciton returns `true`. If no match is
 //! found, `false` is returned.
-//! @tparam T_Type: The type that should be compared against a list of other types
-//! @tparam T_OtherType: The first item inside the list of types thar should be compared to `T_Type`
-//! @tparam T_TypeList: An arbitrary number of additional types that should be compared to `T_Type`
-//! @return `true` if `T_Type` is identical to `T_OtherType` or any of the types in `T_TypeList` and `false` otherwise.
+//!
+//! @tparam T_Type:
+//! The type that should be compared against a list of other types
+//! @tparam T_OtherType:
+//! The first item inside the list of types thar should be compared to `T_Type`
+//! @tparam T_TypeList:
+//! An arbitrary number of additional types that should be compared to `T_Type`
+//!
+//! @return
+//! `true` if `T_Type` is identical to `T_OtherType` or any of the types in `T_TypeList` and `false` otherwise.
 template <typename T_Type, typename T_OtherType, typename... T_TypeList>
 inline consteval auto is_any_of() -> bool;
 

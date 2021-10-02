@@ -17,11 +17,13 @@ namespace mjolnir
 //! @{
 
 
+//! \cond DO_NOT_DOCUMENT
 namespace internal
 {
 inline constexpr const UST alignment_bytes_default = 4;
 inline constexpr const UST alignment_bytes_sse     = 16;
 inline constexpr const UST alignment_bytes_avx     = 32;
+
 
 template <typename T_RegisterType>
 inline consteval auto get_alignment_bytes() -> UST
@@ -34,8 +36,10 @@ inline consteval auto get_alignment_bytes() -> UST
         return alignment_bytes_default;
 }
 
-} // namespace internal
+// ====================================================================================================================
 
+} // namespace internal
+//! \endcond
 
 //! @brief Register type dependent alignment in bytes.
 //! @tparam _registerType: RegisterType

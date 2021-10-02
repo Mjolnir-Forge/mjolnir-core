@@ -13,6 +13,22 @@ namespace mjolnir
 //! \addtogroup core_x86
 //! @{
 
+//! @brief
+//! Broadcast a single value a to all elements of the register
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//! @tparam T_Type:
+//! Type of the broadcasted value
+//!
+//! @param [in] value:
+//! The value that should be broadcasted
+//!
+//! @return
+//! Register with broadcasted value
+template <typename T_RegisterType, typename T_Type>
+[[nodiscard]] inline auto mm_set1(T_Type value) noexcept -> T_RegisterType;
+
 
 //! @}
 } // namespace mjolnir
@@ -25,7 +41,7 @@ namespace mjolnir
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType, typename T_Type>
-inline auto mm_set1(T_Type value) -> T_RegisterType
+[[nodiscard]] inline auto mm_set1(T_Type value) noexcept -> T_RegisterType
 {
     /*
         using namespace GDL::simd;
