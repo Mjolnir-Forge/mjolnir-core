@@ -35,9 +35,10 @@ REGISTER_TYPED_TEST_SUITE_P(TestIsAnyOf, test_case); // NOLINT
 // define expected results
 template <typename T_Type>
 const bool TestIsAnyOf<T_Type>::expected_result =
+        // NOLINTNEXTLINE(misc-redundant-expression)
         std::is_same<T_Type, I32>::value || std::is_same<T_Type, UST>::value || std::is_same<T_Type, F64>::value;
 
 
 // define test cases
-using is_any_of_test_ceses = ::testing::Types<I8, I32, I64, U32, U64, UST, F32, F64>;
-INSTANTIATE_TYPED_TEST_SUITE_P(is_any_of_test_suite, TestIsAnyOf, is_any_of_test_ceses); // NOLINT
+using IsAnyOfTestCases = ::testing::Types<I8, I32, I64, U32, U64, UST, F32, F64>;
+INSTANTIATE_TYPED_TEST_SUITE_P(is_any_of_test_suite, TestIsAnyOf, IsAnyOfTestCases, ); // NOLINT
