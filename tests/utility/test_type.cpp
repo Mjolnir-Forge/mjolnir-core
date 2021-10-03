@@ -12,31 +12,25 @@ using namespace mjolnir;
 // ====================================================================================================================
 
 
-// test_is_any_of ------------------------------------------------------------------------------------------------------
+// test_is_any_of -----------------------------------------------------------------------------------------------------
 
 // define support class for expected results
 template <class T_Type>
 struct TestIsAnyOf : public ::testing::Test
 {
-    static const bool expected_result;
 };
 
-
+// NOLINTNEXTLINE(misc-redundant-expression)
 // define test
 TYPED_TEST_SUITE_P(TestIsAnyOf);     // NOLINT
 TYPED_TEST_P(TestIsAnyOf, test_case) // NOLINT
 {
-    bool result = mjolnir::is_any_of<TypeParam, I32, UST, F64>();
-    EXPECT_EQ(result, TestIsAnyOf<TypeParam>::expected_result);
+    constexpr bool result     = mjolnir::is_any_of<TypeParam, I32, UST, F64>();
+    constexpr bool exp_result = std::is_same<TypeParam, I32>::value || std::is_same<TypeParam, UST>::value
+                                || std::is_same<TypeParam, F64>::value;
+    EXPECT_EQ(result, exp_result);
 }
 REGISTER_TYPED_TEST_SUITE_P(TestIsAnyOf, test_case); // NOLINT
-
-
-// define expected results
-template <typename T_Type>
-const bool TestIsAnyOf<T_Type>::expected_result =
-        // NOLINTNEXTLINE(misc-redundant-expression)
-        std::is_same<T_Type, I32>::value || std::is_same<T_Type, UST>::value || std::is_same<T_Type, F64>::value;
 
 
 // define test cases
