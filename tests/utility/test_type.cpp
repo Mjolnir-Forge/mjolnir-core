@@ -20,7 +20,6 @@ struct TestIsAnyOf : public ::testing::Test
 {
 };
 
-// NOLINTNEXTLINE(misc-redundant-expression)
 // define test
 TYPED_TEST_SUITE_P(TestIsAnyOf);     // NOLINT
 TYPED_TEST_P(TestIsAnyOf, test_case) // NOLINT
