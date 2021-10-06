@@ -18,8 +18,6 @@ namespace mjolnir::x86
 //!
 //! @tparam T_RegisterType:
 //! The register type
-//! @tparam T_Type:
-//! Type of the broadcasted value
 //!
 //! @param [in] value:
 //! The value that should be broadcasted
