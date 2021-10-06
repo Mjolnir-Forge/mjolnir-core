@@ -199,8 +199,8 @@ template <typename T_Type>
 [[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST
 {
     static_assert(is_register<T_Type>, "Type is not a supported x86 vector register type.");
-    constexpr const UST alignment_bytes_sse = 16;
-    constexpr const UST alignment_bytes_avx = 32;
+    constexpr UST alignment_bytes_sse = 16;
+    constexpr UST alignment_bytes_avx = 32;
 
     if constexpr (is_sse_register<T_Type>)
         return alignment_bytes_sse;
@@ -215,8 +215,8 @@ template <typename T_Type>
 [[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST
 {
     static_assert(is_register<T_Type>, "Type is not a supported x86 vector register type.");
-    constexpr const UST num_lanes_sse = 1;
-    constexpr const UST num_lanes_avx = 2;
+    constexpr UST num_lanes_sse = 1;
+    constexpr UST num_lanes_avx = 2;
 
     if constexpr (is_sse_register<T_Type>)
         return num_lanes_sse;
