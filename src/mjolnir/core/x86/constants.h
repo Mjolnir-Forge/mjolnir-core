@@ -89,7 +89,7 @@ template <typename T_Type>
 inline constexpr bool is_float_register = is_any_of<T_Type, __m128, __m128d, __m256, __m256d>();
 
 
-// internal
+// internal declarations
 // --------------------------------------------------------------------------------------------------------------------
 
 //! \cond DO_NOT_DOCUMENT
@@ -108,11 +108,16 @@ struct ValueTypeStruct
 template <typename T_Type>
 [[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST;
 
+//! Return the number of lanes of a register type.
+template <typename T_Type>
+[[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST;
+
 
 } // namespace internal
 //! \endcond
 
 
+// continued public declarations
 // --------------------------------------------------------------------------------------------------------------------
 
 //! @brief
@@ -127,6 +132,7 @@ template <typename T_Type>
 template <typename T_RegisterType>
 using ValueType = typename internal::ValueTypeStruct<T_RegisterType>::Type;
 
+
 //! @brief
 //! Alignment requirement of an x86 vector register in bytes.
 //!
@@ -138,6 +144,19 @@ using ValueType = typename internal::ValueTypeStruct<T_RegisterType>::Type;
 template <typename T_RegisterType>
 inline constexpr UST alignment_bytes = internal::get_alignment_bytes<T_RegisterType>();
 
+
+//! @brief
+//! Number of register lanes.
+//!
+//! @tparam T_RegisterType:
+//! Register type
+//!
+//! @remark
+//! Any type that is not as x86 vector register will trigger a `static_assert`
+template <typename T_RegisterType>
+inline constexpr UST num_lanes = internal::get_num_lanes<T_RegisterType>();
+
+
 //! @brief
 //! Number of values stored inside of the register.
 //!
@@ -148,15 +167,26 @@ inline constexpr UST alignment_bytes = internal::get_alignment_bytes<T_RegisterT
 //! Any type that is not a vector register with a floating-point type as value will trigger a `static_assert`. Integer
 //! based registers are not supported because they do not have a fixed value type.
 template <typename T_RegisterType>
-inline constexpr U32 num_values = sizeof(T_RegisterType) / sizeof(ValueType<T_RegisterType>);
+inline constexpr UST num_values = sizeof(T_RegisterType) / sizeof(ValueType<T_RegisterType>);
 
+
+//! @brief
+//! Number of values stored inside of the register.
+//!
+//! @tparam T_RegisterType:
+//! Register type
+//!
+//! @remark
+//! Any type that is not a vector register with a floating-point type as value will trigger a `static_assert`. Integer
+//! based registers are not supported because they do not have a fixed value type.
+template <typename T_RegisterType>
+inline constexpr UST num_lane_values = num_values<T_RegisterType> / num_lanes<T_RegisterType>;
 
 //! @}
 } // namespace mjolnir::x86
 
 
 // ====================================================================================================================
-
 
 namespace mjolnir::x86
 {
@@ -176,6 +206,22 @@ template <typename T_Type>
         return alignment_bytes_sse;
     else
         return alignment_bytes_avx;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type>
+[[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST
+{
+    static_assert(is_register<T_Type>, "Type is not a supported x86 vector register type.");
+    constexpr const UST num_lanes_sse = 1;
+    constexpr const UST num_lanes_avx = 2;
+
+    if constexpr (is_sse_register<T_Type>)
+        return num_lanes_sse;
+    else
+        return num_lanes_avx;
 }
 
 
