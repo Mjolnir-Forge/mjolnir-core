@@ -1,5 +1,5 @@
 //! @file
-//! intrinsics.h
+//! constants.h
 //!
 //! @brief
 //! Contains x86 vectorization specific constants
@@ -8,6 +8,7 @@
 #pragma once
 #include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/utility/type.h"
+#include "mjolnir/core/x86/concepts.h"
 #include "mjolnir/core/x86/x86.h"
 #include <type_traits>
 
@@ -15,7 +16,6 @@ namespace mjolnir::x86
 {
 //! \addtogroup core_x86
 //! @{
-
 
 //! @brief
 //! Type dependent constant that is only `true` for `__m128` and `false` for all other types.
@@ -95,21 +95,23 @@ inline constexpr bool is_float_register = is_any_of<T_Type, __m128, __m128d, __m
 //! \cond DO_NOT_DOCUMENT
 namespace internal
 {
-//! Support structure to determine the element type of an x86 vector register.
+//! Support structure to determine the element type of a float-based x86 vector register.
 template <typename T_Type>
+requires FloatVectorRegister<T_Type>
 struct ElementTypeStruct
 {
-    static_assert(is_float_register<T_Type>, "Type is not a supported float-based x86 vector register type.");
     using Type = typename std::conditional<is_any_of<T_Type, __m128d, __m256d>(), F64, F32>::type;
 };
 
 
 //! Return the alignment in bytes for a register type.
 template <typename T_Type>
+requires VectorRegister<T_Type>
 [[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST;
 
 //! Return the number of lanes of a register type.
 template <typename T_Type>
+requires VectorRegister<T_Type>
 [[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST;
 
 
@@ -196,9 +198,9 @@ namespace internal
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_Type>
+requires VectorRegister<T_Type>
 [[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST
 {
-    static_assert(is_register<T_Type>, "Type is not a supported x86 vector register type.");
     constexpr UST alignment_bytes_sse = 16;
     constexpr UST alignment_bytes_avx = 32;
 
@@ -212,9 +214,9 @@ template <typename T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_Type>
+requires VectorRegister<T_Type>
 [[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST
 {
-    static_assert(is_register<T_Type>, "Type is not a supported x86 vector register type.");
     constexpr UST num_lanes_sse = 1;
     constexpr UST num_lanes_avx = 2;
 

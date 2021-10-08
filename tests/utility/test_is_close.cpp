@@ -1,10 +1,11 @@
 #include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/utility/is_close.h"
-#include "mjolnir/core/x86/abs.h"
 #include <gtest/gtest.h>
 
+#include <array>
+
+
 using namespace mjolnir;
-using namespace mjolnir::x86;
 
 // ====================================================================================================================
 // Setup
@@ -12,30 +13,27 @@ using namespace mjolnir::x86;
 
 // create test suites -------------------------------------------------------------------------------------------------
 
-class AbsTester : public ::testing::TestWithParam<UST>
+template <typename T_Type>
+class IsCloseTemplateTester : public ::testing::Test
 {
 };
 
-// NOLINTNEXTLINE
-INSTANTIATE_TEST_SUITE_P(abs, AbsTester, ::testing::Values(0, 1, 2, 3, 4, 5, 6, 7));
+
+using is_close_template_testcases = ::testing::Types<I32, F32, F64>; // NOLINT
+
+
+// cppcheck-suppress syntaxError
+TYPED_TEST_SUITE(IsCloseTemplateTester, is_close_template_testcases, );
 
 
 // ====================================================================================================================
 // Tests
 // ====================================================================================================================
 
-
-// test_is_aligned ----------------------------------------------------------------------------------------------------
-
-TEST_P(AbsTester, test_abs) // NOLINT cert-err58-cpp
+TYPED_TEST(IsCloseTemplateTester, is_close_abs) // NOLINT
 {
-    // const UST pointer_offset = GetParam();
-
-    //__m128 a = _mm_set1_ps(pointer_offset);
-    //__m128 b = abs(a);
-    // std::cout << num_elements<__m256> << std::endl;
-    // std::cout << alignment_bytes<__m128> << std::endl;
-
-    std::cout << num_elements<__m128> << std::endl; // NOLINT
-    // abs(mm_set1<__m128>(1.3F));
+    TypeParam tolerance = 1;
+    TypeParam a         = 1;
+    TypeParam b         = 2;
+    is_close_abs<TypeParam>(a, b, tolerance); // NOLINT
 }
