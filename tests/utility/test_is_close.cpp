@@ -36,6 +36,7 @@ TYPED_TEST(IsCloseTemplateTester, is_close_abs) // NOLINT
     const auto tolerance      = static_cast<TypeParam>(5.1);
     const U32  tolerance_uint = static_cast<U32>(tolerance);
 
+    // check inside tolerance
     for (U32 i = 0; i <= tolerance_uint; ++i)
     {
         TypeParam b = a + static_cast<TypeParam>(i);
@@ -45,6 +46,7 @@ TYPED_TEST(IsCloseTemplateTester, is_close_abs) // NOLINT
         EXPECT_TRUE(is_close_abs<TypeParam>(a, c, tolerance));
     }
 
+    // check outside tolerance
     for (U32 i = tolerance_uint + 1; i <= tolerance_uint * 2; ++i)
     {
         TypeParam b = a + static_cast<TypeParam>(i);
