@@ -44,7 +44,7 @@ namespace mjolnir::x86
 template <typename T_RegisterType>
 [[nodiscard]] inline auto abs(T_RegisterType value) noexcept -> T_RegisterType
 {
-    const T_RegisterType mask = mm_set1<T_RegisterType>(static_cast<ValueType<T_RegisterType>>(-0.0));
+    const T_RegisterType mask = mm_set1<T_RegisterType>(static_cast<ElementType<T_RegisterType>>(-0.0));
     return mm_andnot(mask, value);
 }
 

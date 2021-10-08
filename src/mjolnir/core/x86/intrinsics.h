@@ -43,7 +43,7 @@ template <typename T_RegisterType>
 //! @return
 //! Register with broadcasted value
 template <typename T_RegisterType>
-[[nodiscard]] inline auto mm_set1(ValueType<T_RegisterType> value) noexcept -> T_RegisterType;
+[[nodiscard]] inline auto mm_set1(ElementType<T_RegisterType> value) noexcept -> T_RegisterType;
 
 
 //! @}
@@ -75,7 +75,7 @@ template <typename T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType>
-[[nodiscard]] inline auto mm_set1(ValueType<T_RegisterType> value) noexcept -> T_RegisterType
+[[nodiscard]] inline auto mm_set1(ElementType<T_RegisterType> value) noexcept -> T_RegisterType
 {
     static_assert(is_float_register<T_RegisterType>, "Type is not a supported float-based x86 vector register type.");
 

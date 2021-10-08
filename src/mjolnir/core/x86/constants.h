@@ -81,7 +81,7 @@ inline constexpr bool is_avx_register = is_any_of<T_Type, __m256, __m256d, __m25
 
 
 //! @brief
-//! Type dependent constant that is only `true` for x86 vector registers that have floating-point types as values.
+//! Type dependent constant that is only `true` for x86 vector registers that have floating-point types as elements.
 //!
 //! @tparam T_Type:
 //! Type
@@ -95,9 +95,9 @@ inline constexpr bool is_float_register = is_any_of<T_Type, __m128, __m128d, __m
 //! \cond DO_NOT_DOCUMENT
 namespace internal
 {
-//! Support structure to determine the value type of an x86 vector register.
+//! Support structure to determine the element type of an x86 vector register.
 template <typename T_Type>
-struct ValueTypeStruct
+struct ElementTypeStruct
 {
     static_assert(is_float_register<T_Type>, "Type is not a supported float-based x86 vector register type.");
     using Type = typename std::conditional<is_any_of<T_Type, __m128d, __m256d>(), F64, F32>::type;
@@ -121,16 +121,16 @@ template <typename T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 //! @brief
-//! The value type of an x86 vector register that has a floating-point type as value.
+//! The element type of an x86 vector register that is based on floating-point types.
 //!
 //! @tparam T_RegisterType:
 //! Register type
 //!
 //! @remark
-//! Any type that is not a vector register with a floating-point type as value will trigger a `static_assert`. Integer
-//! based registers are not supported because they do not have a fixed value type.
+//! Any type that is not a vector register with a floating-point type as elements will trigger a `static_assert`.
+//! Integer based registers are not supported because they do not have a fixed element type.
 template <typename T_RegisterType>
-using ValueType = typename internal::ValueTypeStruct<T_RegisterType>::Type;
+using ElementType = typename internal::ElementTypeStruct<T_RegisterType>::Type;
 
 
 //! @brief
@@ -158,29 +158,29 @@ inline constexpr UST num_lanes = internal::get_num_lanes<T_RegisterType>();
 
 
 //! @brief
-//! Number of values stored inside of the register.
+//! Number of register elemnts.
 //!
 //! @tparam T_RegisterType:
 //! Register type
 //!
 //! @remark
-//! Any type that is not a vector register with a floating-point type as value will trigger a `static_assert`. Integer
-//! based registers are not supported because they do not have a fixed value type.
+//! Any type that is not a vector register with a floating-point type as elements will trigger a `static_assert`.
+//! Integer based registers are not supported because they do not have a fixed elemnet type.
 template <typename T_RegisterType>
-inline constexpr UST num_values = sizeof(T_RegisterType) / sizeof(ValueType<T_RegisterType>);
+inline constexpr UST num_elements = sizeof(T_RegisterType) / sizeof(ElementType<T_RegisterType>);
 
 
 //! @brief
-//! Number of values stored inside of the register.
+//! Number of elements per register lane.
 //!
 //! @tparam T_RegisterType:
 //! Register type
 //!
 //! @remark
-//! Any type that is not a vector register with a floating-point type as value will trigger a `static_assert`. Integer
-//! based registers are not supported because they do not have a fixed value type.
+//! Any type that is not a vector register with a floating-point type as elements will trigger a `static_assert`.
+//! Integer based registers are not supported because they do not have a fixed elemnet type.
 template <typename T_RegisterType>
-inline constexpr UST num_lane_values = num_values<T_RegisterType> / num_lanes<T_RegisterType>;
+inline constexpr UST num_lane_elements = num_elements<T_RegisterType> / num_lanes<T_RegisterType>;
 
 //! @}
 } // namespace mjolnir::x86
