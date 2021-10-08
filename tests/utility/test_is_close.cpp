@@ -32,9 +32,9 @@ TYPED_TEST_SUITE(IsCloseTemplateTester, is_close_template_testcases, );
 
 TYPED_TEST(IsCloseTemplateTester, is_close_abs) // NOLINT
 {
-    const TypeParam a              = static_cast<TypeParam>(20.56);
-    const TypeParam tolerance      = static_cast<TypeParam>(5.1);
-    const U32       tolerance_uint = static_cast<U32>(tolerance);
+    const auto a              = static_cast<TypeParam>(20.56);
+    const auto tolerance      = static_cast<TypeParam>(5.1);
+    const U32  tolerance_uint = static_cast<U32>(tolerance);
 
     for (U32 i = 0; i <= tolerance_uint; ++i)
     {

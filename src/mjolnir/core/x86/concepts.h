@@ -36,4 +36,3 @@ concept FloatVectorRegister = is_any_of<T_Type, __m128, __m128d, __m256, __m256d
 
 //! @}
 } // namespace mjolnir::x86
-
