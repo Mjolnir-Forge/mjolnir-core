@@ -36,6 +36,6 @@ TEST_P(AbsTester, test_abs) // NOLINT cert-err58-cpp
     // std::cout << num_elements<__m256> << std::endl;
     // std::cout << alignment_bytes<__m128> << std::endl;
 
-    std::cout << num_elements<__m128> << std::endl; // NOLINT
+    std::cout << num_elements<__m128> << std::endl;
     // abs(mm_set1<__m128>(1.3F));
 }

@@ -24,6 +24,7 @@ namespace mjolnir::x86
 template <typename T_Type>
 concept VectorRegister = is_any_of<T_Type, __m128, __m128d, __m128i, __m256, __m256d, __m256i>();
 
+
 //! @brief
 //! Concept for a x86 vector register that has floating-point elements.
 //!
@@ -31,7 +32,6 @@ concept VectorRegister = is_any_of<T_Type, __m128, __m128d, __m128i, __m256, __m
 //! Type
 template <typename T_Type>
 concept FloatVectorRegister = is_any_of<T_Type, __m128, __m128d, __m256, __m256d>();
-
 
 
 //! @}

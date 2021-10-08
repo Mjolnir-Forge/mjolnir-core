@@ -32,8 +32,25 @@ TYPED_TEST_SUITE(IsCloseTemplateTester, is_close_template_testcases, );
 
 TYPED_TEST(IsCloseTemplateTester, is_close_abs) // NOLINT
 {
-    TypeParam tolerance = 1;
-    TypeParam a         = 1;
-    TypeParam b         = 2;
-    is_close_abs<TypeParam>(a, b, tolerance); // NOLINT
+    const TypeParam a              = static_cast<TypeParam>(20.56);
+    const TypeParam tolerance      = static_cast<TypeParam>(5.1);
+    const U32       tolerance_uint = static_cast<U32>(tolerance);
+
+    for (U32 i = 0; i <= tolerance_uint; ++i)
+    {
+        TypeParam b = a + static_cast<TypeParam>(i);
+        EXPECT_TRUE(is_close_abs<TypeParam>(a, b, tolerance));
+
+        TypeParam c = a - static_cast<TypeParam>(i);
+        EXPECT_TRUE(is_close_abs<TypeParam>(a, c, tolerance));
+    }
+
+    for (U32 i = tolerance_uint + 1; i <= tolerance_uint * 2; ++i)
+    {
+        TypeParam b = a + static_cast<TypeParam>(i);
+        EXPECT_FALSE(is_close_abs<TypeParam>(a, b, tolerance));
+
+        TypeParam c = a - static_cast<TypeParam>(i);
+        EXPECT_FALSE(is_close_abs<TypeParam>(a, c, tolerance));
+    }
 }
