@@ -30,6 +30,9 @@ TYPED_TEST_SUITE(IsCloseTemplateTester, is_close_template_testcases, );
 // Tests
 // ====================================================================================================================
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
 TYPED_TEST(IsCloseTemplateTester, is_close_abs) // NOLINT
 {
     const auto a              = static_cast<TypeParam>(20.56);

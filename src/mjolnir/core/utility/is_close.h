@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "mjolnir/core/concepts.h"
+
 namespace mjolnir
 {
 //! \addtogroup core_utility
@@ -39,6 +41,7 @@ inline constexpr T_Type default_tolerance_abs = static_cast<T_Type>(1E-6);
 //! @todo
 //! Add debug exception for negative tolerances
 template <typename T_Type>
+requires Number<T_Type>
 [[nodiscard]] inline auto
 is_close_abs(T_Type lhs, T_Type rhs, T_Type tolerance = default_tolerance_abs<T_Type>) noexcept -> bool;
 
@@ -58,6 +61,7 @@ namespace mjolnir
 
 
 template <typename T_Type>
+requires Number<T_Type>
 [[nodiscard]] inline auto is_close_abs(T_Type lhs, T_Type rhs, T_Type tolerance) noexcept -> bool
 {
     return std::abs(lhs - rhs) <= tolerance;
