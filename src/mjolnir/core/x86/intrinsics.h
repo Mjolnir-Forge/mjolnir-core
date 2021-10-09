@@ -36,6 +36,25 @@ requires FloatVectorRegister<T_RegisterType>
 
 
 //! @brief
+//! Load data from an aligned memory location into a new register.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] ptr:
+//! Pointer to the memory location
+//!
+//! @return
+//! New register with loaded data
+//!
+//! @todo
+//! Debug exception if memory is not aligned
+template <typename T_RegisterType>
+requires FloatVectorRegister<T_RegisterType>
+[[nodiscard]] inline auto mm_load(ElementType<T_RegisterType>* ptr) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Broadcast a single value a to all elements of the register
 //!
 //! @tparam T_RegisterType:
@@ -108,6 +127,23 @@ requires FloatVectorRegister<T_RegisterType>
         return _mm256_andnot_ps(a, b);
     else
         return _mm256_andnot_pd(a, b);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_RegisterType>
+requires FloatVectorRegister<T_RegisterType>
+[[nodiscard]] inline auto mm_load(ElementType<T_RegisterType>* ptr) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_load_ps(ptr);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_load_pd(ptr);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_load_ps(ptr);
+    else
+        return _mm256_load_pd(ptr);
 }
 
 

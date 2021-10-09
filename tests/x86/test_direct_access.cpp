@@ -1,8 +1,10 @@
 #include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/x86/direct_access.h"
+#include "mjolnir/core/x86/intrinsics.h"
 #include "mjolnir/core/x86/x86.h"
 #include <gtest/gtest.h>
 
+#include <array>
 
 using namespace mjolnir;
 using namespace mjolnir::x86;
@@ -33,17 +35,13 @@ TYPED_TEST_SUITE(GetTemplateTester, get_template_testcases, );
 
 // --------------------------------------------------------------------------------------------------------------------
 
-TYPED_TEST(GetTemplateTester, template) // NOLINT
+TYPED_TEST(GetTemplateTester, test_template_get) // NOLINT
 {
-    TypeParam a;
-    if constexpr (is_m128d<TypeParam>)
-        a = mm_setr<TypeParam>(0.0, 1.0); // NOLINT
-    else if constexpr (is_m128<TypeParam>)
-        a = mm_setr<TypeParam>(0.F, 1.F, 2.F, 3.F); // NOLINT
-    else if constexpr (is_m256d<TypeParam>)
-        a = mm_setr<TypeParam>(0.0, 1.0, 2.0, 3.0); // NOLINT
-    else
-        a = mm_setr<TypeParam>(0.F, 1.F, 2.F, 3.F, 4.F, 5.F, 6.F, 7.F); // NOLINT
+    alignas(alignment_bytes<TypeParam>) std::array<ElementType<TypeParam>, num_elements<TypeParam>> data = {{0}};
+
+    for (UST i = 0; i < data.size(); ++i)
+        data.at(i) = static_cast<ElementType<TypeParam>>(i);
+    auto a = mm_load<TypeParam>(data.data());
 
 
     EXPECT_DOUBLE_EQ(get<0>(a), 0.);
