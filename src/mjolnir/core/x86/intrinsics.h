@@ -52,6 +52,24 @@ requires FloatVectorRegister<T_RegisterType>
 
 
 //! @brief
+//! Set register elements with the supplied values in reverse order.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//! @tparam T_Args
+//! Parameter pack that holds the values
+//!
+//! @param args
+//! Values of the parameter pack
+//!
+//! @return
+//! Register that contains the provided values
+template <typename T_RegisterType, typename... T_Args>
+requires FloatVectorRegister<T_RegisterType>
+[[nodiscard]] inline auto mm_setr(T_Args... args) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Store the content of a register to a memory address
 //!
 //! @tparam T_RegisterType:
@@ -70,6 +88,9 @@ inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexc
 
 
 // ====================================================================================================================
+
+#include <utility>
+
 
 namespace mjolnir::x86
 {
@@ -104,6 +125,23 @@ requires FloatVectorRegister<T_RegisterType>
         return _mm256_set1_ps(value);
     else
         return _mm256_set1_pd(value);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_RegisterType, typename... T_Args>
+requires FloatVectorRegister<T_RegisterType>
+[[nodiscard]] inline auto mm_setr(T_Args... args) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_setr_ps(std::forward<T_Args>(args)...);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_setr_pd(std::forward<T_Args>(args)...);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_setr_ps(std::forward<T_Args>(args)...);
+    else
+        return _mm256_setr_pd(std::forward<T_Args>(args)...);
 }
 
 

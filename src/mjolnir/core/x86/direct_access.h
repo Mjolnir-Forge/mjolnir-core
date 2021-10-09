@@ -42,11 +42,10 @@ requires FloatVectorRegister<T_RegisterType>
 
 #include "mjolnir/core/x86/intrinsics.h"
 
+#include <array>
 
 namespace mjolnir::x86
 {
-
-
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_index, typename T_RegisterType>
@@ -55,9 +54,14 @@ requires FloatVectorRegister<T_RegisterType>
 {
     static_assert(t_index < num_elements<T_RegisterType>, "Index out of bounds.");
 
-        alignas(alignment_bytes<T_RegisterType>) ElementType<T_RegisterType> array[num_elements<T_RegisterType>];
-        _mm_store(array, reg);
-        return array[t_index];
+    constexpr UST alignment  = alignment_bytes<T_RegisterType>;
+    constexpr UST n_elements = num_elements<T_RegisterType>;
+    using ArrayType          = ElementType<T_RegisterType>;
+
+    alignas(alignment) std::array<ArrayType, n_elements> array = {{0}};
+
+    mm_store(array.data(), reg);
+    return array[t_index];
 }
 
 } // namespace mjolnir::x86
