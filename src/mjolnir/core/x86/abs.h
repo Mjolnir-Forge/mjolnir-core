@@ -29,6 +29,9 @@ namespace mjolnir::x86
 //!
 //! @remark
 //! source: https://stackoverflow.com/q/23847377/6700329
+//!
+//! @todo
+//! Write test
 template <typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
 [[nodiscard]] inline auto abs(T_RegisterType value) noexcept -> T_RegisterType;

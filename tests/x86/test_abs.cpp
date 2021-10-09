@@ -1,6 +1,7 @@
 #include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/utility/is_close.h"
 #include "mjolnir/core/x86/abs.h"
+#include "mjolnir/core/x86/direct_access.h"
 #include <gtest/gtest.h>
 
 using namespace mjolnir;
