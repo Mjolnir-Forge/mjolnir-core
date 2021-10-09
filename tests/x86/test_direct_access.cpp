@@ -46,18 +46,18 @@ TYPED_TEST(GetTemplateTester, template) // NOLINT
         a = mm_setr<TypeParam>(0.F, 1.F, 2.F, 3.F, 4.F, 5.F, 6.F, 7.F); // NOLINT
 
 
-    EXPECT_FLOAT_EQ(get<0>(a), 0.F);
-    EXPECT_FLOAT_EQ(get<1>(a), 1.F);
+    EXPECT_DOUBLE_EQ(get<0>(a), 0.);
+    EXPECT_DOUBLE_EQ(get<1>(a), 1.);
     if constexpr (not is_m128d<TypeParam>)
     {
-        EXPECT_FLOAT_EQ(get<2>(a), 2.F);
-        EXPECT_FLOAT_EQ(get<3>(a), 3.F);
+        EXPECT_DOUBLE_EQ(get<2>(a), 2.);
+        EXPECT_DOUBLE_EQ(get<3>(a), 3.);
         if constexpr (is_m256<TypeParam>)
         {
-            EXPECT_FLOAT_EQ(get<4>(a), 4.F);
-            EXPECT_FLOAT_EQ(get<5>(a), 5.F);
-            EXPECT_FLOAT_EQ(get<6>(a), 6.F);
-            EXPECT_FLOAT_EQ(get<7>(a), 7.F);
+            EXPECT_DOUBLE_EQ(get<4>(a), 4.);
+            EXPECT_DOUBLE_EQ(get<5>(a), 5.);
+            EXPECT_DOUBLE_EQ(get<6>(a), 6.);
+            EXPECT_DOUBLE_EQ(get<7>(a), 7.);
         }
     }
 }
