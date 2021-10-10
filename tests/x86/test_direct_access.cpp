@@ -1,4 +1,5 @@
 #include "mjolnir/core/fundamental_types.h"
+#include "mjolnir/core/x86/definitions.h"
 #include "mjolnir/core/x86/direct_access.h"
 #include "mjolnir/core/x86/intrinsics.h"
 #include "mjolnir/core/x86/x86.h"
@@ -35,9 +36,9 @@ TYPED_TEST_SUITE(GetTemplateTester, get_template_testcases, );
 
 // --------------------------------------------------------------------------------------------------------------------
 
-TYPED_TEST(GetTemplateTester, test_template_get) // NOLINT
+TYPED_TEST(GetTemplateTester, test_get_template_version) // NOLINT
 {
-    alignas(alignment_bytes<TypeParam>) std::array<ElementType<TypeParam>, num_elements<TypeParam>> data = {{0}};
+    VectorDataArray<TypeParam> data = {{0}};
 
     for (UST i = 0; i < data.size(); ++i)
         data.at(i) = static_cast<ElementType<TypeParam>>(i);

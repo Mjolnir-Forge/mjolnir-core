@@ -8,8 +8,7 @@
 #pragma once
 
 #include "mjolnir/core/fundamental_types.h"
-#include "mjolnir/core/x86/concepts.h"
-#include "mjolnir/core/x86/constants.h"
+#include "mjolnir/core/x86/definitions.h"
 
 namespace mjolnir::x86
 {
@@ -54,11 +53,7 @@ requires FloatVectorRegister<T_RegisterType>
 {
     static_assert(t_index < num_elements<T_RegisterType>, "Index out of bounds.");
 
-    constexpr UST alignment  = alignment_bytes<T_RegisterType>;
-    constexpr UST n_elements = num_elements<T_RegisterType>;
-    using ArrayType          = ElementType<T_RegisterType>;
-
-    alignas(alignment) std::array<ArrayType, n_elements> array = {{0}};
+    VectorDataArray<T_RegisterType> array = {{0}};
 
     mm_store(array.data(), reg);
     return array[t_index];

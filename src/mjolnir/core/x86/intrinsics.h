@@ -7,9 +7,11 @@
 
 #pragma once
 
-#include "mjolnir/core/x86/concepts.h"
-#include "mjolnir/core/x86/constants.h"
-#include "mjolnir/core/x86/x86.h"
+
+// === DECLARATIONS ===================================================================================================
+
+#include "mjolnir/core/x86/definitions.h"
+
 
 namespace mjolnir::x86
 {
@@ -106,8 +108,12 @@ inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexc
 } // namespace mjolnir::x86
 
 
-// ====================================================================================================================
+// === DEFINITIONS ====================================================================================================
 
+#include "mjolnir/core/utility/pointer_operations.h"
+#include "mjolnir/core/x86/x86.h"
+
+#include <cassert>
 #include <utility>
 
 
@@ -136,6 +142,8 @@ template <typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
 [[nodiscard]] inline auto mm_load(ElementType<T_RegisterType>* ptr) noexcept -> T_RegisterType
 {
+    assert(is_aligned<alignment_bytes<T_RegisterType>>(ptr));
+
     if constexpr (is_m128<T_RegisterType>)
         return _mm_load_ps(ptr);
     else if constexpr (is_m128d<T_RegisterType>)
@@ -187,6 +195,8 @@ template <typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
 inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexcept
 {
+    assert(is_aligned<alignment_bytes<T_RegisterType>>(ptr));
+
     if constexpr (is_m128<T_RegisterType>)
         _mm_store_ps(ptr, reg);
     else if constexpr (is_m128d<T_RegisterType>)

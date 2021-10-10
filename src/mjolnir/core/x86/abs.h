@@ -6,7 +6,7 @@
 
 
 #pragma once
-#include "mjolnir/core/x86/concepts.h"
+#include "mjolnir/core/x86/definitions.h"
 #include "mjolnir/core/x86/intrinsics.h"
 
 namespace mjolnir::x86

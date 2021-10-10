@@ -1,21 +1,42 @@
 //! @file
-//! constants.h
+//! x86/definitions.h
 //!
 //! @brief
-//! Contains x86 vectorization specific constants
+//! Contains x86 vectorization specific constants, concepts and definitions
 
 
 #pragma once
 #include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/utility/type.h"
-#include "mjolnir/core/x86/concepts.h"
 #include "mjolnir/core/x86/x86.h"
 #include <type_traits>
+
+#include <array>
+
+// === DECLARATION ====================================================================================================
 
 namespace mjolnir::x86
 {
 //! \addtogroup core_x86
 //! @{
+
+
+//! @brief
+//! Concept for a x86 vector register
+//!
+//! @tparam T_Type
+//! Type
+template <typename T_Type>
+concept VectorRegister = is_any_of<T_Type, __m128, __m128d, __m128i, __m256, __m256d, __m256i>();
+
+
+//! @brief
+//! Concept for a x86 vector register that has floating-point elements.
+//!
+//! @tparam T_Type
+//! Type
+template <typename T_Type>
+concept FloatVectorRegister = is_any_of<T_Type, __m128, __m128d, __m256, __m256d>();
 
 //! @brief
 //! Type dependent constant that is only `true` for `__m128` and `false` for all other types.
@@ -89,8 +110,7 @@ template <typename T_Type>
 inline constexpr bool is_float_register = is_any_of<T_Type, __m128, __m128d, __m256, __m256d>();
 
 
-// internal declarations
-// --------------------------------------------------------------------------------------------------------------------
+// ---internal declarations -------------------------------------------------------------------------------------------
 
 //! \cond DO_NOT_DOCUMENT
 namespace internal
@@ -119,8 +139,7 @@ requires VectorRegister<T_Type>
 //! \endcond
 
 
-// continued public declarations
-// --------------------------------------------------------------------------------------------------------------------
+// --- continued public declarations ----------------------------------------------------------------------------------
 
 //! @brief
 //! The element type of an x86 vector register that is based on floating-point types.
@@ -184,11 +203,25 @@ inline constexpr UST num_elements = sizeof(T_RegisterType) / sizeof(ElementType<
 template <typename T_RegisterType>
 inline constexpr UST num_lane_elements = num_elements<T_RegisterType> / num_lanes<T_RegisterType>;
 
+
+//! @brief
+//! A `std::array` of correct alignment, type and size to store all elements of a vector register type.
+//!
+//! @tparam T_RegisterType:
+//! Register type
+template <typename T_RegisterType>
+requires FloatVectorRegister<T_RegisterType>
+struct alignas(alignment_bytes<T_RegisterType>) VectorDataArray
+    : public std::array<ElementType<T_RegisterType>, num_elements<T_RegisterType>>
+{
+};
+
+
 //! @}
 } // namespace mjolnir::x86
 
 
-// ====================================================================================================================
+// === DEFINITIONS ====================================================================================================
 
 namespace mjolnir::x86
 {
