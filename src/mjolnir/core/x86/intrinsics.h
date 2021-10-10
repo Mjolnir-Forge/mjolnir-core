@@ -48,9 +48,6 @@ requires FloatVectorRegister<T_RegisterType>
 //!
 //! @return
 //! New register with loaded data
-//!
-//! @todo
-//! Debug exception if memory is not aligned
 template <typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
 [[nodiscard]] inline auto mm_load(ElementType<T_RegisterType>* ptr) noexcept -> T_RegisterType;
