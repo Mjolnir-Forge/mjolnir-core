@@ -38,7 +38,7 @@ TYPED_TEST_SUITE(TypedTest, VectorRegisterTestTypes, );
 
 TYPED_TEST(TypedTest, test_get_dynamic_version) // NOLINT
 {
-    VectorDataArray<TypeParam> data = {{0}};
+    VectorDataArray<TypeParam> data = {{{0}}};
 
     for (UST i = 0; i < data.size(); ++i)
         data.at(i) = static_cast<ElementType<TypeParam>>(i);
@@ -53,7 +53,7 @@ TYPED_TEST(TypedTest, test_get_dynamic_version) // NOLINT
 
 TYPED_TEST(TypedTest, test_get_static_version) // NOLINT
 {
-    VectorDataArray<TypeParam> data = {{0}};
+    VectorDataArray<TypeParam> data = {{{0}}};
 
     for (UST i = 0; i < data.size(); ++i)
         data.at(i) = static_cast<ElementType<TypeParam>>(i);
@@ -86,7 +86,7 @@ TYPED_TEST(TypedTest, test_set_dynamic_version) // NOLINT
     for (UST i = 0; i < num_elements<TypeParam>; ++i)
         set(a, i, static_cast<ElementType<TypeParam>>(i));
 
-    VectorDataArray<TypeParam> data = {{0}};
+    VectorDataArray<TypeParam> data = {{{0}}};
     mm_store(data.data(), a);
 
     for (UST i = 0; i < data.size(); ++i)
@@ -116,7 +116,7 @@ TYPED_TEST(TypedTest, test_set_static_version) // NOLINT
         }
     }
 
-    VectorDataArray<TypeParam> data = {{0}}; // NOLINT(readability-misleading-indentation)
+    VectorDataArray<TypeParam> data = {{{0}}}; // NOLINT(readability-misleading-indentation)
     mm_store(data.data(), a);
 
     for (UST i = 0; i < data.size(); ++i)
