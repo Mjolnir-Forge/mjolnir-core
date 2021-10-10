@@ -44,7 +44,7 @@ requires FloatVectorRegister<T_RegisterType>
 //! The register type
 //!
 //! @param [in] ptr:
-//! Pointer to the memory location
+//! Correctly aligned pointer to the memory location
 //!
 //! @return
 //! New register with loaded data
@@ -97,7 +97,7 @@ requires FloatVectorRegister<T_RegisterType>
 //! The register type
 //!
 //! @param [in, out] ptr:
-//! Pointer to the memory where the content should be stored
+//! Correctly aligned pointer to the memory where the content should be stored
 //! @param [in] reg:
 //! The register that should be stored
 template <typename T_RegisterType>
@@ -142,7 +142,7 @@ template <typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
 [[nodiscard]] inline auto mm_load(ElementType<T_RegisterType>* ptr) noexcept -> T_RegisterType
 {
-    assert(is_aligned<alignment_bytes<T_RegisterType>>(ptr));
+    assert(is_aligned<alignment_bytes<T_RegisterType>>(ptr)); // NOLINT
 
     if constexpr (is_m128<T_RegisterType>)
         return _mm_load_ps(ptr);
@@ -195,7 +195,7 @@ template <typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
 inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexcept
 {
-    assert(is_aligned<alignment_bytes<T_RegisterType>>(ptr));
+    assert(is_aligned<alignment_bytes<T_RegisterType>>(ptr)); // NOLINT
 
     if constexpr (is_m128<T_RegisterType>)
         _mm_store_ps(ptr, reg);
