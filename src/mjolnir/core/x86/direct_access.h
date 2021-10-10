@@ -29,6 +29,9 @@ namespace mjolnir::x86
 //!
 //! @return
 //! The value of the indexed element
+//!
+//! @todo
+//! Reimplement once `swizzle.h` is completed
 template <typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
 [[nodiscard]] inline auto get(T_RegisterType reg, UST index) noexcept -> ElementType<T_RegisterType>;
@@ -47,6 +50,9 @@ requires FloatVectorRegister<T_RegisterType>
 //!
 //! @return
 //! The value of the indexed element
+//!
+//! @todo
+//! Reimplement once `swizzle.h` is completed
 template <UST t_index, typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
 [[nodiscard]] inline auto get(T_RegisterType reg) noexcept -> ElementType<T_RegisterType>;
@@ -64,6 +70,9 @@ requires FloatVectorRegister<T_RegisterType>
 //! The element index
 //! @param[in] value:
 //! The new value
+//!
+//! @todo
+//! Reimplement once `swizzle.h` is completed
 template <typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
 inline void set(T_RegisterType& reg, UST index, ElementType<T_RegisterType> value) noexcept;
@@ -72,7 +81,7 @@ inline void set(T_RegisterType& reg, UST index, ElementType<T_RegisterType> valu
 //! @brief
 //! Set the value of a specific vector register element.
 //!
-//! @tparam[in] t_index:
+//! @tparam t_index:
 //! The element index
 //! @tparam T_RegisterType:
 //! Register type
@@ -81,6 +90,9 @@ inline void set(T_RegisterType& reg, UST index, ElementType<T_RegisterType> valu
 //! The target register
 //! @param[in] value:
 //! The new value
+//!
+//! @todo
+//! Reimplement once `swizzle.h` is completed
 template <UST t_index, typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
 inline void set(T_RegisterType& reg, ElementType<T_RegisterType> value) noexcept;
