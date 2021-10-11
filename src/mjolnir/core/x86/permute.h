@@ -47,9 +47,9 @@ template <U32 t_e_0, U32 t_e_1>
 template <U32 t_e_0, U32 t_e_1>
 [[nodiscard]] consteval inline auto blend_mask() noexcept -> U32
 {
-    static_assert(t_e_0 < 2 && t_e_0 < 2, "Values t_e_0 ans t_e_1 must be in the interval [0, 1].");
+    static_assert(t_e_0 < 2 && t_e_1 < 2, "Values t_e_0 ans t_e_1 must be in the interval [0, 1].");
 
-    return (((t_e_1) << 1) | (t_e_0));
+    return ((t_e_1 << 1U) | (t_e_0));
 }
 
 } // namespace mjolnir::x86

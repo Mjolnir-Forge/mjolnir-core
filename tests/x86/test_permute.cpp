@@ -50,10 +50,10 @@ void test_blend()
 #include <cstdint>
 #include <utility>
 
-template <UST... I>
-auto test(std::index_sequence<I...>)
+template <UST... t_i>
+auto test([[maybe_unused]] std::index_sequence<t_i...> seq)
 {
-    std::initializer_list<I32>{(test_blend<I / 2, I % 2>(), 0)...};
+    [[maybe_unused]] auto unused = std::initializer_list<I32>{(test_blend<t_i / 2, t_i % 2>(), 0)...};
 }
 
 TEST(Blend, __m128d) // NOLINT
