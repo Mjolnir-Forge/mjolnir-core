@@ -38,6 +38,27 @@ requires FloatVectorRegister<T_RegisterType>
 
 
 //! @brief
+//! Blend elements from `a` and `b` using a control mask and return the resulting vector register.
+//!
+//! @tparam t_mask
+//! An integer value used control mask. Consult the intel intrinsics guide for further information. Note that this
+//! library provides template functions in `permute.h` to determine the correct mask fo each use-case.
+//! @tparam T_RegisterType
+//! The register type
+//!
+//! @param [in] a:
+//! First register
+//! @param [in] b:
+//! Second register
+//!
+//! @return
+//! Register with blended values
+template <I32 t_mask, typename T_RegisterType>
+requires FloatVectorRegister<T_RegisterType>
+[[nodiscard]] inline auto mm_blend(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Load data from an aligned memory location into a new register.
 //!
 //! @tparam T_RegisterType:
@@ -130,6 +151,23 @@ requires FloatVectorRegister<T_RegisterType>
         return _mm256_andnot_ps(a, b);
     else
         return _mm256_andnot_pd(a, b);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <I32 t_mask, typename T_RegisterType>
+requires FloatVectorRegister<T_RegisterType>
+[[nodiscard]] inline auto mm_blend(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_blend_ps(a, b, t_mask);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_blend_pd(a, b, t_mask);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_blend_ps(a, b, t_mask);
+    else
+        return _mm256_blend_pd(a, b, t_mask);
 }
 
 
