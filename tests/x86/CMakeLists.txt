@@ -1,3 +1,3 @@
 add_mjolnir_core_test(abs)
 add_mjolnir_core_test(direct_access)
-add_mjolnir_core_test(permute)
+add_mjolnir_core_test(permutation)

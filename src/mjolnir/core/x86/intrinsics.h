@@ -109,6 +109,19 @@ requires FloatVectorRegister<T_RegisterType>
 
 
 //! @brief
+//! Return a vector register with all elements set to zero.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @return
+//! Vector register with all elements set to zero
+template <typename T_RegisterType>
+requires FloatVectorRegister<T_RegisterType>
+[[nodiscard]] inline auto mm_setzero() noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Store the content of a register to a memory address
 //!
 //! @tparam T_RegisterType:
@@ -204,6 +217,23 @@ requires FloatVectorRegister<T_RegisterType>
         return _mm256_set1_ps(value);
     else
         return _mm256_set1_pd(value);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_RegisterType>
+requires FloatVectorRegister<T_RegisterType>
+[[nodiscard]] inline auto mm_setzero() noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_setzero_ps();
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_setzero_pd();
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_setzero_ps();
+    else
+        return _mm256_setzero_pd();
 }
 
 
