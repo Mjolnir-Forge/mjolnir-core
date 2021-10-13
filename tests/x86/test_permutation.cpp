@@ -1,4 +1,5 @@
 #include "mjolnir/core/fundamental_types.h"
+#include "mjolnir/core/utility/bit_operations.h"
 #include "mjolnir/core/x86/direct_access.h"
 #include "mjolnir/core/x86/intrinsics.h"
 #include "mjolnir/core/x86/permutation.h"
@@ -33,15 +34,8 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 // Tests
 // ====================================================================================================================
 
-template <typename T_Type>
-[[nodiscard]] constexpr inline auto is_bit_set(T_Type variable, UST position) noexcept -> bool
-{
-    return (variable & (1U << (position)));
-}
-
 
 // --- test_blend -----------------------------------------------------------------------------------------------------
-
 
 //! Calculate the template indices passed to `blend` depending on the test_case_index.
 template <typename T_RegisterType>
