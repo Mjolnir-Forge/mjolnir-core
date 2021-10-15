@@ -96,3 +96,11 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend) // NOLINT
     constexpr UST num_testcases = ((1U) << num_elements<TypeParam>);
     test_blend_test_series<TypeParam>(std::make_index_sequence<num_testcases>());
 }
+
+
+// --- test_blend_above -----------------------------------------------------------------------------------------------
+
+TEST(random, test) // NOLINT
+{
+    std::cout << bit_construct<U32>(-1, 0, 2, 1);
+}
