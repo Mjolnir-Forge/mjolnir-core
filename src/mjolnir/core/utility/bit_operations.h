@@ -10,24 +10,57 @@
 #include "mjolnir/core/fundamental_types.h"
 
 #include <concepts>
+#include <limits>
 
 
 namespace mjolnir
 {
 //! @brief
-//! Construct an unsigned integer from individual bits.
+//! The size of a type in bits.
+//!
+//! @tparam T_Type:
+//! The type
+template <typename T_Type>
+inline constexpr UST num_bits = sizeof(T_Type) * CHAR_BIT;
+
+
+//! @brief
+//! Construct an unsigned integer by setting its individual bits.
 //!
 //! @details
-//! The function sets the first N lowest bits of the returned integer where N is the number of provided parameters. Each
-//! parameter defines the value of a single bit. Values larger than 1 are treated as 1. Depending on the value of
-//! `t_ascending`, the bits can either be in ascending or decending order. Or in other words, `t_ascending` controls
-//! if the lowest bit is represented by the first or last parameter.
+//! The function sets the first N lowest bits of the returned integer where N is the number of provided template
+//! parameters. Each parameter defines the value of a single bit. Depending on the value of `ascending`, the bits can
+//! either be in ascending or decending order. Or in other words, `ascending` controls if the lowest bit is represented
+//! by the first or last parameter.
 //!
-//! @todo
-//! - assert number of parameters not larger than variable bits
-//! - clamp values to 1
-template <std::unsigned_integral T_Type, bool t_ascending = false, std::integral... T_Args>
-[[nodiscard]] consteval inline auto bit_construct(T_Args... bit_values) noexcept -> T_Type;
+//! @tparam T_Type:
+//! An unsigned integer type
+//! @tparam t_bit_values:
+//! The individuel bits (see detailed description). Values other than 0 or 1 will trigger a static assertion.
+//!
+//! @param[in] ascending:
+//! If `true`, the first passed bit represents the lowest bit. If `false`, the lowest bit is represented by the last
+//! value in `t_bit_values`
+//!
+//! @return
+//! Integer constructed from bit values
+template <std::unsigned_integral T_Type, UST... t_bit_values>
+[[nodiscard]] consteval inline auto bit_construct(bool ascending = false) noexcept -> T_Type;
+
+
+//! @brief
+//! Clear a single specific bit of an unsigned integer.
+//!
+//! @tparam T_Type:
+//! An unsigned integer type
+//!
+//! @param[in, out] integer:
+//! The integer that should be modified
+//! @param[in] index
+//! The index of the bit that should be modified
+template <std::unsigned_integral T_Type>
+constexpr inline void clear_bit(T_Type& integer, UST index) noexcept;
+
 
 //! \addtogroup core_utility
 //! @{
@@ -52,6 +85,39 @@ template <typename T_Type>
 [[nodiscard]] constexpr inline auto is_bit_set(T_Type variable, UST position) noexcept -> bool;
 
 
+//! @brief
+//! Set a single specific bit of an unsigned integer.
+//!
+//! @tparam T_Type:
+//! An unsigned integer type
+//!
+//! @param[in, out] integer:
+//! The integer that should be modified
+//! @param[in] index
+//! The index of the bit that should be modified
+template <std::unsigned_integral T_Type>
+constexpr inline void set_bit(T_Type& integer, UST index) noexcept;
+
+
+//! @brief
+//! Set a single bit of an unsigned integer to the specified value
+//!
+//! @tparam t_value:
+//! The new value of the bit
+//! @tparam T_Type:
+//! An unsigned integer type
+//!
+//! @param[in, out] integer:
+//! The integer that should be modified
+//! @param[in] index
+//! The index of the bit that should be modified
+//!
+//! @test
+//! Write test
+template <UST t_value, std::unsigned_integral T_Type>
+constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept;
+
+
 //! @}
 } // namespace mjolnir
 
@@ -68,29 +134,34 @@ namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-template <std::unsigned_integral T_Type, bool t_ascending, std::integral... T_Args>
-[[nodiscard]] consteval inline auto bit_construct(T_Args... bit_values) noexcept -> T_Type
+template <std::unsigned_integral T_Type, UST... t_bit_values>
+[[nodiscard]] consteval inline auto bit_construct(bool ascending) noexcept -> T_Type
 {
-    constexpr auto set_bit_of_integer = [](auto bit_value, T_Type bit_number, T_Type& integer) -> void
-    {
-        if (bit_value > 1)
-            throw 0;
-        T_Type clamped_bit_value = std::clamp(static_cast<T_Type>(bit_value), T_Type(0), T_Type(1));
-        integer                  = (clamped_bit_value << bit_number) | integer;
-    };
+    static_assert(sizeof...(t_bit_values) <= num_bits<T_Type>, "Number of bit values exceeds number of type bits.");
 
     T_Type integer = 0;
-    if constexpr (t_ascending)
+    if (ascending)
     {
-        T_Type bit_number = 0;
-        (void) std::initializer_list<I32>{(set_bit_of_integer(bit_values, bit_number++, integer), 0)...};
+        T_Type bit_index = 0;
+        (void) std::initializer_list<I32>{(set_bit_to<t_bit_values>(integer, bit_index++), 0)...};
     }
     else
     {
-        T_Type bit_number = sizeof...(bit_values) - 1;
-        (void) std::initializer_list<I32>{(set_bit_of_integer(bit_values, bit_number--, integer), 0)...};
+        T_Type bit_index = sizeof...(t_bit_values) - 1;
+        (void) std::initializer_list<I32>{(set_bit_to<t_bit_values>(integer, bit_index--), 0)...};
     }
     return integer;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <std::unsigned_integral T_Type>
+constexpr inline void clear_bit(T_Type& integer, UST index) noexcept
+{
+    assert(index < num_bits<T_Type> && "Index exceeds number of bits."); // NOLINT
+
+    integer &= ~(1U << index);
 }
 
 
@@ -102,5 +173,29 @@ template <typename T_Type>
     return (variable & (1U << (position)));
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <std::unsigned_integral T_Type>
+constexpr inline void set_bit(T_Type& integer, UST index) noexcept
+{
+    assert(index < num_bits<T_Type> && "Index exceeds number of bits."); // NOLINT
+
+    integer |= 1U << index;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_value, std::unsigned_integral T_Type>
+constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept
+{
+    static_assert(t_value <= 1, "Bit value must either be 0 or 1.");
+
+    if constexpr (t_value == 1)
+        set_bit(integer, index);
+    else
+        clear_bit(integer, index);
+}
 
 } // namespace mjolnir

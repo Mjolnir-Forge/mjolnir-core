@@ -16,30 +16,6 @@ namespace mjolnir::x86
 
 
 //! @brief
-//! Blend elements from `src_0` and `src_1` into a new register using the template parameters `t_e_0` and `t_e_1`.
-//!
-//! @details
-//! The template parameters can only have the values 0 or 1. Other values will cause a compile-time error. If a
-//! parameter is 0, the result value of the corresponding element is taken from `src_0`. Otherwise, the value of
-//! `src_1` is used.
-//!
-//! @tparam t_e_0:
-//! Selects the source of the 1. element
-//! @tparam t_e_1:
-//! Selects the source of the 2. element
-//!
-//! @param[in] src_0:
-//! First source register
-//! @param[in] src_1:
-//! Second source register
-//!
-//! @return
-//! New register with blended values
-// template <U32 t_e_0, U32 t_e_1>
-//[[nodiscard]] inline auto blend(__m128d src_0, __m128d src_1) noexcept -> __m128d;
-
-
-//! @brief
 //! Blend elements from `src_0` and `src_1` into a new register using the template parameters `t_e_0` to `t_e_3`.
 //!
 //! @tparam t_args:
@@ -80,7 +56,7 @@ template <U32... t_args, FloatVectorRegister T_RegisterType>
     static_assert(sizeof...(t_args) == num_elements<T_RegisterType>,
                   "Number of template parameters must be equal to the number of register elements.");
 
-    return mm_blend<bit_construct<U32, true>(t_args...)>(src_0, src_1);
+    return mm_blend<bit_construct<U32, t_args...>(true)>(src_0, src_1);
 }
 
 

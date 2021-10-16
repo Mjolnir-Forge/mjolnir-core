@@ -102,5 +102,5 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend) // NOLINT
 
 TEST(random, test) // NOLINT
 {
-    std::cout << bit_construct<U32>(-1, 0, 2, 1);
+    std::cout << bit_construct<U32, 0, 0, 0, 0, 1, 0, 1, 1>();
 }
