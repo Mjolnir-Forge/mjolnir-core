@@ -16,7 +16,7 @@ namespace mjolnir::x86
 
 
 //! @brief
-//! Blend elements from `src_0` and `src_1` into a new register using the template parameters `t_e_0` to `t_e_3`.
+//! Blend elements from `src_0` and `src_1` into a new register.
 //!
 //! @tparam t_args:
 //! Parameters pack to select the source register for the individual elements. The number of parameters must be equal to
@@ -44,7 +44,7 @@ template <U32... t_args, FloatVectorRegister T_RegisterType>
 // === DEFINITIONS ====================================================================================================
 
 #include "mjolnir/core/utility/bit_operations.h"
-#include "mjolnir/core/x86/intrinsics.h"
+
 
 namespace mjolnir::x86
 {
