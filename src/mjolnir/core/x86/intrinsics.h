@@ -69,8 +69,8 @@ template <I32 t_mask, FloatVectorRegister T_RegisterType>
 //!
 //! @return
 //! Bit cast register
-template <FloatVectorRegister T_RegisterTypeIn, IntegerVectorRegister T_RegisterTypeOut>
-[[nodiscard]] inline auto mm_cast_fi(T_RegisterTypeIn src) noexcept -> T_RegisterTypeOut;
+template <FloatVectorRegister T_RegisterTypeIn>
+[[nodiscard]] inline auto mm_cast_fi(T_RegisterTypeIn src) noexcept;
 
 
 //! @brief
@@ -211,8 +211,8 @@ template <I32 t_mask, FloatVectorRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <FloatVectorRegister T_RegisterTypeIn, IntegerVectorRegister T_RegisterTypeOut>
-[[nodiscard]] inline auto mm_cast_fi(T_RegisterTypeIn src) noexcept -> T_RegisterTypeOut
+template <FloatVectorRegister T_RegisterTypeIn>
+[[nodiscard]] inline auto mm_cast_fi(T_RegisterTypeIn src) noexcept
 {
     if constexpr (is_m128<T_RegisterTypeIn>)
         return _mm_castps_si128(src);

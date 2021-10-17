@@ -35,6 +35,63 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 // ====================================================================================================================
 
 
+// --- test_align_right -----------------------------------------------------------------------------------------------
+
+//! A single test case for a specific `t_shift`.
+template <typename T_RegisterType, U32 t_shift>
+void test_align_right_test_case()
+{
+    constexpr UST n_e  = num_elements<T_RegisterType>;
+    constexpr UST n_l  = num_lanes<T_RegisterType>;
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+
+    // create source registers
+    auto a = mm_setzero<T_RegisterType>();
+    auto b = mm_setzero<T_RegisterType>();
+
+
+    // set source register values
+    for (UST i = 0; i < n_e; ++i)
+    {
+        set(a, i, static_cast<ElementType<T_RegisterType>>(i + 1));
+        set(b, i, static_cast<ElementType<T_RegisterType>>(i + 1 + n_e));
+    }
+
+
+    // create result register
+    T_RegisterType c = align_right<t_shift>(a, b);
+
+
+    // check results
+    for (UST i = 0; i < n_le; ++i)
+        for (UST j = 0; j < n_l; ++j)
+        {
+            UST idx     = i + j * n_le;
+            UST idx_exp = idx + t_shift;
+
+            ElementType<T_RegisterType> exp = (i < n_le - t_shift) ? get(b, idx_exp) : get(a, idx_exp - n_le);
+
+            EXPECT_DOUBLE_EQ(get(c, idx), exp);
+        }
+}
+
+
+//! Initializes all test cases that cover all possible shift values.
+template <typename T_RegisterType, UST... t_shifts>
+auto test_align_right_test_series([[maybe_unused]] std::index_sequence<t_shifts...> seq)
+{
+    (void) std::initializer_list<I32>{(test_align_right_test_case<T_RegisterType, t_shifts>(), 0)...};
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_align_right) // NOLINT
+{
+    constexpr UST num_testcases = num_lane_elements<TypeParam>;
+    test_align_right_test_series<TypeParam>(std::make_index_sequence<num_testcases>());
+}
+
+
 // --- test_blend -----------------------------------------------------------------------------------------------------
 
 //! Calculate the template indices passed to `blend` depending on the test_case_index.
@@ -99,8 +156,3 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend) // NOLINT
 
 
 // --- test_blend_above -----------------------------------------------------------------------------------------------
-
-TEST(random, test) // NOLINT
-{
-    std::cout << bit_construct<U32, 0, 0, 0, 0, 1, 0, 1, 1>();
-}
