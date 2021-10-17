@@ -159,7 +159,7 @@ constexpr inline void clear_bit(T_Type& integer, UST index) noexcept
 {
     assert(index < num_bits<T_Type> && "Index exceeds number of bits."); // NOLINT
 
-    integer &= ~(T_Type(1U) << index);
+    integer &= static_cast<T_Type>(~(UST(1) << index));
 }
 
 
@@ -168,7 +168,7 @@ constexpr inline void clear_bit(T_Type& integer, UST index) noexcept
 template <typename T_Type>
 [[nodiscard]] constexpr inline auto is_bit_set(T_Type variable, UST position) noexcept -> bool
 {
-    return (variable & (T_Type(1U) << (position)));
+    return (variable & static_cast<T_Type>(UST(1) << (position)));
 }
 
 
@@ -179,7 +179,7 @@ constexpr inline void set_bit(T_Type& integer, UST index) noexcept
 {
     assert(index < num_bits<T_Type> && "Index exceeds number of bits."); // NOLINT
 
-    integer |= T_Type(1U) << index;
+    integer |= static_cast<T_Type>(UST(1) << index);
 }
 
 
@@ -188,9 +188,9 @@ constexpr inline void set_bit(T_Type& integer, UST index) noexcept
 template <UST t_value, std::unsigned_integral T_Type>
 constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept
 {
-    static_assert(t_value <= 1, "Bit value must either be 0 or 1.");
+    static_assert(t_value <= 1UL, "Bit value must either be 0 or 1.");
 
-    if constexpr (t_value == 1)
+    if constexpr (t_value == 1UL)
         set_bit(integer, index);
     else
         clear_bit(integer, index);
