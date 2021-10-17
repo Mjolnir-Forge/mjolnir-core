@@ -179,7 +179,7 @@ constexpr inline void set_bit(T_Type& integer, UST index) noexcept
 {
     assert(index < num_bits<T_Type> && "Index exceeds number of bits."); // NOLINT
 
-    integer |= 1U << index;
+    integer |= T_Type(1U) << index;
 }
 
 
