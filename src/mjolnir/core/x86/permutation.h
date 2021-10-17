@@ -76,7 +76,7 @@ template <UST t_shift, FloatVectorRegister T_RegisterType>
 {
     static_assert(t_shift <= num_lane_elements<T_RegisterType>, "t_shift must be in the range [0, num_lane_elements].");
 
-    constexpr U32 element_size = sizeof(ElementType<T_RegisterType>);
+    constexpr UST element_size = sizeof(ElementType<T_RegisterType>);
 
     if constexpr (t_shift == 0)
         return rhs;

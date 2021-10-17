@@ -140,12 +140,12 @@ template <std::unsigned_integral T_Type, UST... t_bit_values>
     T_Type integer = 0;
     if (ascending)
     {
-        T_Type bit_index = 0;
+        UST bit_index = 0;
         (void) std::initializer_list<I32>{(set_bit_to<t_bit_values>(integer, bit_index++), 0)...};
     }
     else
     {
-        T_Type bit_index = sizeof...(t_bit_values) - 1;
+        UST bit_index = sizeof...(t_bit_values) - 1;
         (void) std::initializer_list<I32>{(set_bit_to<t_bit_values>(integer, bit_index--), 0)...};
     }
     return integer;
