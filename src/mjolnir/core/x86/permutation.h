@@ -16,6 +16,26 @@ namespace mjolnir::x86
 
 
 //! @brief
+//! Concatenate two floating-point registers, shift the result right by `t_shift` elements, and return the result.
+//!
+//! @tparam t_shift:
+//! Number of elements to shift
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! Left-hand side register
+//! @param[in] rhs:
+//! Right-hand side register
+//!
+//! @return
+//! Result register
+template <UST t_shift, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto align_right([[maybe_unused]] T_RegisterType lhs, [[maybe_unused]] T_RegisterType rhs)
+        -> T_RegisterType;
+
+
+//! @brief
 //! Blend elements from `src_0` and `src_1` into a new register.
 //!
 //! @tparam t_args:
@@ -33,7 +53,7 @@ namespace mjolnir::x86
 //!
 //! @return
 //! New register with blended values
-template <U32... t_args, FloatVectorRegister T_RegisterType>
+template <UST... t_args, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto blend(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType;
 
 
@@ -50,13 +70,34 @@ namespace mjolnir::x86
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-template <U32... t_args, FloatVectorRegister T_RegisterType>
+template <UST t_shift, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto align_right([[maybe_unused]] T_RegisterType lhs, [[maybe_unused]] T_RegisterType rhs)
+        -> T_RegisterType
+{
+    static_assert(t_shift <= num_lane_elements<T_RegisterType>, "t_shift must be in the range [0, num_lane_elements].");
+
+    constexpr U32 element_size = sizeof(ElementType<T_RegisterType>);
+
+    if constexpr (t_shift == 0)
+        return rhs;
+    else if constexpr (t_shift == num_lane_elements<T_RegisterType>)
+        return lhs;
+    else if constexpr (num_lanes<T_RegisterType> == 1)
+        return mm_cast_if<T_RegisterType>(_mm_alignr_epi8(mm_cast_fi(lhs), mm_cast_fi(rhs), t_shift * element_size));
+    else
+        return mm_cast_if<T_RegisterType>(_mm256_alignr_epi8(mm_cast_fi(lhs), mm_cast_fi(rhs), t_shift * element_size));
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST... t_args, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto blend(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType
 {
     static_assert(sizeof...(t_args) == num_elements<T_RegisterType>,
                   "Number of template parameters must be equal to the number of register elements.");
 
-    return mm_blend<bit_construct<U32, t_args...>(true)>(src_0, src_1);
+    return mm_blend<bit_construct<UST, t_args...>(true)>(src_0, src_1);
 }
 
 

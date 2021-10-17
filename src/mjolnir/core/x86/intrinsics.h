@@ -57,6 +57,40 @@ template <I32 t_mask, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Bit cast a floating-point vector register to an equally sized integer vector register.
+//!
+//! @tparam T_RegisterTypeIn:
+//! Type of the input register
+//! @tparam T_RegisterTypeOut:
+//! Type of the output register
+//!
+//! @param[in] src:
+//! Input register
+//!
+//! @return
+//! Bit cast register
+template <FloatVectorRegister T_RegisterTypeIn, IntegerVectorRegister T_RegisterTypeOut>
+[[nodiscard]] inline auto mm_cast_fi(T_RegisterTypeIn src) noexcept -> T_RegisterTypeOut;
+
+
+//! @brief
+//! Bit cast an integer vector register to an equally sized floating-point vector register.
+//!
+//! @tparam T_RegisterTypeOut:
+//! Type of the output register
+//! @tparam T_RegisterTypeIn:
+//! Type of the input register
+//!
+//! @param[in] src:
+//! Input register
+//!
+//! @return
+//! Bit cast register
+template <FloatVectorRegister T_RegisterTypeOut, IntegerVectorRegister T_RegisterTypeIn>
+[[nodiscard]] inline auto mm_cast_if(T_RegisterTypeIn src) noexcept -> T_RegisterTypeOut;
+
+
+//! @brief
 //! Load data from an aligned memory location into a new register.
 //!
 //! @tparam T_RegisterType:
@@ -172,6 +206,38 @@ template <I32 t_mask, FloatVectorRegister T_RegisterType>
         return _mm256_blend_ps(a, b, t_mask);
     else
         return _mm256_blend_pd(a, b, t_mask);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterTypeIn, IntegerVectorRegister T_RegisterTypeOut>
+[[nodiscard]] inline auto mm_cast_fi(T_RegisterTypeIn src) noexcept -> T_RegisterTypeOut
+{
+    if constexpr (is_m128<T_RegisterTypeIn>)
+        return _mm_castps_si128(src);
+    else if constexpr (is_m128d<T_RegisterTypeIn>)
+        return _mm_castpd_si128(src);
+    else if constexpr (is_m256<T_RegisterTypeIn>)
+        return _mm256_castps_si256(src);
+    else
+        return _mm256_castpd_si256(src);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterTypeOut, IntegerVectorRegister T_RegisterTypeIn>
+[[nodiscard]] inline auto mm_cast_if(T_RegisterTypeIn src) noexcept -> T_RegisterTypeOut
+{
+    if constexpr (is_m128<T_RegisterTypeOut>)
+        return _mm_castsi128_ps(src);
+    else if constexpr (is_m128d<T_RegisterTypeOut>)
+        return _mm_castsi128_pd(src);
+    else if constexpr (is_m256<T_RegisterTypeOut>)
+        return _mm256_castsi256_ps(src);
+    else
+        return _mm256_castsi256_pd(src);
 }
 
 

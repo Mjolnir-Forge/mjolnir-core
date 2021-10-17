@@ -102,15 +102,6 @@ public:
 };
 
 
-//! @brief
-//! Special exception type that should only be thrown in debug builds.
-class AssertionError : public Exception
-{
-public:
-    AssertionError(const std::string& origin, const std::string& message);
-};
-
-
 //! @}
 } // namespace mjolnir
 
@@ -127,12 +118,5 @@ inline Exception::Exception(const std::string& origin, const std::string& messag
 {
 }
 
-
-// --------------------------------------------------------------------------------------------------------------------
-
-inline AssertionError::AssertionError(const std::string& origin, const std::string& message)
-    : Exception(origin, message)
-{
-}
 
 } // namespace mjolnir
