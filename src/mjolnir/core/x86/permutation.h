@@ -76,16 +76,20 @@ template <UST t_shift, FloatVectorRegister T_RegisterType>
 {
     static_assert(t_shift <= num_lane_elements<T_RegisterType>, "t_shift must be in the range [0, num_lane_elements].");
 
-    constexpr UST element_size = sizeof(ElementType<T_RegisterType>);
 
     if constexpr (t_shift == 0)
         return rhs;
     else if constexpr (t_shift == num_lane_elements<T_RegisterType>)
         return lhs;
-    else if constexpr (num_lanes<T_RegisterType> == 1)
-        return mm_cast_if<T_RegisterType>(_mm_alignr_epi8(mm_cast_fi(lhs), mm_cast_fi(rhs), t_shift * element_size));
     else
-        return mm_cast_if<T_RegisterType>(_mm256_alignr_epi8(mm_cast_fi(lhs), mm_cast_fi(rhs), t_shift * element_size));
+    {
+        constexpr UST element_shift = t_shift * sizeof(ElementType<T_RegisterType>);
+
+        if constexpr (num_lanes<T_RegisterType> == 1)
+            return mm_cast_if<T_RegisterType>(_mm_alignr_epi8(mm_cast_fi(lhs), mm_cast_fi(rhs), element_shift));
+        else
+            return mm_cast_if<T_RegisterType>(_mm256_alignr_epi8(mm_cast_fi(lhs), mm_cast_fi(rhs), element_shift));
+    }
 }
 
 
