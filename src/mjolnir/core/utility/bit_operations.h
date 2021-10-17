@@ -159,7 +159,7 @@ constexpr inline void clear_bit(T_Type& integer, UST index) noexcept
 {
     assert(index < num_bits<T_Type> && "Index exceeds number of bits."); // NOLINT
 
-    integer &= ~(1U << index);
+    integer &= ~(T_Type(1U) << index);
 }
 
 
@@ -168,7 +168,7 @@ constexpr inline void clear_bit(T_Type& integer, UST index) noexcept
 template <typename T_Type>
 [[nodiscard]] constexpr inline auto is_bit_set(T_Type variable, UST position) noexcept -> bool
 {
-    return (variable & (1U << (position)));
+    return (variable & (T_Type(1U) << (position)));
 }
 
 
