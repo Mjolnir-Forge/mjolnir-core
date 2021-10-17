@@ -32,8 +32,7 @@ namespace mjolnir::x86
 //!
 //! @return
 //! Result of the bitwise operation `NOT a AND b` per register element
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_andnot(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
 
 
@@ -53,8 +52,7 @@ requires FloatVectorRegister<T_RegisterType>
 //!
 //! @return
 //! Register with blended values
-template <I32 t_mask, typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <I32 t_mask, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_blend(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
 
 
@@ -69,8 +67,7 @@ requires FloatVectorRegister<T_RegisterType>
 //!
 //! @return
 //! New register with loaded data
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_load(ElementType<T_RegisterType>* ptr) noexcept -> T_RegisterType;
 
 
@@ -85,8 +82,7 @@ requires FloatVectorRegister<T_RegisterType>
 //!
 //! @return
 //! Register with broadcasted value
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_set1(ElementType<T_RegisterType> value) noexcept -> T_RegisterType;
 
 
@@ -103,8 +99,7 @@ requires FloatVectorRegister<T_RegisterType>
 //!
 //! @return
 //! Register that contains the provided values
-template <typename T_RegisterType, typename... T_Args>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType, typename... T_Args>
 [[nodiscard]] inline auto mm_setr(T_Args... args) noexcept -> T_RegisterType;
 
 
@@ -116,8 +111,7 @@ requires FloatVectorRegister<T_RegisterType>
 //!
 //! @return
 //! Vector register with all elements set to zero
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_setzero() noexcept -> T_RegisterType;
 
 
@@ -131,8 +125,7 @@ requires FloatVectorRegister<T_RegisterType>
 //! Correctly aligned pointer to the memory where the content should be stored
 //! @param [in] reg:
 //! The register that should be stored
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexcept;
 
 //! @}
@@ -152,8 +145,7 @@ namespace mjolnir::x86
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_andnot(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
 {
     if constexpr (is_m128<T_RegisterType>)
@@ -169,8 +161,7 @@ requires FloatVectorRegister<T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <I32 t_mask, typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <I32 t_mask, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_blend(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
 {
     if constexpr (is_m128<T_RegisterType>)
@@ -186,8 +177,7 @@ requires FloatVectorRegister<T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_load(ElementType<T_RegisterType>* ptr) noexcept -> T_RegisterType
 {
     assert(is_aligned<alignment_bytes<T_RegisterType>>(ptr)); // NOLINT
@@ -205,8 +195,7 @@ requires FloatVectorRegister<T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_set1(ElementType<T_RegisterType> value) noexcept -> T_RegisterType
 {
     if constexpr (is_m128<T_RegisterType>)
@@ -222,25 +211,7 @@ requires FloatVectorRegister<T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
-[[nodiscard]] inline auto mm_setzero() noexcept -> T_RegisterType
-{
-    if constexpr (is_m128<T_RegisterType>)
-        return _mm_setzero_ps();
-    else if constexpr (is_m128d<T_RegisterType>)
-        return _mm_setzero_pd();
-    else if constexpr (is_m256<T_RegisterType>)
-        return _mm256_setzero_ps();
-    else
-        return _mm256_setzero_pd();
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <typename T_RegisterType, typename... T_Args>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType, typename... T_Args>
 [[nodiscard]] inline auto mm_setr(T_Args... args) noexcept -> T_RegisterType
 {
     if constexpr (is_m128<T_RegisterType>)
@@ -256,8 +227,23 @@ requires FloatVectorRegister<T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_setzero() noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_setzero_ps();
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_setzero_pd();
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_setzero_ps();
+    else
+        return _mm256_setzero_pd();
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
 inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexcept
 {
     assert(is_aligned<alignment_bytes<T_RegisterType>>(ptr)); // NOLINT

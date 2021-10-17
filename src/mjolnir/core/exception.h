@@ -18,21 +18,25 @@
 //! @brief T
 //! hrow an exception and automatically add the function that caused it.
 //!
+//! @param[in] exception_type:
+//! The exception type
 //! @param[in] message:
 //! The exception message
-#define THROW_EXCEPTION(message) throw mjolnir::Exception(__PRETTY_FUNCTION__, message)
+#define THROW_EXCEPTION(exception_type, message) throw exception_type(__PRETTY_FUNCTION__, message)
 
 //! @brief
 //! Throw an exception if the passed condition is met.
 //!
 //! @param[in] condition:
 //! If the passed condition validates as `true`, the exception is thrown.
-//!
+//! @param[in] exception_type:
+//! The exception type
 //! @param[in] message:
 //! The exception message
-#define THROW_EXCEPTION_IF(condition, message)                                                                         \
+#define THROW_EXCEPTION_IF(condition, exception_type, message)                                                         \
     if (condition) [[unlikely]]                                                                                        \
-    THROW_EXCEPTION(message)
+    THROW_EXCEPTION(exception_type, message)
+
 
 //! @}
 
@@ -44,7 +48,8 @@ namespace mjolnir
 //! \addtogroup core
 //! @{
 
-//! @brief Stores origion and message of an exception
+//! @brief
+//! Stores origin and message of an exception
 class Exception : public std::runtime_error
 {
 public:
@@ -96,6 +101,16 @@ public:
     Exception(const std::string& origin, const std::string& message);
 };
 
+
+//! @brief
+//! Special exception type that should only be thrown in debug builds.
+class AssertionError : public Exception
+{
+public:
+    AssertionError(const std::string& origin, const std::string& message);
+};
+
+
 //! @}
 } // namespace mjolnir
 
@@ -109,6 +124,14 @@ namespace mjolnir
 
 inline Exception::Exception(const std::string& origin, const std::string& message)
     : std::runtime_error{std::string("[") + origin + std::string("] ") + message}
+{
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+inline AssertionError::AssertionError(const std::string& origin, const std::string& message)
+    : Exception(origin, message)
 {
 }
 

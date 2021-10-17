@@ -3,6 +3,10 @@
 //!
 //! @brief
 //! Contains utility functions for bit related operations like setting and reading specific bits.
+//!
+//! @note
+//! sources:
+//! - https://stackoverflow.com/a/47990/6700329
 
 
 #pragma once
@@ -78,9 +82,6 @@ constexpr inline void clear_bit(T_Type& integer, UST index) noexcept;
 //!
 //! @return
 //! `true` or `false`
-//!
-//! @test
-//! Write a test
 template <typename T_Type>
 [[nodiscard]] constexpr inline auto is_bit_set(T_Type variable, UST position) noexcept -> bool;
 
@@ -111,9 +112,6 @@ constexpr inline void set_bit(T_Type& integer, UST index) noexcept;
 //! The integer that should be modified
 //! @param[in] index
 //! The index of the bit that should be modified
-//!
-//! @test
-//! Write test
 template <UST t_value, std::unsigned_integral T_Type>
 constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept;
 

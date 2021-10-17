@@ -20,6 +20,7 @@ TEST(test_bit_operations, bit_construct) // NOLINT
     EXPECT_EQ((bit_construct<U8, 1, 0, 1, 1, 0, 1, 1, 0>(true)), 0b01101101);
 }
 
+
 // --- test clear_bit -------------------------------------------------------------------------------------------------
 
 TEST(test_bit_operations, clear_bit) // NOLINT
@@ -35,7 +36,7 @@ TEST(test_bit_operations, clear_bit) // NOLINT
     clear_bit(a, 7); // NOLINT - magic number
     EXPECT_EQ(a, 0b01101110);
 
-    // test clear already cleared
+    // test clear already cleared bit
     clear_bit(a, 4);
     EXPECT_EQ(a, 0b01101110);
 }
@@ -73,7 +74,7 @@ TEST(test_bit_operations, set_bit) // NOLINT
     set_bit(a, 7); // NOLINT - magic number
     EXPECT_EQ(a, 0b10010001);
 
-    // test clear already cleared
+    // test setting already set bit
     set_bit(a, 4);
     EXPECT_EQ(a, 0b10010001);
 }
