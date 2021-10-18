@@ -107,5 +107,26 @@ template <UST... t_args, FloatVectorRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto blend_above(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType
+{
+    static_assert(t_index < num_elements<T_RegisterType>, "`t_index` exceeds register size.");
+
+    if constexpr (t_index == num_elements<T_RegisterType> - 1)
+        return src_0;
+    else
+    {
+        constexpr auto get_mask = [](UST index) -> UST
+        {
+            UST mask = 0;
+            for (UST i = index + 1; i < num_elements<T_RegisterType>; ++i)
+                set_bit(mask, i);
+            return mask;
+        };
+
+        return mm_blend<get_mask(t_index)>(src_0, src_1);
+    }
+}
+
 
 } // namespace mjolnir::x86
