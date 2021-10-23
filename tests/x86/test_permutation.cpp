@@ -211,24 +211,48 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_below) // NOLINT
 
 // --- test_blend_from_to ---------------------------------------------------------------------------------------------
 
-template <typename T_RegisterType, UST t_index>
+template <typename T_RegisterType>
+[[nodiscard]] constexpr inline auto get_blend_from_to_index_array(U32 test_case_index) noexcept
+{
+    std::array<UST, 2> indices = {{0}};
+    for (UST i = 0; i < test_case_index; ++i)
+    {
+        if (indices[1] == num_elements<T_RegisterType> - 1)
+        {
+            indices[0]++;
+            indices[1] = indices[0];
+        }
+        else
+            indices[1]++;
+    }
+    return indices;
+}
+
+
+template <typename T_RegisterType, UST t_test_case_index>
 void test_blend_from_to_test_case(T_RegisterType a, T_RegisterType b)
 {
-    constexpr UST idx_start = 0;
-    constexpr UST idx_end   = 0;
+    constexpr auto indices = get_blend_from_to_index_array<T_RegisterType>(t_test_case_index);
 
-    T_RegisterType c = blend_from_to<idx_start, idx_end>(a, b);
-
+    T_RegisterType c = blend_from_to<indices[0], indices[1]>(a, b);
 
     for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
     {
-        auto exp = (i >= idx_start && i <= idx_end) ? get(b, i) : get(a, i);
+        auto exp = (i >= indices[0] && i <= indices[1]) ? get(b, i) : get(a, i);
         EXPECT_DOUBLE_EQ(get(c, i), exp);
     }
 }
 
 
+template <typename T_RegisterType>
+[[nodiscard]] constexpr inline auto num_blend_from_to_test_cases() noexcept -> UST
+{
+    constexpr UST n = num_elements<T_RegisterType>;
+    return (n * n + n) / 2;
+}
+
+
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_from_to) // NOLINT
 {
-    TYPED_TEST_SERIES(test_blend_from_to_test_case, 1)
+    TYPED_TEST_SERIES(test_blend_from_to_test_case, num_blend_from_to_test_cases<TypeParam>())
 }
