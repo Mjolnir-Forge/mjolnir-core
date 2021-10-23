@@ -19,7 +19,7 @@ using namespace mjolnir::x86;
 // create test suites -------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
-class TestFloatingPointVectorRegisterTypes : public ::testing::Test
+class alignas(alignment_bytes<T_RegisterType>) TestFloatingPointVectorRegisterTypes : public ::testing::Test
 {
 protected:
     T_RegisterType m_a = mm_setzero<T_RegisterType>(); // NOLINT
