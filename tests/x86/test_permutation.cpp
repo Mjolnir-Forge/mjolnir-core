@@ -21,12 +21,11 @@ using namespace mjolnir::x86;
 template <FloatVectorRegister T_RegisterType>
 class TestFloatingPointVectorRegisterTypes : public ::testing::Test
 {
-public:
-    T_RegisterType m_a = mm_setzero<T_RegisterType>();
-    T_RegisterType m_b = mm_setzero<T_RegisterType>();
-
 protected:
-    virtual void SetUp() final
+    T_RegisterType m_a = mm_setzero<T_RegisterType>(); // NOLINT
+    T_RegisterType m_b = mm_setzero<T_RegisterType>(); // NOLINT
+
+    void SetUp() final
     {
         for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
         {
@@ -46,19 +45,24 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 
 // NOLINTNEXTLINE
 #define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>(this->m_a, this->m_b)
-
+#ifndef CLANG_TIDY
 // NOLINTNEXTLINE
-#define TYPED_TEST_SERIES(test_func, num_test_cases)                                                                   \
-    auto start_typed_test_series = [this]()                                                                            \
-    {                                                                                                                  \
-        auto test_series = [this]<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)                \
+#    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
+        auto start_typed_test_series = [this]()                                                                        \
         {                                                                                                              \
-            (void) std::initializer_list<I32>{(CALL_TEST_CASE_FUNC(test_func), 0)...};                                 \
+            auto test_series = [this]<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)            \
+            {                                                                                                          \
+                (void) std::initializer_list<I32>{(CALL_TEST_CASE_FUNC(test_func), 0)...};                             \
+            };                                                                                                         \
+            test_series(std::make_index_sequence<num_test_cases>());                                                   \
         };                                                                                                             \
-        test_series(std::make_index_sequence<num_test_cases>());                                                       \
-    };                                                                                                                 \
-    start_typed_test_series();
-
+        start_typed_test_series();
+#else
+// NOLINTNEXTLINE
+#    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
+        constexpr UST t_index = 0;                                                                                     \
+        CALL_TEST_CASE_FUNC(test_func);
+#endif
 
 // ====================================================================================================================
 // Tests

@@ -1,5 +1,6 @@
 """Checks if all cpp files pass the clang-tidy tests."""
 
+import time
 from argparse import ArgumentParser
 from subprocess import run
 from sys import exit, stdout
@@ -23,6 +24,12 @@ parser.add_argument(
     type=str,
     default="build",
 )
+parser.add_argument(
+    "--filter",
+    help="All files not containing the passed string in their file path are excluded",
+    type=str,
+    default=None,
+)
 args = parser.parse_args()
 
 if args.gtest_dir is None:
@@ -35,7 +42,14 @@ stdout.flush()
 
 error = False
 
-for file in get_cpp_files():
+files = get_cpp_files()
+if args.filter is not None:
+    files = [file for file in files if args.filter in file]
+
+
+for file in files:
+    print(f"Checking file: {file}")
+    start_time = time.time()
     r = run(
         [
             f"clang-tidy-{args.version}",
@@ -43,6 +57,7 @@ for file in get_cpp_files():
             "-header-filter=.*",
             "--extra-arg=-std=gnu++20",
             "--extra-arg=-pthread",
+            "--extra-arg=-DCLANG_TIDY",
             "--",
             "-I",
             "src",
@@ -50,6 +65,7 @@ for file in get_cpp_files():
             args.gtest_dir,
         ],
     )
+    print(f"Elapsed time: {round(time.time()-start_time, 2)}s")
     print("\n")
     stdout.flush()
     if r.returncode != 0:
