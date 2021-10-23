@@ -19,20 +19,8 @@ using namespace mjolnir::x86;
 // create test suites -------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
-class alignas(alignment_bytes<T_RegisterType>) TestFloatingPointVectorRegisterTypes : public ::testing::Test
+class TestFloatingPointVectorRegisterTypes : public ::testing::Test
 {
-protected:
-    T_RegisterType m_a = mm_setzero<T_RegisterType>(); // NOLINT
-    T_RegisterType m_b = mm_setzero<T_RegisterType>(); // NOLINT
-
-    void SetUp() final
-    {
-        for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
-        {
-            set(m_a, i, static_cast<ElementType<T_RegisterType>>(i + 1));
-            set(m_b, i, static_cast<ElementType<T_RegisterType>>(i + 1 + num_elements<T_RegisterType>));
-        }
-    }
 };
 
 
@@ -44,14 +32,27 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 
 
 // NOLINTNEXTLINE
-#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>(this->m_a, this->m_b)
+#define CREATE_SOURCE_VALUES                                                                                           \
+    TypeParam a = mm_setzero<TypeParam>();                                                                             \
+    TypeParam b = mm_setzero<TypeParam>();                                                                             \
+                                                                                                                       \
+    for (UST i = 0; i < num_elements<TypeParam>; ++i)                                                                  \
+    {                                                                                                                  \
+        set(a, i, static_cast<ElementType<TypeParam>>(i + 1));                                                         \
+        set(b, i, static_cast<ElementType<TypeParam>>(i + 1 + num_elements<TypeParam>));                               \
+    }
+
+
+// NOLINTNEXTLINE
+#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>(a, b)
 #ifndef CLANG_TIDY
 // NOLINTNEXTLINE
 #    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
-        auto start_typed_test_series = [this]()                                                                        \
+        auto start_typed_test_series = []()                                                                            \
         {                                                                                                              \
-            auto test_series = [this]<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)            \
+            auto test_series = []<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)                \
             {                                                                                                          \
+                CREATE_SOURCE_VALUES;                                                                                  \
                 (void) std::initializer_list<I32>{(CALL_TEST_CASE_FUNC(test_func), 0)...};                             \
             };                                                                                                         \
             test_series(std::make_index_sequence<num_test_cases>());                                                   \
@@ -61,6 +62,7 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 // NOLINTNEXTLINE
 #    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
         constexpr UST t_index = 0;                                                                                     \
+        CREATE_SOURCE_VALUES;                                                                                          \
         CALL_TEST_CASE_FUNC(test_func);
 #endif
 
