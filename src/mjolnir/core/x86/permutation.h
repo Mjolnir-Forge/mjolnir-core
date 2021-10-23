@@ -57,6 +57,86 @@ template <UST... t_args, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto blend(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType;
 
 
+//! @brief
+//! Get a register where elements with a higher index than `t_index` are copied from `src_1`and the rest from `src_0`.
+//!
+//! @tparam t_index:
+//! Up to the speciefied value, all elemets of the result register are identical to `src_0`. All other values are taken
+//! from `src_1`
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src_0:
+//! First source register
+//! @param[in] src_1:
+//! Second source register
+//!
+//! @return
+//! New register with blended values
+template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto blend_above(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Get a new register where the element with index `t_index` is taken from `src_1` and the rest from `src_0`
+//!
+//! @tparam t_index:
+//! Index that specifies the index of the only elemet that is taken from `src_1`
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src_0:
+//! First source register
+//! @param[in] src_1:
+//! Second source register
+//!
+//! @return
+//! New register with blended values
+template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto blend_at(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Get a register where elements with a lower index than `t_index` are copied from `src_1`and the rest from `src_0`.
+//!
+//! @tparam t_index:
+//! All elemets of the result register with a lower index than this value are copied from `src_1`. All other values are
+//! taken from `src_0`
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src_0:
+//! First source register
+//! @param[in] src_1:
+//! Second source register
+//!
+//! @return
+//! New register with blended values
+template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto blend_below(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Get a register where elements inside the specified index range are taken from `src_1` and the rest from `src_0`.
+//!
+//! @tparam t_index_first:
+//! Index of the first element that is taken from `src_1`
+//! @tparam t_index_last:
+//! Index of the last element that is taken from `src_1`
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src_0:
+//! First source register
+//! @param[in] src_1:
+//! Second source register
+//!
+//! @return
+//! New register with blended values
+template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto blend_from_to(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType;
+
+
 //! @}
 } // namespace mjolnir::x86
 
@@ -160,6 +240,31 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
         };
 
         return mm_blend<get_mask(t_index)>(src_0, src_1);
+    }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto blend_from_to(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType
+{
+    static_assert(t_index_first <= t_index_last, "`t_index_first` is larger than `t_index_last`.");
+    static_assert(t_index_last < num_elements<T_RegisterType>, "`t_index_last` exceeds register size.");
+
+    if constexpr (t_index_first == 0 and t_index_last == num_elements<T_RegisterType> - 1)
+        return src_1;
+    else
+    {
+        constexpr auto get_mask = [](UST idx_first, UST idx_last) -> UST
+        {
+            UST mask = 0;
+            for (UST i = idx_first; i <= idx_last; ++i)
+                set_bit(mask, i);
+            return mask;
+        };
+
+        return mm_blend<get_mask(t_index_first, t_index_last)>(src_0, src_1);
     }
 }
 
