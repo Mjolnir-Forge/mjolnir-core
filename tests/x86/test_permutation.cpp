@@ -1,5 +1,6 @@
 #include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/utility/bit_operations.h"
+#include "mjolnir/core/x86/definitions.h"
 #include "mjolnir/core/x86/direct_access.h"
 #include "mjolnir/core/x86/intrinsics.h"
 #include "mjolnir/core/x86/permutation.h"
@@ -17,9 +18,22 @@ using namespace mjolnir::x86;
 
 // create test suites -------------------------------------------------------------------------------------------------
 
-template <typename T_Type>
+template <FloatVectorRegister T_RegisterType>
 class TestFloatingPointVectorRegisterTypes : public ::testing::Test
 {
+public:
+    T_RegisterType m_a = mm_setzero<T_RegisterType>();
+    T_RegisterType m_b = mm_setzero<T_RegisterType>();
+
+protected:
+    virtual void SetUp() final
+    {
+        for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
+        {
+            set(m_a, i, static_cast<ElementType<T_RegisterType>>(i + 1));
+            set(m_b, i, static_cast<ElementType<T_RegisterType>>(i + 1 + num_elements<T_RegisterType>));
+        }
+    }
 };
 
 
@@ -31,13 +45,13 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 
 
 // NOLINTNEXTLINE
-#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>()
+#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>(this->m_a, this->m_b)
 
 // NOLINTNEXTLINE
 #define TYPED_TEST_SERIES(test_func, num_test_cases)                                                                   \
-    auto start_typed_test_series = []()                                                                                \
+    auto start_typed_test_series = [this]()                                                                            \
     {                                                                                                                  \
-        auto test_series = []<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)                    \
+        auto test_series = [this]<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)                \
         {                                                                                                              \
             (void) std::initializer_list<I32>{(CALL_TEST_CASE_FUNC(test_func), 0)...};                                 \
         };                                                                                                             \
@@ -55,25 +69,10 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 
 //! A single test case for a specific `t_shift`.
 template <typename T_RegisterType, U32 t_shift>
-void test_align_right_test_case()
+void test_align_right_test_case(T_RegisterType a, T_RegisterType b)
 {
-    constexpr UST n_e  = num_elements<T_RegisterType>;
     constexpr UST n_l  = num_lanes<T_RegisterType>;
     constexpr UST n_le = num_lane_elements<T_RegisterType>;
-
-
-    // create source registers
-    auto a = mm_setzero<T_RegisterType>();
-    auto b = mm_setzero<T_RegisterType>();
-
-
-    // set source register values
-    for (UST i = 0; i < n_e; ++i)
-    {
-        set(a, i, static_cast<ElementType<T_RegisterType>>(i + 1));
-        set(b, i, static_cast<ElementType<T_RegisterType>>(i + 1 + n_e));
-    }
-
 
     // create result register
     T_RegisterType c = align_right<t_shift>(a, b);
@@ -91,7 +90,6 @@ void test_align_right_test_case()
             EXPECT_DOUBLE_EQ(get(c, idx), exp);
         }
 }
-
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_align_right) // NOLINT
 {
@@ -112,23 +110,9 @@ template <typename T_RegisterType>
 }
 
 
-//! A single test case for a specific template parameter combination derived from `t_test_case_index`.
 template <typename T_RegisterType, U32 t_test_case_index>
-void test_blend_test_case()
+void test_blend_test_case(T_RegisterType a, T_RegisterType b)
 {
-    // create source registers
-    auto a = mm_setzero<T_RegisterType>();
-    auto b = mm_setzero<T_RegisterType>();
-
-
-    // set source register values
-    for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
-    {
-        set(a, i, static_cast<ElementType<T_RegisterType>>(i + 1));
-        set(b, i, static_cast<ElementType<T_RegisterType>>(i + 1 + num_elements<T_RegisterType>));
-    }
-
-
     // create result register
     auto           c = mm_setzero<T_RegisterType>();
     constexpr auto v = get_blend_index_array<T_RegisterType>(t_test_case_index);
@@ -155,31 +139,16 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend) // NOLINT
 
 // --- test_blend_above -----------------------------------------------------------------------------------------------
 
-
-//! A single test case for a specific template parameter combination derived from `t_test_case_index`.
 template <typename T_RegisterType, U32 t_index>
-void test_blend_above_test_case()
+void test_blend_above_test_case(T_RegisterType a, T_RegisterType b)
 {
-    // create source registers
-    auto a = mm_setzero<T_RegisterType>();
-    auto b = mm_setzero<T_RegisterType>();
-
-
-    // set source register values
-    for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
-    {
-        set(a, i, static_cast<ElementType<T_RegisterType>>(i + 1));
-        set(b, i, static_cast<ElementType<T_RegisterType>>(i + 1 + num_elements<T_RegisterType>));
-    }
-
     T_RegisterType c = blend_above<t_index>(a, b);
+
     for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
     {
         auto exp = (i > t_index) ? get(b, i) : get(a, i);
         EXPECT_DOUBLE_EQ(get(c, i), exp);
     }
-    // std::cout << get(c, i);
-    //    std::cout << std::endl;
 }
 
 
@@ -191,10 +160,16 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_above) // NOLINT
 
 // --- test_blend_at --------------------------------------------------------------------------------------------------
 
-template <typename T_RegisterType, U32 t_test_case_index>
-void test_blend_at_test_case()
+template <typename T_RegisterType, U32 t_index>
+void test_blend_at_test_case(T_RegisterType a, T_RegisterType b)
 {
-    std::cout << t_test_case_index << std::endl;
+    T_RegisterType c = blend_at<t_index>(a, b);
+
+    for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
+    {
+        auto exp = (i == t_index) ? get(b, i) : get(a, i);
+        EXPECT_DOUBLE_EQ(get(c, i), exp);
+    }
 }
 
 
