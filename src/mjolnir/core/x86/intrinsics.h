@@ -40,8 +40,8 @@ template <FloatVectorRegister T_RegisterType>
 //! Blend elements from `a` and `b` using a control mask and return the resulting vector register.
 //!
 //! @tparam t_mask
-//! An integer value used control mask. Consult the intel intrinsics guide for further information. Note that this
-//! library provides template functions in `permute.h` to determine the correct mask fo each use-case.
+//! An integer value used as control mask. Consult the intel intrinsics guide for further information. Note that this
+//! library provides template functions in `permute.h` to apply the correct mask for each use-case.
 //! @tparam T_RegisterType
 //! The register type
 //!
@@ -104,6 +104,23 @@ template <FloatVectorRegister T_RegisterTypeOut, IntegerVectorRegister T_Registe
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_load(ElementType<T_RegisterType>* ptr) noexcept -> T_RegisterType;
 
+
+//! @brief
+//! Shuffle the elements in `src` using the control mask `t_mask` and return the resulting vector register.
+//!
+//! @tparam t_mask
+//! An integer value used as control mask. Consult the intel intrinsics guide for further information. Note that this
+//! library provides template functions in `permute.h` to apply the correct mask for each use-case.
+//! @tparam T_RegisterType
+//! The register type
+//!
+//! @param [in] src:
+//! Source register
+//!
+//! @return
+//! Register with shuffled values
+template <I32 t_mask, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_permute(T_RegisterType src) noexcept -> T_RegisterType;
 
 //! @brief
 //! Broadcast a single value a to all elements of the register
@@ -258,6 +275,21 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_load_pd(ptr);
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <I32 t_mask, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_permute(T_RegisterType src) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_permute_ps(src, t_mask);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_permute_pd(src, t_mask);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_permute_ps(src, t_mask);
+    else
+        return _mm256_permute_pd(src, t_mask);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 

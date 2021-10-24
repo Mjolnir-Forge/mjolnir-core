@@ -45,6 +45,8 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 
 // NOLINTNEXTLINE
 #define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>(a, b)
+
+
 #ifndef STATIC_ANALYSIS
 // NOLINTNEXTLINE
 #    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
@@ -73,7 +75,6 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 
 // --- test_align_right -----------------------------------------------------------------------------------------------
 
-//! A single test case for a specific `t_shift`.
 template <typename T_RegisterType, U32 t_shift>
 void test_align_right_test_case(T_RegisterType a, T_RegisterType b)
 {
