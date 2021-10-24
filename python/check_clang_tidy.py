@@ -57,7 +57,7 @@ for file in files:
             "-header-filter=.*",
             "--extra-arg=-std=gnu++20",
             "--extra-arg=-pthread",
-            "--extra-arg=-DCLANG_TIDY",
+            "--extra-arg=-DSTATIC_ANALYSIS",
             "--",
             "-I",
             "src",

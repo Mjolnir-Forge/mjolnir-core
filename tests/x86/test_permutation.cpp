@@ -45,7 +45,7 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 
 // NOLINTNEXTLINE
 #define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>(a, b)
-#ifndef CLANG_TIDY
+#ifndef STATIC_ANALYSIS
 // NOLINTNEXTLINE
 #    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
         auto start_typed_test_series = []()                                                                            \

@@ -80,7 +80,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        scan-build-11 --status-bugs cmake -DCMAKE_BUILD_TYPE=DEBUG ..
+        scan-build-11 --status-bugs cmake -DCMAKE_BUILD_TYPE=DEBUG -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-DSTATIC_ANALYSIS" ..
     - name: Build / Check
       run: |
         cd build
