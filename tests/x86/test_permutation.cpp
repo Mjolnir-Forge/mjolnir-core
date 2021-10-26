@@ -259,3 +259,72 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_from_to) // NOLINT
 {
     TYPED_TEST_SERIES(test_blend_from_to_test_case, num_blend_from_to_test_cases<TypeParam>())
 }
+
+
+// --- test_blend_below -----------------------------------------------------------------------------------------------
+
+template <typename T_RegisterType>
+[[nodiscard]] constexpr inline auto get_permute_index_array(UST test_case_index) noexcept
+{
+    std::array<U32, num_lane_elements<T_RegisterType>> a = {{0}};
+    for (UST i = 0; i < a.size(); ++i)
+        if constexpr (is_m128<T_RegisterType> || is_m256<T_RegisterType>)
+            a.at(i) = static_cast<UST>(0b11) & (test_case_index >> (i * 2));
+        else
+            a.at(i) = static_cast<UST>(0b1) & (test_case_index >> (i));
+    return a;
+}
+
+
+template <typename T_RegisterType, UST t_index>
+void test_permute_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT
+{
+    constexpr UST  n_le = num_lane_elements<T_RegisterType>;
+    constexpr auto v    = get_permute_index_array<T_RegisterType>(t_index);
+    auto           c    = mm_setzero<T_RegisterType>();
+
+    if constexpr (is_m128d<T_RegisterType> || is_m256d<T_RegisterType>)
+        c = permute<v[0], v[1]>(a);
+    else
+        c = permute<v[0], v[1], v[2], v[3]>(a);
+
+
+    for (UST i = 0; i < n_le; ++i)
+    {
+        EXPECT_DOUBLE_EQ(get(c, i), get(a, v.at(i)));
+        if constexpr (num_lanes<T_RegisterType> == 2)
+        {
+            EXPECT_DOUBLE_EQ(get(c, i + n_le), get(a, v.at(i) + n_le));
+        }
+    }
+
+
+    if constexpr (is_m256d<T_RegisterType>)
+    {
+        c = permute<v[0], v[1], v[1], v[0]>(a);
+
+        for (UST i = 0; i < n_le; ++i)
+        {
+            EXPECT_DOUBLE_EQ(get(c, i), get(a, v.at(i)));
+            EXPECT_DOUBLE_EQ(get(c, i + n_le), get(a, v.at((i + 1) % n_le) + n_le));
+        }
+    }
+}
+
+template <typename T_RegisterType>
+[[nodiscard]] constexpr inline auto num_permute_test_cases() noexcept -> UST
+{
+    constexpr UST n = num_lane_elements<T_RegisterType>;
+
+    UST num_test_cases = 1;
+    for (UST i = 0; i < n; ++i)
+        num_test_cases *= n;
+
+    return num_test_cases;
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute) // NOLINT
+{
+    TYPED_TEST_SERIES(test_permute_test_case, num_permute_test_cases<TypeParam>())
+}

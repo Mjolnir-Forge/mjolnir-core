@@ -137,6 +137,27 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
 [[nodiscard]] inline auto blend_from_to(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType;
 
 
+//! @brief
+//! Shuffle register elements within lanes using indices.
+//!
+//! @tparam t_indices
+//! A set of indices equal to the number of lane elements. The n-th value specifies the lane index of the element from
+//! the source register that should be copied to the n-th lane element of the result register. The permutations for each
+//! lane are identical. The only exception is the `__m256d` register. For this register, one can use a number of
+//! parameters equal to number of register elements. In this case one can select the indices individually for all
+//! elements so that the permutations might differ between lanes. However, permutations can not be performed accross
+//! lane boundaries. If an index exceeds the number of lane elements, a compile-time error is generated.
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src:
+//! The source register
+//!
+//! @return
+//! New register with shuffled values
+template <UST... t_indices, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto permute(T_RegisterType src) noexcept -> T_RegisterType;
+
 //! @}
 } // namespace mjolnir::x86
 
@@ -145,6 +166,7 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
 
 #include "mjolnir/core/utility/bit_operations.h"
 
+#include <iostream>
 
 namespace mjolnir::x86
 {
@@ -267,6 +289,45 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
         return mm_blend<get_mask(t_index_first, t_index_last)>(src_0, src_1);
     }
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST... t_indices, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto permute(T_RegisterType src) noexcept -> T_RegisterType
+{
+    constexpr UST n_e  = num_elements<T_RegisterType>;
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    static_assert(sizeof...(t_indices) == n_le || (is_m256d<T_RegisterType> && sizeof...(t_indices) == n_e),
+                  "Number of indices must be identical to the number of lane elements. If the register type is "
+                  "__m256d, it can also be equal to the number of elements.");
+
+    if constexpr (is_m256d<T_RegisterType> and sizeof...(t_indices) == n_le)
+        return permute<t_indices..., t_indices...>(src);
+    else
+    {
+        constexpr auto get_mask = []() -> UST
+        {
+            auto compute_mask = []<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)
+            {
+                constexpr UST bit_diff = num_lane_elements<T_RegisterType> / 2;
+                UST           mask     = 0;
+                UST           index    = 0;
+
+                (void) std::initializer_list<I32>{(mask |= t_indices << index, index += bit_diff, 0)...};
+
+                return mask;
+            };
+            return compute_mask(std::make_index_sequence<sizeof...(t_indices)>());
+        };
+
+        return mm_permute<get_mask()>(src);
+    }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
 
 
 } // namespace mjolnir::x86
