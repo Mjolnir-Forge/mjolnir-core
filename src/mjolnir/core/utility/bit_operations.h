@@ -52,6 +52,10 @@ template <std::unsigned_integral T_Type, UST... t_bit_values>
 [[nodiscard]] consteval inline auto bit_construct(bool ascending = false) noexcept -> T_Type;
 
 
+template <std::unsigned_integral T_Type, UST t_num_bits>
+[[nodiscard]] constexpr inline auto bit_construct_set_first_n_bits() noexcept -> T_Type;
+
+
 //! @brief
 //! Clear a single specific bit of an unsigned integer.
 //!
@@ -64,6 +68,10 @@ template <std::unsigned_integral T_Type, UST... t_bit_values>
 //! The index of the bit that should be modified
 template <std::unsigned_integral T_Type>
 constexpr inline void clear_bit(T_Type& integer, UST index) noexcept;
+
+
+template <UST t_num_bits, std::unsigned_integral T_Type>
+constexpr inline void clear_bits(T_Type& integer, UST index) noexcept;
 
 
 //! \addtogroup core_utility
@@ -116,6 +124,14 @@ template <UST t_value, std::unsigned_integral T_Type>
 constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept;
 
 
+template <UST t_num_bits, std::unsigned_integral T_Type>
+constexpr inline void set_bits(T_Type& integer, UST index) noexcept;
+
+
+template <UST t_num_bits, bool t_clear_bits = true, std::unsigned_integral T_Type>
+constexpr inline void set_bits_to_int(T_Type& integer, UST index, UST value) noexcept;
+
+
 //! @}
 } // namespace mjolnir
 
@@ -127,6 +143,7 @@ constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept;
 
 #include <algorithm>
 #include <cassert>
+#include <limits>
 
 namespace mjolnir
 {
@@ -154,12 +171,45 @@ template <std::unsigned_integral T_Type, UST... t_bit_values>
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <std::unsigned_integral T_Type, UST t_num_bits>
+[[nodiscard]] constexpr inline auto bit_construct_set_first_n_bits() noexcept -> T_Type
+{
+    if (t_num_bits >= sizeof(T_Type) * CHAR_BIT)
+        return ~(T_Type(0));
+    return static_cast<T_Type>(((UST(1)) << t_num_bits) - 1);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_int_bits, std::unsigned_integral T_Type, UST... t_bit_values>
+[[nodiscard]] consteval inline auto bit_construct_from_ints(bool ascending) noexcept -> T_Type
+{
+    static_assert(sizeof...(t_bit_values) * t_num_int_bits <= num_bits<T_Type>,
+                  "Totoal number of provided bits exceeds number of type bits.");
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <std::unsigned_integral T_Type>
 constexpr inline void clear_bit(T_Type& integer, UST index) noexcept
 {
     assert(index < num_bits<T_Type> && "Index exceeds number of bits."); // NOLINT
 
     integer &= static_cast<T_Type>(~(UST(1) << index));
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_bits, std::unsigned_integral T_Type>
+constexpr inline void clear_bits(T_Type& integer, UST index) noexcept
+{
+    assert(index + t_num_bits <= num_bits<T_Type>);
+
+    constexpr UST bits = bit_construct_set_first_n_bits<UST, t_num_bits>();
+    integer &= static_cast<T_Type>(~(bits << index));
 }
 
 
@@ -195,5 +245,37 @@ constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept
     else
         clear_bit(integer, index);
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_bits, std::unsigned_integral T_Type>
+constexpr inline void set_bits(T_Type& integer, UST index) noexcept
+{
+    assert(index + t_num_bits <= num_bits<T_Type>); // NOLINT
+
+    constexpr UST bits = bit_construct_set_first_n_bits<UST, t_num_bits>();
+    integer |= static_cast<T_Type>(bits << index);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_bits, bool t_clear_bits, std::unsigned_integral T_Type>
+constexpr inline void set_bits_to_int(T_Type& integer, UST index, UST value) noexcept
+{
+    [[maybe_unused]] constexpr UST max_value = bit_construct_set_first_n_bits<UST, t_num_bits>();
+
+    assert(value <= max_value && "Value doesn't fit into specified number of bits.");
+    assert(index + t_num_bits <= num_bits<T_Type>);
+
+    if constexpr (t_clear_bits)
+    {
+        clear_bits<t_num_bits>(integer, index);
+    }
+
+    integer |= static_cast<T_Type>(value << index);
+}
+
 
 } // namespace mjolnir

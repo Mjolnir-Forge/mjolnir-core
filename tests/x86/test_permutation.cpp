@@ -267,8 +267,9 @@ template <typename T_RegisterType>
 [[nodiscard]] constexpr inline auto get_permute_index_array(UST test_case_index) noexcept
 {
     std::array<U32, num_lane_elements<T_RegisterType>> a = {{0}};
+
     for (UST i = 0; i < a.size(); ++i)
-        if constexpr (is_m128<T_RegisterType> || is_m256<T_RegisterType>)
+        if constexpr (is_single_precision<T_RegisterType>)
             a.at(i) = static_cast<UST>(0b11) & (test_case_index >> (i * 2));
         else
             a.at(i) = static_cast<UST>(0b1) & (test_case_index >> (i));
@@ -277,13 +278,14 @@ template <typename T_RegisterType>
 
 
 template <typename T_RegisterType, UST t_index>
-void test_permute_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT
+void test_permute_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT - complexity
 {
     constexpr UST  n_le = num_lane_elements<T_RegisterType>;
     constexpr auto v    = get_permute_index_array<T_RegisterType>(t_index);
     auto           c    = mm_setzero<T_RegisterType>();
 
-    if constexpr (is_m128d<T_RegisterType> || is_m256d<T_RegisterType>)
+
+    if constexpr (is_double_precision<T_RegisterType>)
         c = permute<v[0], v[1]>(a);
     else
         c = permute<v[0], v[1], v[2], v[3]>(a);
@@ -292,7 +294,7 @@ void test_permute_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b)
     for (UST i = 0; i < n_le; ++i)
     {
         EXPECT_DOUBLE_EQ(get(c, i), get(a, v.at(i)));
-        if constexpr (num_lanes<T_RegisterType> == 2)
+        if constexpr (is_multi_lane<T_RegisterType>)
         {
             EXPECT_DOUBLE_EQ(get(c, i + n_le), get(a, v.at(i) + n_le));
         }

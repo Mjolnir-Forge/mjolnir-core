@@ -90,7 +90,7 @@ inline constexpr bool is_m256d = std::is_same<T_Type, __m256d>::value;
 //! @tparam T_Type:
 //! Type
 template <typename T_Type>
-inline constexpr bool is_register = is_any_of<T_Type, __m128, __m128d, __m128i, __m256, __m256d, __m256i>();
+inline constexpr bool is_vector_register = is_any_of<T_Type, __m128, __m128d, __m128i, __m256, __m256d, __m256i>();
 
 
 //! @brief
@@ -126,8 +126,7 @@ inline constexpr bool is_float_register = is_any_of<T_Type, __m128, __m128d, __m
 namespace internal
 {
 //! Support structure to determine the element type of a float-based x86 vector register.
-template <typename T_Type>
-requires FloatVectorRegister<T_Type>
+template <FloatVectorRegister T_Type>
 struct ElementTypeStruct
 {
     using Type = typename std::conditional<is_any_of<T_Type, __m128d, __m256d>(), F64, F32>::type;
@@ -135,13 +134,11 @@ struct ElementTypeStruct
 
 
 //! Return the alignment in bytes for a register type.
-template <typename T_Type>
-requires VectorRegister<T_Type>
+template <VectorRegister T_Type>
 [[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST;
 
 //! Return the number of lanes of a register type.
-template <typename T_Type>
-requires VectorRegister<T_Type>
+template <VectorRegister T_Type>
 [[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST;
 
 
@@ -156,12 +153,26 @@ requires VectorRegister<T_Type>
 //!
 //! @tparam T_RegisterType:
 //! Register type
-//!
-//! @remark
-//! Any type that is not a vector register with a floating-point type as elements will trigger a `static_assert`.
-//! Integer based registers are not supported because they do not have a fixed element type.
-template <typename T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 using ElementType = typename internal::ElementTypeStruct<T_RegisterType>::Type;
+
+
+//! @brief
+//! `true` if the element type has single precision and `false` otherwise.
+//!
+//! @tparam T_RegisterType:
+//! Register type
+template <FloatVectorRegister T_RegisterType>
+inline constexpr bool is_single_precision = std::is_same_v<ElementType<T_RegisterType>, F32>;
+
+
+//! @brief
+//! `true` if the element type has double precision and `false` otherwise.
+//!
+//! @tparam T_RegisterType:
+//! Register type
+template <FloatVectorRegister T_RegisterType>
+inline constexpr bool is_double_precision = std::is_same_v<ElementType<T_RegisterType>, F64>;
 
 
 //! @brief
@@ -169,10 +180,7 @@ using ElementType = typename internal::ElementTypeStruct<T_RegisterType>::Type;
 //!
 //! @tparam T_RegisterType:
 //! Register type
-//!
-//! @remark
-//! Any type that is not as x86 vector register will trigger a `static_assert`
-template <typename T_RegisterType>
+template <VectorRegister T_RegisterType>
 inline constexpr UST alignment_bytes = internal::get_alignment_bytes<T_RegisterType>();
 
 
@@ -181,10 +189,7 @@ inline constexpr UST alignment_bytes = internal::get_alignment_bytes<T_RegisterT
 //!
 //! @tparam T_RegisterType:
 //! Register type
-//!
-//! @remark
-//! Any type that is not as x86 vector register will trigger a `static_assert`
-template <typename T_RegisterType>
+template <VectorRegister T_RegisterType>
 inline constexpr UST num_lanes = internal::get_num_lanes<T_RegisterType>();
 
 
@@ -193,11 +198,7 @@ inline constexpr UST num_lanes = internal::get_num_lanes<T_RegisterType>();
 //!
 //! @tparam T_RegisterType:
 //! Register type
-//!
-//! @remark
-//! Any type that is not a vector register with a floating-point type as elements will trigger a `static_assert`.
-//! Integer based registers are not supported because they do not have a fixed elemnet type.
-template <typename T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 inline constexpr UST num_elements = sizeof(T_RegisterType) / sizeof(ElementType<T_RegisterType>);
 
 
@@ -206,12 +207,17 @@ inline constexpr UST num_elements = sizeof(T_RegisterType) / sizeof(ElementType<
 //!
 //! @tparam T_RegisterType:
 //! Register type
-//!
-//! @remark
-//! Any type that is not a vector register with a floating-point type as elements will trigger a `static_assert`.
-//! Integer based registers are not supported because they do not have a fixed elemnet type.
-template <typename T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 inline constexpr UST num_lane_elements = num_elements<T_RegisterType> / num_lanes<T_RegisterType>;
+
+
+//! @brief
+//! `true` if the register has multiple lanes and `false` otherwise.
+//!
+//! @tparam T_RegisterType:
+//! Register type
+template <FloatVectorRegister T_RegisterType>
+inline constexpr bool is_multi_lane = num_lanes<T_RegisterType> > 1;
 
 
 //! @brief
@@ -219,8 +225,7 @@ inline constexpr UST num_lane_elements = num_elements<T_RegisterType> / num_lane
 //!
 //! @tparam T_RegisterType:
 //! Register type
-template <typename T_RegisterType>
-requires FloatVectorRegister<T_RegisterType>
+template <FloatVectorRegister T_RegisterType>
 struct alignas(alignment_bytes<T_RegisterType>) VectorDataArray
     : public std::array<ElementType<T_RegisterType>, num_elements<T_RegisterType>>
 {
@@ -240,8 +245,7 @@ namespace internal
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type>
-requires VectorRegister<T_Type>
+template <VectorRegister T_Type>
 [[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST
 {
     constexpr UST alignment_bytes_sse = 16;
@@ -256,8 +260,7 @@ requires VectorRegister<T_Type>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type>
-requires VectorRegister<T_Type>
+template <VectorRegister T_Type>
 [[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST
 {
     constexpr UST num_lanes_sse = 1;
