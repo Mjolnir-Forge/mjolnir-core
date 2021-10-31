@@ -14,10 +14,33 @@ using namespace mjolnir;
 
 TEST(test_bit_operations, bit_construct) // NOLINT
 {
-    EXPECT_EQ((bit_construct<U8, 0, 1, 1>()), 0b00000011);
+    EXPECT_EQ((bit_construct<U8, 0, 1, 1>(false)), 0b00000011);
     EXPECT_EQ((bit_construct<U8, 0, 1, 1>(true)), 0b00000110);
-    EXPECT_EQ((bit_construct<U8, 1, 0, 1, 1, 0, 1, 1, 0>()), 0b10110110);
+    EXPECT_EQ((bit_construct<U8, 1, 0, 1, 1, 0, 1, 1, 0>(false)), 0b10110110);
     EXPECT_EQ((bit_construct<U8, 1, 0, 1, 1, 0, 1, 1, 0>(true)), 0b01101101);
+
+    // Test other types
+    EXPECT_EQ((bit_construct<UST, 1, 0, 1, 1, 0, 1, 1, 0>(false)), 0b10110110);
+    EXPECT_EQ((bit_construct<UST, 1, 0, 1, 1, 0, 1, 1, 0>(true)), 0b01101101);
+}
+
+
+// --- test bit_construct_from_ints -----------------------------------------------------------------------------------
+
+TEST(test_bit_operations, bit_construct_from_ints) // NOLINT
+{
+    EXPECT_EQ((bit_construct_from_ints<2, U8, 3, 2, 3, 1>(false)), 0b11101101);
+    EXPECT_EQ((bit_construct_from_ints<2, U8, 3, 2, 3, 1>(true)), 0b01111011);
+
+    EXPECT_EQ((bit_construct_from_ints<3, U8, 6, 4>(false)), 0b00110100);
+    EXPECT_EQ((bit_construct_from_ints<3, U8, 6, 4>(true)), 0b00100110);
+
+    EXPECT_EQ((bit_construct_from_ints<4, U8, 9, 13>(false)), 0b10011101);
+    EXPECT_EQ((bit_construct_from_ints<4, U8, 9, 13>(true)), 0b11011001);
+
+    // Test other types
+    EXPECT_EQ((bit_construct_from_ints<4, UST, 9, 13>(false)), 0b10011101);
+    EXPECT_EQ((bit_construct_from_ints<4, UST, 9, 13>(true)), 0b11011001);
 }
 
 
@@ -109,7 +132,7 @@ TEST(test_bit_operations, is_bit_set) // NOLINT
 
 TEST(test_bit_operations, set_bit) // NOLINT
 {
-    U8 a = 0b00000000; // NOLINT - magic number
+    U8 a = 0b00000000;
 
     set_bit(a, 4);
     EXPECT_EQ(a, 0b00010000);
@@ -176,32 +199,32 @@ TEST(test_bit_operations, set_bits) // NOLINT
 }
 
 
-// --- test set_bits_to_int -------------------------------------------------------------------------------------------
+// --- test set_bits_with_int -----------------------------------------------------------------------------------------
 
-TEST(test_bit_operations, set_bits_to_int) // NOLINT
+TEST(test_bit_operations, set_bits_with_int) // NOLINT
 {
     U8 a = 0b00000000;
 
-    set_bits_to_int<3>(a, 2, 0b101); // NOLINT - magic number
+    set_bits_with_int<3>(a, 2, 0b101); // NOLINT - magic number
     EXPECT_EQ(a, 0b00010100);
 
-    set_bits_to_int<2>(a, 5, 0b01); // NOLINT - magic number
+    set_bits_with_int<2>(a, 5, 0b01); // NOLINT - magic number
     EXPECT_EQ(a, 0b00110100);
 
     // test overwriting already set bit
-    set_bits_to_int<4>(a, 3, 0b1001); // NOLINT - magic number
+    set_bits_with_int<4>(a, 3, 0b1001); // NOLINT - magic number
     EXPECT_EQ(a, 0b01001100);
 
     // test writing whithout clearing
-    set_bits_to_int<3, false>(a, 1, 0b101); // NOLINT - magic number
+    set_bits_with_int<3, false>(a, 1, 0b101); // NOLINT - magic number
     EXPECT_EQ(a, 0b01001110);
 
-    set_bits_to_int<2, false>(a, 4, 0b11); // NOLINT - magic number
+    set_bits_with_int<2, false>(a, 4, 0b11); // NOLINT - magic number
     EXPECT_EQ(a, 0b01111110);
 
     // test other type
     UST b = 0b00000000;
 
-    set_bits_to_int<5>(b, 2, 0b11001); // NOLINT - magic number
+    set_bits_with_int<5>(b, 2, 0b11001); // NOLINT - magic number
     EXPECT_EQ(b, 0b01100100);
 }

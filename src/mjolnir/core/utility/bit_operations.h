@@ -33,25 +33,62 @@ inline constexpr UST num_bits = sizeof(T_Type) * CHAR_BIT;
 //!
 //! @details
 //! The function sets the first N lowest bits of the returned integer where N is the number of provided template
-//! parameters. Each parameter defines the value of a single bit. Depending on the value of `ascending`, the bits can
-//! either be in ascending or decending order. Or in other words, `ascending` controls if the lowest bit is represented
-//! by the first or last parameter.
+//! parameters. Each parameter defines the value of a single bit. Depending on the value of `left_is_low`, the bits can
+//! either be specified in ascending or decending order. Or in other words, `left_is_low` controls if the lowest bit is
+//! represented by the first or last parameter.
 //!
 //! @tparam T_Type:
 //! An unsigned integer type
 //! @tparam t_bit_values:
 //! The individuel bits (see detailed description). Values other than 0 or 1 will trigger a static assertion.
 //!
-//! @param[in] ascending:
-//! If `true`, the first passed bit represents the lowest bit. If `false`, the lowest bit is represented by the last
-//! value in `t_bit_values`
+//! @param[in] left_is_low:
+//! If `true`, the first value represents the lowest bit. Otherwise, the last value represents the lowest bit.
 //!
 //! @return
-//! Integer constructed from bit values
+//! The constructed integer value
 template <std::unsigned_integral T_Type, UST... t_bit_values>
-[[nodiscard]] consteval inline auto bit_construct(bool ascending = false) noexcept -> T_Type;
+[[nodiscard]] consteval inline auto bit_construct(bool left_is_low = false) noexcept -> T_Type;
 
 
+//! @brief
+//! Construct an unsigned integer from the bit patterns of multiple integer values.
+//!
+//! @details
+//! The function takes multiple integer value of the specified size in bits. Their bit patterns are concatenated to
+//! construct the bit pattern of the result value. Depending on the value of `left_is_low`, the lowest bit pattern is
+//! either represented by the first or the last provided value.
+//!
+//! @tparam t_num_int_bits:
+//! Specifies how many bits are possessed by each of the individual integers
+//! @tparam T_Type:
+//! An unsigned integer type
+//! @tparam t_integers:
+//! The individuel integer values (see detailed description). Values exceeding the bit size  will trigger an assertion.
+//!
+//! @param[in] left_is_low:
+//! If `true`, the first value represents the lowest bit pattern. Otherwise, the last value represents the lowest bit
+//! pattern.
+//!
+//! @return
+//! The constructed integer value
+template <UST t_num_int_bits, std::unsigned_integral T_Type, UST... t_integers>
+[[nodiscard]] consteval inline auto bit_construct_from_ints(bool left_is_low = false) noexcept -> T_Type;
+
+
+//! @brief
+//! Construct an unsigned integer with its first `t_num_bits` set to 1.
+//!
+//! @tparam T_Type:
+//! An unsigned integer type
+//! @tparam t_num_bits:
+//! Number of bits that should be set
+//!
+//! @return
+//! The constructed integer value
+//!
+//! @note
+//! Source: https://stackoverflow.com/a/45352771/6700329
 template <std::unsigned_integral T_Type, UST t_num_bits>
 [[nodiscard]] constexpr inline auto bit_construct_set_first_n_bits() noexcept -> T_Type;
 
@@ -70,6 +107,18 @@ template <std::unsigned_integral T_Type>
 constexpr inline void clear_bit(T_Type& integer, UST index) noexcept;
 
 
+//! @brief
+//! Clear multiple consecutive bits of an unsigned integer.
+//!
+//! @tparam t_num_bits:
+//! Number of bits that should be cleared
+//! @tparam T_Type:
+//! An unsigned integer type
+//!
+//! @param[in, out] integer:
+//! The integer that should be modified
+//! @param[in] index
+//! The index of the first bit that should be modified
 template <UST t_num_bits, std::unsigned_integral T_Type>
 constexpr inline void clear_bits(T_Type& integer, UST index) noexcept;
 
@@ -124,12 +173,41 @@ template <UST t_value, std::unsigned_integral T_Type>
 constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept;
 
 
+//! @brief
+//! Set multiple consecutive bits of an unsigned integer.
+//!
+//! @tparam t_num_bits:
+//! Number of bits that should be set
+//! @tparam T_Type:
+//! An unsigned integer type
+//!
+//! @param[in, out] integer:
+//! The integer that should be modified
+//! @param[in] index:
+//! The index of the first bit that should be modified
 template <UST t_num_bits, std::unsigned_integral T_Type>
 constexpr inline void set_bits(T_Type& integer, UST index) noexcept;
 
 
+//! @brief
+//! Set multiple consecutive bits of an unsigned integer using the bit pattern of another integer value.
+//!
+//! @tparam t_num_bits:
+//! Number of bits that should be set. Values of the source integer `value` that can't be represented by the provided
+//! number of bits will trigger an assertion
+//! @tparam t_clear_bits:
+//! If `false`, already set bits won't be cleared to match the source integers bit pattern.
+//! @tparam T_Type:
+//! An unsigned integer type
+//!
+//! @param[in, out] integer:
+//! The integer that should be modified
+//! @param[in] index:
+//! The index of the first bit that should be modified
+//! @param[in] value:
+//! The source integer
 template <UST t_num_bits, bool t_clear_bits = true, std::unsigned_integral T_Type>
-constexpr inline void set_bits_to_int(T_Type& integer, UST index, UST value) noexcept;
+constexpr inline void set_bits_with_int(T_Type& integer, UST index, UST value) noexcept;
 
 
 //! @}
@@ -150,12 +228,12 @@ namespace mjolnir
 // --------------------------------------------------------------------------------------------------------------------
 
 template <std::unsigned_integral T_Type, UST... t_bit_values>
-[[nodiscard]] consteval inline auto bit_construct(bool ascending) noexcept -> T_Type
+[[nodiscard]] consteval inline auto bit_construct(bool left_is_low) noexcept -> T_Type
 {
     static_assert(sizeof...(t_bit_values) <= num_bits<T_Type>, "Number of bit values exceeds number of type bits.");
 
     T_Type integer = 0;
-    if (ascending)
+    if (left_is_low)
     {
         UST bit_index = 0;
         (void) std::initializer_list<I32>{(set_bit_to<t_bit_values>(integer, bit_index++), 0)...};
@@ -182,11 +260,25 @@ template <std::unsigned_integral T_Type, UST t_num_bits>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <UST t_num_int_bits, std::unsigned_integral T_Type, UST... t_bit_values>
-[[nodiscard]] consteval inline auto bit_construct_from_ints(bool ascending) noexcept -> T_Type
+template <UST t_num_int_bits, std::unsigned_integral T_Type, UST... t_integers>
+[[nodiscard]] consteval inline auto bit_construct_from_ints(bool left_is_low) noexcept -> T_Type
 {
-    static_assert(sizeof...(t_bit_values) * t_num_int_bits <= num_bits<T_Type>,
+    static_assert(sizeof...(t_integers) * t_num_int_bits <= num_bits<T_Type>,
                   "Totoal number of provided bits exceeds number of type bits.");
+    T_Type integer = 0;
+    if (left_is_low)
+    {
+        UST bit_index = 0;
+        (void) std::initializer_list<I32>{
+                (set_bits_with_int<t_num_int_bits>(integer, bit_index, t_integers), bit_index += t_num_int_bits, 0)...};
+    }
+    else
+    {
+        UST bit_index = (sizeof...(t_integers) - 1) * t_num_int_bits;
+        (void) std::initializer_list<I32>{
+                (set_bits_with_int<t_num_int_bits>(integer, bit_index, t_integers), bit_index -= t_num_int_bits, 0)...};
+    }
+    return integer;
 }
 
 
@@ -206,7 +298,7 @@ constexpr inline void clear_bit(T_Type& integer, UST index) noexcept
 template <UST t_num_bits, std::unsigned_integral T_Type>
 constexpr inline void clear_bits(T_Type& integer, UST index) noexcept
 {
-    assert(index + t_num_bits <= num_bits<T_Type>);
+    assert(index + t_num_bits <= num_bits<T_Type>); // NOLINT
 
     constexpr UST bits = bit_construct_set_first_n_bits<UST, t_num_bits>();
     integer &= static_cast<T_Type>(~(bits << index));
@@ -262,17 +354,15 @@ constexpr inline void set_bits(T_Type& integer, UST index) noexcept
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_num_bits, bool t_clear_bits, std::unsigned_integral T_Type>
-constexpr inline void set_bits_to_int(T_Type& integer, UST index, UST value) noexcept
+constexpr inline void set_bits_with_int(T_Type& integer, UST index, UST value) noexcept
 {
     [[maybe_unused]] constexpr UST max_value = bit_construct_set_first_n_bits<UST, t_num_bits>();
 
-    assert(value <= max_value && "Value doesn't fit into specified number of bits.");
-    assert(index + t_num_bits <= num_bits<T_Type>);
+    assert(value <= max_value && "Value doesn't fit into specified number of bits."); // NOLINT
+    assert(index + t_num_bits <= num_bits<T_Type>);                                   // NOLINT
 
     if constexpr (t_clear_bits)
-    {
         clear_bits<t_num_bits>(integer, index);
-    }
 
     integer |= static_cast<T_Type>(value << index);
 }
