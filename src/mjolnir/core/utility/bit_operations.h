@@ -269,19 +269,23 @@ template <UST t_num_int_bits, std::unsigned_integral T_Type, UST... t_integers>
 {
     static_assert(sizeof...(t_integers) * t_num_int_bits <= num_bits<T_Type>,
                   "Totoal number of provided bits exceeds number of type bits.");
+
     T_Type integer = 0;
     if (left_is_low)
     {
         UST bit_index = 0;
-        (void) std::initializer_list<I32>{
-                (set_bits_with_int<t_num_int_bits>(integer, bit_index, t_integers), bit_index += t_num_int_bits, 0)...};
+        (void) std::initializer_list<I32>{(set_bits_with_int<t_num_int_bits, false>(integer, bit_index, t_integers),
+                                           bit_index += t_num_int_bits,
+                                           0)...};
     }
     else
     {
         UST bit_index = (sizeof...(t_integers) - 1) * t_num_int_bits;
-        (void) std::initializer_list<I32>{
-                (set_bits_with_int<t_num_int_bits>(integer, bit_index, t_integers), bit_index -= t_num_int_bits, 0)...};
+        (void) std::initializer_list<I32>{(set_bits_with_int<t_num_int_bits, false>(integer, bit_index, t_integers),
+                                           bit_index -= t_num_int_bits,
+                                           0)...};
     }
+
     return integer;
 }
 
