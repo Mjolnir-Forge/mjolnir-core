@@ -252,7 +252,7 @@ template <std::unsigned_integral T_Type, UST... t_bit_values>
 template <std::unsigned_integral T_Type, UST t_num_bits>
 [[nodiscard]] constexpr inline auto bit_construct_set_first_n_bits() noexcept -> T_Type
 {
-    if (t_num_bits >= sizeof(T_Type) * CHAR_BIT)
+    if constexpr (t_num_bits >= num_bits<T_Type>)
         return ~(T_Type(0));
     return static_cast<T_Type>(((UST(1)) << t_num_bits) - 1);
 }
