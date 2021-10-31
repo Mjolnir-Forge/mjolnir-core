@@ -252,6 +252,10 @@ template <std::unsigned_integral T_Type, UST... t_bit_values>
 template <std::unsigned_integral T_Type, UST t_num_bits>
 [[nodiscard]] constexpr inline auto bit_construct_set_first_n_bits() noexcept -> T_Type
 {
+    // INFO:
+    // The static_cast for the `true` case is actually needed because the `~` operator seems to perform a promotion to
+    // `int`. See the following links:
+    // https://stackoverflow.com/q/30473958/6700329
     if constexpr (t_num_bits >= num_bits<T_Type>)
         return static_cast<T_Type>(~(T_Type(0)));
     else
