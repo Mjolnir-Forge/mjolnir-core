@@ -59,8 +59,8 @@ TEST(test_bit_operations, bit_construct_set_first_n_bits) // NOLINT
     EXPECT_EQ((bit_construct_set_first_n_bits<U8, 11>()), 0b11111111);
 
     // Test other types
-    EXPECT_EQ((bit_construct_set_first_n_bits<U32, 6>()), 0b00111111);
-    EXPECT_NE((bit_construct_set_first_n_bits<U32, 11>()), 0b11111111);
+    EXPECT_EQ((bit_construct_set_first_n_bits<U32, 6>()), U32(0b00111111));
+    EXPECT_NE((bit_construct_set_first_n_bits<U32, 11>()), U32(0b11111111));
     EXPECT_EQ((bit_construct_set_first_n_bits<UST, 1>()), 0b00000001);
     EXPECT_NE((bit_construct_set_first_n_bits<UST, 11>()), 0b11111111);
 }
