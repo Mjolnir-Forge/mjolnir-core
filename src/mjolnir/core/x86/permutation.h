@@ -307,22 +307,8 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
         return permute<t_indices..., t_indices...>(src);
     else
     {
-        constexpr auto get_mask = []() -> UST
-        {
-            auto compute_mask = []<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)
-            {
-                constexpr UST bit_diff = num_lane_elements<T_RegisterType> / 2;
-                UST           mask     = 0;
-                UST           index    = 0;
-
-                (void) std::initializer_list<I32>{(mask |= t_indices << index, index += bit_diff, 0)...};
-
-                return mask;
-            };
-            return compute_mask(std::make_index_sequence<sizeof...(t_indices)>());
-        };
-
-        return mm_permute<get_mask()>(src);
+        constexpr UST num_index_bits = num_lane_elements<T_RegisterType> / 2;
+        return mm_permute<bit_construct_from_ints<num_index_bits, U8, t_indices...>(true)>(src);
     }
 }
 
