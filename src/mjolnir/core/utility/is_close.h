@@ -14,6 +14,7 @@ namespace mjolnir
 //! \addtogroup core_utility
 //! @{
 
+
 //! @brief
 //! The default absolute tolerance
 //!

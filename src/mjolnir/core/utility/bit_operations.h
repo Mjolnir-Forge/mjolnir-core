@@ -1,5 +1,5 @@
 //! @file
-//! utility/bir_operations.h
+//! utility/bit_operations.h
 //!
 //! @brief
 //! Contains utility functions for bit related operations like setting and reading specific bits.
@@ -19,6 +19,10 @@
 
 namespace mjolnir
 {
+//! \addtogroup core_utility
+//! @{
+
+
 //! @brief
 //! The size of a type in bits.
 //!
@@ -122,9 +126,6 @@ constexpr inline void clear_bit(T_Type& integer, UST index) noexcept;
 template <UST t_num_bits, std::unsigned_integral T_Type>
 constexpr inline void clear_bits(T_Type& integer, UST index) noexcept;
 
-
-//! \addtogroup core_utility
-//! @{
 
 //! @brief
 //! Return `true` if a specific bit is set and `false` otherwise
