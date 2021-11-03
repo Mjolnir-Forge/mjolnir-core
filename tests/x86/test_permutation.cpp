@@ -1,4 +1,5 @@
 #include "mjolnir/core/fundamental_types.h"
+#include "mjolnir/core/math/math.h"
 #include "mjolnir/core/utility/bit_operations.h"
 #include "mjolnir/core/x86/definitions.h"
 #include "mjolnir/core/x86/direct_access.h"
@@ -139,6 +140,8 @@ void test_blend_test_case(T_RegisterType a, T_RegisterType b)
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend) // NOLINT
 {
+    //! @todo create power of 2 function in math header
+
     TYPED_TEST_SERIES(test_blend_test_case, ((1U) << num_elements<TypeParam>) )
 }
 
@@ -247,17 +250,9 @@ void test_blend_from_to_test_case(T_RegisterType a, T_RegisterType b)
 }
 
 
-template <typename T_RegisterType>
-[[nodiscard]] constexpr inline auto num_blend_from_to_test_cases() noexcept -> UST
-{
-    constexpr UST n = num_elements<T_RegisterType>;
-    return (n * n + n) / 2;
-}
-
-
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_from_to) // NOLINT
 {
-    TYPED_TEST_SERIES(test_blend_from_to_test_case, num_blend_from_to_test_cases<TypeParam>())
+    TYPED_TEST_SERIES(test_blend_from_to_test_case, gauss_summation(num_elements<TypeParam>))
 }
 
 
@@ -313,20 +308,8 @@ void test_permute_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b)
     }
 }
 
-template <typename T_RegisterType>
-[[nodiscard]] constexpr inline auto num_permute_test_cases() noexcept -> UST
-{
-    constexpr UST n = num_lane_elements<T_RegisterType>;
-
-    UST num_test_cases = 1;
-    for (UST i = 0; i < n; ++i)
-        num_test_cases *= n;
-
-    return num_test_cases;
-}
-
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute) // NOLINT
 {
-    TYPED_TEST_SERIES(test_permute_test_case, num_permute_test_cases<TypeParam>())
+    TYPED_TEST_SERIES(test_permute_test_case, power(num_lane_elements<TypeParam>, num_lane_elements<TypeParam>))
 }
