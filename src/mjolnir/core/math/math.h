@@ -7,7 +7,6 @@
 
 #pragma once
 
-
 #include "mjolnir/core/concepts.h"
 #include "mjolnir/core/fundamental_types.h"
 
@@ -52,6 +51,24 @@ template <Number T_Type>
 [[nodiscard]] inline constexpr auto power(T_Type base, std::integral auto exponent) noexcept -> T_Type;
 
 
+//! @brief
+//! Calculate the power of 2 using an integer based exponent.
+//!
+//! @note
+//! This function is faster than the `power` function with a base of 2.
+//!
+//! @tparam T_Type:
+//! An integer or floating-point type used for the returned value
+//!
+//! @param[in] exponent:
+//! The exponent
+//!
+//! @return
+//! The result of the power function
+template <Number T_Type = UST>
+[[nodiscard]] inline constexpr auto power_of_2(std::integral auto exponent) noexcept -> T_Type;
+
+
 //! @}
 } // namespace mjolnir
 
@@ -61,6 +78,7 @@ template <Number T_Type>
 
 #include <cassert>
 
+
 namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
@@ -69,6 +87,7 @@ template <std::integral T_Type>
 [[nodiscard]] inline constexpr auto gauss_summation(T_Type n) -> T_Type
 {
     assert(n >= 0 && "n must be a positive number"); // NOLINT
+
     return (n * n + n) / 2;
 }
 
@@ -86,6 +105,17 @@ template <Number T_Type>
     if (exponent % 2 == 0)
         return power(base, exponent / 2) * power(base, exponent / 2);
     return base * power(base, (exponent - 1) / 2) * power(base, (exponent - 1) / 2);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <Number T_Type>
+[[nodiscard]] inline constexpr auto power_of_2(std::integral auto exponent) noexcept -> T_Type
+{
+    assert(exponent >= 0 && "exponent must be a positive number"); // NOLINT
+
+    return static_cast<T_Type>((1U) << static_cast<UST>(exponent)); // NOLINT(bugprone-misplaced-widening-cast)
 }
 
 

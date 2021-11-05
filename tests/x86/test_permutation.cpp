@@ -142,7 +142,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend) // NOLINT
 {
     //! @todo create power of 2 function in math header
 
-    TYPED_TEST_SERIES(test_blend_test_case, ((1U) << num_elements<TypeParam>) )
+    TYPED_TEST_SERIES(test_blend_test_case, power_of_2(num_elements<TypeParam>))
 }
 
 

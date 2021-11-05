@@ -48,3 +48,22 @@ TEST(test_math, power) // NOLINT
     EXPECT_DOUBLE_EQ(power(2., 10), 1024.);
     EXPECT_DOUBLE_EQ(power(3., 3), 27.);
 }
+
+
+// --- test power_of_2 ------------------------------------------------------------------------------------------------
+
+TEST(test_math, power_of_2) // NOLINT
+{
+    // test with integers
+    EXPECT_EQ(power_of_2(0), 1);
+    EXPECT_EQ(power_of_2(1), 2);
+    EXPECT_EQ(power_of_2(2), 4);
+    EXPECT_EQ(power_of_2(4), 16);
+    EXPECT_EQ(power_of_2(8), 256);
+
+    EXPECT_DOUBLE_EQ(power_of_2<F64>(0), 1.);
+    EXPECT_DOUBLE_EQ(power_of_2<F64>(1), 2.);
+    EXPECT_DOUBLE_EQ(power_of_2<F64>(2), 4.);
+    EXPECT_DOUBLE_EQ(power_of_2<F64>(4), 16.);
+    EXPECT_DOUBLE_EQ(power_of_2<F64>(8), 256.);
+}
