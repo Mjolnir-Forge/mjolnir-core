@@ -256,6 +256,33 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_from_to) // NOLINT
 }
 
 
+// --- test broadcast -------------------------------------------------------------------------------------------------
+
+template <typename T_RegisterType, UST t_test_case_index>
+void test_broadcast(T_RegisterType a, [[maybe_unused]] T_RegisterType b)
+{
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    T_RegisterType c = broadcast<t_test_case_index>(a);
+
+
+    for (UST i = 0; i < n_le; ++i)
+    {
+        EXPECT_DOUBLE_EQ(get(c, i), get(a, t_test_case_index));
+        if constexpr (is_avx_register<T_RegisterType>)
+        {
+            EXPECT_DOUBLE_EQ(get(c, i + n_le), get(a, t_test_case_index + n_le));
+        }
+    }
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_broadcast) // NOLINT
+{
+    TYPED_TEST_SERIES(test_broadcast, num_lane_elements<TypeParam>)
+}
+
+
 // --- test_blend_below -----------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType>

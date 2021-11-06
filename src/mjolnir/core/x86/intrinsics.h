@@ -57,6 +57,28 @@ template <I32 t_mask, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Broadcasts the lowest floating point element accross lanes to all elements of the returned register.
+//!
+//! @warning
+//! Since the value is broadcastet accross lanes, the latency of this operation is much higher for multi-lane registers
+//! (AVX) than for single lane registers (SSE).
+//!
+//! @tparam T_RegisterType
+//! The register type
+//!
+//! @param[in] src:
+//! The source register
+//!
+//! @return
+//! Register with broadcastet values
+//!
+//! @todo:
+//! Fix GCC bug once GCC 11 is available and set as new minimal compiler version. See comments in function definition.
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_broadcast(T_RegisterType src) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Bit cast a floating-point vector register to an equally sized integer vector register.
 //!
 //! @tparam T_RegisterTypeIn:
@@ -223,6 +245,25 @@ template <I32 t_mask, FloatVectorRegister T_RegisterType>
         return _mm256_blend_ps(a, b, t_mask);
     else
         return _mm256_blend_pd(a, b, t_mask);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_broadcast(T_RegisterType src) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_broadcastss_ps(src);
+    else if constexpr (is_m128d<T_RegisterType>)
+        // The following command is currently missing in gcc - see https://stackoverflow.com/q/58270381/6700329
+        // Should be fixed in gcc 11 - see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95483
+        // return _mm_broadcastsd_pd(src);
+        return _mm_movedup_pd(src);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_broadcastss_ps(_mm256_castps256_ps128(src));
+    else
+        return _mm256_broadcastsd_pd(_mm256_castpd256_pd128(src));
 }
 
 

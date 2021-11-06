@@ -138,6 +138,26 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
 
 
 //! @brief
+//! Broadcast a register element per lane selected by `t_index` within lane boundaries.
+//!
+//! @details
+//! For mulit-lane registers, the same index is used for every lane.
+//!
+//! @tparam t_index:
+//! Index of the lane element should be broadcasted
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src:
+//! The source register
+//!
+//! @return
+//! New register with broadcasted values
+template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto broadcast(T_RegisterType src) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Shuffle register elements within lanes using indices.
 //!
 //! @tparam t_indices
@@ -165,6 +185,7 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 // === DEFINITIONS ====================================================================================================
 
 #include "mjolnir/core/utility/bit_operations.h"
+#include "mjolnir/core/x86/intrinsics.h"
 
 #include <iostream>
 
@@ -290,6 +311,20 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
     }
 }
 
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto broadcast(T_RegisterType src) noexcept -> T_RegisterType
+{
+    static_assert(t_index < num_lane_elements<T_RegisterType>, "t_index exceeds lane size.");
+
+    if constexpr (t_index == 0 && is_sse_register<T_RegisterType>)
+        return mm_broadcast(src);
+    else if constexpr (is_double_precision<T_RegisterType>)
+        return permute<t_index, t_index>(src);
+    else
+        return permute<t_index, t_index, t_index, t_index>(src);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 
