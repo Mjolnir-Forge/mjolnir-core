@@ -115,7 +115,7 @@ template <Number T_Type>
 {
     assert(exponent >= 0 && "exponent must be a positive number"); // NOLINT
 
-    return static_cast<T_Type>((1U) << static_cast<UST>(exponent)); // NOLINT(bugprone-misplaced-widening-cast)
+    return static_cast<T_Type>(UST(1) << static_cast<UST>(exponent));
 }
 
 
