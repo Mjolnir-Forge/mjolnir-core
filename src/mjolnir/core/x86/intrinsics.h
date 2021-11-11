@@ -144,6 +144,28 @@ template <FloatVectorRegister T_RegisterType>
 template <I32 t_mask, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_permute(T_RegisterType src) noexcept -> T_RegisterType;
 
+
+//! @brief
+//! Shuffle 128-bits lanes selected by `t_mask` from `a` and `b`, and return the results in a new register.
+//!
+//! @tparam t_mask
+//! An integer value used as control mask. Consult the intel intrinsics guide for further information. Note that this
+//! library provides template functions in `permute.h` to apply the correct mask for each use-case.
+//! @tparam T_RegisterType
+//! The register type
+//!
+//!
+//! @param [in] a:
+//! First register
+//! @param [in] b:
+//! Second register
+//!
+//! @return
+//! Register with permuted 128 bit lanes values
+template <I32 t_mask, FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto mm_permute2f128(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
+
+
 //! @brief
 //! Broadcast a single value a to all elements of the register
 //!
@@ -331,6 +353,19 @@ template <I32 t_mask, FloatVectorRegister T_RegisterType>
     else
         return _mm256_permute_pd(src, t_mask);
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <I32 t_mask, FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto mm_permute2f128(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
+{
+    if constexpr (is_m256<T_RegisterType>)
+        return _mm256_permute2f128_ps(a, b, t_mask);
+    else
+        return _mm256_permute2f128_pd(a, b, t_mask);
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 

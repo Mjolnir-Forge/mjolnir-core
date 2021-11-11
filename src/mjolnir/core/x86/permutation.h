@@ -158,7 +158,7 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Shuffle register elements within lanes using indices.
+//! Shuffle the elements of a vector register within lanes using indices and return the result in a new register.
 //!
 //! @tparam t_indices
 //! A set of indices equal to the number of lane elements. The n-th value specifies the lane index of the element from
@@ -177,6 +177,70 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 //! New register with shuffled values
 template <UST... t_indices, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto permute(T_RegisterType src) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Create a new AVX register by an arbitrary combination of the source registers lanes.
+//!
+//! @tparam t_lane_0:
+//! Set to `0` to copy the lower lane of the source register to the lower lane of the result register. Use `1`to copy
+//! the upper lane
+//! @tparam t_lane_1:
+//! Set to `0` to copy the lower lane of the source register to the upper lane of the result register. Use `1` to copy
+//! the upper lane
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src:
+//! Source register
+//!
+//! @return
+//! New register with an arbitrary combination of the source registers lanes
+template <UST t_lane_0, UST t_lane_1, FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto permute_lanes(T_RegisterType src) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Create a new AVX register by combining arbitrary lanes from two source registers.
+//!
+//! @tparam t_src_0:
+//! Set to `0` to select `src_0` as source for the lower lane values of the result register and to `1` for `src_1`
+//! @tparam t_lane_0:
+//! Set to `0` to copy the lower lane of the selected source register to the lower lane of the result register. Use `1`
+//! to copy the upper lane
+//! @tparam t_src_1:
+//! Set to `0` to select `src_0` as source for the upper lane values of the result register and to `1` for `src_1`
+//! @tparam t_lane_1:
+//! Set to `0` to copy the lower lane of the selected source register to the upper lane of the result register. Use `1`
+//! to copy the upper lane
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src_0:
+//! First source register
+//! @param[in] src_1:
+//! Second source register
+//!
+//! @return
+//! New register with an arbitrary combination of the two source registers lanes
+template <UST t_src_0, UST t_lane_0, UST t_src_1, UST t_lane_1, FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto shuffle_lanes(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Swap the lanes of an AVX register and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src:
+//! Source register
+//!
+//! @return
+//! Register with swapped lanes
+template <FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto swap_lanes(T_RegisterType src) noexcept -> T_RegisterType;
+
 
 //! @}
 } // namespace mjolnir::x86
@@ -326,6 +390,26 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
         return permute<t_index, t_index, t_index, t_index>(src);
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto broadcast_across_lanes(T_RegisterType src) noexcept -> T_RegisterType
+{
+    if constexpr (t_index == 0)
+        return mm_broadcasts(src);
+    else if constexpr (is_sse_register<T_RegisterType>)
+        return broadcast<t_index>(src);
+    else
+    {
+        constexpr UST idx_value = t_index % num_lane_elements<T_RegisterType>;
+        constexpr UST idx_lane  = t_index / num_lane_elements<T_RegisterType>;
+
+        return permute_lanes<idx_lane, idx_lane>(broadcast<idx_value>(src));
+    }
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST... t_indices, FloatVectorRegister T_RegisterType>
@@ -345,6 +429,37 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
         constexpr UST num_index_bits = num_lane_elements<T_RegisterType> / 2;
         return mm_permute<bit_construct_from_ints<num_index_bits, U8, t_indices...>(true)>(src);
     }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_lane_0, UST t_lane_1, FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto permute_lanes(T_RegisterType src) noexcept -> T_RegisterType
+{
+    return shuffle_lanes<0, t_lane_0, 0, t_lane_1>(src, src);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_src_0, UST t_lane_0, UST t_src_1, UST t_lane_1, FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto shuffle_lanes(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType
+{
+    constexpr UST sel_0 = bit_construct<UST, t_src_0, t_lane_0>();
+    constexpr UST sel_1 = bit_construct<UST, t_src_1, t_lane_1>();
+    constexpr UST mask  = (sel_1 << 4U) | sel_0;
+
+    return mm_permute2f128<mask>(src_0, src_1);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto swap_lanes(T_RegisterType src) noexcept -> T_RegisterType
+{
+    return permute_lanes<1, 0>(src);
 }
 
 

@@ -283,7 +283,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_broadcast) // NOLINT
 }
 
 
-// --- test_blend_below -----------------------------------------------------------------------------------------------
+// --- test permute ---------------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType>
 [[nodiscard]] constexpr inline auto get_permute_index_array(UST test_case_index) noexcept
@@ -339,4 +339,96 @@ void test_permute_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b)
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute) // NOLINT
 {
     TYPED_TEST_SERIES(test_permute_test_case, power(num_lane_elements<TypeParam>, num_lane_elements<TypeParam>))
+}
+
+
+// --- test permute_lanes ---------------------------------------------------------------------------------------------
+
+template <typename T_RegisterType, UST t_test_index>
+void test_permute_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT - complexity
+{
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    constexpr UST lane_0 = is_bit_set(t_test_index, 1) ? 1 : 0;
+    constexpr UST lane_1 = is_bit_set(t_test_index, 1) ? 1 : 0;
+
+    auto c = permute_lanes<lane_0, lane_1>(a);
+
+    for (UST i = 0; i < n_le; ++i)
+    {
+        UST lane_index_0 = lane_0 * n_le + i;
+        UST lane_index_1 = lane_1 * n_le + i;
+
+        EXPECT_DOUBLE_EQ(get(c, i), get(a, lane_index_0));
+        EXPECT_DOUBLE_EQ(get(c, i + n_le), get(a, lane_index_1));
+    }
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute_lanes) // NOLINT
+{
+    if constexpr (is_avx_register<TypeParam>)
+    {
+        TYPED_TEST_SERIES(test_permute_lanes_test_case, 4)
+    }
+}
+
+
+// --- test shuffle_lanes ---------------------------------------------------------------------------------------------
+
+template <typename T_RegisterType, UST t_test_index>
+void test_shuffle_lanes_test_case(T_RegisterType a, T_RegisterType b) // NOLINT - complexity
+{
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    constexpr UST src_0  = is_bit_set(t_test_index, 0) ? 1 : 0;
+    constexpr UST src_1  = is_bit_set(t_test_index, 1) ? 1 : 0;
+    constexpr UST lane_0 = is_bit_set(t_test_index, 2) ? 1 : 0;
+    constexpr UST lane_1 = is_bit_set(t_test_index, 3) ? 1 : 0;
+
+    auto c = shuffle_lanes<src_0, lane_0, src_1, lane_1>(a, b);
+
+    for (UST i = 0; i < n_le; ++i)
+    {
+        UST            lane_index_0 = lane_0 * n_le + i;
+        UST            lane_index_1 = lane_1 * n_le + i;
+        T_RegisterType src_lane_0   = (src_0 == 0) ? a : b;
+        T_RegisterType src_lane_1   = (src_1 == 0) ? a : b;
+
+        EXPECT_DOUBLE_EQ(get(c, i), get(src_lane_0, lane_index_0));
+        EXPECT_DOUBLE_EQ(get(c, i + n_le), get(src_lane_1, lane_index_1));
+    }
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_shuffle_lanes) // NOLINT
+{
+    if constexpr (is_avx_register<TypeParam>)
+    {
+        TYPED_TEST_SERIES(test_shuffle_lanes_test_case, power(2, 4))
+    }
+}
+
+
+// --- test swap_lanes ------------------------------------------------------------------------------------------------
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_swap_lanes) // NOLINT
+{
+    if constexpr (is_avx_register<TypeParam>)
+    {
+        constexpr UST n_le = num_lane_elements<TypeParam>;
+
+        TypeParam a = mm_setzero<TypeParam>();
+        for (UST i = 0; i < num_elements<TypeParam>; ++i)
+            set(a, i, static_cast<ElementType<TypeParam>>(i + 1));
+
+
+        auto c = swap_lanes(a);
+
+        for (UST i = 0; i < n_le; ++i)
+        {
+            EXPECT_DOUBLE_EQ(get(c, i), get(a, i + n_le));
+            EXPECT_DOUBLE_EQ(get(c, i + n_le), get(a, i));
+        }
+    }
 }

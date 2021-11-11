@@ -40,6 +40,24 @@ concept FloatVectorRegister = is_any_of<T_Type, __m128, __m128d, __m256, __m256d
 
 
 //! @brief
+//! Concept for a x86 SSE vector register that has floating-point elements.
+//!
+//! @tparam T_Type
+//! Type
+template <typename T_Type>
+concept FloatSSERegister = is_any_of<T_Type, __m128, __m128d>();
+
+
+//! @brief
+//! Concept for a x86 vector register that has floating-point elements.
+//!
+//! @tparam T_Type
+//! Type
+template <typename T_Type>
+concept FloatAVXRegister = is_any_of<T_Type, __m256, __m256d>();
+
+
+//! @brief
 //! Concept for a x86 vector register that has integer elements.
 //!
 //! @tparam T_Type
