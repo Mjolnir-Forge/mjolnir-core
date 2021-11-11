@@ -34,8 +34,8 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 
 // NOLINTNEXTLINE
 #define CREATE_SOURCE_VALUES                                                                                           \
-    TypeParam a = mm_setzero<TypeParam>();                                                                             \
-    TypeParam b = mm_setzero<TypeParam>();                                                                             \
+    auto a = mm_setzero<TypeParam>();                                                                                  \
+    auto b = mm_setzero<TypeParam>();                                                                                  \
                                                                                                                        \
     for (UST i = 0; i < num_elements<TypeParam>; ++i)                                                                  \
     {                                                                                                                  \
@@ -283,6 +283,26 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_broadcast) // NOLINT
 }
 
 
+// --- test broadcast_across_lanes ------------------------------------------------------------------------------------
+
+template <typename T_RegisterType, UST t_test_case_index>
+void test_broadcast_across_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b)
+{
+    T_RegisterType c = broadcast_across_lanes<t_test_case_index>(a);
+
+    for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
+    {
+        EXPECT_DOUBLE_EQ(get(c, i), get(a, t_test_case_index));
+    }
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_broadcast_across_lanes) // NOLINT
+{
+    TYPED_TEST_SERIES(test_broadcast_across_lanes_test_case, num_elements<TypeParam>)
+}
+
+
 // --- test permute ---------------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType>
@@ -418,7 +438,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_swap_lanes) // NOLINT
     {
         constexpr UST n_le = num_lane_elements<TypeParam>;
 
-        TypeParam a = mm_setzero<TypeParam>();
+        auto a = mm_setzero<TypeParam>();
         for (UST i = 0; i < num_elements<TypeParam>; ++i)
             set(a, i, static_cast<ElementType<TypeParam>>(i + 1));
 

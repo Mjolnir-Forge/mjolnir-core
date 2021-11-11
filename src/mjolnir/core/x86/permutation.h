@@ -144,7 +144,7 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
 //! For mulit-lane registers, the same index is used for every lane.
 //!
 //! @tparam t_index:
-//! Index of the lane element should be broadcasted
+//! Index of the lane element that should be broadcasted
 //! @tparam T_RegisterType:
 //! The register type
 //!
@@ -155,6 +155,26 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
 //! New register with broadcasted values
 template <UST t_index, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto broadcast(T_RegisterType src) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Broadcast a register element selected by `t_index` across lane boundaries.
+//!
+//! @details
+//! For single-lane registers, the function behaves identical to `broadcast`.
+//!
+//! @tparam t_index:
+//! Index of the element that should be broadcasted
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src:
+//! The source register
+//!
+//! @return
+//! New register with broadcasted values
+template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto broadcast_across_lanes(T_RegisterType src) noexcept -> T_RegisterType;
 
 
 //! @brief
@@ -397,7 +417,7 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto broadcast_across_lanes(T_RegisterType src) noexcept -> T_RegisterType
 {
     if constexpr (t_index == 0)
-        return mm_broadcasts(src);
+        return mm_broadcast(src);
     else if constexpr (is_sse_register<T_RegisterType>)
         return broadcast<t_index>(src);
     else
