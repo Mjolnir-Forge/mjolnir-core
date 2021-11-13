@@ -259,7 +259,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_from_to) // NOLINT
 // --- test broadcast -------------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType, UST t_test_case_index>
-void test_broadcast(T_RegisterType a, [[maybe_unused]] T_RegisterType b)
+void test_broadcast(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT - complexity
 {
     constexpr UST n_le = num_lane_elements<T_RegisterType>;
 
@@ -272,6 +272,20 @@ void test_broadcast(T_RegisterType a, [[maybe_unused]] T_RegisterType b)
         if constexpr (is_avx_register<T_RegisterType>)
         {
             EXPECT_DOUBLE_EQ(get(c, i + n_le), get(a, t_test_case_index + n_le));
+        }
+    }
+
+    if constexpr (is_avx_register<T_RegisterType>)
+    {
+        constexpr UST idx_1 = (t_test_case_index + 1) % n_le;
+
+        c = broadcast<t_test_case_index, idx_1>(a);
+
+
+        for (UST i = 0; i < n_le; ++i)
+        {
+            EXPECT_DOUBLE_EQ(get(c, i), get(a, t_test_case_index));
+            EXPECT_DOUBLE_EQ(get(c, i + n_le), get(a, idx_1 + n_le));
         }
     }
 }
@@ -300,6 +314,36 @@ void test_broadcast_across_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_broadcast_across_lanes) // NOLINT
 {
     TYPED_TEST_SERIES(test_broadcast_across_lanes_test_case, num_elements<TypeParam>)
+}
+
+
+// --- test exchange --------------------------------------------------------------------------------------------------
+
+template <typename T_RegisterType, UST t_test_case_index>
+void test_exchange_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b)
+{
+    constexpr UST idx_0 = t_test_case_index % num_elements<T_RegisterType>;
+    constexpr UST idx_1 = t_test_case_index / num_elements<T_RegisterType>;
+
+    T_RegisterType c = a;
+    T_RegisterType d = b;
+
+    exchange<idx_0, idx_1>(c, d);
+
+    for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
+    {
+        auto exp_c = (i == idx_0) ? get(b, idx_1) : get(a, i);
+        auto exp_d = (i == idx_1) ? get(a, idx_0) : get(b, i);
+
+        EXPECT_DOUBLE_EQ(get(c, i), exp_c);
+        EXPECT_DOUBLE_EQ(get(d, i), exp_d);
+    }
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_exchange) // NOLINT
+{
+    TYPED_TEST_SERIES(test_exchange_test_case, power(num_elements<TypeParam>, 2))
 }
 
 
@@ -343,9 +387,12 @@ void test_permute_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b)
     }
 
 
-    if constexpr (is_m256d<T_RegisterType>)
+    if constexpr (is_avx_register<T_RegisterType>)
     {
-        c = permute<v[0], v[1], v[1], v[0]>(a);
+        if constexpr (is_m256d<T_RegisterType>)
+            c = permute<v[0], v[1], v[1], v[0]>(a);
+        else
+            c = permute<v[0], v[1], v[2], v[3], v[1], v[2], v[3], v[0]>(a);
 
         for (UST i = 0; i < n_le; ++i)
         {

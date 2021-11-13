@@ -138,10 +138,10 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
 
 
 //! @brief
-//! Broadcast a register element per lane selected by `t_index` within lane boundaries.
+//! Broadcast a register element per lane selected by `t_index`.
 //!
 //! @details
-//! For mulit-lane registers, the same index is used for every lane.
+//! For mulit-lane registers, the same index is used for every lane. The broadcasting does not cross lane boundaries.
 //!
 //! @tparam t_index:
 //! Index of the lane element that should be broadcasted
@@ -154,6 +154,28 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
 //! @return
 //! New register with broadcasted values
 template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto broadcast(T_RegisterType src) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Broadcast a register element per lane selected by `t_index_0` and `t_index_1`.
+//!
+//! @details
+//! The broadcasting does not cross lane boundaries.
+//!
+//! @tparam t_index_0:
+//! Index of the first lane's element that should be broadcasted
+//! @tparam t_index_0:
+//! Index of the second lane's element that should be broadcasted
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src:
+//! The source register
+//!
+//! @return
+//! New register with broadcasted values
+template <UST t_index_0, UST t_index_1, FloatAVXRegister T_RegisterType>
 [[nodiscard]] inline auto broadcast(T_RegisterType src) noexcept -> T_RegisterType;
 
 
@@ -178,15 +200,35 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Exchange two elements selected by indices between two registers.
+//!
+//! @details
+//! The passed registers are modified during the operation. Note that the exchange is significantly slower if the
+//! exchanged elements are not inside the same lane.
+//!
+//! @tparam t_index_0:
+//! Selects the element of `reg_0` that should be exchanged
+//! @tparam t_index_1:
+//! Selects the element of `reg_1` that should be exchanged
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in, out] reg_0:
+//! First register
+//! @param[in, out] reg_1:
+//! Second register
+template <UST t_index_0, UST t_index_1, FloatVectorRegister T_RegisterType>
+inline void exchange(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept;
+
+
+//! @brief
 //! Shuffle the elements of a vector register within lanes using indices and return the result in a new register.
 //!
 //! @tparam t_indices
-//! A set of indices equal to the number of lane elements. The n-th value specifies the lane index of the element from
-//! the source register that should be copied to the n-th lane element of the result register. The permutations for each
-//! lane are identical. The only exception is the `__m256d` register. For this register, one can use a number of
-//! parameters equal to number of register elements. In this case one can select the indices individually for all
-//! elements so that the permutations might differ between lanes. However, permutations can not be performed accross
-//! lane boundaries. If an index exceeds the number of lane elements, a compile-time error is generated.
+//! A set of indices equal to the number of register elements or the number of lane elements. In the latter case the
+//! permutation pattern is identical for all lanes. The N-th index selects the value for the N-th element/lane element.
+//! Index values may not exceed the lane size of a register. Otherwise a compile-time error is triggered.
+//!
 //! @tparam T_RegisterType:
 //! The register type
 //!
@@ -195,6 +237,10 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 //!
 //! @return
 //! New register with shuffled values
+//!
+//! @todo
+//! assert that the 8 indices for the __m256 case do not exceed number of lane elemets. Maybe write a generalized
+//! function for integer based parameter packs
 template <UST... t_indices, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto permute(T_RegisterType src) noexcept -> T_RegisterType;
 
@@ -413,6 +459,22 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <UST t_index_0, UST t_index_1, FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto broadcast(T_RegisterType src) noexcept -> T_RegisterType
+{
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    static_assert(t_index_0 < n_le && t_index_1 < n_le, "Indices may not exceed lane size.");
+
+    if constexpr (is_m256d<T_RegisterType>)
+        return permute<t_index_0, t_index_0, t_index_1, t_index_1>(src);
+    else
+        return permute<t_index_0, t_index_0, t_index_0, t_index_0, t_index_1, t_index_1, t_index_1, t_index_1>(src);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <UST t_index, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto broadcast_across_lanes(T_RegisterType src) noexcept -> T_RegisterType
 {
@@ -432,18 +494,67 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <UST t_index_0, UST t_index_1, FloatVectorRegister T_RegisterType>
+inline void exchange(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept
+{
+    constexpr UST n_e        = num_elements<T_RegisterType>;
+    constexpr UST n_le       = num_lane_elements<T_RegisterType>;
+    constexpr UST lane_idx_0 = t_index_0 / n_le;
+    constexpr UST lane_idx_1 = t_index_1 / n_le;
+
+    static_assert(t_index_0 < n_e && t_index_1 < n_e, "Indices exceed the register size.");
+
+
+    if constexpr (lane_idx_0 == lane_idx_1)
+    {
+        T_RegisterType tmp_0 = reg_0;
+        T_RegisterType tmp_1 = reg_1;
+
+        if constexpr (t_index_0 != t_index_1)
+        {
+            tmp_0 = broadcast<t_index_0 % n_le>(tmp_0);
+            tmp_1 = broadcast<t_index_1 % n_le>(tmp_1);
+        }
+
+        reg_0 = blend_at<t_index_0>(reg_0, tmp_1); // NOLINT(readability-misleading-indentation) - clang-tidy bug
+        reg_1 = blend_at<t_index_1>(reg_1, tmp_0);
+    }
+    else
+    {
+        constexpr UST select_reg_0  = (lane_idx_0 == 0) ? 1 : 0;
+        constexpr UST select_reg_1  = (lane_idx_1 == 0) ? 1 : 0;
+        constexpr U32 element_idx_0 = (lane_idx_0 == 0) ? t_index_1 % n_le : t_index_0 % n_le;
+        constexpr U32 element_idx_1 = (lane_idx_0 == 0) ? t_index_0 % n_le : t_index_1 % n_le;
+
+
+        T_RegisterType tmp_0 = shuffle_lanes<select_reg_0, 1, select_reg_1, 0>(reg_0, reg_1);
+
+        if constexpr (element_idx_0 != element_idx_1)
+        {
+            tmp_0 = broadcast<element_idx_0, element_idx_1>(tmp_0);
+        }
+
+        reg_0 = blend_at<t_index_0>(reg_0, tmp_0);
+        reg_1 = blend_at<t_index_1>(reg_1, tmp_0);
+    }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <UST... t_indices, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto permute(T_RegisterType src) noexcept -> T_RegisterType
 {
     constexpr UST n_e  = num_elements<T_RegisterType>;
     constexpr UST n_le = num_lane_elements<T_RegisterType>;
 
-    static_assert(sizeof...(t_indices) == n_le || (is_m256d<T_RegisterType> && sizeof...(t_indices) == n_e),
-                  "Number of indices must be identical to the number of lane elements. If the register type is "
-                  "__m256d, it can also be equal to the number of elements.");
+    static_assert(sizeof...(t_indices) == n_le || (is_avx_register<T_RegisterType> && sizeof...(t_indices) == n_e),
+                  "Number of indices must be identical to the number of elements or the number of lane elements.");
 
-    if constexpr (is_m256d<T_RegisterType> and sizeof...(t_indices) == n_le)
+    if constexpr (is_m256d<T_RegisterType> && sizeof...(t_indices) == n_le)
         return permute<t_indices..., t_indices...>(src);
+    else if constexpr (is_m256<T_RegisterType> && sizeof...(t_indices) == n_e)
+        return _mm256_permutevar_ps(src, _mm256_setr_epi32(t_indices...));
     else
     {
         constexpr UST num_index_bits = num_lane_elements<T_RegisterType> / 2;
