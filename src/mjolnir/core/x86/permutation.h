@@ -542,6 +542,19 @@ inline void exchange(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <UST t_index_src, UST t_index_dst, bool... t_set_zero>
+inline __m128 insert(__m128 src, __m128 dst)
+{
+    constexpr UST set_zero_mask  = bit_construct<UST, t_set_zero...>(true);
+    constexpr UST selection_mask = bit_construct_from_ints<2, UST, t_index_src, t_index_dst>();
+    constexpr UST mask           = bit_construct_from_ints<4, UST, selection_mask, set_zero_mask>();
+
+    return _mm_insert_ps(dst, src, mask);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <UST... t_indices, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto permute(T_RegisterType src) noexcept -> T_RegisterType
 {

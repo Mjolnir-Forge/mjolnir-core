@@ -342,8 +342,41 @@ void test_exchange_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b
 
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_exchange) // NOLINT
+{TYPED_TEST_SERIES(test_exchange_test_case, power(num_elements<TypeParam>, 2))}
+
+
+// --- test insert ----------------------------------------------------------------------------------------------------
+
+
+TEST(TestM128, test_insert) // NOLINT
 {
-    TYPED_TEST_SERIES(test_exchange_test_case, power(num_elements<TypeParam>, 2))
+    auto check_all_equal = [](__m128 val, F32 v_0, F32 v_1, F32 v_2, F32 v_3)
+    {
+        EXPECT_DOUBLE_EQ(get(val, 0), v_0);
+        EXPECT_DOUBLE_EQ(get(val, 1), v_1);
+        EXPECT_DOUBLE_EQ(get(val, 2), v_2);
+        EXPECT_DOUBLE_EQ(get(val, 3), v_3);
+    };
+
+    auto a = mm_setr<__m128>(1, 2, 3, 4);
+    auto b = mm_setr<__m128>(5, 6, 7, 8); // NOLINT - magic number
+
+    // test source index
+    check_all_equal(insert<0, 0>(a, b), 1, 6, 7, 8); // NOLINT - magic number
+    check_all_equal(insert<1, 0>(a, b), 2, 6, 7, 8); // NOLINT - magic number
+    check_all_equal(insert<2, 0>(a, b), 3, 6, 7, 8); // NOLINT - magic number
+    check_all_equal(insert<3, 0>(a, b), 4, 6, 7, 8); // NOLINT - magic number
+
+    // test destination index
+    check_all_equal(insert<2, 1>(a, b), 5, 3, 7, 8); // NOLINT - magic number
+    check_all_equal(insert<2, 2>(a, b), 5, 6, 3, 8); // NOLINT - magic number
+    check_all_equal(insert<2, 3>(a, b), 5, 6, 7, 3); // NOLINT - magic number
+
+    // test set zero flags
+    check_all_equal(insert<3, 1, false, false, true, false>(a, b), 5, 4, 0, 8); // NOLINT - magic number
+    check_all_equal(insert<1, 0, false, true, false, true>(a, b), 2, 0, 7, 0);  // NOLINT - magic number
+    check_all_equal(insert<2, 3, true, true, true, false>(a, b), 0, 0, 0, 3);
+    check_all_equal(insert<0, 2, true, true, true, true>(a, b), 0, 0, 0, 0);
 }
 
 
