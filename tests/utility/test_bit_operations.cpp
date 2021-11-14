@@ -14,6 +14,8 @@ using namespace mjolnir;
 
 TEST(test_bit_operations, bit_construct) // NOLINT
 {
+    EXPECT_EQ((bit_construct<U8>(false)), 0b00000000);
+
     EXPECT_EQ((bit_construct<U8, 0, 1, 1>(false)), 0b00000011);
     EXPECT_EQ((bit_construct<U8, 0, 1, 1>(true)), 0b00000110);
     EXPECT_EQ((bit_construct<U8, 1, 0, 1, 1, 0, 1, 1, 0>(false)), 0b10110110);
