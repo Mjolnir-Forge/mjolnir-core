@@ -52,7 +52,7 @@ inline constexpr UST num_bits = sizeof(T_Type) * CHAR_BIT;
 //! @return
 //! The constructed integer value
 template <std::unsigned_integral T_Type, UST... t_bit_values>
-[[nodiscard]] consteval inline auto bit_construct(bool left_is_low = false) noexcept -> T_Type;
+[[nodiscard]] consteval inline auto bit_construct([[maybe_unused]] bool left_is_low = false) noexcept -> T_Type;
 
 
 //! @brief
@@ -247,7 +247,7 @@ template <std::unsigned_integral T_Type, UST... t_bit_values>
             (void) std::initializer_list<I32>{(set_bit_to<t_bit_values>(integer, bit_index--), 0)...};
         }
     }
-    return integer;
+    return integer; // NOLINT(readability-misleading-indentation) --- clang-tidy bug
 }
 
 

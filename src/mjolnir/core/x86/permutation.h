@@ -267,6 +267,34 @@ template <UST t_lane_0, UST t_lane_1, FloatAVXRegister T_RegisterType>
 
 
 //! @brief
+//! Insert a single element from `src` into `dst` and return the result in a new `__m128` register.
+//!
+//! @details
+//! The source and the target elements are selected by template parameter indices. Optionally, elements can be set to
+//! zero by providing additional boolean template values.
+//!
+//! @tparam t_index_src:
+//! Index of the element in `src` that should be copied
+//! @tparam t_index_dst:
+//! Index of the element in `dst` that should receive the copied value
+//! @tparam t_set_zero:
+//! An optional parameter pack of boolean values. If the N-th provided value is `true`, the N-th element of the result
+//! register will be set to `0`. If it is `false`, no changes are applied to this element. Note that you can set
+//! multiple values to `0`. If the boolean value that corresponds to `t_index_dst` is `true`, the resulting value is
+//! `0`, which makes the insertion obsolete.
+//!
+//! @param[in] src:
+//! Source register
+//! @param[in] dst:
+//! Target register
+//!
+//! @return
+//! A new `__m128` register with corresponding values
+template <UST t_index_src, UST t_index_dst, bool... t_set_zero>
+inline auto insert(__m128 src, __m128 dst) -> __m128;
+
+
+//! @brief
 //! Create a new AVX register by combining arbitrary lanes from two source registers.
 //!
 //! @tparam t_src_0:
