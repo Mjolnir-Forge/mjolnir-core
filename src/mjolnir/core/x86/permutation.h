@@ -543,7 +543,7 @@ inline void exchange(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_index_src, UST t_index_dst, bool... t_set_zero>
-inline __m128 insert(__m128 src, __m128 dst)
+inline auto insert(__m128 src, __m128 dst) -> __m128
 {
     constexpr UST set_zero_mask  = bit_construct<UST, t_set_zero...>(true);
     constexpr UST selection_mask = bit_construct_from_ints<2, UST, t_index_src, t_index_dst>();
