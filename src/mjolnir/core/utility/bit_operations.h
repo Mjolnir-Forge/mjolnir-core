@@ -229,7 +229,7 @@ namespace mjolnir
 // --------------------------------------------------------------------------------------------------------------------
 
 template <std::unsigned_integral T_Type, UST... t_bit_values>
-[[nodiscard]] consteval inline auto bit_construct(bool left_is_low) noexcept -> T_Type
+[[nodiscard]] consteval inline auto bit_construct([[maybe_unused]] bool left_is_low) noexcept -> T_Type
 {
     static_assert(sizeof...(t_bit_values) <= num_bits<T_Type>, "Number of bit values exceeds number of type bits.");
 

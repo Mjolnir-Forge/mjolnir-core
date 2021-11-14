@@ -358,8 +358,8 @@ TEST(TestM128, test_insert) // NOLINT
         EXPECT_DOUBLE_EQ(get(val, 3), v_3);
     };
 
-    auto a = mm_setr<__m128>(1, 2, 3, 4);
-    auto b = mm_setr<__m128>(5, 6, 7, 8); // NOLINT - magic number
+    auto a = mm_setr<__m128>(1., 2., 3., 4.);
+    auto b = mm_setr<__m128>(5., 6., 7., 8.); // NOLINT - magic number
 
     // test source index
     check_all_equal(insert<0, 0>(a, b), 1, 6, 7, 8); // NOLINT - magic number
