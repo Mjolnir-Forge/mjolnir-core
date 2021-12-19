@@ -222,6 +222,34 @@ inline void exchange(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept;
 
 
 //! @brief
+//! Insert a single element from `src` into `dst` and return the result in a new `__m128` register.
+//!
+//! @details
+//! The source and the target elements are selected by template parameter indices. Optionally, elements can be set to
+//! zero by providing additional boolean template values.
+//!
+//! @tparam t_index_src:
+//! Index of the element in `src` that should be copied
+//! @tparam t_index_dst:
+//! Index of the element in `dst` that should receive the copied value
+//! @tparam t_set_zero:
+//! An optional parameter pack of boolean values. If the N-th provided value is `true`, the N-th element of the result
+//! register will be set to `0`. If it is `false`, no changes are applied to this element. Note that you can set
+//! multiple values to `0`. If the boolean value that corresponds to `t_index_dst` is `true`, the resulting value is
+//! `0`, which makes the insertion obsolete.
+//!
+//! @param[in] src:
+//! Source register
+//! @param[in] dst:
+//! Target register
+//!
+//! @return
+//! A new `__m128` register with corresponding values
+template <UST t_index_src, UST t_index_dst, bool... t_set_zero>
+inline auto insert(__m128 src, __m128 dst) -> __m128;
+
+
+//! @brief
 //! Shuffle the elements of a vector register within lanes using indices and return the result in a new register.
 //!
 //! @tparam t_indices
@@ -264,34 +292,6 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 //! New register with an arbitrary combination of the source registers lanes
 template <UST t_lane_0, UST t_lane_1, FloatAVXRegister T_RegisterType>
 [[nodiscard]] inline auto permute_lanes(T_RegisterType src) noexcept -> T_RegisterType;
-
-
-//! @brief
-//! Insert a single element from `src` into `dst` and return the result in a new `__m128` register.
-//!
-//! @details
-//! The source and the target elements are selected by template parameter indices. Optionally, elements can be set to
-//! zero by providing additional boolean template values.
-//!
-//! @tparam t_index_src:
-//! Index of the element in `src` that should be copied
-//! @tparam t_index_dst:
-//! Index of the element in `dst` that should receive the copied value
-//! @tparam t_set_zero:
-//! An optional parameter pack of boolean values. If the N-th provided value is `true`, the N-th element of the result
-//! register will be set to `0`. If it is `false`, no changes are applied to this element. Note that you can set
-//! multiple values to `0`. If the boolean value that corresponds to `t_index_dst` is `true`, the resulting value is
-//! `0`, which makes the insertion obsolete.
-//!
-//! @param[in] src:
-//! Source register
-//! @param[in] dst:
-//! Target register
-//!
-//! @return
-//! A new `__m128` register with corresponding values
-template <UST t_index_src, UST t_index_dst, bool... t_set_zero>
-inline auto insert(__m128 src, __m128 dst) -> __m128;
 
 
 //! @brief
@@ -610,6 +610,19 @@ template <UST t_lane_0, UST t_lane_1, FloatAVXRegister T_RegisterType>
 [[nodiscard]] inline auto permute_lanes(T_RegisterType src) noexcept -> T_RegisterType
 {
     return shuffle_lanes<0, t_lane_0, 0, t_lane_1>(src, src);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST... t_indices, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto shuffle(T_RegisterType src_0, T_RegisterType scr_1) noexcept -> T_RegisterType
+{
+    constexpr UST n_e  = num_elements<T_RegisterType>;
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    static_assert(sizeof...(t_indices) == n_le || (is_avx_register<T_RegisterType> && sizeof...(t_indices) == n_e),
+                  "Number of indices must be identical to the number of elements or the number of lane elements.");
 }
 
 
