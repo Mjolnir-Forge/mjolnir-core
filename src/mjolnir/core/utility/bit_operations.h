@@ -179,6 +179,8 @@ template <std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnTy
 //!
 //! @tparam t_num_bits:
 //! The patterns number of bits
+//! @tparam t_index:
+//! The index of the first bit of the bit pattern
 //! @tparam t_shift:
 //! An integer that specifies the direction and magnitude that the bit pattern should be shifted. Positive
 //! values will shift it to the left (higher values) while negative values will shift the bit to the right
@@ -190,21 +192,40 @@ template <std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnTy
 //!
 //! @param[in] integer:
 //! The source integer
-//! @tparam[in] index:
-//! The index of the first bit of the bit pattern
 //!
 //! @return
 //! An integer containing the extracted and shifted bit pattern.
-template <UST t_num_bits, std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
-[[nodiscard]] constexpr inline auto get_bits(T_Type integer, UST index, I32 shift = 0) noexcept -> T_ReturnType;
-
-
 template <UST                    t_index,
           UST                    t_num_bits,
           I32                    t_shift      = 0,
           std::unsigned_integral T_Type       = UST,
           std::unsigned_integral T_ReturnType = T_Type>
 [[nodiscard]] constexpr inline auto get_bits(T_Type integer) noexcept -> T_ReturnType;
+
+
+//! @brief
+//! Extract a bit pattern from an integer and store it with an optional shift in a new integer.
+//!
+//! @tparam t_num_bits:
+//! The patterns number of bits
+//! @tparam T_Type:
+//! The type of the source integer.
+//! @tparam T_ReturnType
+//! The type of the returned integer
+//!
+//! @param[in] integer:
+//! The source integer
+//! @tparam[in] index:
+//! The index of the first bit of the bit pattern
+//! @tparam[in] shift:
+//! An integer that specifies the direction and magnitude that the bit pattern should be shifted. Positive
+//! values will shift it to the left (higher values) while negative values will shift the bit to the right
+//! (lower values).
+//!
+//! @return
+//! An integer containing the extracted and shifted bit pattern.
+template <UST t_num_bits, std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
+[[nodiscard]] constexpr inline auto get_bits(T_Type integer, UST index, I32 shift = 0) noexcept -> T_ReturnType;
 
 
 //! @brief
