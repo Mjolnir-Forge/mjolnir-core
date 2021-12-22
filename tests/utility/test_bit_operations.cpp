@@ -113,9 +113,46 @@ TEST(test_bit_operations, clear_bits) // NOLINT
 }
 
 
-// --- test get_bit ---------------------------------------------------------------------------------------------------
+// --- test get_bit (static) -----------------------------------------------------------------------------------------
 
-TEST(test_bit_operations, get_bit) // NOLINT
+TEST(test_bit_operations, get_bit_static) // NOLINT
+{
+    U8 a = 0b10100111; // NOLINT - magic number
+
+    EXPECT_EQ(get_bit<0>(a), 0b00000001);
+    EXPECT_EQ(get_bit<1>(a), 0b00000010);
+    EXPECT_EQ(get_bit<2>(a), 0b00000100);
+    EXPECT_EQ(get_bit<3>(a), 0b00000000);
+    EXPECT_EQ(get_bit<4>(a), 0b00000000);
+    EXPECT_EQ(get_bit<5>(a), 0b00100000);
+    EXPECT_EQ(get_bit<6>(a), 0b00000000);
+    EXPECT_EQ(get_bit<7>(a), 0b10000000);
+
+    // test positive shifts
+    EXPECT_EQ((get_bit<1, 0>(a)), 0b00000010);
+    EXPECT_EQ((get_bit<2, 3>(a)), 0b00100000);
+    EXPECT_EQ((get_bit<2, 5>(a)), 0b10000000);
+    EXPECT_EQ((get_bit<3, 3>(a)), 0b00000000);
+
+    // test negative shifts
+    EXPECT_EQ((get_bit<1, -1>(a)), 0b00000001);
+    EXPECT_EQ((get_bit<2, -2>(a)), 0b00000001);
+    EXPECT_EQ((get_bit<3, -1>(a)), 0b00000000);
+    EXPECT_EQ((get_bit<3, -3>(a)), 0b00000000);
+    EXPECT_EQ((get_bit<7, -3>(a)), 0b00010000);
+    EXPECT_EQ((get_bit<5, -2>(a)), 0b00001000);
+
+
+    // test other type
+    U16 b = 0b11111111; // NOLINT - magic number
+    EXPECT_EQ((get_bit<1, 12, U16>(b)), 0b0010000000000000);
+    EXPECT_EQ((get_bit<1, 12, U8, U16>(a)), 0b0010000000000000);
+}
+
+
+// --- test get_bit (dynamic) -----------------------------------------------------------------------------------------
+
+TEST(test_bit_operations, get_bit_dynamic) // NOLINT
 {
     U8 a = 0b10100111; // NOLINT - magic number
 
@@ -129,30 +166,67 @@ TEST(test_bit_operations, get_bit) // NOLINT
     EXPECT_EQ(get_bit(a, 7), 0b10000000);
 
     // test positive shifts
-    EXPECT_EQ(get_bit<1>(a, 0), 0b00000010);
-    EXPECT_EQ(get_bit<3>(a, 2), 0b00100000);
-    EXPECT_EQ(get_bit<5>(a, 2), 0b10000000);
-    EXPECT_EQ(get_bit<3>(a, 3), 0b00000000);
+    EXPECT_EQ(get_bit(a, 0, 1), 0b00000010);
+    EXPECT_EQ(get_bit(a, 2, 3), 0b00100000);
+    EXPECT_EQ(get_bit(a, 2, 5), 0b10000000);
+    EXPECT_EQ(get_bit(a, 3, 3), 0b00000000);
 
     // test negative shifts
-    EXPECT_EQ(get_bit<-1>(a, 1), 0b00000001);
-    EXPECT_EQ(get_bit<-2>(a, 2), 0b00000001);
-    EXPECT_EQ(get_bit<-1>(a, 3), 0b00000000);
-    EXPECT_EQ(get_bit<-3>(a, 3), 0b00000000);
-    EXPECT_EQ(get_bit<-3>(a, 7), 0b00010000);
-    EXPECT_EQ(get_bit<-2>(a, 5), 0b00001000);
+    EXPECT_EQ(get_bit(a, 1, -1), 0b00000001);
+    EXPECT_EQ(get_bit(a, 2, -2), 0b00000001);
+    EXPECT_EQ(get_bit(a, 3, -1), 0b00000000);
+    EXPECT_EQ(get_bit(a, 3, -3), 0b00000000);
+    EXPECT_EQ(get_bit(a, 7, -3), 0b00010000);
+    EXPECT_EQ(get_bit(a, 5, -2), 0b00001000);
 
 
     // test other type
     U16 b = 0b11111111; // NOLINT - magic number
-    EXPECT_EQ((get_bit<12, U16>(b, 1)), 0b0010000000000000);
-    EXPECT_EQ((get_bit<12, U8, U16>(a, 1)), 0b0010000000000000);
+    EXPECT_EQ((get_bit<U16>(b, 1, 12)), 0b0010000000000000);
+    EXPECT_EQ((get_bit<U8, U16>(a, 1, 12)), 0b0010000000000000);
 }
 
 
-// --- test get_bits ---------------------------------------------------------------------------------------------------
+// --- test get_bit_max_shift -----------------------------------------------------------------------------------------
 
-TEST(test_bit_operations, get_bits) // NOLINT
+TEST(test_bit_operations, get_bit_max_shift) // NOLINT
+{
+    U8 a = 0b10100111; // NOLINT - magic number
+
+    EXPECT_EQ(get_bit(a, 0), 0b00000001);
+}
+
+
+// --- test get_bits (static) -----------------------------------------------------------------------------------------
+
+TEST(test_bit_operations, get_bits_static) // NOLINT
+{
+    U8 a = 0b10100111; // NOLINT - magic number
+
+    EXPECT_EQ((get_bits<0, 3>(a)), 0b00000111);
+    EXPECT_EQ((get_bits<2, 4>(a)), 0b00100100);
+    EXPECT_EQ((get_bits<3, 5>(a)), 0b10100000);
+
+    // test positive shifts
+    EXPECT_EQ((get_bits<0, 3, 2>(a)), 0b00011100);
+    EXPECT_EQ((get_bits<2, 4, 1>(a)), 0b01001000);
+    EXPECT_EQ((get_bits<2, 4, 2>(a)), 0b10010000);
+
+    // test negative shifts
+    EXPECT_EQ((get_bits<1, 3, -1>(a)), 0b00000011);
+    EXPECT_EQ((get_bits<2, 4, -2>(a)), 0b00001001);
+    EXPECT_EQ((get_bits<5, 3, -3>(a)), 0b00010100);
+
+    // test other type
+    U16 b = 0b11111111; // NOLINT - magic number
+    EXPECT_EQ((get_bits<1, 3, 10, U16>(b)), 0b0011100000000000);
+    EXPECT_EQ((get_bits<1, 3, 10, U8, U16>(a)), 0b0001100000000000);
+}
+
+
+// --- test get_bits (dynamic) ----------------------------------------------------------------------------------------
+
+TEST(test_bit_operations, get_bits_dynamic) // NOLINT
 {
     U8 a = 0b10100111; // NOLINT - magic number
 
@@ -161,19 +235,19 @@ TEST(test_bit_operations, get_bits) // NOLINT
     EXPECT_EQ(get_bits<5>(a, 3), 0b10100000);
 
     // test positive shifts
-    EXPECT_EQ((get_bits<3, 2>(a, 0)), 0b00011100);
-    EXPECT_EQ((get_bits<4, 1>(a, 2)), 0b01001000);
-    EXPECT_EQ((get_bits<4, 2>(a, 2)), 0b10010000);
+    EXPECT_EQ((get_bits<3>(a, 0, 2)), 0b00011100);
+    EXPECT_EQ((get_bits<4>(a, 2, 1)), 0b01001000);
+    EXPECT_EQ((get_bits<4>(a, 2, 2)), 0b10010000);
 
     // test negative shifts
-    EXPECT_EQ((get_bits<3, -1>(a, 1)), 0b00000011);
-    EXPECT_EQ((get_bits<4, -2>(a, 2)), 0b00001001);
-    EXPECT_EQ((get_bits<3, -3>(a, 5)), 0b00010100);
+    EXPECT_EQ((get_bits<3>(a, 1, -1)), 0b00000011);
+    EXPECT_EQ((get_bits<4>(a, 2, -2)), 0b00001001);
+    EXPECT_EQ((get_bits<3>(a, 5, -3)), 0b00010100);
 
     // test other type
     U16 b = 0b11111111; // NOLINT - magic number
-    EXPECT_EQ((get_bits<3, 10, U16>(b, 1)), 0b0011100000000000);
-    EXPECT_EQ((get_bits<3, 10, U8, U16>(a, 1)), 0b0001100000000000);
+    EXPECT_EQ((get_bits<3, U16>(b, 1, 10)), 0b0011100000000000);
+    EXPECT_EQ((get_bits<3, U8, U16>(a, 1, 10)), 0b0001100000000000);
 }
 
 

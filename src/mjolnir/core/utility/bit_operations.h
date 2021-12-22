@@ -130,6 +130,8 @@ constexpr inline void clear_bits(T_Type& integer, UST index) noexcept;
 //! @brief
 //! Extract a bit from an integer and store it with an optional shift in a new integer.
 //!
+//! @tparam t_index:
+//! The index of the bit that should be extracted
 //! @tparam t_shift:
 //! An integer that specifies the direction and magnitude that the bit should be shifted. Positive values will shift
 //! it to the left (higher values) while negative values will shift the bit to the right (lower values).
@@ -140,13 +142,36 @@ constexpr inline void clear_bits(T_Type& integer, UST index) noexcept;
 //!
 //! @param[in] integer:
 //! The source integer
-//! @tparam[in] index:
-//! The index of the bit that should be extracted
 //!
 //! @return
 //! An integer containing the extracted and shifted bit value.
-template <I32 t_shift = 0, std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
-[[nodiscard]] constexpr inline auto get_bit(T_Type integer, UST index) noexcept -> T_ReturnType;
+template <UST                    t_index,
+          I32                    t_shift      = 0,
+          std::unsigned_integral T_Type       = UST,
+          std::unsigned_integral T_ReturnType = T_Type>
+[[nodiscard]] constexpr inline auto get_bit(T_Type integer) noexcept -> T_ReturnType;
+
+
+//! @brief
+//! Extract a bit from an integer and store it with an optional shift in a new integer.
+//!
+//! @tparam T_Type:
+//! The type of the source integer.
+//! @tparam T_ReturnType
+//! The type of the returned integer
+//!
+//! @param[in] integer:
+//! The source integer
+//! @param[in] index:
+//! The index of the bit that should be extracted
+//! @param[in] shift:
+//! An integer that specifies the direction and magnitude that the bit should be shifted. Positive values will shift
+//! it to the left (higher values) while negative values will shift the bit to the right (lower values).
+//!
+//! @return
+//! An integer containing the extracted and shifted bit value.
+template <std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
+[[nodiscard]] constexpr inline auto get_bit(T_Type integer, UST index, I32 shift = 0) noexcept -> T_ReturnType;
 
 
 //! @brief
@@ -155,8 +180,9 @@ template <I32 t_shift = 0, std::unsigned_integral T_Type = UST, std::unsigned_in
 //! @tparam t_num_bits:
 //! The patterns number of bits
 //! @tparam t_shift:
-//! An integer that specifies the direction and magnitude that the bit pattern should be shifted. Positive values will
-//! shift it to the left (higher values) while negative values will shift the bit to the right (lower values).
+//! An integer that specifies the direction and magnitude that the bit pattern should be shifted. Positive
+//! values will shift it to the left (higher values) while negative values will shift the bit to the right
+//! (lower values).
 //! @tparam T_Type:
 //! The type of the source integer.
 //! @tparam T_ReturnType
@@ -169,11 +195,16 @@ template <I32 t_shift = 0, std::unsigned_integral T_Type = UST, std::unsigned_in
 //!
 //! @return
 //! An integer containing the extracted and shifted bit pattern.
-template <UST                    t_num_bits,
+template <UST t_num_bits, std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
+[[nodiscard]] constexpr inline auto get_bits(T_Type integer, UST index, I32 shift = 0) noexcept -> T_ReturnType;
+
+
+template <UST                    t_index,
+          UST                    t_num_bits,
           I32                    t_shift      = 0,
           std::unsigned_integral T_Type       = UST,
           std::unsigned_integral T_ReturnType = T_Type>
-[[nodiscard]] constexpr inline auto get_bits(T_Type integer, UST index) noexcept -> T_ReturnType;
+[[nodiscard]] constexpr inline auto get_bits(T_Type integer) noexcept -> T_ReturnType;
 
 
 //! @brief
@@ -368,23 +399,23 @@ constexpr inline void clear_bits(T_Type& integer, UST index) noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <I32 t_shift, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
-[[nodiscard]] constexpr inline auto get_bit(T_Type integer, UST index) noexcept -> T_ReturnType
+template <UST t_index, I32 t_shift, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
+[[nodiscard]] constexpr inline auto get_bit(T_Type integer) noexcept -> T_ReturnType
 {
-    assert(index < num_bits<T_Type>); // NOLINT
+    static_assert(t_index < num_bits<T_Type>, "Index exceeds number of bits");
 
-    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << (index)));
+    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << (t_index)));
 
     if constexpr (t_shift == 0)
         return bit;
     else if constexpr (t_shift > 0)
     {
-        assert(index + t_shift < num_bits<T_ReturnType>); // NOLINT
+        static_assert(t_index + t_shift < num_bits<T_ReturnType>, "Shift exceeds highest bit.");
         return bit << static_cast<UST>(t_shift);
     }
     else
     {
-        assert(index >= std::abs(t_shift)); // NOLINT
+        static_assert(t_index >= std::abs(t_shift), "Shift exceeds lowest bit");
         return bit >> static_cast<UST>(std::abs(t_shift));
     }
 }
@@ -392,8 +423,60 @@ template <I32 t_shift, std::unsigned_integral T_Type, std::unsigned_integral T_R
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <UST t_num_bits, I32 t_shift, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
-[[nodiscard]] constexpr inline auto get_bits(T_Type integer, UST index) noexcept -> T_ReturnType
+template <std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
+[[nodiscard]] constexpr inline auto get_bit(T_Type integer, UST index, I32 shift) noexcept -> T_ReturnType
+{
+    assert(index < num_bits<T_Type>); // NOLINT
+
+    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << (index)));
+
+
+    if (shift >= 0)
+    {
+        assert(index + shift < num_bits<T_ReturnType>); // NOLINT
+        return bit << static_cast<UST>(shift);
+    }
+    else
+    {
+        assert(index >= std::abs(shift)); // NOLINT
+        return bit >> static_cast<UST>(std::abs(shift));
+    }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_index, UST t_num_bits, I32 t_shift, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
+[[nodiscard]] constexpr inline auto get_bits(T_Type integer) noexcept -> T_ReturnType
+{
+    static_assert(t_num_bits > 1, "Number of bits must be larger than 0.");
+    static_assert(t_index + t_num_bits <= num_bits<T_Type>, "Required bits exceed maximum number of bits.");
+
+    constexpr UST mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << (t_index);
+    T_ReturnType  bits = integer & mask;
+
+    if constexpr (t_shift == 0)
+    {
+        static_assert(t_index + t_num_bits <= num_bits<T_ReturnType>, "Shifted bits exceed highest bit.");
+        return bits;
+    }
+    else if constexpr (t_shift > 0)
+    {
+        static_assert(t_index + t_num_bits + t_shift <= num_bits<T_ReturnType>, "Shifted bits exceed highest bit.");
+        return bits << static_cast<UST>(t_shift);
+    }
+    else
+    {
+        static_assert(t_index >= std::abs(t_shift), "Shifted bits exceed lowest bit.");
+        return bits >> static_cast<UST>(std::abs(t_shift));
+    }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_bits, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
+[[nodiscard]] constexpr inline auto get_bits(T_Type integer, UST index, I32 shift) noexcept -> T_ReturnType
 {
     static_assert(t_num_bits > 1, "Number of bits must be larger than 0.");
     assert(index + t_num_bits <= num_bits<T_Type>); // NOLINT
@@ -401,20 +484,16 @@ template <UST t_num_bits, I32 t_shift, std::unsigned_integral T_Type, std::unsig
     UST          mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << (index);
     T_ReturnType bits = integer & mask;
 
-    if constexpr (t_shift == 0)
+
+    if (shift >= 0)
     {
-        assert(index + t_num_bits <= num_bits<T_ReturnType>); // NOLINT
-        return bits;
-    }
-    else if constexpr (t_shift > 0)
-    {
-        assert(index + t_num_bits + t_shift <= num_bits<T_ReturnType>); // NOLINT
-        return bits << static_cast<UST>(t_shift);
+        assert(index + t_num_bits + shift <= num_bits<T_ReturnType>); // NOLINT
+        return bits << static_cast<UST>(shift);
     }
     else
     {
-        assert(index >= std::abs(t_shift)); // NOLINT
-        return bits >> static_cast<UST>(std::abs(t_shift));
+        assert(index >= std::abs(shift)); // NOLINT
+        return bits >> static_cast<UST>(std::abs(shift));
     }
 }
 
