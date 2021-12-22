@@ -533,7 +533,7 @@ template <UST t_index, I32 t_shift, std::unsigned_integral T_Type, std::unsigned
     }
     else
     {
-        static_assert(t_index >= std::abs(t_shift), "Shift exceeds lowest bit");
+        static_assert(t_index >= -t_shift, "Shift exceeds lowest bit");
         return bit >> static_cast<UST>(std::abs(t_shift));
     }
 }
@@ -549,17 +549,14 @@ template <std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
 
     T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << (index)));
 
-
     if (shift >= 0)
     {
         assert(index + shift < num_bits<T_ReturnType>); // NOLINT
         return bit << static_cast<UST>(shift);
     }
-    else
-    {
-        assert(index >= std::abs(shift)); // NOLINT
-        return bit >> static_cast<UST>(std::abs(shift));
-    }
+
+    assert(index >= std::abs(shift)); // NOLINT
+    return bit >> static_cast<UST>(std::abs(shift));
 }
 
 
@@ -608,7 +605,7 @@ template <UST t_index, UST t_num_bits, I32 t_shift, std::unsigned_integral T_Typ
     }
     else
     {
-        static_assert(t_index >= std::abs(t_shift), "Shifted bits exceed lowest bit.");
+        static_assert(t_index >= -t_shift, "Shifted bits exceed lowest bit.");
         return bits >> static_cast<UST>(std::abs(t_shift));
     }
 }
@@ -625,17 +622,14 @@ template <UST t_num_bits, std::unsigned_integral T_Type, std::unsigned_integral 
     UST          mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << (index);
     T_ReturnType bits = integer & mask;
 
-
     if (shift >= 0)
     {
         assert(index + t_num_bits + shift <= num_bits<T_ReturnType>); // NOLINT
         return bits << static_cast<UST>(shift);
     }
-    else
-    {
-        assert(index >= std::abs(shift)); // NOLINT
-        return bits >> static_cast<UST>(std::abs(shift));
-    }
+
+    assert(index >= std::abs(shift)); // NOLINT
+    return bits >> static_cast<UST>(std::abs(shift));
 }
 
 
@@ -648,7 +642,8 @@ template <UST                    t_index,
           std::unsigned_integral T_ReturnType>
 [[nodiscard]] constexpr inline auto get_bits_shift_max(T_Type integer) noexcept -> T_ReturnType
 {
-    constexpr I32 shift = (t_shift_right) ? -static_cast<I32>(t_index) : num_bits<T_ReturnType> - t_index - t_num_bits;
+    constexpr I32 shift = (t_shift_right) ? -static_cast<I32>(t_index)
+                                          : static_cast<I32>(num_bits<T_ReturnType> - t_index - t_num_bits);
     return get_bits<t_index, t_num_bits, shift, T_Type, T_ReturnType>(integer);
 }
 
