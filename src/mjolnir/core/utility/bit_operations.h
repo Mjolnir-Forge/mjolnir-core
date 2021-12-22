@@ -444,6 +444,7 @@ template <UST t_index, I32 t_shift, std::unsigned_integral T_Type, std::unsigned
 
 // --------------------------------------------------------------------------------------------------------------------
 
+
 template <std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
 [[nodiscard]] constexpr inline auto get_bit(T_Type integer, UST index, I32 shift) noexcept -> T_ReturnType
 {
@@ -462,6 +463,31 @@ template <std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
         assert(index >= std::abs(shift)); // NOLINT
         return bit >> static_cast<UST>(std::abs(shift));
     }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST                    t_index,
+          bool                   t_shift_right = true,
+          std::unsigned_integral T_Type        = UST,
+          std::unsigned_integral T_ReturnType  = T_Type>
+[[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer) noexcept -> T_ReturnType
+{
+    constexpr I32 shift = (t_shift_right) ? -static_cast<I32>(t_index) : num_bits<T_ReturnType> - t_index - 1;
+    return get_bit<t_index, shift, T_Type, T_ReturnType>(integer);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_shift_right = true, std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
+[[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType
+{
+    if constexpr (t_shift_right)
+        return get_bit<T_Type, T_ReturnType>(integer, index, -static_cast<I32>(index));
+    else
+        return get_bit<T_Type, T_ReturnType>(integer, index, num_bits<T_ReturnType> - index - 1);
 }
 
 
