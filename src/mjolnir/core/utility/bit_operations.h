@@ -175,6 +175,51 @@ template <std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnTy
 
 
 //! @brief
+//! Extract a bit from an integer and shift it maximally.
+//!
+//! @tparam t_index:
+//! The index of the bit that should be extracted
+//! @tparam t_shift_right:
+//! If `true`, the bit value will be maximally shifted to the right (lowest bit) and to the left (highest bit) otherwise
+//! @tparam T_Type:
+//! The type of the source integer.
+//! @tparam T_ReturnType
+//! The type of the returned integer
+//!
+//! @param[in] integer:
+//! The source integer
+//!
+//! @return
+//! An integer containing the extracted and shifted bit value.
+template <UST                    t_index,
+          bool                   t_shift_right = true,
+          std::unsigned_integral T_Type        = UST,
+          std::unsigned_integral T_ReturnType  = T_Type>
+[[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer) noexcept -> T_ReturnType;
+
+
+//! @brief
+//! Extract a bit from an integer and shift it maximally.
+//!
+//! @tparam t_shift_right:
+//! If `true`, the bit value will be maximally shifted to the right (lowest bit) and to the left (highest bit) otherwise
+//! @tparam T_Type:
+//! The type of the source integer.
+//! @tparam T_ReturnType
+//! The type of the returned integer
+//!
+//! @param[in] integer:
+//! The source integer
+//! @tparam[in] index:
+//! The index of the bit that should be extracted
+//!
+//! @return
+//! An integer containing the extracted and shifted bit value.
+template <bool t_shift_right = true, std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
+[[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType;
+
+
+//! @brief
 //! Extract a bit pattern from an integer and store it with an optional shift in a new integer.
 //!
 //! @tparam t_num_bits:
@@ -227,6 +272,58 @@ template <UST                    t_index,
 template <UST t_num_bits, std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
 [[nodiscard]] constexpr inline auto get_bits(T_Type integer, UST index, I32 shift = 0) noexcept -> T_ReturnType;
 
+
+//! @brief
+//! Extract a bit pattern from an integer and store it with a maximal shift in a new integer.
+//!
+//! @tparam t_num_bits:
+//! The patterns number of bits
+//! @tparam t_index:
+//! The index of the first bit of the bit pattern
+//! @tparam t_shift_right:
+//! If `true`, the bit pattern will be maximally shifted to the right (low bits) and to the left (high bits) otherwise
+//! @tparam T_Type:
+//! The type of the source integer.
+//! @tparam T_ReturnType
+//! The type of the returned integer
+//!
+//! @param[in] integer:
+//! The source integer
+//!
+//! @return
+//! An integer containing the extracted and shifted bit pattern.
+template <UST                    t_index,
+          UST                    t_num_bits,
+          bool                   t_shift_right = true,
+          std::unsigned_integral T_Type        = UST,
+          std::unsigned_integral T_ReturnType  = T_Type>
+[[nodiscard]] constexpr inline auto get_bits_shift_max(T_Type integer) noexcept -> T_ReturnType;
+
+
+//! @brief
+//! Extract a bit pattern from an integer and store it with a maximal shift in a new integer.
+//!
+//! @tparam t_num_bits:
+//! The patterns number of bits
+//! @tparam t_shift_right:
+//! If `true`, the bit pattern will be maximally shifted to the right (low bits) and to the left (high bits) otherwise
+//! @tparam T_Type:
+//! The type of the source integer.
+//! @tparam T_ReturnType
+//! The type of the returned integer
+//!
+//! @param[in] integer:
+//! The source integer
+//! @tparam[in] index:
+//! The index of the first bit of the bit pattern
+//!
+//! @return
+//! An integer containing the extracted and shifted bit pattern.
+template <UST                    t_num_bits,
+          bool                   t_shift_right = true,
+          std::unsigned_integral T_Type        = UST,
+          std::unsigned_integral T_ReturnType  = T_Type>
+[[nodiscard]] constexpr inline auto get_bits_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType;
 
 //! @brief
 //! Return `true` if a specific bit is set and `false` otherwise
@@ -468,10 +565,7 @@ template <std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <UST                    t_index,
-          bool                   t_shift_right = true,
-          std::unsigned_integral T_Type        = UST,
-          std::unsigned_integral T_ReturnType  = T_Type>
+template <UST t_index, bool t_shift_right, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
 [[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer) noexcept -> T_ReturnType
 {
     constexpr I32 shift = (t_shift_right) ? -static_cast<I32>(t_index) : num_bits<T_ReturnType> - t_index - 1;
@@ -481,7 +575,7 @@ template <UST                    t_index,
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_shift_right = true, std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
+template <bool t_shift_right, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
 [[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType
 {
     if constexpr (t_shift_right)
@@ -549,9 +643,9 @@ template <UST t_num_bits, std::unsigned_integral T_Type, std::unsigned_integral 
 
 template <UST                    t_index,
           UST                    t_num_bits,
-          bool                   t_shift_right = true,
-          std::unsigned_integral T_Type        = UST,
-          std::unsigned_integral T_ReturnType  = T_Type>
+          bool                   t_shift_right,
+          std::unsigned_integral T_Type,
+          std::unsigned_integral T_ReturnType>
 [[nodiscard]] constexpr inline auto get_bits_shift_max(T_Type integer) noexcept -> T_ReturnType
 {
     constexpr I32 shift = (t_shift_right) ? -static_cast<I32>(t_index) : num_bits<T_ReturnType> - t_index - t_num_bits;
@@ -561,10 +655,7 @@ template <UST                    t_index,
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <UST                    t_num_bits,
-          bool                   t_shift_right = true,
-          std::unsigned_integral T_Type        = UST,
-          std::unsigned_integral T_ReturnType  = T_Type>
+template <UST t_num_bits, bool t_shift_right, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
 [[nodiscard]] constexpr inline auto get_bits_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType
 {
     if constexpr (t_shift_right)
