@@ -319,6 +319,64 @@ TEST(test_bit_operations, get_bits_dynamic) // NOLINT
 }
 
 
+// --- test get_bits_shift_max (static) -------------------------------------------------------------------------------
+
+TEST(test_bit_operations, get_bits_shift_max_static) // NOLINT
+{
+    U8 a = 0b10100111; // NOLINT - magic number
+
+    // shift right
+    EXPECT_EQ((get_bits_shift_max<0, 4>(a)), 0b00000111);
+    EXPECT_EQ((get_bits_shift_max<2, 4>(a)), 0b00001001);
+    EXPECT_EQ((get_bits_shift_max<3, 5>(a)), 0b00010100);
+
+    // shift left
+    EXPECT_EQ((get_bits_shift_max<0, 4, false>(a)), 0b01110000);
+    EXPECT_EQ((get_bits_shift_max<2, 4, false>(a)), 0b10010000);
+    EXPECT_EQ((get_bits_shift_max<3, 5, false>(a)), 0b10100000);
+
+    // test other type
+    U16 b = 0b11111111; // NOLINT - magic number
+    EXPECT_EQ((get_bits_shift_max<5, 4, true>(b)), 0b0000000000000111);
+    EXPECT_EQ((get_bits_shift_max<5, 4, false>(b)), 0b0111000000000000);
+
+    EXPECT_EQ((get_bits_shift_max<5, 4, true, U16, U8>(b)), 0b00000111);
+    EXPECT_EQ((get_bits_shift_max<5, 4, false, U16, U8>(b)), 0b01110000);
+
+    EXPECT_EQ((get_bits_shift_max<2, 4, true, U8, U16>(a)), 0b0000000000001001);
+    EXPECT_EQ((get_bits_shift_max<2, 4, false, U8, U16>(a)), 0b1001000000000000);
+}
+
+
+// --- test get_bits_shift_max (dynamic) ------------------------------------------------------------------------------
+
+TEST(test_bit_operations, get_bits_shift_max_dynamic) // NOLINT
+{
+    U8 a = 0b10100111; // NOLINT - magic number
+
+    // shift right
+    EXPECT_EQ(get_bits_shift_max<4>(a, 0), 0b00000111);
+    EXPECT_EQ(get_bits_shift_max<4>(a, 2), 0b00001001);
+    EXPECT_EQ(get_bits_shift_max<5>(a, 3), 0b00010100);
+
+    // shift left
+    EXPECT_EQ((get_bits_shift_max<4, false>(a, 0)), 0b01110000);
+    EXPECT_EQ((get_bits_shift_max<4, false>(a, 2)), 0b10010000);
+    EXPECT_EQ((get_bits_shift_max<5, false>(a, 3)), 0b10100000);
+
+    // test other type
+    U16 b = 0b11111111; // NOLINT - magic number
+    EXPECT_EQ((get_bits_shift_max<4, true>(b, 5)), 0b0000000000000111);
+    EXPECT_EQ((get_bits_shift_max<4, false>(b, 5)), 0b0111000000000000);
+
+    EXPECT_EQ((get_bits_shift_max<4, true, U16, U8>(b, 5)), 0b00000111);
+    EXPECT_EQ((get_bits_shift_max<4, false, U16, U8>(b, 5)), 0b01110000);
+
+    EXPECT_EQ((get_bits_shift_max<4, true, U8, U16>(a, 2)), 0b0000000000001001);
+    EXPECT_EQ((get_bits_shift_max<4, false, U8, U16>(a, 2)), 0b1001000000000000);
+}
+
+
 // --- test is_bit_set ------------------------------------------------------------------------------------------------
 
 TEST(test_bit_operations, is_bit_set) // NOLINT
