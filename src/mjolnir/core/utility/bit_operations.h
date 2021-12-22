@@ -566,7 +566,8 @@ template <UST t_index, bool t_shift_right, std::unsigned_integral T_Type, std::u
 [[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer) noexcept -> T_ReturnType
 {
     // cppcheck-suppress unreadVariable // false positive
-    constexpr I32 shift = (t_shift_right) ? -static_cast<I32>(t_index) : num_bits<T_ReturnType> - t_index - 1;
+    constexpr I32 shift =
+            (t_shift_right) ? -static_cast<I32>(t_index) : static_cast<I32>(num_bits<T_ReturnType> - t_index - 1);
     return get_bit<t_index, shift, T_Type, T_ReturnType>(integer);
 }
 
