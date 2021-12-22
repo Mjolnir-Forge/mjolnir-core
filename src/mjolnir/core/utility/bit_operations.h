@@ -580,7 +580,7 @@ template <bool t_shift_right, std::unsigned_integral T_Type, std::unsigned_integ
     if constexpr (t_shift_right)
         return get_bit<T_Type, T_ReturnType>(integer, index, -static_cast<I32>(index));
     else
-        return get_bit<T_Type, T_ReturnType>(integer, index, num_bits<T_ReturnType> - index - 1);
+        return get_bit<T_Type, T_ReturnType>(integer, index, static_cast<I32>(num_bits<T_ReturnType> - index - 1));
 }
 
 
@@ -593,7 +593,7 @@ template <UST t_index, UST t_num_bits, I32 t_shift, std::unsigned_integral T_Typ
     static_assert(t_index + t_num_bits <= num_bits<T_Type>, "Required bits exceed maximum number of bits.");
 
     constexpr UST mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << (t_index);
-    T_ReturnType  bits = integer & mask;
+    auto          bits = static_cast<T_ReturnType>(integer & mask);
 
     if constexpr (t_shift == 0)
     {
@@ -621,8 +621,8 @@ template <UST t_num_bits, std::unsigned_integral T_Type, std::unsigned_integral 
     static_assert(t_num_bits > 1, "Number of bits must be larger than 0.");
     assert(index + t_num_bits <= num_bits<T_Type>); // NOLINT
 
-    UST          mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << (index);
-    T_ReturnType bits = integer & mask;
+    UST  mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << (index);
+    auto bits = static_cast<T_ReturnType>(integer & mask);
 
     if (shift >= 0)
     {
@@ -659,7 +659,8 @@ template <UST t_num_bits, bool t_shift_right, std::unsigned_integral T_Type, std
     if constexpr (t_shift_right)
         return get_bits<t_num_bits, T_Type, T_ReturnType>(integer, index, -static_cast<I32>(index));
     else
-        return get_bits<t_num_bits, T_Type, T_ReturnType>(integer, index, num_bits<T_ReturnType> - index - t_num_bits);
+        return get_bits<t_num_bits, T_Type, T_ReturnType>(
+                integer, index, static_cast<I32>(num_bits<T_ReturnType> - index - t_num_bits));
 }
 
 
