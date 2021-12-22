@@ -476,17 +476,17 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute_lanes) // NOLINT
 
 // --- test shuffle ---------------------------------------------------------------------------------------------------
 
-template <typename T_RegisterType, UST t_test_index>
-void test_shuffle_test_case(T_RegisterType a, T_RegisterType b) // NOLINT - complexity
-{
-    std::cout << std::endl;
-}
+// template <typename T_RegisterType, UST t_test_index>
+// void test_shuffle_test_case(T_RegisterType a, T_RegisterType b) // NOLINT - complexity
+//{
+//    std::cout << std::endl;
+//}
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_shuffle) // NOLINT
-{
-    TYPED_TEST_SERIES(test_shuffle_test_case, 4)
-}
+// TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_shuffle) // NOLINT
+//{
+//    TYPED_TEST_SERIES(test_shuffle_test_case, 4)
+//}
 
 
 // --- test shuffle_lanes ---------------------------------------------------------------------------------------------

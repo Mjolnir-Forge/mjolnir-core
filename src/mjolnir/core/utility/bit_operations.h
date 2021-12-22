@@ -210,7 +210,7 @@ template <UST                    t_index,
 //!
 //! @param[in] integer:
 //! The source integer
-//! @tparam[in] index:
+//! @param[in] index:
 //! The index of the bit that should be extracted
 //!
 //! @return
@@ -260,9 +260,9 @@ template <UST                    t_index,
 //!
 //! @param[in] integer:
 //! The source integer
-//! @tparam[in] index:
+//! @param[in] index:
 //! The index of the first bit of the bit pattern
-//! @tparam[in] shift:
+//! @param[in] shift:
 //! An integer that specifies the direction and magnitude that the bit pattern should be shifted. Positive
 //! values will shift it to the left (higher values) while negative values will shift the bit to the right
 //! (lower values).
@@ -314,7 +314,7 @@ template <UST                    t_index,
 //!
 //! @param[in] integer:
 //! The source integer
-//! @tparam[in] index:
+//! @param[in] index:
 //! The index of the first bit of the bit pattern
 //!
 //! @return

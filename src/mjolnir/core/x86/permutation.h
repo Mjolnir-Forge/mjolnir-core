@@ -615,15 +615,15 @@ template <UST t_lane_0, UST t_lane_1, FloatAVXRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <UST... t_indices, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto shuffle(T_RegisterType src_0, T_RegisterType scr_1) noexcept -> T_RegisterType
-{
-    constexpr UST n_e  = num_elements<T_RegisterType>;
-    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+// template <UST... t_indices, FloatVectorRegister T_RegisterType>
+//[[nodiscard]] inline auto shuffle(T_RegisterType src_0, T_RegisterType scr_1) noexcept -> T_RegisterType
+//{
+//    constexpr UST n_e  = num_elements<T_RegisterType>;
+//    constexpr UST n_le = num_lane_elements<T_RegisterType>;
 
-    static_assert(sizeof...(t_indices) == n_le || (is_avx_register<T_RegisterType> && sizeof...(t_indices) == n_e),
-                  "Number of indices must be identical to the number of elements or the number of lane elements.");
-}
+//    static_assert(sizeof...(t_indices) == n_le || (is_avx_register<T_RegisterType> && sizeof...(t_indices) == n_e),
+//                  "Number of indices must be identical to the number of elements or the number of lane elements.");
+//}
 
 
 // --------------------------------------------------------------------------------------------------------------------
