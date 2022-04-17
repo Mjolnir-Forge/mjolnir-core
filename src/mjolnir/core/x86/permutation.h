@@ -615,15 +615,27 @@ template <UST t_lane_0, UST t_lane_1, FloatAVXRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-// template <UST... t_indices, FloatVectorRegister T_RegisterType>
-//[[nodiscard]] inline auto shuffle(T_RegisterType src_0, T_RegisterType scr_1) noexcept -> T_RegisterType
-//{
-//    constexpr UST n_e  = num_elements<T_RegisterType>;
-//    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+template <UST... t_indices, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto shuffle(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType
+{
+    constexpr UST n_e  = num_elements<T_RegisterType>;
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
 
-//    static_assert(sizeof...(t_indices) == n_le || (is_avx_register<T_RegisterType> && sizeof...(t_indices) == n_e),
-//                  "Number of indices must be identical to the number of elements or the number of lane elements.");
-//}
+    static_assert(sizeof...(t_indices) == n_le || (is_m256d<T_RegisterType> && sizeof...(t_indices) == n_e),
+                  "Number of indices must be identical to the number of lane elements (or elements for __m256d).");
+
+    constexpr auto get_mask = []() -> UST
+    {
+        if constexpr (is_single_precision<T_RegisterType>)
+            return bit_construct_from_ints<2, UST, t_indices...>(true);
+        else if constexpr (sizeof...(t_indices) == num_elements<T_RegisterType>)
+            return bit_construct<UST, t_indices...>(true);
+        else
+            return bit_construct<UST, t_indices..., t_indices...>(true);
+    };
+
+    return mm_shuffle<get_mask()>(src_0, src_1);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

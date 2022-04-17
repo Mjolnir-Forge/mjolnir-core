@@ -211,6 +211,26 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Return a register with the first half of the lane elements selected from `a` and the second half from `b`.
+//!
+//! @tparam t_mask:
+//! An integer value used as control mask. Consult the intel intrinsics guide for further information. Note that this
+//! library provides template functions in `permute.h` to apply the correct mask for each use-case.
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] a:
+//! First register
+//! @param [in] b:
+//! Second register
+//!
+//! @return
+//! New register with shuffled values
+template <UST t_mask, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_shuffle(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Store the content of a register to a memory address
 //!
 //! @tparam T_RegisterType:
@@ -412,6 +432,22 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_setzero_ps();
     else
         return _mm256_setzero_pd();
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_mask, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_shuffle(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_shuffle_ps(a, b, t_mask);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_shuffle_pd(a, b, t_mask);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_shuffle_ps(a, b, t_mask);
+    else
+        return _mm256_shuffle_pd(a, b, t_mask);
 }
 
 

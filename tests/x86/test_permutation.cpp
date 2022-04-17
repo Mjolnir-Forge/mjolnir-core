@@ -476,17 +476,89 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute_lanes) // NOLINT
 
 // --- test shuffle ---------------------------------------------------------------------------------------------------
 
-// template <typename T_RegisterType, UST t_test_index>
-// void test_shuffle_test_case(T_RegisterType a, T_RegisterType b) // NOLINT - complexity
-//{
-//    std::cout << std::endl;
-//}
+
+template <typename T_RegisterType>
+[[nodiscard]] constexpr inline auto get_shuffle_index_array(UST test_case_index) noexcept
+{
+    std::array<UST, num_lane_elements<T_RegisterType>> a = {{0}};
+
+    for (UST i = 0; i < a.size(); ++i)
+        if constexpr (is_single_precision<T_RegisterType>)
+            a.at(i) = get_bits_shift_max<2>(test_case_index, i * 2);
+        else
+            a.at(i) = get_bit_shift_max(test_case_index, i);
+    return a;
+}
 
 
-// TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_shuffle) // NOLINT
-//{
-//    TYPED_TEST_SERIES(test_shuffle_test_case, 4)
-//}
+template <typename T_RegisterType, UST t_test_index>
+void test_shuffle_test_case(T_RegisterType a, T_RegisterType b) // NOLINT - complexity
+{
+    constexpr UST  n_l   = num_lanes<T_RegisterType>;
+    constexpr UST  n_le  = num_lane_elements<T_RegisterType>;
+    constexpr UST  n_hle = n_le / 2;
+    constexpr auto v     = get_shuffle_index_array<T_RegisterType>(t_test_index);
+
+
+    auto c = mm_setzero<T_RegisterType>();
+    if constexpr (is_single_precision<T_RegisterType>)
+        c = shuffle<v[0], v[1], v[2], v[3]>(a, b);
+    else
+        c = shuffle<v[0], v[1]>(a, b);
+
+
+    for (UST i = 0; i < n_hle; ++i)
+        for (UST j = 0; j < n_l; ++j)
+        {
+            UST offset = j * n_le;
+            EXPECT_DOUBLE_EQ(get(c, i + offset), get(a, v[i] + offset));
+            EXPECT_DOUBLE_EQ(get(c, i + offset + n_hle), get(b, v[i + n_hle] + offset));
+        }
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_shuffle) // NOLINT
+{
+    constexpr UST n_le = num_lane_elements<TypeParam>;
+    TYPED_TEST_SERIES(test_shuffle_test_case, power(n_le, n_le))
+}
+
+
+[[nodiscard]] constexpr inline auto get_shuffle_m256d_index_array(UST test_case_index) noexcept
+{
+    std::array<UST, num_elements<__m256d>> a = {{0}};
+    for (UST i = 0; i < a.size(); ++i)
+        a.at(i) = get_bit_shift_max(test_case_index, i);
+    return a;
+}
+
+template <typename T_RegisterType, UST t_test_index>
+void test_shuffle_test_case_m256d(T_RegisterType a, T_RegisterType b) // NOLINT - complexity
+{
+    static_assert(is_m256d<T_RegisterType>, "Test is only compatible with m256d registers");
+
+    constexpr UST  n_le = num_lane_elements<T_RegisterType>;
+    constexpr auto v    = get_shuffle_m256d_index_array(t_test_index);
+
+    auto c = shuffle<v[0], v[1], v[2], v[3]>(a, b);
+
+
+    EXPECT_DOUBLE_EQ(get(c, 0), get(a, v[0]));
+    EXPECT_DOUBLE_EQ(get(c, 1), get(b, v[1]));
+    EXPECT_DOUBLE_EQ(get(c, 2), get(a, v[2] + n_le));
+    EXPECT_DOUBLE_EQ(get(c, 3), get(b, v[3] + n_le));
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_shuffle_m256_extra) // NOLINT
+{
+    if constexpr (is_m256d<TypeParam>)
+    {
+        constexpr UST n_e  = num_elements<TypeParam>;
+        constexpr UST n_le = num_lane_elements<TypeParam>;
+        TYPED_TEST_SERIES(test_shuffle_test_case_m256d, power(n_le, n_e))
+    }
+}
 
 
 // --- test shuffle_lanes ---------------------------------------------------------------------------------------------
