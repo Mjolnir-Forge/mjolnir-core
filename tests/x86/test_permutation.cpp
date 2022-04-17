@@ -477,16 +477,16 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute_lanes) // NOLINT
 // --- test shuffle ---------------------------------------------------------------------------------------------------
 
 
-template <typename T_RegisterType>
-[[nodiscard]] constexpr inline auto get_shuffle_index_array(UST test_case_index) noexcept
+template <typename T_RegisterType, UST t_test_index>
+[[nodiscard]] constexpr inline auto get_shuffle_index_array() noexcept
 {
     std::array<UST, num_lane_elements<T_RegisterType>> a = {{0}};
 
     for (UST i = 0; i < a.size(); ++i)
         if constexpr (is_single_precision<T_RegisterType>)
-            a.at(i) = get_bits_shift_max<2>(test_case_index, i * 2);
+            a.at(i) = get_bits_shift_max<2>(t_test_index, i * 2);
         else
-            a.at(i) = get_bit_shift_max(test_case_index, i);
+            a.at(i) = get_bit_shift_max(t_test_index, i);
     return a;
 }
 
@@ -497,7 +497,7 @@ void test_shuffle_test_case(T_RegisterType a, T_RegisterType b) // NOLINT - comp
     constexpr UST  n_l   = num_lanes<T_RegisterType>;
     constexpr UST  n_le  = num_lane_elements<T_RegisterType>;
     constexpr UST  n_hle = n_le / 2;
-    constexpr auto v     = get_shuffle_index_array<T_RegisterType>(t_test_index);
+    constexpr auto v     = get_shuffle_index_array<T_RegisterType, t_test_index>();
 
 
     auto c = mm_setzero<T_RegisterType>();

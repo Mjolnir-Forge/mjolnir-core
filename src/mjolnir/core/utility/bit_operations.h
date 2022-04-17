@@ -426,6 +426,19 @@ namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
+namespace internal
+{
+template <std::integral T_Type>
+[[nodiscard]] constexpr inline auto abs(T_Type value) noexcept -> T_Type
+{
+    if (value < 0)
+        return -value;
+    return value;
+}
+
+} // namespace internal
+
+
 template <std::unsigned_integral T_Type, UST... t_bit_values>
 [[nodiscard]] consteval inline auto bit_construct([[maybe_unused]] bool left_is_low) noexcept -> T_Type
 {
@@ -534,7 +547,7 @@ template <UST t_index, I32 t_shift, std::unsigned_integral T_Type, std::unsigned
     else
     {
         static_assert(t_index >= -t_shift, "Shift exceeds lowest bit");
-        return bit >> static_cast<UST>(std::abs(t_shift));
+        return bit >> static_cast<UST>(internal::abs(t_shift));
     }
 }
 
@@ -555,8 +568,8 @@ template <std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
         return bit << static_cast<UST>(shift);
     }
 
-    assert(index >= std::abs(shift)); // NOLINT
-    return bit >> static_cast<UST>(std::abs(shift));
+    assert(index >= internal::abs(shift)); // NOLINT
+    return bit >> static_cast<UST>(internal::abs(shift));
 }
 
 
@@ -608,7 +621,7 @@ template <UST t_index, UST t_num_bits, I32 t_shift, std::unsigned_integral T_Typ
     else
     {
         static_assert(t_index >= -t_shift, "Shifted bits exceed lowest bit.");
-        return bits >> static_cast<UST>(std::abs(t_shift));
+        return bits >> static_cast<UST>(internal::abs(t_shift));
     }
 }
 
@@ -630,8 +643,8 @@ template <UST t_num_bits, std::unsigned_integral T_Type, std::unsigned_integral 
         return bits << static_cast<UST>(shift);
     }
 
-    assert(index >= std::abs(shift)); // NOLINT
-    return bits >> static_cast<UST>(std::abs(shift));
+    assert(index >= internal::abs(shift)); // NOLINT
+    return bits >> static_cast<UST>(internal::abs(shift));
 }
 
 
