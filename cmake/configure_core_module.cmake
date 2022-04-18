@@ -81,7 +81,8 @@ if(MSVC)
     set(MJOLNIR_CORE_COMPILE_OPTIONS /W4 /arch:AVX2
                                      ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
     if(${MJOLNIR_CORE_ENABLE_TESTS})
-        set(MJOLNIR_CORE_COMPILE_OPTIONS ${MJOLNIR_CORE_COMPILE_OPTIONS} /bigobj)
+        set(MJOLNIR_CORE_COMPILE_OPTIONS ${MJOLNIR_CORE_COMPILE_OPTIONS}
+                                         /bigobj)
     endif()
 else()
     set(MJOLNIR_CORE_COMPILE_OPTIONS
