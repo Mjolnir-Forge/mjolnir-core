@@ -429,13 +429,23 @@ namespace mjolnir
 //! \cond DO_NOT_DOCUMENT
 namespace internal
 {
+//! @note
+//! This function is necessary because `std::abs` is not `constepr` in the currently used compiler/STL versions.
 template <std::integral T_Type>
 [[nodiscard]] constexpr inline auto abs(T_Type value) noexcept -> T_Type
 {
-    if (value < 0)
-        return -value;
-    return value;
+    if constexpr (std::is_unsigned_v<T_Type>)
+    {
+        return value;
+    }
+    else
+    {
+        // source: https://stackoverflow.com/a/9772647/6700329
+        int const mask = value >> (sizeof(T_Type) * CHAR_BIT - 1);
+        return (value + mask) ^ mask;
+    }
 }
+
 
 } // namespace internal
 //! \endcond
