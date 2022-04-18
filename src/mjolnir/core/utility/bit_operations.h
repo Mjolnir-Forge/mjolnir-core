@@ -441,8 +441,9 @@ template <std::integral T_Type>
     else
     {
         // source: https://stackoverflow.com/a/9772647/6700329
-        int const mask = value >> (sizeof(T_Type) * CHAR_BIT - 1);
-        return (value + mask) ^ mask;
+        // regarding nolint: https://stackoverflow.com/a/58845898/6700329
+        int const mask = value >> (sizeof(T_Type) * CHAR_BIT - 1); // NOLINT(hicpp-signed-bitwise)
+        return (value + mask) ^ mask;                              // NOLINT(hicpp-signed-bitwise)
     }
 }
 
