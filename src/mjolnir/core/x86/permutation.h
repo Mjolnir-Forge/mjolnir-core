@@ -295,6 +295,31 @@ template <UST t_lane_0, UST t_lane_1, FloatAVXRegister T_RegisterType>
 
 
 //! @brief
+//! Return a register with the first half of the lane elements selected from `src_0` and the second half from `src_1`.
+//!
+//! @details
+//! Each integer of the parameter pack specifies the index of the value that should be taken from the corresponding
+//! source register. The first half of a lane is taken from the source `src_0` and the second from `src_1`. The number
+//! of integers must be equal to the number of lane values. Therefore, the pattern is identical for each lane. The sole
+//! exception is the `__m256d` register. Here the pattern might differ if you provide 4 instead of 2 indices.
+//!
+//! @tparam t_indices:
+//! Parameter pack of indices that specify which elements are chosen from the source registers.
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src_0:
+//! First source register
+//! @param[in] src_1:
+//! Second source register
+//!
+//! @return
+//! New register with shuffled values
+template <UST... t_indices, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto shuffle(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Create a new AVX register by combining arbitrary lanes from two source registers.
 //!
 //! @tparam t_src_0:

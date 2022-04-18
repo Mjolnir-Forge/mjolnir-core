@@ -424,8 +424,9 @@ constexpr inline void set_bits_with_int(T_Type& integer, UST index, UST value) n
 
 namespace mjolnir
 {
-// --------------------------------------------------------------------------------------------------------------------
+// ---internal definitions --------------------------------------------------------------------------------------------
 
+//! \cond DO_NOT_DOCUMENT
 namespace internal
 {
 template <std::integral T_Type>
@@ -437,6 +438,10 @@ template <std::integral T_Type>
 }
 
 } // namespace internal
+//! \endcond
+
+
+// --- public definitions ---------------------------------------------------------------------------------------------
 
 
 template <std::unsigned_integral T_Type, UST... t_bit_values>
