@@ -511,8 +511,8 @@ void test_shuffle_test_case(T_RegisterType a, T_RegisterType b) // NOLINT - comp
         for (UST j = 0; j < n_l; ++j)
         {
             UST offset = j * n_le;
-            EXPECT_DOUBLE_EQ(get(c, i + offset), get(a, v[i] + offset));
-            EXPECT_DOUBLE_EQ(get(c, i + offset + n_hle), get(b, v[i + n_hle] + offset));
+            EXPECT_DOUBLE_EQ(get(c, i + offset), get(a, v.at(i) + offset));
+            EXPECT_DOUBLE_EQ(get(c, i + offset + n_hle), get(b, v.at(i + n_hle) + offset));
         }
 }
 
