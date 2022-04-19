@@ -597,6 +597,36 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_shuffle_lanes) // NOLINT
 }
 
 
+// --- test swap -----------------------------------------------------------------------------------------------------
+
+
+template <typename T_RegisterType, UST t_test_index>
+void test_swap_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT - complexity
+{
+    constexpr UST n_e   = num_elements<T_RegisterType>;
+    constexpr UST idx_0 = t_test_index / n_e;
+    constexpr UST idx_1 = t_test_index % n_e;
+
+    auto c = swap<idx_0, idx_1>(a);
+
+    for (UST i = 0; i < n_e; ++i)
+    {
+        UST idx = (i == idx_0) ? idx_1 : (i == idx_1) ? idx_0 : i;
+        EXPECT_DOUBLE_EQ(get(c, i), get(a, idx));
+    }
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_swap) // NOLINT
+{
+    constexpr UST n_e = num_elements<TypeParam>;
+    if constexpr (is_avx_register<TypeParam>)
+    {
+        TYPED_TEST_SERIES(test_swap_test_case, power(n_e, 2))
+    }
+}
+
+
 // --- test swap_lanes ------------------------------------------------------------------------------------------------
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_swap_lanes) // NOLINT

@@ -678,6 +678,41 @@ template <UST t_src_0, UST t_lane_0, UST t_src_1, UST t_lane_1, FloatAVXRegister
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <UST t_idx_0, UST t_idx_1, FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto swap(T_RegisterType src) -> T_RegisterType
+{
+    constexpr UST n_e  = num_elements<T_RegisterType>;
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    constexpr UST lane_0 = t_idx_0 / n_le;
+    constexpr UST lane_1 = t_idx_1 / n_le;
+
+    if constexpr (lane_0 == lane_1)
+    {
+        auto get_index_array = []() constexpr->std::array<UST, n_e>
+        {
+            std::array<UST, n_e> a = {{0}};
+            for (UST i = 0; i < n_e; ++i)
+                a[i] = ((t_idx_0 == i) ? t_idx_1 : (t_idx_1 == i) ? t_idx_0 : i) % n_le;
+            return a;
+        };
+        constexpr auto idx = get_index_array();
+
+        if constexpr (n_e == 2)
+            return permute<idx[0], idx[1]>(src);
+        else if constexpr (n_e == 4)
+            return permute<idx[0], idx[1], idx[2], idx[3]>(src);
+        else
+            return permute<idx[0], idx[1], idx[2], idx[3], idx[4], idx[5], idx[6], idx[7]>(src);
+    }
+    else
+    {
+        return mm_setzero<T_RegisterType>();
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <FloatAVXRegister T_RegisterType>
 [[nodiscard]] inline auto swap_lanes(T_RegisterType src) noexcept -> T_RegisterType
 {
