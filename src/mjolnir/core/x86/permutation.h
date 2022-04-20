@@ -347,6 +347,28 @@ template <UST t_src_0, UST t_lane_0, UST t_src_1, UST t_lane_1, FloatAVXRegister
 
 
 //! @brief
+//! Swap two elements of a register and return the result.
+//!
+//! @details
+//! Swapping across lane boundaries is supported but more expensive than swapping inside lanes.
+//!
+//! @tparam t_idx_0:
+//! Index of the first element that should be swapped.
+//! @tparam t_idx_1:
+//! Index of the second element that should be swapped.
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src:
+//! The source register
+//!
+//! @return
+//! New register with swapped values
+template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto swap(T_RegisterType src) -> T_RegisterType;
+
+
+//! @brief
 //! Swap the lanes of an AVX register and return the result.
 //!
 //! @tparam T_RegisterType:
