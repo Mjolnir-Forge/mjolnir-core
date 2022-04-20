@@ -609,6 +609,7 @@ void test_swap_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) //
 
     auto c = swap<idx_0, idx_1>(a);
 
+    std::cout << idx_0 << idx_1 << std::endl;
     for (UST i = 0; i < n_e; ++i)
     {
         UST idx = (i == idx_0) ? idx_1 : (i == idx_1) ? idx_0 : i;
@@ -620,10 +621,7 @@ void test_swap_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) //
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_swap) // NOLINT
 {
     constexpr UST n_e = num_elements<TypeParam>;
-    if constexpr (is_avx_register<TypeParam>)
-    {
-        TYPED_TEST_SERIES(test_swap_test_case, power(n_e, 2))
-    }
+    TYPED_TEST_SERIES(test_swap_test_case, power(n_e, 2))
 }
 
 
