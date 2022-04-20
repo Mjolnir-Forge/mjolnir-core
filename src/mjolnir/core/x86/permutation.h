@@ -709,6 +709,7 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
             else if constexpr (n_e == 4)
                 return permute<p[0], p[1], p[2], p[3]>(src);
             else
+                // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
                 return permute<p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]>(src);
         }
         else
@@ -733,6 +734,7 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
             if constexpr (n_e == 4)
                 return blend<b[0], b[1], b[2], b[3]>(src, tmp);
             else
+                // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
                 return blend<b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]>(src, tmp);
         }
     }
