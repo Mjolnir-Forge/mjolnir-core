@@ -698,67 +698,92 @@ template <UST t_src_0, UST t_lane_0, UST t_src_1, UST t_lane_1, FloatAVXRegister
 }
 
 
+// --- internal functions of swap -------------------------------------------------------------------------------------
+
+//! \cond DO_NOT_DOCUMENT
+namespace internal
+{
+template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto swap_same_lane(T_RegisterType src) -> T_RegisterType
+{
+    constexpr UST n_e  = num_elements<T_RegisterType>;
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    auto get_permute_index_array = []() constexpr->std::array<UST, n_e>
+    {
+        std::array<UST, n_e> a = {{0}};
+        for (UST i = 0; i < n_e; ++i)
+            a[i] = ((t_idx_0 == i) ? t_idx_1 : (t_idx_1 == i) ? t_idx_0 : i) % n_le;
+        return a;
+    };
+    constexpr auto p = get_permute_index_array();
+
+    if constexpr (n_e == 2)
+        return permute<p[0], p[1]>(src);
+    else if constexpr (n_e == 4)
+        return permute<p[0], p[1], p[2], p[3]>(src);
+    else
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+        return permute<p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]>(src);
+}
+
+
+// --------------------------------------------------------
+
+template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto swap_different_lane(T_RegisterType src) -> T_RegisterType
+{
+    constexpr UST n_e  = num_elements<T_RegisterType>;
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    constexpr U32 idx_lane_0 = (t_idx_0 < t_idx_1) ? t_idx_0 : t_idx_1;
+    constexpr U32 idx_lane_1 = ((t_idx_0 > t_idx_1) ? t_idx_0 : t_idx_1) % n_le;
+
+    auto get_blend_index_array = []() constexpr->std::array<UST, n_e>
+    {
+        std::array<UST, n_e> a = {{0}};
+        for (UST i = 0; i < n_le; ++i)
+        {
+            a[i]        = (idx_lane_0 == i) ? 1 : 0;
+            a[i + n_le] = (idx_lane_1 == i) ? 1 : 0;
+        }
+        return a;
+    };
+    constexpr auto b = get_blend_index_array();
+
+    T_RegisterType bc  = broadcast<idx_lane_0, idx_lane_1>(src);
+    T_RegisterType tmp = swap_lanes(bc);
+    if constexpr (n_e == 4)
+        return blend<b[0], b[1], b[2], b[3]>(src, tmp);
+    else
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+        return blend<b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]>(src, tmp);
+}
+
+} // namespace internal
+//! \endcond
+
+
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto swap(T_RegisterType src) -> T_RegisterType
 {
+    constexpr UST n_e = num_elements<T_RegisterType>;
+    static_assert(t_idx_0 < n_e && t_idx_1 < n_e, "Indices must be smaller than the number of register elements.");
+
     if constexpr (t_idx_0 == t_idx_1)
         return src;
     else
     {
-        constexpr UST n_e  = num_elements<T_RegisterType>;
-        constexpr UST n_le = num_lane_elements<T_RegisterType>;
-
-        static_assert(t_idx_0 < n_e && t_idx_1 < n_e, "Indices must be smaller than the number of register elements.");
-
+        constexpr UST n_le   = num_lane_elements<T_RegisterType>;
         constexpr UST lane_0 = t_idx_0 / n_le;
         constexpr UST lane_1 = t_idx_1 / n_le;
 
         if constexpr (lane_0 == lane_1)
-        {
-            auto get_permute_index_array = []() constexpr->std::array<UST, n_e>
-            {
-                std::array<UST, n_e> a = {{0}};
-                for (UST i = 0; i < n_e; ++i)
-                    a[i] = ((t_idx_0 == i) ? t_idx_1 : (t_idx_1 == i) ? t_idx_0 : i) % n_le;
-                return a;
-            };
-            constexpr auto p = get_permute_index_array();
-
-            if constexpr (n_e == 2)
-                return permute<p[0], p[1]>(src);
-            else if constexpr (n_e == 4)
-                return permute<p[0], p[1], p[2], p[3]>(src);
-            else
-                // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-                return permute<p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]>(src);
-        }
+            return internal::swap_same_lane<t_idx_0, t_idx_1>(src);
         else
-        {
-            constexpr U32 idx_lane_0 = (t_idx_0 < t_idx_1) ? t_idx_0 : t_idx_1;
-            constexpr U32 idx_lane_1 = ((t_idx_0 > t_idx_1) ? t_idx_0 : t_idx_1) % n_le;
-
-            auto get_blend_index_array = []() constexpr->std::array<UST, n_e>
-            {
-                std::array<UST, n_e> a = {{0}};
-                for (UST i = 0; i < n_le; ++i)
-                {
-                    a[i]        = (idx_lane_0 == i) ? 1 : 0;
-                    a[i + n_le] = (idx_lane_1 == i) ? 1 : 0;
-                }
-                return a;
-            };
-            constexpr auto b = get_blend_index_array();
-
-            T_RegisterType bc  = broadcast<idx_lane_0, idx_lane_1>(src);
-            T_RegisterType tmp = swap_lanes(bc);
-            if constexpr (n_e == 4)
-                return blend<b[0], b[1], b[2], b[3]>(src, tmp);
-            else
-                // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-                return blend<b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]>(src, tmp);
-        }
+            return internal::swap_different_lane<t_idx_0, t_idx_1>(src);
     }
 }
 
