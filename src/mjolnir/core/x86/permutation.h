@@ -383,6 +383,23 @@ template <FloatAVXRegister T_RegisterType>
 [[nodiscard]] inline auto swap_lanes(T_RegisterType src) noexcept -> T_RegisterType;
 
 
+//! @brief
+//! Return a new register with or without swapped lanes depending on the value of the boolean template parameter.
+//!
+//! @tparam t_swap_lanes:
+//! Decides if the lanes should be swapped or not
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src:
+//! Source register
+//!
+//! @return
+//! Register with or without swapped lanes
+template <bool t_swap_lanes, FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto swap_lanes_if(T_RegisterType src) noexcept -> T_RegisterType;
+
+
 //! @}
 } // namespace mjolnir::x86
 
@@ -718,6 +735,7 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
     };
     constexpr auto p = get_permute_index_array();
 
+
     if constexpr (n_e == 2)
         return permute<p[0], p[1]>(src);
     else if constexpr (n_e == 4)
@@ -750,6 +768,7 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
         return a;
     };
     constexpr auto b = get_blend_index_array();
+
 
     T_RegisterType bc  = broadcast<idx_lane_0, idx_lane_1>(src);
     T_RegisterType tmp = swap_lanes(bc);
@@ -798,5 +817,15 @@ template <FloatAVXRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <bool t_swap_lanes, FloatAVXRegister T_RegisterType>
+[[nodiscard]] inline auto swap_lanes_if(T_RegisterType src) noexcept -> T_RegisterType
+{
+    if constexpr (t_swap_lanes)
+        return swap_lanes(src);
+    else
+        return src;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
 
 } // namespace mjolnir::x86

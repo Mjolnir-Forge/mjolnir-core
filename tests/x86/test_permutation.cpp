@@ -609,7 +609,6 @@ void test_swap_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) //
 
     auto c = swap<idx_0, idx_1>(a);
 
-    std::cout << idx_0 << idx_1 << std::endl;
     for (UST i = 0; i < n_e; ++i)
     {
         UST idx = (i == idx_0) ? idx_1 : (i == idx_1) ? idx_0 : i;
@@ -645,5 +644,40 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_swap_lanes) // NOLINT
             EXPECT_DOUBLE_EQ(get(c, i), get(a, i + n_le));
             EXPECT_DOUBLE_EQ(get(c, i + n_le), get(a, i));
         }
+    }
+}
+
+
+// --- test swap_lanes_if ---------------------------------------------------------------------------------------------
+
+template <typename T_RegisterType, UST t_test_index>
+void test_swap_lanes_if_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT - complexity
+{
+    constexpr UST  n_le      = num_lane_elements<T_RegisterType>;
+    constexpr bool condition = (t_test_index == 0) ? true : false;
+
+    auto c = swap_lanes_if<condition>(a);
+
+    if constexpr (condition == true)
+    {
+        for (UST i = 0; i < n_le; ++i)
+        {
+            EXPECT_DOUBLE_EQ(get(c, i), get(a, i + n_le));
+            EXPECT_DOUBLE_EQ(get(c, i + n_le), get(a, i));
+        }
+    }
+    else
+    {
+        for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
+            EXPECT_DOUBLE_EQ(get(c, i), get(a, i));
+    }
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_swap_lanes_if) // NOLINT
+{
+    if constexpr (is_avx_register<TypeParam>)
+    {
+        TYPED_TEST_SERIES(test_swap_lanes_if_test_case, 2)
     }
 }
