@@ -654,11 +654,11 @@ template <typename T_RegisterType, UST t_test_index>
 void test_swap_lanes_if_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT - complexity
 {
     constexpr UST  n_le      = num_lane_elements<T_RegisterType>;
-    constexpr bool condition = (t_test_index == 0) ? true : false;
+    constexpr bool condition = t_test_index == 0;
 
     auto c = swap_lanes_if<condition>(a);
 
-    if constexpr (condition == true)
+    if constexpr (condition)
     {
         for (UST i = 0; i < n_le; ++i)
         {
