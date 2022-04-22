@@ -256,7 +256,6 @@ inline auto insert(__m128 src, __m128 dst) -> __m128;
 //! A set of indices equal to the number of register elements or the number of lane elements. In the latter case the
 //! permutation pattern is identical for all lanes. The N-th index selects the value for the N-th element/lane element.
 //! Index values may not exceed the lane size of a register. Otherwise a compile-time error is triggered.
-//!
 //! @tparam T_RegisterType:
 //! The register type
 //!
@@ -280,7 +279,6 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 //! A set of indices equal to the number of register elements. The N-th index selects the value for the N-th
 //! element/lane element. Index values may not exceed the number of register elements. Otherwise a compile-time error is
 //! triggered.
-//!
 //! @tparam T_RegisterType:
 //! The register type
 //!
@@ -289,10 +287,6 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 //!
 //! @return
 //! New register with shuffled values
-//!
-//! @todo
-//! assert that the 8 indices for the __m256 case do not exceed number of lane elemets. Maybe write a generalized
-//! function for integer based parameter packs
 template <UST... t_indices, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto permute_accross_lanes(T_RegisterType src) noexcept -> T_RegisterType;
 

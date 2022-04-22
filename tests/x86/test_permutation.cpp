@@ -482,12 +482,12 @@ template <>
 
     switch (index)
     {
-        case 0: return IndexArray{{0, 1, 2, 3, 4, 5, 6, 7}};
-        case 1: return IndexArray{{7, 6, 5, 4, 3, 2, 1, 0}};
-        case 2: return IndexArray{{1, 2, 3, 0, 1, 2, 3, 0}};
-        case 3: return IndexArray{{5, 6, 7, 4, 5, 6, 7, 4}};
-        case 4: return IndexArray{{1, 6, 4, 3, 2, 0, 7, 5}};
-        default: return IndexArray{{5, 7, 6, 4, 1, 0, 3, 2}};
+        case 0: return IndexArray{{0, 1, 2, 3, 4, 5, 6, 7}};  // NOLINT - magic number
+        case 1: return IndexArray{{7, 6, 5, 4, 3, 2, 1, 0}};  // NOLINT - magic number
+        case 2: return IndexArray{{1, 2, 3, 0, 1, 2, 3, 0}};  // NOLINT - magic number
+        case 3: return IndexArray{{5, 6, 7, 4, 5, 6, 7, 4}};  // NOLINT - magic number
+        case 4: return IndexArray{{1, 6, 4, 3, 2, 0, 7, 5}};  // NOLINT - magic number
+        default: return IndexArray{{5, 7, 6, 4, 1, 0, 3, 2}}; // NOLINT - magic number
     }
 }
 
@@ -521,7 +521,7 @@ void test_permute_accross_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_R
     else if constexpr (not is_m256<T_RegisterType>)
         c = permute_accross_lanes<p[0], p[1], p[2], p[3]>(a);
     else
-        c = permute_accross_lanes<p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]>(a);
+        c = permute_accross_lanes<p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]>(a); // NOLINT - magic number
 
 
     for (UST i = 0; i < n_e; ++i)
