@@ -567,6 +567,7 @@ template <UST t_index_0, UST t_index_1, FloatAVXRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
+//! @todo: check if using permute_accross lanes is faster in the last branch
 template <UST t_index, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto broadcast_across_lanes(T_RegisterType src) noexcept -> T_RegisterType
 {
@@ -664,6 +665,26 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
     {
         constexpr UST num_index_bits = num_lane_elements<T_RegisterType> / 2;
         return mm_permute<bit_construct_from_ints<num_index_bits, U8, t_indices...>(true)>(src);
+    }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST... t_indices, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto permute_accross_lanes(T_RegisterType src) noexcept -> T_RegisterType
+{
+    if constexpr (num_lanes<T_RegisterType> == 1)
+        return permute<t_indices...>(src);
+    else if constexpr (is_m256d<T_RegisterType>)
+    {
+        constexpr UST mask = bit_construct_from_ints<2, UST, t_indices...>(true);
+        return _mm256_permute4x64_pd(src, mask);
+    }
+    else
+    {
+        const __m256i mask = _mm256_setr_epi32(t_indices...);
+        return _mm256_permutevar8x32_ps(src, mask);
     }
 }
 

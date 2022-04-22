@@ -442,6 +442,100 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute) // NOLINT
 }
 
 
+// --- test permute_accross_lanes -------------------------------------------------------------------------------------
+
+template <typename T_RegisterType>
+[[nodiscard]] constexpr inline auto get_permute_accross_lanes_specific_indices(UST index) noexcept
+{
+    constexpr UST n_e = num_elements<T_RegisterType>;
+    using IndexArray  = std::array<U32, n_e>;
+
+    switch (index)
+    {
+        case 0: return IndexArray{{0, 1, 2, 3}};
+        case 1: return IndexArray{{3, 2, 1, 0}};
+        case 2: return IndexArray{{1, 2, 3, 2}};
+        case 3: return IndexArray{{3, 0, 1, 2}};
+        case 4: return IndexArray{{2, 3, 0, 1}};
+        default: return IndexArray{{3, 1, 0, 0}};
+    }
+}
+
+
+template <>
+[[nodiscard]] constexpr inline auto get_permute_accross_lanes_specific_indices<__m128d>(UST index) noexcept
+{
+    constexpr UST n_e = num_elements<__m128d>;
+    using IndexArray  = std::array<U32, n_e>;
+
+    if (index == 0)
+        return IndexArray{{1, 0}};
+    return IndexArray{{0, 1}};
+}
+
+
+template <>
+[[nodiscard]] constexpr inline auto get_permute_accross_lanes_specific_indices<__m256>(UST index) noexcept
+{
+    constexpr UST n_e = num_elements<__m256>;
+    using IndexArray  = std::array<U32, n_e>;
+
+    switch (index)
+    {
+        case 0: return IndexArray{{0, 1, 2, 3, 4, 5, 6, 7}};
+        case 1: return IndexArray{{7, 6, 5, 4, 3, 2, 1, 0}};
+        case 2: return IndexArray{{1, 2, 3, 0, 1, 2, 3, 0}};
+        case 3: return IndexArray{{5, 6, 7, 4, 5, 6, 7, 4}};
+        case 4: return IndexArray{{1, 6, 4, 3, 2, 0, 7, 5}};
+        default: return IndexArray{{5, 7, 6, 4, 1, 0, 3, 2}};
+    }
+}
+
+
+template <typename T_RegisterType>
+[[nodiscard]] constexpr inline auto get_permute_accross_lanes_index_array(UST index) noexcept
+{
+    constexpr UST n_e = num_elements<T_RegisterType>;
+
+    if (index < n_e)
+    {
+        std::array<U32, n_e> a = {{0}};
+        for (UST i = 0; i < a.size(); ++i)
+            a.at(i) = static_cast<U32>(index);
+        return a;
+    }
+
+    return get_permute_accross_lanes_specific_indices<T_RegisterType>(index - n_e);
+}
+
+template <typename T_RegisterType, UST t_index>
+void test_permute_accross_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT - complexity
+{
+    constexpr UST  n_e = num_elements<T_RegisterType>;
+    constexpr auto p   = get_permute_accross_lanes_index_array<T_RegisterType>(t_index);
+
+
+    auto c = mm_setzero<T_RegisterType>();
+    if constexpr (is_m128d<T_RegisterType>)
+        c = permute_accross_lanes<p[0], p[1]>(a);
+    else if constexpr (not is_m256<T_RegisterType>)
+        c = permute_accross_lanes<p[0], p[1], p[2], p[3]>(a);
+    else
+        c = permute_accross_lanes<p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]>(a);
+
+
+    for (UST i = 0; i < n_e; ++i)
+        EXPECT_DOUBLE_EQ(get(c, i), get(a, p.at(i)));
+}
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute_accross_lanes) // NOLINT
+{
+    constexpr UST n_e     = num_elements<TypeParam>;
+    constexpr UST n_extra = (is_m128d<TypeParam>) ? 2 : 6;
+    TYPED_TEST_SERIES(test_permute_accross_lanes_test_case, n_e + n_extra)
+}
+
+
 // --- test permute_lanes ---------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType, UST t_test_index>
