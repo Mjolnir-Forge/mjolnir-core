@@ -274,6 +274,30 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Shuffle the elements of a vector register accross lanes using indices and return the result in a new register.
+//!
+//! @tparam t_indices
+//! A set of indices equal to the number of register elements. The N-th index selects the value for the N-th
+//! element/lane element. Index values may not exceed the number of register elements. Otherwise a compile-time error is
+//! triggered.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src:
+//! The source register
+//!
+//! @return
+//! New register with shuffled values
+//!
+//! @todo
+//! assert that the 8 indices for the __m256 case do not exceed number of lane elemets. Maybe write a generalized
+//! function for integer based parameter packs
+template <UST... t_indices, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto permute_accross_lanes(T_RegisterType src) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Create a new AVX register by an arbitrary combination of the source registers lanes.
 //!
 //! @tparam t_lane_0:
