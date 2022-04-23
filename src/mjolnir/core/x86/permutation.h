@@ -691,7 +691,7 @@ template <UST t_index_src, UST t_index_dst, bool... t_set_zero>
 inline auto insert(__m128 src, __m128 dst) noexcept -> __m128
 {
     constexpr UST n_e = num_elements<__m128>;
-    static_assert(t_index_src < n_e & t_index_dst < n_e, "Indices exceed the register size.");
+    static_assert(t_index_src < n_e && t_index_dst < n_e, "Indices exceed the register size.");
 
     constexpr UST set_zero_mask  = bit_construct<UST, t_set_zero...>(true);
     constexpr UST selection_mask = bit_construct_from_ints<2, UST, t_index_src, t_index_dst>();
