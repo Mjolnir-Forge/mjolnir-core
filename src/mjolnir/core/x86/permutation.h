@@ -34,7 +34,7 @@ namespace mjolnir::x86
 //! @return
 //! Result register
 template <UST t_shift, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto align_right([[maybe_unused]] T_RegisterType lhs, [[maybe_unused]] T_RegisterType rhs)
+[[nodiscard]] inline auto align_right([[maybe_unused]] T_RegisterType lhs, [[maybe_unused]] T_RegisterType rhs) noexcept
         -> T_RegisterType;
 
 
@@ -249,7 +249,7 @@ inline void exchange(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept;
 //! @return
 //! A new `__m128` register with corresponding values
 template <UST t_index_src, UST t_index_dst, bool... t_set_zero>
-inline auto insert(__m128 src, __m128 dst) -> __m128;
+inline auto insert(__m128 src, __m128 dst) noexcept -> __m128;
 
 
 //! @brief
@@ -386,7 +386,7 @@ template <UST t_src_0, UST t_lane_0, UST t_src_1, UST t_lane_1, FloatAVXRegister
 //! @return
 //! New register with swapped values
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto swap(T_RegisterType src) -> T_RegisterType;
+[[nodiscard]] inline auto swap(T_RegisterType src) noexcept -> T_RegisterType;
 
 
 //! @brief
@@ -437,7 +437,7 @@ namespace mjolnir::x86
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_shift, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto align_right([[maybe_unused]] T_RegisterType lhs, [[maybe_unused]] T_RegisterType rhs)
+[[nodiscard]] inline auto align_right([[maybe_unused]] T_RegisterType lhs, [[maybe_unused]] T_RegisterType rhs) noexcept
         -> T_RegisterType
 {
     static_assert(t_shift <= num_lane_elements<T_RegisterType>, "t_shift must be in the range [0, num_lane_elements].");
@@ -606,6 +606,58 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 }
 
 
+// --- internal functions of exchange ---------------------------------------------------------------------------------
+
+//! \cond DO_NOT_DOCUMENT
+namespace internal
+{
+template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto exchange_same_lane(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept
+{
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    T_RegisterType tmp_0 = reg_0;
+    T_RegisterType tmp_1 = reg_1;
+
+    if constexpr (t_idx_0 != t_idx_1)
+    {
+        tmp_0 = broadcast<t_idx_0 % n_le>(tmp_0);
+        tmp_1 = broadcast<t_idx_1 % n_le>(tmp_1);
+    }
+
+    reg_0 = blend_at<t_idx_0>(reg_0, tmp_1); // NOLINT(readability-misleading-indentation) - clang-tidy bug
+    reg_1 = blend_at<t_idx_1>(reg_1, tmp_0);
+}
+
+
+// --------------------------------------------------------
+
+template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto exchange_different_lane(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept
+{
+    constexpr UST n_le       = num_lane_elements<T_RegisterType>;
+    constexpr UST lane_idx_0 = t_idx_0 / n_le;
+    constexpr UST lane_idx_1 = t_idx_1 / n_le;
+
+    constexpr UST select_reg_0  = (lane_idx_0 == 0) ? 1 : 0;
+    constexpr UST select_reg_1  = (lane_idx_1 == 0) ? 1 : 0;
+    constexpr U32 element_idx_0 = (lane_idx_0 == 0) ? t_idx_1 % n_le : t_idx_0 % n_le;
+    constexpr U32 element_idx_1 = (lane_idx_0 == 0) ? t_idx_0 % n_le : t_idx_1 % n_le;
+
+
+    T_RegisterType tmp_0 = shuffle_lanes<select_reg_0, 1, select_reg_1, 0>(reg_0, reg_1);
+
+    if constexpr (element_idx_0 != element_idx_1)
+        tmp_0 = broadcast<element_idx_0, element_idx_1>(tmp_0);
+
+    reg_0 = blend_at<t_idx_0>(reg_0, tmp_0);
+    reg_1 = blend_at<t_idx_1>(reg_1, tmp_0);
+}
+
+} // namespace internal
+//! \endcond
+
+
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_index_0, UST t_index_1, FloatVectorRegister T_RegisterType>
@@ -620,44 +672,16 @@ inline void exchange(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept
 
 
     if constexpr (lane_idx_0 == lane_idx_1)
-    {
-        T_RegisterType tmp_0 = reg_0;
-        T_RegisterType tmp_1 = reg_1;
-
-        if constexpr (t_index_0 != t_index_1)
-        {
-            tmp_0 = broadcast<t_index_0 % n_le>(tmp_0);
-            tmp_1 = broadcast<t_index_1 % n_le>(tmp_1);
-        }
-
-        reg_0 = blend_at<t_index_0>(reg_0, tmp_1); // NOLINT(readability-misleading-indentation) - clang-tidy bug
-        reg_1 = blend_at<t_index_1>(reg_1, tmp_0);
-    }
+        internal::exchange_same_lane<t_index_0, t_index_1>(reg_0, reg_1);
     else
-    {
-        constexpr UST select_reg_0  = (lane_idx_0 == 0) ? 1 : 0;
-        constexpr UST select_reg_1  = (lane_idx_1 == 0) ? 1 : 0;
-        constexpr U32 element_idx_0 = (lane_idx_0 == 0) ? t_index_1 % n_le : t_index_0 % n_le;
-        constexpr U32 element_idx_1 = (lane_idx_0 == 0) ? t_index_0 % n_le : t_index_1 % n_le;
-
-
-        T_RegisterType tmp_0 = shuffle_lanes<select_reg_0, 1, select_reg_1, 0>(reg_0, reg_1);
-
-        if constexpr (element_idx_0 != element_idx_1)
-        {
-            tmp_0 = broadcast<element_idx_0, element_idx_1>(tmp_0);
-        }
-
-        reg_0 = blend_at<t_index_0>(reg_0, tmp_0);
-        reg_1 = blend_at<t_index_1>(reg_1, tmp_0);
-    }
+        internal::exchange_different_lane<t_index_0, t_index_1>(reg_0, reg_1);
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_index_src, UST t_index_dst, bool... t_set_zero>
-inline auto insert(__m128 src, __m128 dst) -> __m128
+inline auto insert(__m128 src, __m128 dst) noexcept -> __m128
 {
     constexpr UST set_zero_mask  = bit_construct<UST, t_set_zero...>(true);
     constexpr UST selection_mask = bit_construct_from_ints<2, UST, t_index_src, t_index_dst>();
@@ -763,7 +787,7 @@ template <UST t_src_0, UST t_lane_0, UST t_src_1, UST t_lane_1, FloatAVXRegister
 namespace internal
 {
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto swap_same_lane(T_RegisterType src) -> T_RegisterType
+[[nodiscard]] inline auto swap_same_lane(T_RegisterType src) noexcept -> T_RegisterType
 {
     constexpr UST n_e  = num_elements<T_RegisterType>;
     constexpr UST n_le = num_lane_elements<T_RegisterType>;
@@ -791,7 +815,7 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------
 
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto swap_different_lane(T_RegisterType src) -> T_RegisterType
+[[nodiscard]] inline auto swap_different_lane(T_RegisterType src) noexcept -> T_RegisterType
 {
     constexpr UST n_e  = num_elements<T_RegisterType>;
     constexpr UST n_le = num_lane_elements<T_RegisterType>;
@@ -828,7 +852,7 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto swap(T_RegisterType src) -> T_RegisterType
+[[nodiscard]] inline auto swap(T_RegisterType src) noexcept -> T_RegisterType
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
     static_assert(t_idx_0 < n_e && t_idx_1 < n_e, "Indices must be smaller than the number of register elements.");
