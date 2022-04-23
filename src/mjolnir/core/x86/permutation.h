@@ -428,6 +428,7 @@ template <bool t_swap_lanes, FloatAVXRegister T_RegisterType>
 // === DEFINITIONS ====================================================================================================
 
 #include "mjolnir/core/utility/bit_operations.h"
+#include "mjolnir/core/utility/parameter_pack.h"
 #include "mjolnir/core/x86/intrinsics.h"
 
 #include <iostream>
@@ -466,6 +467,7 @@ template <UST... t_args, FloatVectorRegister T_RegisterType>
 {
     static_assert(sizeof...(t_args) == num_elements<T_RegisterType>,
                   "Number of template parameters must be equal to the number of register elements.");
+    static_assert(pp_all_less<t_args...>(2), "All template values must be in the range [0, 1]");
 
     return mm_blend<bit_construct<UST, t_args...>(true)>(src_0, src_1);
 }
@@ -592,6 +594,8 @@ template <UST t_index_0, UST t_index_1, FloatAVXRegister T_RegisterType>
 template <UST t_index, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto broadcast_across_lanes(T_RegisterType src) noexcept -> T_RegisterType
 {
+    static_assert(t_index < num_elements<T_RegisterType>, "Index exceeds register size.");
+
     if constexpr (t_index == 0)
         return mm_broadcast(src);
     else if constexpr (is_sse_register<T_RegisterType>)
@@ -611,6 +615,7 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 //! \cond DO_NOT_DOCUMENT
 namespace internal
 {
+//! Branch of the exchange function that covers cases where the exchanged elements are in the same register lane.
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto exchange_same_lane(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept
 {
@@ -632,6 +637,8 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 
 // --------------------------------------------------------
 
+
+//! Branch of the exchange function that covers cases where the exchanged elements are in different register lanes.
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto exchange_different_lane(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept
 {
@@ -683,6 +690,9 @@ inline void exchange(T_RegisterType& reg_0, T_RegisterType& reg_1) noexcept
 template <UST t_index_src, UST t_index_dst, bool... t_set_zero>
 inline auto insert(__m128 src, __m128 dst) noexcept -> __m128
 {
+    constexpr UST n_e = num_elements<__m128>;
+    static_assert(t_index_src < n_e & t_index_dst < n_e, "Indices exceed the register size.");
+
     constexpr UST set_zero_mask  = bit_construct<UST, t_set_zero...>(true);
     constexpr UST selection_mask = bit_construct_from_ints<2, UST, t_index_src, t_index_dst>();
     constexpr UST mask           = bit_construct_from_ints<4, UST, selection_mask, set_zero_mask>();
@@ -701,6 +711,8 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 
     static_assert(sizeof...(t_indices) == n_le || (is_avx_register<T_RegisterType> && sizeof...(t_indices) == n_e),
                   "Number of indices must be identical to the number of elements or the number of lane elements.");
+    static_assert(pp_all_less<t_indices...>(n_le),
+                  "All index values must be in the range [0, number of lane elements]");
 
     if constexpr (is_m256d<T_RegisterType> && sizeof...(t_indices) == n_le)
         return permute<t_indices..., t_indices...>(src);
@@ -719,6 +731,12 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 template <UST... t_indices, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto permute_accross_lanes(T_RegisterType src) noexcept -> T_RegisterType
 {
+    constexpr UST n_e = num_elements<T_RegisterType>;
+
+    static_assert(sizeof...(t_indices) == n_e, "Number of indices must be equal to the number of register elements.");
+    static_assert(pp_all_less<t_indices...>(n_e),
+                  "All template values must be in the range [0, number of register elements]");
+
     if constexpr (num_lanes<T_RegisterType> == 1)
         return permute<t_indices...>(src);
     else if constexpr (is_m256d<T_RegisterType>)
@@ -753,6 +771,8 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 
     static_assert(sizeof...(t_indices) == n_le || (is_m256d<T_RegisterType> && sizeof...(t_indices) == n_e),
                   "Number of indices must be identical to the number of lane elements (or elements for __m256d).");
+    static_assert(pp_all_less<t_indices...>(n_le),
+                  "All index values must be in the range [0, number of lane elements]");
 
     constexpr auto get_mask = []() -> UST
     {
@@ -773,6 +793,9 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 template <UST t_src_0, UST t_lane_0, UST t_src_1, UST t_lane_1, FloatAVXRegister T_RegisterType>
 [[nodiscard]] inline auto shuffle_lanes(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType
 {
+    static_assert(pp_all_less<t_src_0, t_lane_0, t_src_1, t_lane_1>(2),
+                  "All template values must be in the range [0, 1]");
+
     constexpr UST sel_0 = bit_construct<UST, t_src_0, t_lane_0>();
     constexpr UST sel_1 = bit_construct<UST, t_src_1, t_lane_1>();
     constexpr UST mask  = (sel_1 << 4U) | sel_0;
@@ -786,6 +809,7 @@ template <UST t_src_0, UST t_lane_0, UST t_src_1, UST t_lane_1, FloatAVXRegister
 //! \cond DO_NOT_DOCUMENT
 namespace internal
 {
+//! Branch of the swap function that handles cases where elements are swapped in the same lane.
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto swap_same_lane(T_RegisterType src) noexcept -> T_RegisterType
 {
@@ -814,6 +838,7 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 
 // --------------------------------------------------------
 
+//! Branch of the swap function that handles cases where elements are swapped accross lanes.
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto swap_different_lane(T_RegisterType src) noexcept -> T_RegisterType
 {
