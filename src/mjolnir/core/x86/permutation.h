@@ -9,6 +9,9 @@
 
 #include "mjolnir/core/x86/definitions.h"
 
+
+// === DECLARATION ====================================================================================================
+
 namespace mjolnir::x86
 {
 //! \addtogroup core_x86
