@@ -431,8 +431,6 @@ template <bool t_swap_lanes, FloatAVXRegister T_RegisterType>
 #include "mjolnir/core/utility/parameter_pack.h"
 #include "mjolnir/core/x86/intrinsics.h"
 
-#include <iostream>
-
 namespace mjolnir::x86
 {
 // --------------------------------------------------------------------------------------------------------------------
