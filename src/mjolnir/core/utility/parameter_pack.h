@@ -9,8 +9,8 @@
 
 #include "mjolnir/core/fundamental_types.h"
 
+#include <algorithm>
 #include <array>
-#include <concepts>
 
 
 // === DECLARATION ====================================================================================================
@@ -39,10 +39,12 @@ template <UST... t_pack>
     constexpr UST         size = sizeof...(t_pack);
     std::array<UST, size> a    = {{t_pack...}};
 
-    for (auto& e : a)
-        if (e >= value)
-            return false;
-    return true;
+    auto f = [value](UST e) -> bool
+    {
+        return e < value;
+    };
+
+    return std::all_of(a.begin(), a.end(), f);
 }
 
 
