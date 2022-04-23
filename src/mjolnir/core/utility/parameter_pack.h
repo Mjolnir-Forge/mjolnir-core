@@ -20,6 +20,18 @@ namespace mjolnir
 //! \addtogroup core_utility
 //! @{
 
+
+//! @brief
+//! Return `true` if all values of an unsigned integer parameter pack are less then a given value and `false` otherwise.
+//!
+//! @tparam t_pack:
+//! The parameter pack that should be checked
+//!
+//! @param[in] value:
+//! The reference value
+//!
+//! @return
+//! `true` or `false`
 template <UST... t_pack>
 [[nodiscard]] inline consteval auto pp_all_less(UST value) noexcept -> bool;
 
