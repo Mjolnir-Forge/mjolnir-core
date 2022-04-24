@@ -1,5 +1,5 @@
 //! @file
-//! direct_access.h
+//! permutation.h
 //!
 //! @brief
 //! Contains functions to permute and blend the elements of verctor registers.
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/x86/definitions.h"
 
 

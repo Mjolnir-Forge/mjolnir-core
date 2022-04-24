@@ -35,6 +35,19 @@ namespace mjolnir
 template <UST... t_pack>
 [[nodiscard]] inline consteval auto pp_all_less(UST value) noexcept -> bool;
 
+
+//! @brief
+//! Return `true` if all values of an boolean parameter pack are `true` and `false` otherwise.
+//!
+//! @tparam t_pack:
+//! The parameter pack that should be checked
+//!
+//! @return
+//! `true` or `false`
+template <bool... t_pack>
+[[nodiscard]] inline consteval auto pp_all_true() noexcept -> bool;
+
+
 //! @}
 } // namespace mjolnir
 
@@ -59,5 +72,21 @@ template <UST... t_pack>
     return std::all_of(a.begin(), a.end(), f);
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool... t_pack>
+[[nodiscard]] inline consteval auto pp_all_true() noexcept -> bool
+{
+    constexpr UST          size = sizeof...(t_pack);
+    std::array<bool, size> a    = {{t_pack...}};
+
+    auto f = [](UST e) -> bool
+    {
+        return e;
+    };
+
+    return std::all_of(a.begin(), a.end(), f);
+}
 
 } // namespace mjolnir

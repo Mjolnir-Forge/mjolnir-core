@@ -344,6 +344,22 @@ template <FloatVectorRegister T_RegisterTypeOut, IntegerVectorRegister T_Registe
 // --------------------------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_cmp_eq(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_cmpeq_ps(lhs, rhs);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_cmpeq_pd(lhs, rhs);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_cmp_ps(lhs, rhs, _CMP_EQ_OS);
+    else
+        return _mm256_cmp_pd(lhs, rhs, _CMP_EQ_OS);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_load(ElementType<T_RegisterType>* ptr) noexcept -> T_RegisterType
 {
     assert(is_aligned<alignment_bytes<T_RegisterType>>(ptr)); // NOLINT
@@ -356,6 +372,18 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_load_ps(ptr);
     else
         return _mm256_load_pd(ptr);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <IntegerVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_movemask_epi8(T_RegisterType src)
+{
+    if constexpr (is_m128i<T_RegisterType>)
+        return static_cast<U16>(_mm_movemask_epi8(src));
+    else
+        return static_cast<U32>(_mm256_movemask_epi8(src));
 }
 
 

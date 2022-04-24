@@ -85,6 +85,15 @@ inline constexpr bool is_m128d = std::is_same<T_Type, __m128d>::value;
 
 
 //! @brief
+//! Type dependent constant that is only `true` for `__m128i` and `false` for all other types.
+//!
+//! @tparam T_Type:
+//! Type
+template <typename T_Type>
+inline constexpr bool is_m128i = std::is_same<T_Type, __m128i>::value;
+
+
+//! @brief
 //! Type dependent constant that is only `true` for `__m256` and `false` for all other types.
 //!
 //! @tparam T_Type:
@@ -100,6 +109,15 @@ inline constexpr bool is_m256 = std::is_same<T_Type, __m256>::value;
 //! Type
 template <typename T_Type>
 inline constexpr bool is_m256d = std::is_same<T_Type, __m256d>::value;
+
+
+//! @brief
+//! Type dependent constant that is only `true` for `__m256i` and `false` for all other types.
+//!
+//! @tparam T_Type:
+//! Type
+template <typename T_Type>
+inline constexpr bool is_m256i = std::is_same<T_Type, __m256i>::value;
 
 
 //! @brief
@@ -138,19 +156,20 @@ template <typename T_Type>
 inline constexpr bool is_float_register = is_any_of<T_Type, __m128, __m128d, __m256, __m256d>();
 
 
+//! @brief
+//! Type dependent constant that is only `true` for x86 vector registers that have integer types as elements.
+//!
+//! @tparam T_Type:
+//! Type
+template <typename T_Type>
+inline constexpr bool is_integer_register = is_any_of<T_Type, __m128i, __m256i>();
+
+
 // ---internal declarations -------------------------------------------------------------------------------------------
 
 //! \cond DO_NOT_DOCUMENT
 namespace internal
 {
-//! Support structure to determine the element type of a float-based x86 vector register.
-template <FloatVectorRegister T_Type>
-struct ElementTypeStruct
-{
-    using Type = typename std::conditional<is_any_of<T_Type, __m128d, __m256d>(), F64, F32>::type;
-};
-
-
 //! Return the alignment in bytes for a register type.
 template <VectorRegister T_Type>
 [[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST;
@@ -172,7 +191,7 @@ template <VectorRegister T_Type>
 //! @tparam T_RegisterType:
 //! Register type
 template <FloatVectorRegister T_RegisterType>
-using ElementType = typename internal::ElementTypeStruct<T_RegisterType>::Type;
+using ElementType = typename std::conditional<is_any_of<T_RegisterType, __m128d, __m256d>(), F64, F32>::type;
 
 
 //! @brief
