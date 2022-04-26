@@ -55,8 +55,8 @@ constexpr auto SSECalculateComparisonValueAllTrue()
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_CompFunction, bool... t_cmp, FloatVectorRegister T_RegisterType>
-inline bool compare_all_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunction comp_func) noexcept
+template <typename T_CompFunction, FloatVectorRegister T_RegisterType, bool... t_cmp>
+inline auto compare_all_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunction comp_func) noexcept -> bool
 {
     // constexpr UST n_e    = num_elements<T_RegisterType>;
     constexpr UST n_bits = sizeof(ElementType<T_RegisterType>);
@@ -100,7 +100,8 @@ inline bool compare_all_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunct
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto compare_all_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_true<decltype(mm_cmp_eq<T_RegisterType>), t_cmp...>(lhs, rhs, &mm_cmp_eq<T_RegisterType>);
+    return compare_all_true<decltype(mm_cmp_eq<T_RegisterType>), T_RegisterType, t_cmp...>(
+            lhs, rhs, &mm_cmp_eq<T_RegisterType>);
 }
 
 
