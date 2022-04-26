@@ -49,7 +49,7 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 // NOLINTNEXTLINE
 #    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
         constexpr UST t_index = 0;                                                                                     \
-        \ CALL_TEST_CASE_FUNC(test_func);
+        CALL_TEST_CASE_FUNC(test_func);
 #endif
 
 
