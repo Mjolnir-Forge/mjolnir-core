@@ -53,60 +53,6 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 #endif
 
 
-// NOLINTNEXTLINE
-#define CALL_CHECK_FUNC_2(check_func_name) check_func_name<b[0], b[1]>(a.at(0), v)
-// NOLINTNEXTLINE
-#define CALL_CHECK_FUNC_4(check_func_name) check_func_name<b[0], b[1], b[2], b[3]>(a.at(0), v)
-// NOLINTNEXTLINE
-#define CALL_CHECK_FUNC_8(check_func_name) check_func_name<b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]>(a.at(0), v)
-
-// NOLINTNEXTLINE
-#define COMPARISON_TESTCASE_BODY(check_func_name)                                                                      \
-    auto           a = get_test_register_array<T_RegisterType>();                                                      \
-    constexpr auto b = get_test_case_boolean_array<T_RegisterType, t_test_case_index>();                               \
-                                                                                                                       \
-    for (auto& v : a)                                                                                                  \
-    {                                                                                                                  \
-        if constexpr (num_elements<T_RegisterType> == 2)                                                               \
-            CALL_CHECK_FUNC_2(check_func_name);                                                                        \
-        else if constexpr (num_elements<T_RegisterType> == 4)                                                          \
-            CALL_CHECK_FUNC_4(check_func_name);                                                                        \
-        else                                                                                                           \
-            CALL_CHECK_FUNC_8(check_func_name);                                                                        \
-    }
-
-// ====================================================================================================================
-// Tests
-// ====================================================================================================================
-
-#include <iostream>
-
-template <bool... t_bool, FloatVectorRegister T_RegisterType>
-void check_compare_equal(T_RegisterType a, T_RegisterType b)
-{
-    constexpr UST n_e        = num_elements<T_RegisterType>;
-    bool          res        = compare_all_equal<t_bool...>(a, b);
-    bool          exp_result = true;
-
-    std::array<bool, n_e> check = {{t_bool...}};
-    for (UST i = 0; i < n_e; ++i)
-    {
-        if (check.at(i))
-        {
-            // std::cout << get(a, i) << "-" << get(b, i) << "==" << (get(a, i) == get(b, i)) << std::endl;
-            exp_result &= (get(a, i) == get(b, i));
-        }
-        std::cout << check.at(i);
-    }
-    std::cout << std::endl;
-
-    // std::cout << res << '-' << exp_result << std::endl;
-    EXPECT_EQ(res, exp_result);
-    // if (not res == exp_result)
-    //    auto u = compare_all_equal<t_bool...>(a, b);
-}
-
-
 template <typename T_RegisterType>
 [[nodiscard]] auto get_test_register_array()
 {
@@ -151,8 +97,58 @@ template <typename T_RegisterType, UST t_test_case_index>
 }
 
 
-template <typename T_RegisterType, UST t_test_case_index>
-void test_compare_all_equal(){COMPARISON_TESTCASE_BODY(check_compare_equal)}
+// NOLINTNEXTLINE
+#define CALL_CMP_FUNC_2(cmp_func_name) cmp_func_name<c[0], c[1]>(a, b)
+// NOLINTNEXTLINE
+#define CALL_CMP_FUNC_4(cmp_func_name) cmp_func_name<c[0], c[1], c[2], c[3]>(a, b)
+// NOLINTNEXTLINE
+#define CALL_CMP_FUNC_8(cmp_func_name) cmp_func_name<c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7]>(a, b)
+
+// NOLINTNEXTLINE
+#define COMPARISON_TESTCASE(test_case_func_name, cmp_func_name, cmp_operator)                                          \
+    template <typename T_RegisterType, UST t_test_case_index>                                                          \
+    void test_case_func_name()                                                                                         \
+    {                                                                                                                  \
+        auto           t = get_test_register_array<T_RegisterType>();                                                  \
+        constexpr auto c = get_test_case_boolean_array<T_RegisterType, t_test_case_index>();                           \
+                                                                                                                       \
+        auto func = [&c](T_RegisterType a, T_RegisterType b)                                                           \
+        {                                                                                                              \
+            constexpr UST n_e        = num_elements<T_RegisterType>;                                                   \
+            bool          res        = false;                                                                          \
+            bool          exp_result = true;                                                                           \
+                                                                                                                       \
+            if constexpr (num_elements<T_RegisterType> == 2)                                                           \
+                res = CALL_CMP_FUNC_2(cmp_func_name);                                                                  \
+            else if constexpr (num_elements<T_RegisterType> == 4)                                                      \
+                res = CALL_CMP_FUNC_4(cmp_func_name);                                                                  \
+            else                                                                                                       \
+                res = CALL_CMP_FUNC_8(cmp_func_name);                                                                  \
+                                                                                                                       \
+            for (UST i = 0; i < n_e; ++i)                                                                              \
+                if (c.at(i))                                                                                           \
+                    exp_result &= (get(a, i) cmp_operator get(b, i));                                                  \
+                                                                                                                       \
+            std::cout << res << '-' << exp_result << std::endl;                                                        \
+            EXPECT_EQ(res, exp_result);                                                                                \
+        };                                                                                                             \
+                                                                                                                       \
+                                                                                                                       \
+        for (auto& v : t)                                                                                              \
+            func(t.at(0), v);                                                                                          \
+    }
+
+
+// ====================================================================================================================
+// Tests
+// ====================================================================================================================
+
+#include <iostream>
+
+
+// test compare_equal -------------------------------------------------------------------------------------------------
+
+COMPARISON_TESTCASE(test_compare_all_equal, compare_all_equal, ==)
 
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_align_right) // NOLINT

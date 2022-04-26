@@ -72,7 +72,7 @@ inline bool compare_all_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunct
     if constexpr (not pp_all_true<t_cmp...>()) // todo: pack all true implementieren
         result &= ref;                         // Set bits of elemts that should not be compared to zero
 
-    // std::cout << std::bitset<16>(result) << "-" << std::bitset<16>(ref) << std::endl;
+    // std::cout << std::bitset<32>(result) << "-" << std::bitset<32>(ref) << std::endl;
     return result == ref;
 }
 
