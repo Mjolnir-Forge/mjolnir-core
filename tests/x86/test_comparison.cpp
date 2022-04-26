@@ -56,32 +56,32 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 template <typename T_RegisterType>
 [[nodiscard]] auto get_test_register_array()
 {
-    return std::array<T_RegisterType, 5>{{mm_setr<T_RegisterType>(1, 2, 3, 4),
-                                          mm_setr<T_RegisterType>(4, 2, 3, 1),
-                                          mm_setr<T_RegisterType>(1, 2, 2, 4),
-                                          mm_setr<T_RegisterType>(1, 0, 3, 2),
-                                          mm_setr<T_RegisterType>(2, 1, 1, 0)}};
+    return std::array<T_RegisterType, 5>{{mm_setr<T_RegisterType>(1.F, 2.F, 3.F, 4.F),
+                                          mm_setr<T_RegisterType>(4.F, 2.F, 3.F, 1.F),
+                                          mm_setr<T_RegisterType>(1.F, 2.F, 2.F, 4.F),
+                                          mm_setr<T_RegisterType>(1.F, 0.F, 3.F, 2.F),
+                                          mm_setr<T_RegisterType>(2.F, 1.F, 1.F, 0.F)}};
 }
 
 
 template <>
 [[nodiscard]] auto get_test_register_array<__m128d>()
 {
-    return std::array<__m128d, 5>{{mm_setr<__m128d>(1, 2),
-                                   mm_setr<__m128d>(4, 2),
-                                   mm_setr<__m128d>(1, 4),
-                                   mm_setr<__m128d>(0, 1),
-                                   mm_setr<__m128d>(3, 4)}};
+    return std::array<__m128d, 5>{{mm_setr<__m128d>(1.F, 2.F),
+                                   mm_setr<__m128d>(4.F, 2.F),
+                                   mm_setr<__m128d>(1.F, 4.F),
+                                   mm_setr<__m128d>(0.F, 1.F),
+                                   mm_setr<__m128d>(3.F, 4.F)}};
 }
 
 
 template <>
 [[nodiscard]] auto get_test_register_array<__m256>()
 {
-    return std::array<__m256, 4>{{mm_setr<__m256>(1, 2, 3, 4, 5, 6, 7, 8),
-                                  mm_setr<__m256>(0, 0, 1, 3, 2, 5, 2, 1),
-                                  mm_setr<__m256>(4, 3, 5, 6, 6, 7, 9, 9),
-                                  mm_setr<__m256>(4, 2, 3, 1, 4, 6, 2, 6)}};
+    return std::array<__m256, 4>{{mm_setr<__m256>(1.F, 2.F, 3.F, 4.F, 5.F, 6.F, 7.F, 8.F),
+                                  mm_setr<__m256>(0.F, 0.F, 1.F, 3.F, 2.F, 5.F, 2.F, 1.F),
+                                  mm_setr<__m256>(4.F, 3.F, 5.F, 6.F, 6.F, 7.F, 9.F, 9.F),
+                                  mm_setr<__m256>(4.F, 2.F, 3.F, 1.F, 4.F, 6.F, 2.F, 6.F)}};
 }
 
 
