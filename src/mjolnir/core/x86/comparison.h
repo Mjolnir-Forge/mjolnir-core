@@ -9,6 +9,7 @@
 
 #include "mjolnir/core/fundamental_types.h"
 
+#include <concepts>
 
 // === DECLARATION ====================================================================================================
 
@@ -55,7 +56,9 @@ constexpr auto SSECalculateComparisonValueAllTrue()
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <FloatVectorRegister T_RegisterType, bool... t_cmp, typename T_CompFunction>
+template <bool... t_cmp,
+          FloatVectorRegister                            T_RegisterType,
+          std::invocable<T_RegisterType, T_RegisterType> T_CompFunction>
 inline auto compare_all_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunction comp_func) noexcept -> bool
 {
     // constexpr UST n_e    = num_elements<T_RegisterType>;
@@ -97,10 +100,21 @@ inline auto compare_all_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunct
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <FloatVectorRegister T_RegisterType, bool... t_cmp>
+// https://stackoverflow.com/a/12718449/6700329
+// https://stackoverflow.com/a/356993/6700329
+template <FloatVectorRegister T_RegisterType>
+struct CompEqual
+{
+    [[nodiscard]] inline auto operator()(T_RegisterType lhs, T_RegisterType rhs) const noexcept -> T_RegisterType
+    {
+        return mm_cmp_eq<T_RegisterType>(lhs, rhs);
+    }
+};
+
+template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto compare_all_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_true<T_RegisterType, t_cmp...>(lhs, rhs, mm_cmp_eq<T_RegisterType>);
+    return compare_all_true<t_cmp...>(lhs, rhs, CompEqual<T_RegisterType>());
 }
 
 

@@ -98,12 +98,11 @@ template <typename T_RegisterType, UST t_test_case_index>
 
 
 // NOLINTNEXTLINE
-#define CALL_CMP_FUNC_2(cmp_func_name) cmp_func_name<T_RegisterType, c[0], c[1]>(a, b)
+#define CALL_CMP_FUNC_2(cmp_func_name) cmp_func_name<c[0], c[1]>(a, b)
 // NOLINTNEXTLINE
-#define CALL_CMP_FUNC_4(cmp_func_name) cmp_func_name<T_RegisterType, c[0], c[1], c[2], c[3]>(a, b)
+#define CALL_CMP_FUNC_4(cmp_func_name) cmp_func_name<c[0], c[1], c[2], c[3]>(a, b)
 // NOLINTNEXTLINE
-#define CALL_CMP_FUNC_8(cmp_func_name)                                                                                 \
-    cmp_func_name<T_RegisterType, c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7]>(a, b)
+#define CALL_CMP_FUNC_8(cmp_func_name) cmp_func_name<c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7]>(a, b)
 
 // NOLINTNEXTLINE
 #define COMPARISON_TESTCASE(test_case_func_name, cmp_func_name, cmp_operator)                                          \
