@@ -9,8 +9,7 @@
 
 #include "mjolnir/core/fundamental_types.h"
 
-#include <algorithm>
-#include <array>
+#include <concepts>
 
 
 // === DECLARATION ====================================================================================================
@@ -19,6 +18,28 @@ namespace mjolnir
 {
 //! \addtogroup core_utility
 //! @{
+
+
+//! @brief
+//! Return `true` if the passed function object returns `true` for all parameter pack values as input.
+//!
+//! @details
+//! All values of the parameter pack need to be of the same type.
+//!
+//! @tparam T_CommonType:
+//! The common type of all parameter pack elements.
+//! @tparam t_pack:
+//! The parameter pack that should be checked
+//! @tparam T_Func:
+//! Type of the passed callable object.
+//!
+//! @param[in] func:
+//! The function or functor that should be evaluated with all parameter pack elements
+//!
+//! @return
+//! `true` or `false`
+template <typename T_CommonType, T_CommonType... t_pack, std::invocable<T_CommonType> T_Func>
+[[nodiscard]] inline consteval auto pp_all(T_Func func) noexcept -> bool;
 
 
 //! @brief
@@ -66,39 +87,35 @@ template <bool... t_pack>
 
 // === DEFINITIONS ====================================================================================================
 
+
+#include <algorithm>
+#include <array>
+
 namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-template <UST... t_pack>
-[[nodiscard]] inline consteval auto pp_all_less(UST value) noexcept -> bool
+template <typename T_CommonType, T_CommonType... t_pack, std::invocable<T_CommonType> T_Func>
+[[nodiscard]] inline consteval auto pp_all(T_Func func) noexcept -> bool
 {
-    constexpr UST         size = sizeof...(t_pack);
-    std::array<UST, size> a    = {{t_pack...}};
+    constexpr UST                  size = sizeof...(t_pack);
+    std::array<T_CommonType, size> a    = {{t_pack...}};
 
-    auto f = [value](UST e) -> bool
-    {
-        return e < value;
-    };
-
-    return std::all_of(a.begin(), a.end(), f);
+    return std::all_of(a.begin(), a.end(), func);
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool... t_pack>
-[[nodiscard]] inline consteval auto pp_all_true() noexcept -> bool
+template <UST... t_pack>
+[[nodiscard]] inline consteval auto pp_all_less(UST value) noexcept -> bool
 {
-    constexpr UST          size = sizeof...(t_pack);
-    std::array<bool, size> a    = {{t_pack...}};
-
-    auto f = [](UST e) -> bool
+    auto f = [value](UST e) -> bool
     {
-        return e;
+        return e < value;
     };
 
-    return std::all_of(a.begin(), a.end(), f);
+    return pp_all<UST, t_pack...>(f);
 }
 
 
@@ -107,15 +124,26 @@ template <bool... t_pack>
 template <bool... t_pack>
 [[nodiscard]] inline consteval auto pp_all_false() noexcept -> bool
 {
-    constexpr UST          size = sizeof...(t_pack);
-    std::array<bool, size> a    = {{t_pack...}};
-
-    auto f = [](UST e) -> bool
+    auto f = [](bool e) -> bool
     {
         return not e;
     };
 
-    return std::all_of(a.begin(), a.end(), f);
+    return pp_all<bool, t_pack...>(f);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool... t_pack>
+[[nodiscard]] inline consteval auto pp_all_true() noexcept -> bool
+{
+    auto f = [](bool e) -> bool
+    {
+        return e;
+    };
+
+    return pp_all<bool, t_pack...>(f);
 }
 
 
