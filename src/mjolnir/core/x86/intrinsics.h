@@ -12,6 +12,7 @@
 
 #include "mjolnir/core/x86/definitions.h"
 
+#include <concepts>
 
 namespace mjolnir::x86
 {
@@ -111,6 +112,25 @@ template <FloatVectorRegister T_RegisterTypeIn>
 template <FloatVectorRegister T_RegisterTypeOut, IntegerVectorRegister T_RegisterTypeIn>
 [[nodiscard]] inline auto mm_cast_if(T_RegisterTypeIn src) noexcept -> T_RegisterTypeOut;
 
+//! @brief
+//! Compare the register elements in `lhs` and `rhs` for equality and return the result.
+//!
+//! @details
+//! If a comparison is false, the corresponding value of the returned register is `0`. For single precision registers, a
+//! true comparison yields `0xFFFFFFFF`. For double precision registers it is `0xFFFFFFFFFFFFFFFF`.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return Register with the comparison results. See detailed description.
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_cmp_eq(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
+
 
 //! @brief
 //! Load data from an aligned memory location into a new register.
@@ -128,11 +148,29 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Create mask from the most significant bit of each 8-bit element in `src`, and return the result as unsigned integer.
+//!
+//! @details
+//! For SSE registers a 16 bit integer is returned. For AVX registers a 32 bit integer is returned.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] src:
+//! The source register
+//!
+//! @return
+//! The created mask
+template <IntegerVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_movemask_epi8(T_RegisterType src) noexcept;
+
+
+//! @brief
 //! Shuffle the elements in `src` using the control mask `t_mask` and return the resulting vector register.
 //!
 //! @tparam t_mask
-//! An integer value used as control mask. Consult the intel intrinsics guide for further information. Note that this
-//! library provides template functions in `permute.h` to apply the correct mask for each use-case.
+//! An integer value used as control mask. Consult the intel intrinsics guide for further information. Note that
+//! this library provides template functions in `permute.h` to apply the correct mask for each use-case.
 //! @tparam T_RegisterType
 //! The register type
 //!
@@ -378,7 +416,7 @@ template <FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <IntegerVectorRegister T_RegisterType>
-[[nodiscard]] inline auto mm_movemask_epi8(T_RegisterType src)
+[[nodiscard]] inline auto mm_movemask_epi8(T_RegisterType src) noexcept
 {
     if constexpr (is_m128i<T_RegisterType>)
         return static_cast<U16>(_mm_movemask_epi8(src));

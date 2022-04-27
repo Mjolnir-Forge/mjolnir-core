@@ -37,6 +37,18 @@ template <UST... t_pack>
 
 
 //! @brief
+//! Return `true` if all values of an boolean parameter pack are `false` and `false` otherwise.
+//!
+//! @tparam t_pack:
+//! The parameter pack that should be checked
+//!
+//! @return
+//! `true` or `false`
+template <bool... t_pack>
+[[nodiscard]] inline consteval auto pp_all_false() noexcept -> bool;
+
+
+//! @brief
 //! Return `true` if all values of an boolean parameter pack are `true` and `false` otherwise.
 //!
 //! @tparam t_pack:
