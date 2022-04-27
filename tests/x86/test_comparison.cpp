@@ -148,10 +148,10 @@ template <typename T_RegisterType, UST t_test_case_index>
 
 // test compare_equal -------------------------------------------------------------------------------------------------
 
-COMPARISON_TESTCASE(test_compare_all_equal, compare_all_equal, ==)
+COMPARISON_TESTCASE(test_compare_all_equal_selective, compare_all_equal, ==)
 
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_align_right) // NOLINT
 {
-    TYPED_TEST_SERIES(test_compare_all_equal, power_of_2(num_elements<TypeParam>) - 1)
+    TYPED_TEST_SERIES(test_compare_all_equal_selective, power_of_2(num_elements<TypeParam>) - 1)
 }

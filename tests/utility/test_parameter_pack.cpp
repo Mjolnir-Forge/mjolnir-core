@@ -29,6 +29,34 @@ TEST(ParameterPackTester, test_pp_all_less) // NOLINT
 }
 
 
+// test pp_all_false --------------------------------------------------------------------------------------------------
+
+TEST(ParameterPackTester, test_pp_all_false) // NOLINT
+{
+    EXPECT_TRUE((pp_all_false<false>()));
+    EXPECT_TRUE((pp_all_false<false, false>()));
+    EXPECT_TRUE((pp_all_false<false, false, false>()));
+    EXPECT_TRUE((pp_all_false<false, false, false, false>()));
+
+    EXPECT_FALSE((pp_all_false<true>()));
+
+    EXPECT_FALSE((pp_all_false<true, true>()));
+    EXPECT_FALSE((pp_all_false<true, false>()));
+    EXPECT_FALSE((pp_all_false<false, true>()));
+
+    EXPECT_FALSE((pp_all_false<true, true, true>()));
+    EXPECT_FALSE((pp_all_false<true, true, false>()));
+    EXPECT_FALSE((pp_all_false<true, false, true>()));
+    EXPECT_FALSE((pp_all_false<false, true, true>()));
+    EXPECT_FALSE((pp_all_false<true, false, false>()));
+    EXPECT_FALSE((pp_all_false<false, true, false>()));
+    EXPECT_FALSE((pp_all_false<false, false, true>()));
+
+
+    EXPECT_FALSE((pp_all_false<true, false, false, true>()));
+}
+
+
 // test pp_all_true ---------------------------------------------------------------------------------------------------
 
 TEST(ParameterPackTester, test_pp_all_true) // NOLINT

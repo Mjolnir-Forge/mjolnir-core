@@ -89,4 +89,22 @@ template <bool... t_pack>
     return std::all_of(a.begin(), a.end(), f);
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool... t_pack>
+[[nodiscard]] inline consteval auto pp_all_false() noexcept -> bool
+{
+    constexpr UST          size = sizeof...(t_pack);
+    std::array<bool, size> a    = {{t_pack...}};
+
+    auto f = [](UST e) -> bool
+    {
+        return not e;
+    };
+
+    return std::all_of(a.begin(), a.end(), f);
+}
+
+
 } // namespace mjolnir

@@ -41,20 +41,6 @@ namespace mjolnir::x86
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-/*
-template <FloatVectorRegister T_RegisterType, bool... t_cmp>
-constexpr auto SSECalculateComparisonValueAllTrue()
-{
-    using ReturnType = decltype(mm_movemask_epi8(mm_cast_fi(mm_setzero<T_RegisterType>())));
-
-
-    constexpr UST n_bits = sizeof(ElementType<T_RegisterType>);
-    constexpr UST val    = power_of_2(n_bits) - 1;
-    return bit_construct_from_ints<n_bits, ReturnType, (t_cmp * val)...>(true);
-}
-*/
-
-// --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_cmp,
           FloatVectorRegister                            T_RegisterType,
@@ -71,11 +57,9 @@ inline auto compare_all_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunct
     constexpr auto ref    = bit_construct_from_ints<n_bits, decltype(result), (t_cmp * val)...>(true);
 
 
-    // std::cout << std::bitset<16>(result) << "-" << std::bitset<16>(ref) << std::endl;
-    if constexpr (not pp_all_true<t_cmp...>()) // todo: pack all true implementieren
-        result &= ref;                         // Set bits of elemts that should not be compared to zero
+    if constexpr (not pp_all_true<t_cmp...>())
+        result &= ref; // Set bits of elemtens that shouldn't be compared to zero
 
-    // std::cout << std::bitset<32>(result) << "-" << std::bitset<32>(ref) << std::endl;
     return result == ref;
 }
 
@@ -103,7 +87,7 @@ inline auto compare_all_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunct
 // https://stackoverflow.com/a/12718449/6700329
 // https://stackoverflow.com/a/356993/6700329
 template <FloatVectorRegister T_RegisterType>
-struct CompEqual
+struct CompareEqual
 {
     [[nodiscard]] inline auto operator()(T_RegisterType lhs, T_RegisterType rhs) const noexcept -> T_RegisterType
     {
@@ -114,7 +98,7 @@ struct CompEqual
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto compare_all_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_true<t_cmp...>(lhs, rhs, CompEqual<T_RegisterType>());
+    return compare_all_true<t_cmp...>(lhs, rhs, CompareEqual<T_RegisterType>());
 }
 
 
