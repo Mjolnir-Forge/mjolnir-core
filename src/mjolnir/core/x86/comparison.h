@@ -178,7 +178,7 @@ compare_all_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc 
     {
         std::array<bool, n_e> arr = {{{0}}};
         for (UST i = t_idx_first; i < t_idx_first + t_length; ++i)
-            arr[i] = true;
+            arr.at(i) = true;
         return arr;
     };
     constexpr auto b = get_boolen_array();
@@ -189,6 +189,7 @@ compare_all_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc 
     else if constexpr (is_m128<T_RegisterType> || is_m256d<T_RegisterType>)
         return compare_all_selected_true<b[0], b[1], b[2], b[3]>(lhs, rhs, comp_func);
     else
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
         return compare_all_selected_true<b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]>(lhs, rhs, comp_func);
 }
 
