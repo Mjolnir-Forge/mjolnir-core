@@ -53,6 +53,8 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 #endif
 
 
+// create test registers ----------------------------------------------------------------------------------------------
+
 template <typename T_RegisterType>
 [[nodiscard]] auto get_test_register_array()
 {
@@ -85,14 +87,16 @@ template <>
 }
 
 
+// test case macro for selective comparison ---------------------------------------------------------------------------
+
 template <typename T_RegisterType, UST t_test_case_index>
-[[nodiscard]] constexpr auto get_test_case_boolean_array() -> std::array<bool, num_elements<T_RegisterType>>
+[[nodiscard]] constexpr auto get_selective_test_case_boolean_array() -> std::array<bool, num_elements<T_RegisterType>>
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
 
     std::array<bool, n_e> a = {{0}};
     for (UST i = 0; i < n_e; ++i)
-        a[i] = not is_bit_set(t_test_case_index, i);
+        a.at(i) = not is_bit_set(t_test_case_index, i);
     return a;
 }
 
@@ -105,15 +109,14 @@ template <typename T_RegisterType, UST t_test_case_index>
 #define CALL_CMP_FUNC_8(cmp_func_name) cmp_func_name<c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7]>(a, b)
 
 // NOLINTNEXTLINE
-#define COMPARISON_TESTCASE(test_case_func_name, cmp_func_name, cmp_operator)                                          \
+#define SELECTIVE_COMPARISON_TESTCASE(test_case_func_name, cmp_func_name, cmp_operator)                                \
     template <typename T_RegisterType, UST t_test_case_index>                                                          \
     void test_case_func_name()                                                                                         \
     {                                                                                                                  \
-        auto           t = get_test_register_array<T_RegisterType>();                                                  \
-        constexpr auto c = get_test_case_boolean_array<T_RegisterType, t_test_case_index>();                           \
-                                                                                                                       \
-        auto func = [&c](T_RegisterType a, T_RegisterType b)                                                           \
+        auto test_func = [](T_RegisterType a, T_RegisterType b)                                                        \
         {                                                                                                              \
+            constexpr auto c = get_selective_test_case_boolean_array<T_RegisterType, t_test_case_index>();             \
+                                                                                                                       \
             constexpr UST n_e        = num_elements<T_RegisterType>;                                                   \
             bool          res        = false;                                                                          \
             bool          exp_result = true;                                                                           \
@@ -129,13 +132,61 @@ template <typename T_RegisterType, UST t_test_case_index>
                 if (c.at(i))                                                                                           \
                     exp_result &= (get(a, i) cmp_operator get(b, i));                                                  \
                                                                                                                        \
-            std::cout << res << '-' << exp_result << std::endl;                                                        \
             EXPECT_EQ(res, exp_result);                                                                                \
         };                                                                                                             \
                                                                                                                        \
                                                                                                                        \
+        auto t = get_test_register_array<T_RegisterType>();                                                            \
+                                                                                                                       \
         for (auto& v : t)                                                                                              \
-            func(t.at(0), v);                                                                                          \
+            test_func(t.at(0), v);                                                                                     \
+    }
+
+
+// test case macro for sequential comparison --------------------------------------------------------------------------
+
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline constexpr auto get_idx_start(UST test_case_idx) noexcept -> UST
+{
+    constexpr UST n_e       = num_elements<T_RegisterType>;
+    UST           idx_start = 0;
+
+    while (test_case_idx >= gauss_summation(n_e) - gauss_summation(n_e - 1 - idx_start))
+        ++idx_start;
+    return idx_start;
+}
+
+
+// NOLINTNEXTLINE
+#define CALL_SEQ_CMP_FUNC(cmp_func_name) cmp_func_name<idx_start, length>(a, b)
+
+// NOLINTNEXTLINE
+#define SEQUENTIAL_COMPARISON_TESTCASE(test_case_func_name, cmp_func_name, cmp_operator)                               \
+    template <typename T_RegisterType, UST t_test_case_index>                                                          \
+    void test_case_func_name()                                                                                         \
+    {                                                                                                                  \
+        auto test_func = [](T_RegisterType a, T_RegisterType b)                                                        \
+        {                                                                                                              \
+            constexpr UST n_e                = num_elements<T_RegisterType>;                                           \
+            constexpr UST idx_start          = get_idx_start<T_RegisterType>(t_test_case_index);                       \
+            constexpr UST prev_start_inc_idx = gauss_summation(n_e) - gauss_summation(n_e - idx_start);                \
+            constexpr UST length             = t_test_case_index - prev_start_inc_idx + 1;                             \
+                                                                                                                       \
+            bool res = CALL_SEQ_CMP_FUNC(cmp_func_name);                                                               \
+                                                                                                                       \
+            bool exp_result = true;                                                                                    \
+            for (UST i = 0; i < length; ++i)                                                                           \
+                exp_result &= (get(a, i + idx_start) cmp_operator get(b, i + idx_start));                              \
+                                                                                                                       \
+            EXPECT_EQ(res, exp_result);                                                                                \
+        };                                                                                                             \
+                                                                                                                       \
+                                                                                                                       \
+        auto t = get_test_register_array<T_RegisterType>();                                                            \
+                                                                                                                       \
+        for (auto& v : t)                                                                                              \
+            test_func(t.at(0), v);                                                                                     \
     }
 
 
@@ -145,13 +196,24 @@ template <typename T_RegisterType, UST t_test_case_index>
 
 #include <iostream>
 
+// tast compare_all_in_sequence_equal ---------------------------------------------------------------------------------
+
+SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_equal, compare_all_in_sequence_equal, ==)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_equal) // NOLINT
+{
+    constexpr UST n_e = num_elements<TypeParam>;
+    TYPED_TEST_SERIES(test_compare_all_in_sequence_equal, gauss_summation(n_e))
+}
+
 
 // test compare_equal -------------------------------------------------------------------------------------------------
 
-COMPARISON_TESTCASE(test_compare_all_equal_selective, compare_all_equal, ==)
+SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_equal, compare_all_selected_equal, ==)
 
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_align_right) // NOLINT
 {
-    TYPED_TEST_SERIES(test_compare_all_equal_selective, power_of_2(num_elements<TypeParam>) - 1)
+    TYPED_TEST_SERIES(test_compare_all_selected_equal, power_of_2(num_elements<TypeParam>) - 1)
 }

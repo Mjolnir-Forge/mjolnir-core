@@ -21,6 +21,57 @@ namespace mjolnir::x86
 
 
 //! @brief
+//! Return `true` if the comparisons of all register elements in a specified sequence are `true` and `false` otherwise.
+//!
+//! @tparam t_idx_first:
+//! The index of the first register element that is part of the sequence
+//! @tparam t_length:
+//! The number of elements in the sequence
+//! @tparam T_RegisterType:
+//! The register type
+//! @tparam T_CompFunc:
+//! The Type of a callable object that performs the register element comparison.
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//! @param[in] comp_func:
+//! A comparison function or functor that provides the comparison of the register elements. Functors should be preferred
+//! to assure inlining. See  https://stackoverflow.com/a/12718449/6700329
+//!
+//! @return
+//! `true` or `false`
+template <UST                                            t_idx_first,
+          UST                                            t_length,
+          FloatVectorRegister                            T_RegisterType,
+          std::invocable<T_RegisterType, T_RegisterType> T_CompFunc>
+[[nodiscard]] inline auto
+compare_all_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept -> bool;
+
+
+//! @brief
+//! Return `true` if all register elements in a specified sequence are `equal and `false` otherwise.
+//!
+//! @tparam t_idx_first:
+//! The index of the first register element that is part of the sequence
+//! @tparam t_length:
+//! The number of elements in the sequence
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! `true` or `false`
+template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto compare_all_in_sequence_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+
+
+//! @brief
 //! Return `true` if the comparisons of all selected register elements are `true` and `false` otherwise.
 //!
 //! @tparam t_cmp:
@@ -42,8 +93,8 @@ namespace mjolnir::x86
 //! @return
 //! `true` or `false`
 template <bool... t_cmp, FloatVectorRegister T_RegisterType, std::invocable<T_RegisterType, T_RegisterType> T_CompFunc>
-[[nodiscard]] inline auto compare_all_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept
-        -> bool;
+[[nodiscard]] inline auto
+compare_all_selected_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept -> bool;
 
 
 //! @brief
@@ -63,7 +114,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType, std::invocable<T_Re
 //! @return
 //! `true` or `false`
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+[[nodiscard]] inline auto compare_all_selected_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 //! @}
 } // namespace mjolnir::x86
@@ -111,9 +162,42 @@ struct CompareEqual
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <UST                                            t_idx_first,
+          UST                                            t_length,
+          FloatVectorRegister                            T_RegisterType,
+          std::invocable<T_RegisterType, T_RegisterType> T_CompFunc>
+[[nodiscard]] inline auto
+compare_all_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept -> bool
+{
+    constexpr UST n_e = num_elements<T_RegisterType>;
+
+    static_assert(t_length > 0, "At least 1 element must be compared.");
+    static_assert(t_idx_first + t_length <= n_e, "Sequence exceeds data length.");
+
+    constexpr auto get_boolen_array = []() constexpr->std::array<bool, n_e>
+    {
+        std::array<bool, n_e> arr = {{{0}}};
+        for (UST i = t_idx_first; i < t_idx_first + t_length; ++i)
+            arr[i] = true;
+        return arr;
+    };
+    constexpr auto b = get_boolen_array();
+
+
+    if constexpr (is_m128d<T_RegisterType>)
+        return compare_all_selected_true<b[0], b[1]>(lhs, rhs, comp_func);
+    else if constexpr (is_m128<T_RegisterType> || is_m256d<T_RegisterType>)
+        return compare_all_selected_true<b[0], b[1], b[2], b[3]>(lhs, rhs, comp_func);
+    else
+        return compare_all_selected_true<b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]>(lhs, rhs, comp_func);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <bool... t_cmp, FloatVectorRegister T_RegisterType, std::invocable<T_RegisterType, T_RegisterType> T_CompFunc>
-[[nodiscard]] inline auto compare_all_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept
-        -> bool
+[[nodiscard]] inline auto
+compare_all_selected_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept -> bool
 {
     constexpr UST n_e    = num_elements<T_RegisterType>;
     constexpr UST n_bits = sizeof(ElementType<T_RegisterType>);
@@ -144,20 +228,20 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType, std::invocable<T_Re
 
 // --------------------------------------------------------------------------------------------------------------------
 
-// template <UST t_idx_first, UST t_idx_last, FloatVectorRegister T_RegisterType>
-//[[nodiscard]] inline auto compare_all_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
-//{
-//    return true;
-//}
+template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto compare_all_in_sequence_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+{
+    return compare_all_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareEqual<T_RegisterType>());
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_all_selected_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_true<t_cmp...>(lhs, rhs, internal::CompareEqual<T_RegisterType>());
+    return compare_all_selected_true<t_cmp...>(lhs, rhs, internal::CompareEqual<T_RegisterType>());
 }
 
 
