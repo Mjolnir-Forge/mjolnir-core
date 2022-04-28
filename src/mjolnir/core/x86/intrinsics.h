@@ -474,16 +474,16 @@ template <FloatVectorRegister T_RegisterType>
 template <FloatVectorRegister T_RegisterType, typename... T_Args>
 [[nodiscard]] inline auto mm_setr(T_Args... args) noexcept -> T_RegisterType
 {
-    using E_Type = ElementType<T_RegisterType>;
+    using EType = ElementType<T_RegisterType>;
 
     if constexpr (is_m128<T_RegisterType>)
-        return _mm_setr_ps(std::forward<T_Args>(static_cast<E_Type>(args))...);
+        return _mm_setr_ps(static_cast<EType>(std::forward<T_Args>(args))...);
     else if constexpr (is_m128d<T_RegisterType>)
-        return _mm_setr_pd(std::forward<T_Args>(static_cast<E_Type>(args))...);
+        return _mm_setr_pd(static_cast<EType>(std::forward<T_Args>(args))...);
     else if constexpr (is_m256<T_RegisterType>)
-        return _mm256_setr_ps(std::forward<T_Args>(static_cast<E_Type>(args))...);
+        return _mm256_setr_ps(static_cast<EType>(std::forward<T_Args>(args))...);
     else
-        return _mm256_setr_pd(std::forward<T_Args>(static_cast<E_Type>(args))...);
+        return _mm256_setr_pd(static_cast<EType>(std::forward<T_Args>(args))...);
 }
 
 

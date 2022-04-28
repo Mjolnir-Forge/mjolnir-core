@@ -194,7 +194,7 @@ template <FloatVectorRegister T_RegisterType>
 // Tests
 // ====================================================================================================================
 
-#include <iostream>
+#include <iostream> // REMOVE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 // tast compare_all_in_sequence_equal ---------------------------------------------------------------------------------
 
@@ -213,7 +213,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_eq
 SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_equal, compare_all_selected_equal, ==)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_align_right) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_equal) // NOLINT
 {
     TYPED_TEST_SERIES(test_compare_all_selected_equal, power_of_2(num_elements<TypeParam>) - 1)
 }
