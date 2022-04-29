@@ -89,6 +89,27 @@ template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Return `true` only if all elements of `lhs` are less than in `rhs` inside of a specified sequence of indices.
+//!
+//! @tparam t_idx_first:
+//! The index of the first register element that is part of the sequence
+//! @tparam t_length:
+//! The number of elements in the sequence
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! `true` or `false`
+template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto compare_all_in_sequence_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+
+
+//! @brief
 //! Return `true` only if all elements of `lhs` are less equal than in `rhs` inside of a specified sequence of indices.
 //!
 //! @tparam t_idx_first:
@@ -110,7 +131,24 @@ template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Return `true` if all elements of `lhs` are less equal than the corresponding ones in `rhs` and `false` otherwise.
+//! Return `true` only if all elements of `lhs` are less than the corresponding ones in `rhs`.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! `true` or `false`
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto compare_all_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+
+
+//! @brief
+//! Return `true` only if all elements of `lhs` are less equal than the corresponding ones in `rhs`.
 //!
 //! @tparam T_RegisterType:
 //! The register type
@@ -173,6 +211,26 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Return `true` if all selected elements of `lhs` are less than the corresponding ones in `rhs`.
+//!
+//! @tparam t_cmp:
+//! A parameter pack of boolean values with the size of the number of register elements. If a value is `true`, the
+//! corresponding element is compared. Otherwise, it is ignored.
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! `true` or `false`
+template <bool... t_cmp, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto compare_all_selected_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+
+
+//! @brief
 //! Return `true` if all selected elements of `lhs` are less equal than the corresponding ones in `rhs`.
 //!
 //! @tparam t_cmp:
@@ -228,8 +286,6 @@ template <FloatVectorRegister T_RegisterType, std::invocable<T_RegisterType, T_R
 #include "mjolnir/core/x86/intrinsics.h"
 #include "mjolnir/core/x86/x86.h"
 
-#include <bitset>   // todo: remove ##############################################
-#include <iostream> // todo: remove $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #include <limits>
 
 namespace mjolnir::x86
@@ -250,6 +306,18 @@ struct CompareEqual
     [[nodiscard]] inline auto operator()(T_RegisterType lhs, T_RegisterType rhs) const noexcept -> T_RegisterType
     {
         return mm_cmp_eq<T_RegisterType>(lhs, rhs);
+    }
+};
+
+
+// --------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+struct CompareLess
+{
+    [[nodiscard]] inline auto operator()(T_RegisterType lhs, T_RegisterType rhs) const noexcept -> T_RegisterType
+    {
+        return mm_cmp_lt<T_RegisterType>(lhs, rhs);
     }
 };
 
@@ -325,9 +393,27 @@ template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto compare_all_in_sequence_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+{
+    return compare_all_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareLess<T_RegisterType>());
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto compare_all_in_sequence_less_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
     return compare_all_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareLessEqual<T_RegisterType>());
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto compare_all_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+{
+    return compare_all_true(lhs, rhs, internal::CompareLess<T_RegisterType>());
 }
 
 
@@ -370,6 +456,15 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto compare_all_selected_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
     return compare_all_selected_true<t_cmp...>(lhs, rhs, internal::CompareEqual<T_RegisterType>());
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool... t_cmp, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto compare_all_selected_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+{
+    return compare_all_selected_true<t_cmp...>(lhs, rhs, internal::CompareLess<T_RegisterType>());
 }
 
 

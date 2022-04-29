@@ -430,6 +430,23 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_cmp_pd(lhs, rhs, _CMP_LE_OS);
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_cmp_lt(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_cmplt_ps(lhs, rhs);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_cmplt_pd(lhs, rhs);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_cmp_ps(lhs, rhs, _CMP_LT_OS);
+    else
+        return _mm256_cmp_pd(lhs, rhs, _CMP_LT_OS);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
