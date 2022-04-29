@@ -226,10 +226,11 @@ template <FloatVectorRegister T_RegisterType>
 // Tests
 // ====================================================================================================================
 
-#include <iostream> // REMOVE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+// equal ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-// test compare_all_selected_equal -------------------------------------------------------------------------------
+// test compare_all_equal ---------------------------------------------------------------------------------------------
 
 FULL_COMPARISON_TESTCASE(test_compare_all_equal, compare_all_equal, ==)
 
@@ -264,4 +265,45 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_equal
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
     TYPED_TEST_SERIES(test_compare_all_selected_equal, n_testcases)
+}
+
+
+// less equal ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+// test compare_all_less_equal ----------------------------------------------------------------------------------------
+
+FULL_COMPARISON_TESTCASE(test_compare_all_less_equal, compare_all_less_equal, <=)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_less_equal) // NOLINT
+{
+    constexpr UST n_testcases = 1;
+    TYPED_TEST_SERIES(test_compare_all_less_equal, n_testcases)
+}
+
+
+// tast compare_all_in_sequence_less_equal ----------------------------------------------------------------------------
+
+SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_less_equal, compare_all_in_sequence_less_equal, <=)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_less_equal) // NOLINT
+{
+    constexpr UST n_e         = num_elements<TypeParam>;
+    constexpr UST n_testcases = gauss_summation(n_e);
+    TYPED_TEST_SERIES(test_compare_all_in_sequence_less_equal, n_testcases)
+}
+
+
+// test compare_all_selected_less_equal -------------------------------------------------------------------------------
+
+SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_less_equal, compare_all_selected_less_equal, <=)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_less_equal) // NOLINT
+{
+    constexpr UST n_e         = num_elements<TypeParam>;
+    constexpr UST n_testcases = power_of_2(n_e) - 1;
+    TYPED_TEST_SERIES(test_compare_all_selected_less_equal, n_testcases)
 }

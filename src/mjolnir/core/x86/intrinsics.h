@@ -133,6 +133,26 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Compare element-wise if the register elements of `lhs` are less equal than the onse in `rhs`.
+//!
+//! @details
+//! If a comparison is false, the corresponding value of the returned register is `0`. For single precision registers, a
+//! true comparison yields `0xFFFFFFFF`. For double precision registers it is `0xFFFFFFFFFFFFFFFF`.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return Register with the comparison results. See detailed description.
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_cmp_le(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Load data from an aligned memory location into a new register.
 //!
 //! @tparam T_RegisterType:
@@ -394,6 +414,21 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_cmp_pd(lhs, rhs, _CMP_EQ_OS);
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_cmp_le(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_cmple_ps(lhs, rhs);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_cmple_pd(lhs, rhs);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_cmp_ps(lhs, rhs, _CMP_LE_OS);
+    else
+        return _mm256_cmp_pd(lhs, rhs, _CMP_LE_OS);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 
