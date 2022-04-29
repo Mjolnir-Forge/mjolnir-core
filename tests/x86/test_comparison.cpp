@@ -58,9 +58,10 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 template <typename T_RegisterType>
 [[nodiscard]] auto get_test_register_array()
 {
-    return std::array<T_RegisterType, 5>{{mm_setr<T_RegisterType>(1, 2, 3, 4),   // NOLINT - magic number
+    return std::array<T_RegisterType, 6>{{mm_setr<T_RegisterType>(1, 2, 3, 4),   // NOLINT - magic number
                                           mm_setr<T_RegisterType>(4, 2, 3, 1),   // NOLINT - magic number
                                           mm_setr<T_RegisterType>(1, 2, 2, 4),   // NOLINT - magic number
+                                          mm_setr<T_RegisterType>(1, 2, 4, 4),   // NOLINT - magic number
                                           mm_setr<T_RegisterType>(1, 0, 3, 2),   // NOLINT - magic number
                                           mm_setr<T_RegisterType>(2, 1, 1, 0)}}; // NOLINT - magic number
 }
@@ -85,6 +86,37 @@ template <>
                                   mm_setr<__m256>(4, 3, 5, 6, 6, 7, 9, 9),   // NOLINT - magic number
                                   mm_setr<__m256>(4, 2, 3, 1, 4, 6, 2, 6)}}; // NOLINT - magic number
 }
+
+
+// test case macro for comparison of all elements ---------------------------------------------------------------------
+
+// NOLINTNEXTLINE
+#define CALL_FULL_CMP_FUNC(cmp_func_name) cmp_func_name(a, b)
+
+// NOLINTNEXTLINE
+#define FULL_COMPARISON_TESTCASE(test_case_func_name, cmp_func_name, cmp_operator)                                     \
+    template <typename T_RegisterType, UST t_test_case_index>                                                          \
+    void test_case_func_name()                                                                                         \
+    {                                                                                                                  \
+        auto test_func = [](T_RegisterType a, T_RegisterType b)                                                        \
+        {                                                                                                              \
+            constexpr UST n_e = num_elements<T_RegisterType>;                                                          \
+                                                                                                                       \
+            bool res = CALL_FULL_CMP_FUNC(cmp_func_name);                                                              \
+                                                                                                                       \
+            bool exp_result = true;                                                                                    \
+            for (UST i = 0; i < n_e; ++i)                                                                              \
+                exp_result &= (get(a, i) cmp_operator get(b, i));                                                      \
+                                                                                                                       \
+            EXPECT_EQ(res, exp_result);                                                                                \
+        };                                                                                                             \
+                                                                                                                       \
+                                                                                                                       \
+        auto t = get_test_register_array<T_RegisterType>();                                                            \
+                                                                                                                       \
+        for (auto& v : t)                                                                                              \
+            test_func(t.at(0), v);                                                                                     \
+    }
 
 
 // test case macro for selective comparison ---------------------------------------------------------------------------
@@ -196,6 +228,19 @@ template <FloatVectorRegister T_RegisterType>
 
 #include <iostream> // REMOVE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
+
+// test compare_all_selected_equal -------------------------------------------------------------------------------
+
+FULL_COMPARISON_TESTCASE(test_compare_all_equal, compare_all_equal, ==)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_equal) // NOLINT
+{
+    constexpr UST n_testcases = 1;
+    TYPED_TEST_SERIES(test_compare_all_equal, n_testcases)
+}
+
+
 // tast compare_all_in_sequence_equal ---------------------------------------------------------------------------------
 
 SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_equal, compare_all_in_sequence_equal, ==)
@@ -203,17 +248,20 @@ SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_equal, compare_all_i
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_equal) // NOLINT
 {
-    constexpr UST n_e = num_elements<TypeParam>;
-    TYPED_TEST_SERIES(test_compare_all_in_sequence_equal, gauss_summation(n_e))
+    constexpr UST n_e         = num_elements<TypeParam>;
+    constexpr UST n_testcases = gauss_summation(n_e);
+    TYPED_TEST_SERIES(test_compare_all_in_sequence_equal, n_testcases)
 }
 
 
-// test compare_equal -------------------------------------------------------------------------------------------------
+// test compare_all_selected_equal ------------------------------------------------------------------------------------
 
 SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_equal, compare_all_selected_equal, ==)
 
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_equal) // NOLINT
 {
-    TYPED_TEST_SERIES(test_compare_all_selected_equal, power_of_2(num_elements<TypeParam>) - 1)
+    constexpr UST n_e         = num_elements<TypeParam>;
+    constexpr UST n_testcases = power_of_2(n_e) - 1;
+    TYPED_TEST_SERIES(test_compare_all_selected_equal, n_testcases)
 }
