@@ -21,7 +21,7 @@ namespace mjolnir::x86
 //! @tparam T_RegisterType:
 //! Register type
 //!
-//! @param[in] value:
+//! @param[in] src:
 //! The initial values
 //!
 //! @return
@@ -29,12 +29,9 @@ namespace mjolnir::x86
 //!
 //! @remark
 //! source: https://stackoverflow.com/q/23847377/6700329
-//!
-//! @todo
-//! Write test
 template <typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
-[[nodiscard]] inline auto abs(T_RegisterType value) noexcept -> T_RegisterType;
+[[nodiscard]] inline auto abs(T_RegisterType src) noexcept -> T_RegisterType;
 
 //! @}
 } // namespace mjolnir::x86
@@ -48,10 +45,12 @@ namespace mjolnir::x86
 
 template <typename T_RegisterType>
 requires FloatVectorRegister<T_RegisterType>
-[[nodiscard]] inline auto abs(T_RegisterType value) noexcept -> T_RegisterType
+[[nodiscard]] inline auto abs(T_RegisterType src) noexcept -> T_RegisterType
 {
-    const T_RegisterType mask = mm_set1<T_RegisterType>(static_cast<ElementType<T_RegisterType>>(-0.0));
-    return mm_andnot(mask, value);
+    using EType     = ElementType<T_RegisterType>;
+    const auto mask = mm_set1<T_RegisterType>(static_cast<EType>(-0.0));
+
+    return mm_andnot(mask, src);
 }
 
 
