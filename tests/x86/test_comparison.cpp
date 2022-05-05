@@ -443,3 +443,33 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_less_
     constexpr UST n_testcases = power_of_2(n_e) - 1;
     TYPED_TEST_SERIES(test_compare_all_selected_less_equal, n_testcases)
 }
+
+
+// test is_memory_zero ------------------------------------------------------------------------------------------------
+
+
+template <typename T_RegisterType, UST t_test_case_index>
+void test_is_memory_zero_testcase()
+{
+    using EType = ElementType<T_RegisterType>;
+
+    constexpr UST  n_e = num_elements<T_RegisterType>;
+    T_RegisterType a   = mm_setzero<T_RegisterType>();
+
+    EXPECT_TRUE(is_memory_zero(a));
+
+    for (UST i = 0; i < n_e; ++i)
+    {
+        set(a, i, static_cast<EType>(i + 1));
+        EXPECT_FALSE(is_memory_zero(a));
+        set(a, i, 0.);
+        EXPECT_TRUE(is_memory_zero(a));
+    }
+}
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_is_memory_zero) // NOLINT
+{
+    constexpr UST n_testcases = 1;
+    TYPED_TEST_SERIES(test_is_memory_zero_testcase, n_testcases)
+}

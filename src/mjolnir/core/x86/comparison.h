@@ -390,6 +390,21 @@ template <FloatVectorRegister T_RegisterType, std::invocable<T_RegisterType, T_R
         -> bool;
 
 
+//! @brief
+//! Return `true` if the whole memory of the passed register is zero and `false` otherwise
+//!
+//! @tparam T_RegisterType
+//! The register type
+//!
+//! @param[in] a
+//! The register that should be checked
+//!
+//! @return
+//! `true` or `false`
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto is_memory_zero(T_RegisterType a) noexcept -> bool;
+
+
 //! @}
 } // namespace mjolnir::x86
 
@@ -403,6 +418,7 @@ template <FloatVectorRegister T_RegisterType, std::invocable<T_RegisterType, T_R
 #include "mjolnir/core/x86/intrinsics.h"
 #include "mjolnir/core/x86/x86.h"
 
+#include <cstring>
 #include <limits>
 
 namespace mjolnir::x86
@@ -685,6 +701,18 @@ template <FloatVectorRegister T_RegisterType, std::invocable<T_RegisterType, T_R
 
 
 // --------------------------------------------------------------------------------------------------------------------
+
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto is_memory_zero(T_RegisterType a) noexcept -> bool
+{
+    constexpr UST n_bytes   = sizeof(T_RegisterType);
+    constexpr UST alignment = alignment_bytes<T_RegisterType>;
+
+    alignas(alignment) constexpr std::array<U8, n_bytes> ref = {{{0}}};
+
+    return not static_cast<bool>(std::memcmp(&a, &ref, n_bytes));
+}
 
 
 } // namespace mjolnir::x86
