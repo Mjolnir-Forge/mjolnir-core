@@ -21,7 +21,7 @@ namespace mjolnir::x86
 
 
 //! @brief
-//! Return `true` if all elements of two registers are equal and `false` otherwise.
+//! Return `true` only if all elements of two registers are equal.
 //!
 //! @tparam T_RegisterType:
 //! The register type
@@ -38,7 +38,7 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Return `true` if all elements of `lhs` are greater than the ones of `rhs` and `false` otherwise.
+//! Return `true` only if all elements of `lhs` are greater than the ones of `rhs`.
 //!
 //! @tparam T_RegisterType:
 //! The register type
@@ -55,7 +55,7 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Return `true` if all elements of `lhs` are greater or equal than the ones of `rhs` and `false` otherwise.
+//! Return `true` only if all elements of `lhs` are greater or equal than the ones of `rhs`.
 //!
 //! @tparam T_RegisterType:
 //! The register type
@@ -72,7 +72,7 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Return `true` only if the comparisons of all register elements are true inside of a specified sequence of indices.
+//! Return `true` only if the comparisons of all register elements are true inside of a specified sequence.
 //!
 //! @tparam t_idx_first:
 //! The index of the first register element that is part of the sequence
@@ -242,7 +242,7 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Return `true` if the comparisons of all selected register elements are `true` and `false` otherwise.
+//! Return `true` only if the comparisons of all selected register elements yields `true`.
 //!
 //! @tparam t_cmp:
 //! A parameter pack of boolean values with the size of the number of register elements. If a value is `true`, the
@@ -268,7 +268,7 @@ compare_all_selected_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc com
 
 
 //! @brief
-//! Return `true` if all selected register elements are equal and `false` otherwise.
+//! Return `true` only if all selected register elements are equal.
 //!
 //! @tparam t_cmp:
 //! A parameter pack of boolean values with the size of the number of register elements. If a value is `true`, the
@@ -288,7 +288,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Return `true` if all selected elements of `lhs` are greater than the corresponding ones in `rhs`.
+//! Return `true` only if all selected elements of `lhs` are greater than the corresponding ones in `rhs`.
 //!
 //! @tparam t_cmp:
 //! A parameter pack of boolean values with the size of the number of register elements. If a value is `true`, the
@@ -308,7 +308,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Return `true` if all selected elements of `lhs` are greater or equal than the corresponding ones in `rhs`.
+//! Return `true` only if all selected elements of `lhs` are greater or equal than the corresponding ones in `rhs`.
 //!
 //! @tparam t_cmp:
 //! A parameter pack of boolean values with the size of the number of register elements. If a value is `true`, the
@@ -328,7 +328,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Return `true` if all selected elements of `lhs` are less than the corresponding ones in `rhs`.
+//! Return `true` only if all selected elements of `lhs` are less than the corresponding ones in `rhs`.
 //!
 //! @tparam t_cmp:
 //! A parameter pack of boolean values with the size of the number of register elements. If a value is `true`, the
@@ -348,7 +348,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Return `true` if all selected elements of `lhs` are less equal than the corresponding ones in `rhs`.
+//! Return `true` only if all selected elements of `lhs` are less equal than the corresponding ones in `rhs`.
 //!
 //! @tparam t_cmp:
 //! A parameter pack of boolean values with the size of the number of register elements. If a value is `true`, the
@@ -368,7 +368,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Return `true` if the comparisons of all elements of two registers are `true` and `false` otherwise.
+//! Return `true` only if the element-wise comparisons of `lhs` and `rhs` yields `true` for all elements.
 //!
 //! @tparam T_RegisterType:
 //! The register type
