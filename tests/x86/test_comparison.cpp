@@ -451,10 +451,10 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_less_
 template <typename T_RegisterType, UST t_test_case_index>
 void test_is_memory_zero_testcase()
 {
-    using EType = ElementType<T_RegisterType>;
+    using EType       = ElementType<T_RegisterType>;
+    constexpr UST n_e = num_elements<T_RegisterType>;
 
-    constexpr UST  n_e = num_elements<T_RegisterType>;
-    T_RegisterType a   = mm_setzero<T_RegisterType>();
+    auto a = mm_setzero<T_RegisterType>();
 
     EXPECT_TRUE(is_memory_zero(a));
 
