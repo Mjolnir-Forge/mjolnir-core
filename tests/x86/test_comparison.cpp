@@ -58,33 +58,45 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 template <typename T_RegisterType>
 [[nodiscard]] auto get_test_register_array()
 {
-    return std::array<T_RegisterType, 6>{{mm_setr<T_RegisterType>(1, 2, 3, 4),   // NOLINT - magic number
-                                          mm_setr<T_RegisterType>(4, 2, 3, 1),   // NOLINT - magic number
-                                          mm_setr<T_RegisterType>(1, 2, 2, 4),   // NOLINT - magic number
-                                          mm_setr<T_RegisterType>(1, 2, 4, 4),   // NOLINT - magic number
-                                          mm_setr<T_RegisterType>(1, 0, 3, 2),   // NOLINT - magic number
-                                          mm_setr<T_RegisterType>(2, 1, 1, 0)}}; // NOLINT - magic number
+    return std::array<T_RegisterType, 10>{{mm_setr<T_RegisterType>(1, 2, 3, 4),   // NOLINT - magic number
+                                           mm_setr<T_RegisterType>(1, 2, 4, 4),   // NOLINT - magic number
+                                           mm_setr<T_RegisterType>(3, 5, 4, 5),   // NOLINT - magic number
+                                           mm_setr<T_RegisterType>(1, 2, 2, 4),   // NOLINT - magic number
+                                           mm_setr<T_RegisterType>(0, 1, 1, 2),   // NOLINT - magic number
+                                           mm_setr<T_RegisterType>(0, 0, 5, 5),   // NOLINT - magic number
+                                           mm_setr<T_RegisterType>(4, 2, 3, 1),   // NOLINT - magic number
+                                           mm_setr<T_RegisterType>(1, 2, 4, 4),   // NOLINT - magic number
+                                           mm_setr<T_RegisterType>(1, 0, 3, 2),   // NOLINT - magic number
+                                           mm_setr<T_RegisterType>(2, 1, 1, 0)}}; // NOLINT - magic number
 }
 
 
 template <>
 [[nodiscard]] auto get_test_register_array<__m128d>()
 {
-    return std::array<__m128d, 5>{{mm_setr<__m128d>(1, 2),   // NOLINT - magic number
+    return std::array<__m128d, 7>{{mm_setr<__m128d>(1, 2),   // NOLINT - magic number
                                    mm_setr<__m128d>(4, 2),   // NOLINT - magic number
-                                   mm_setr<__m128d>(1, 4),   // NOLINT - magic number
+                                   mm_setr<__m128d>(4, 3),   // NOLINT - magic number
+                                   mm_setr<__m128d>(0, 2),   // NOLINT - magic number
                                    mm_setr<__m128d>(0, 1),   // NOLINT - magic number
-                                   mm_setr<__m128d>(3, 4)}}; // NOLINT - magic number
+                                   mm_setr<__m128d>(0, 4),   // NOLINT - magic number
+                                   mm_setr<__m128d>(4, 0)}}; // NOLINT - magic number
 }
 
 
 template <>
 [[nodiscard]] auto get_test_register_array<__m256>()
 {
-    return std::array<__m256, 4>{{mm_setr<__m256>(1, 2, 3, 4, 5, 6, 7, 8),   // NOLINT - magic number
-                                  mm_setr<__m256>(0, 0, 1, 3, 2, 5, 2, 1),   // NOLINT - magic number
-                                  mm_setr<__m256>(4, 3, 5, 6, 6, 7, 9, 9),   // NOLINT - magic number
-                                  mm_setr<__m256>(4, 2, 3, 1, 4, 6, 2, 6)}}; // NOLINT - magic number
+    return std::array<__m256, 10>{{mm_setr<__m256>(1, 2, 3, 4, 5, 6, 7, 8),   // NOLINT - magic number
+                                   mm_setr<__m256>(1, 2, 3, 4, 5, 7, 7, 8),   // NOLINT - magic number
+                                   mm_setr<__m256>(2, 3, 4, 5, 6, 7, 8, 9),   // NOLINT - magic number
+                                   mm_setr<__m256>(1, 2, 3, 4, 5, 6, 6, 8),   // NOLINT - magic number
+                                   mm_setr<__m256>(0, 0, 1, 3, 2, 5, 2, 1),   // NOLINT - magic number
+                                   mm_setr<__m256>(4, 3, 5, 6, 6, 7, 9, 9),   // NOLINT - magic number
+                                   mm_setr<__m256>(0, 0, 1, 1, 7, 9, 9, 9),   // NOLINT - magic number
+                                   mm_setr<__m256>(9, 3, 3, 1, 2, 7, 3, 9),   // NOLINT - magic number
+                                   mm_setr<__m256>(6, 3, 8, 4, 1, 5, 7, 5),   // NOLINT - magic number
+                                   mm_setr<__m256>(4, 2, 3, 1, 4, 6, 2, 6)}}; // NOLINT - magic number
 }
 
 
@@ -265,6 +277,89 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_equal
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
     TYPED_TEST_SERIES(test_compare_all_selected_equal, n_testcases)
+}
+
+
+// greater ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+// test compare_all_greater -------------------------------------------------------------------------------------------
+
+FULL_COMPARISON_TESTCASE(test_compare_all_greater, compare_all_greater, >)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_greater) // NOLINT
+{
+    constexpr UST n_testcases = 1;
+    TYPED_TEST_SERIES(test_compare_all_greater, n_testcases)
+}
+
+
+// tast compare_all_in_sequence_greater -------------------------------------------------------------------------------
+
+SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_greater, compare_all_in_sequence_greater, >)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_greater) // NOLINT
+{
+    constexpr UST n_e         = num_elements<TypeParam>;
+    constexpr UST n_testcases = gauss_summation(n_e);
+    TYPED_TEST_SERIES(test_compare_all_in_sequence_greater, n_testcases)
+}
+
+
+// test compare_all_selected_greater ----------------------------------------------------------------------------------
+
+SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_greater, compare_all_selected_greater, >)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_greater) // NOLINT
+{
+    constexpr UST n_e         = num_elements<TypeParam>;
+    constexpr UST n_testcases = power_of_2(n_e) - 1;
+    TYPED_TEST_SERIES(test_compare_all_selected_greater, n_testcases)
+}
+
+
+// less equal ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+// test compare_all_greater_equal -------------------------------------------------------------------------------------
+
+FULL_COMPARISON_TESTCASE(test_compare_all_greater_equal, compare_all_greater_equal, >=)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_greater_equal) // NOLINT
+{
+    constexpr UST n_testcases = 1;
+    TYPED_TEST_SERIES(test_compare_all_greater_equal, n_testcases)
+}
+
+
+// tast compare_all_in_sequence_greater_equal -------------------------------------------------------------------------
+
+SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_greater_equal, compare_all_in_sequence_greater_equal, >=)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_greater_equal) // NOLINT
+{
+    constexpr UST n_e         = num_elements<TypeParam>;
+    constexpr UST n_testcases = gauss_summation(n_e);
+    TYPED_TEST_SERIES(test_compare_all_in_sequence_greater_equal, n_testcases)
+}
+
+
+// test compare_all_selected_greater_equal
+// -------------------------------------------------------------------------------
+
+SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_greater_equal, compare_all_selected_greater_equal, >=)
+
+
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_greater_equal) // NOLINT
+{
+    constexpr UST n_e         = num_elements<TypeParam>;
+    constexpr UST n_testcases = power_of_2(n_e) - 1;
+    TYPED_TEST_SERIES(test_compare_all_selected_greater_equal, n_testcases)
 }
 
 
