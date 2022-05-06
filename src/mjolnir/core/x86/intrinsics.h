@@ -397,6 +397,23 @@ template <FloatVectorRegister T_RegisterType>
 inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexcept;
 
 
+//! @brief
+//! Compute the bitwise XOR of `a` and `b`.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] a:
+//! First register
+//! @param [in] b:
+//! Second register
+//!
+//! @return
+//! Result of the bitwise XOR operation
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_xor(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
+
+
 //! @}
 } // namespace mjolnir::x86
 
@@ -746,6 +763,22 @@ inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexc
         _mm256_store_ps(ptr, reg);
     else
         _mm256_store_pd(ptr, reg);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_xor(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_xor_ps(a, b);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_xor_pd(a, b);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_xor_ps(a, b);
+    else
+        return _mm256_xor_pd(a, b);
 }
 
 
