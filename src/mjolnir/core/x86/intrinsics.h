@@ -21,6 +21,23 @@ namespace mjolnir::x86
 
 
 //! @brief
+//! Compute the bitwise AND of `a` and `b`.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] a:
+//! First register
+//! @param [in] b:
+//! Second register
+//!
+//! @return
+//! Result of the bitwise AND operation
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_and(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Compute the bitwise NOT of all elements in `a` and then AND with `b`.
 //!
 //! @tparam T_RegisterType:
@@ -111,6 +128,7 @@ template <FloatVectorRegister T_RegisterTypeIn>
 //! Bit cast register
 template <FloatVectorRegister T_RegisterTypeOut, IntegerVectorRegister T_RegisterTypeIn>
 [[nodiscard]] inline auto mm_cast_if(T_RegisterTypeIn src) noexcept -> T_RegisterTypeOut;
+
 
 //! @brief
 //! Compare the register elements in `lhs` and `rhs` for equality and return the result.
@@ -246,6 +264,23 @@ template <IntegerVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Compute the bitwise OR of `a` and `b`.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] a:
+//! First register
+//! @param [in] b:
+//! Second register
+//!
+//! @return
+//! Result of the bitwise OR operation
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_or(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Shuffle the elements in `src` using the control mask `t_mask` and return the resulting vector register.
 //!
 //! @tparam t_mask
@@ -361,6 +396,7 @@ template <UST t_mask, FloatVectorRegister T_RegisterType>
 template <FloatVectorRegister T_RegisterType>
 inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexcept;
 
+
 //! @}
 } // namespace mjolnir::x86
 
@@ -376,6 +412,22 @@ inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexc
 
 namespace mjolnir::x86
 {
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_and(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_and_ps(a, b);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_and_pd(a, b);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_and_ps(a, b);
+    else
+        return _mm256_and_pd(a, b);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
@@ -566,6 +618,22 @@ template <IntegerVectorRegister T_RegisterType>
         return static_cast<U16>(_mm_movemask_epi8(src));
     else
         return static_cast<U32>(_mm256_movemask_epi8(src));
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_or(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_or_ps(a, b);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_or_pd(a, b);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_or_ps(a, b);
+    else
+        return _mm256_or_pd(a, b);
 }
 
 

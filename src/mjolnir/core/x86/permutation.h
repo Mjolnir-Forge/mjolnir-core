@@ -7,11 +7,12 @@
 
 #pragma once
 
+
+// === DECLARATIONS ===================================================================================================
+
 #include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/x86/definitions.h"
 
-
-// === DECLARATION ====================================================================================================
 
 namespace mjolnir::x86
 {
