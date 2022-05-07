@@ -23,7 +23,7 @@ using namespace mjolnir::x86;
 #include "mjolnir/testing/typed_test_series.h"
 
 // NOLINTNEXTLINE
-#define CREATE_INPUT_VALUES                                                                                            \
+#define CREATE_TEST_CASE_INPUT_VALUES                                                                                  \
     auto a = mm_setzero<TypeParam>();                                                                                  \
     auto b = mm_setzero<TypeParam>();                                                                                  \
                                                                                                                        \
@@ -32,8 +32,7 @@ using namespace mjolnir::x86;
         set(a, i, static_cast<ElementType<TypeParam>>(i + 1));                                                         \
         set(b, i, static_cast<ElementType<TypeParam>>(i + 1 + num_elements<TypeParam>));                               \
     }
-
-#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>(a, b) // NOLINT
+#define TEST_CASE_ARGUMENTS a, b
 
 
 // ====================================================================================================================

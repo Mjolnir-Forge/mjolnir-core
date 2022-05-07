@@ -20,7 +20,7 @@ using namespace mjolnir::x86;
 
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline constexpr auto get_default_test_values() noexcept
-        -> std::array<std::array<ElementType<T_RegisterType>, 8>, 4>
+        -> std::array<std::array<ElementType<T_RegisterType>, 8>, 4> // NOLINT - magic number
 {
     using EType = ElementType<T_RegisterType>;
 
@@ -35,8 +35,8 @@ template <FloatVectorRegister T_RegisterType>
 
 #include "mjolnir/testing/typed_test_series.h"
 
-#define CREATE_INPUT_VALUES
-#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>() // NOLINT
+#define CREATE_TEST_CASE_INPUT_VALUES
+#define TEST_CASE_ARGUMENTS
 
 // ====================================================================================================================
 // Tests

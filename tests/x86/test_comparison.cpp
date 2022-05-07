@@ -21,8 +21,8 @@ using namespace mjolnir::x86;
 
 #include "mjolnir/testing/typed_test_series.h"
 
-#define CREATE_INPUT_VALUES
-#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>() // NOLINT
+#define CREATE_TEST_CASE_INPUT_VALUES
+#define TEST_CASE_ARGUMENTS
 
 
 // create test registers ----------------------------------------------------------------------------------------------
