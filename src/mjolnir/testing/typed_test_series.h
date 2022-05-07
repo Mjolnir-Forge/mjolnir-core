@@ -17,7 +17,7 @@
 //! Macro that generates a test series for typed tests.
 //!
 //! @details
-//! This macro can be used inside the body of `TYPED_TEST` from the google test framework. It calls the function with
+//! This macro can be used inside the body of a `TYPED_TEST` from the google test framework. It calls the function with
 //! the name passed as `test_func_name` as often as specified by `num_test_cases`. The called function needs to be a
 //! template function with a variable type as first and and an unsigned integer as second parameter. During each call,
 //! the integer parameter is increased by one, starting at 0. It serves as test case index. The current type of the
@@ -26,9 +26,9 @@
 //! Since the test case index is a template parameter and therefore known at compile time, it can be used to derive
 //! other compile time constants like template parameters that should be used.
 //!
-//! Before you can use this MACRO, you need to define two other macros:
+//! Before you can use this macro, you need to define two other macros:
 //!
-//! - `CREATE_TEST_CASE_INPUT_VALUES` is inserted befor the call to the test function. It can be used to create and
+//! - `CREATE_TEST_CASE_INPUT_VALUES` is inserted before the call to the test function. It can be used to create and
 //!    initialize variables that should be passed to the test case function
 //! - `TEST_CASE_ARGUMENTS` specifies the arguments to the called test case function.
 //!
@@ -66,6 +66,7 @@
             auto test_series = []<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)                \
             {                                                                                                          \
                 CREATE_TEST_CASE_INPUT_VALUES;                                                                         \
+                /* NOLINTNEXTLINE(bugprone-macro-parentheses) */                                                       \
                 (void) std::initializer_list<I32>{(test_func_name<TypeParam, t_index>(TEST_CASE_ARGUMENTS), 0)...};    \
             };                                                                                                         \
             test_series(std::make_index_sequence<num_test_cases>());                                                   \
@@ -75,7 +76,7 @@
 // NOLINTNEXTLINE
 #    define TYPED_TEST_SERIES(test_func_name, num_test_cases)                                                          \
         CREATE_TEST_CASE_INPUT_VALUES;                                                                                 \
-        test_func_name<TypeParam, 0>(TEST_CASE_ARGUMENTS)
+        test_func_name<TypeParam, 0>(TEST_CASE_ARGUMENTS) // NOLINT(bugprone-macro-parentheses)
 #endif
 
 //! \cond DO_NOT_DOCUMENT
