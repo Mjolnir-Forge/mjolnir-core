@@ -10,6 +10,7 @@
 using namespace mjolnir;
 using namespace mjolnir::x86;
 
+
 // ====================================================================================================================
 // Setup
 // ====================================================================================================================
@@ -100,6 +101,15 @@ template <>
 }
 
 
+//! ###################################################################################################################
+//! INFO:
+//! Most of the test case functions are created by macros since the general approach is equal for the different
+//! comparison operators. Each macro expects the name of the test case function, the tested function name and a
+//! corresponding comparison operator. The expected results are determined by performing element-wise comparison of all
+//! relevant register elements using the passed comparison operator.
+//! ###################################################################################################################
+
+
 // test case macro for comparison of all elements ---------------------------------------------------------------------
 
 // NOLINTNEXTLINE
@@ -107,7 +117,7 @@ template <>
 
 // NOLINTNEXTLINE
 #define FULL_COMPARISON_TESTCASE(test_case_func_name, cmp_func_name, cmp_operator)                                     \
-    template <typename T_RegisterType, UST t_test_case_index>                                                          \
+    template <typename T_RegisterType>                                                                                 \
     void test_case_func_name()                                                                                         \
     {                                                                                                                  \
         auto test_func = [](T_RegisterType a, T_RegisterType b)                                                        \
@@ -246,8 +256,7 @@ FULL_COMPARISON_TESTCASE(test_compare_all_equal, compare_all_equal, ==)
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_equal) // NOLINT
 {
-    constexpr UST n_testcases = 1;
-    TYPED_TEST_SERIES(test_compare_all_equal, n_testcases)
+    test_compare_all_equal<TypeParam>();
 }
 
 
@@ -258,8 +267,7 @@ FULL_COMPARISON_TESTCASE(test_compare_all_greater, compare_all_greater, >)
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_greater) // NOLINT
 {
-    constexpr UST n_testcases = 1;
-    TYPED_TEST_SERIES(test_compare_all_greater, n_testcases)
+    test_compare_all_greater<TypeParam>();
 }
 
 
@@ -270,8 +278,7 @@ FULL_COMPARISON_TESTCASE(test_compare_all_greater_equal, compare_all_greater_equ
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_greater_equal) // NOLINT
 {
-    constexpr UST n_testcases = 1;
-    TYPED_TEST_SERIES(test_compare_all_greater_equal, n_testcases)
+    test_compare_all_greater_equal<TypeParam>();
 }
 
 
@@ -282,8 +289,7 @@ FULL_COMPARISON_TESTCASE(test_compare_all_less, compare_all_less, <)
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_less) // NOLINT
 {
-    constexpr UST n_testcases = 1;
-    TYPED_TEST_SERIES(test_compare_all_less, n_testcases)
+    test_compare_all_less<TypeParam>();
 }
 
 
@@ -294,8 +300,7 @@ FULL_COMPARISON_TESTCASE(test_compare_all_less_equal, compare_all_less_equal, <=
 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_less_equal) // NOLINT
 {
-    constexpr UST n_testcases = 1;
-    TYPED_TEST_SERIES(test_compare_all_less_equal, n_testcases)
+    test_compare_all_less_equal<TypeParam>();
 }
 
 
@@ -431,14 +436,12 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_less_equa
 
 // test is_memory_zero ------------------------------------------------------------------------------------------------
 
-
-template <typename T_RegisterType, UST t_test_case_index>
-void test_is_memory_zero_testcase()
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_is_memory_zero) // NOLINT
 {
-    using EType       = ElementType<T_RegisterType>;
-    constexpr UST n_e = num_elements<T_RegisterType>;
+    using EType       = ElementType<TypeParam>;
+    constexpr UST n_e = num_elements<TypeParam>;
 
-    auto a = mm_setzero<T_RegisterType>();
+    auto a = mm_setzero<TypeParam>();
 
     EXPECT_TRUE(is_memory_zero(a));
 
@@ -449,11 +452,4 @@ void test_is_memory_zero_testcase()
         set(a, i, 0.);
         EXPECT_TRUE(is_memory_zero(a));
     }
-}
-
-
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_is_memory_zero) // NOLINT
-{
-    constexpr UST n_testcases = 1;
-    TYPED_TEST_SERIES(test_is_memory_zero_testcase, n_testcases)
 }
