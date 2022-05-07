@@ -67,7 +67,7 @@ template <bool t_all_mag_positive = false, FloatVectorRegister T_RegisterType>
 //! @return
 //! Register with negated values
 template <FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto negate(T_RegisterType src) noexcept -> T_RegisterType;
+[[nodiscard]] inline auto negate_all(T_RegisterType src) noexcept -> T_RegisterType;
 
 
 //! @brief
@@ -76,7 +76,6 @@ template <FloatVectorRegister T_RegisterType>
 //! @tparam t_neg:
 //! A parameter pack of the same size as the number of register elements. If a value is `true`, the corresponding
 //! element will be negated. Otherwise the element is just copied.
-//!
 //! @tparam T_RegisterType
 //! The register type
 //!
@@ -137,7 +136,7 @@ template <bool t_all_mag_positive, FloatVectorRegister T_RegisterType>
 
 
 template <FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto negate(T_RegisterType src) noexcept -> T_RegisterType
+[[nodiscard]] inline auto negate_all(T_RegisterType src) noexcept -> T_RegisterType
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
 
@@ -159,7 +158,7 @@ template <bool... t_neg, FloatVectorRegister T_RegisterType>
     using EType       = ElementType<T_RegisterType>;
     constexpr UST n_e = num_elements<T_RegisterType>;
 
-    static_assert(sizeof...(t_neg) == 0 || sizeof...(t_neg) == n_e,
+    static_assert(sizeof...(t_neg) == n_e,
                   "Number of boolean template parameters must be 0 or equal to the number of register elements");
 
     constexpr auto get_mask = [](bool a) constexpr->EType

@@ -15,6 +15,21 @@ using namespace mjolnir::x86;
 // Setup
 // ====================================================================================================================
 
+// default test values ------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline constexpr auto get_default_test_values() noexcept
+        -> std::array<std::array<ElementType<T_RegisterType>, 8>, 4>
+{
+    using EType = ElementType<T_RegisterType>;
+
+    constexpr std::array<std::array<EType, 8>, 4> test_values = {{{{-1, 2, -3, -4, 5, 6, 7, 8}},
+                                                                  {{3, -0, 6, 2, -1, 9, -3, -5}},
+                                                                  {{-3, -1, -3, -5, -6, -2, -0, -1}},
+                                                                  {{6, 2, 5, 5, 1, 0, 6, 3}}}};
+    return test_values;
+}
+
 // create test suites -------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
@@ -64,14 +79,9 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_abs) // NOLINT
 {
     constexpr UST n_e = num_elements<TypeParam>;
-    using EType       = ElementType<TypeParam>;
 
-    constexpr std::array<std::array<EType, 8>, 4> test_values = {{{{-1, 2, -3, -4, 5, 6, 7, 8}},
-                                                                  {{3, -0, 6, 2, -1, 9, -3, -5}},
-                                                                  {{-3, -1, -3, -5, -6, -2, -0, -1}},
-                                                                  {{6, 2, 5, 5, 1, 0, 6, 3}}}};
-
-    constexpr UST n_tests = test_values.size();
+    constexpr auto test_values = get_default_test_values<TypeParam>();
+    constexpr UST  n_tests     = test_values.size();
 
     for (UST i = 0; i < n_tests; ++i)
     {
@@ -94,14 +104,9 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_abs) // NOLINT
 TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_copy_sign) // NOLINT
 {
     constexpr UST n_e = num_elements<TypeParam>;
-    using EType       = ElementType<TypeParam>;
 
-    constexpr std::array<std::array<EType, 8>, 4> test_values = {{{{-1, 2, -3, -4, 5, 6, 7, 8}},
-                                                                  {{3, -0, 6, 2, -1, 9, -3, -5}},
-                                                                  {{-3, -1, -3, -5, -6, -2, -0, -1}},
-                                                                  {{6, 2, 5, 5, 1, 0, 6, 3}}}};
-
-    constexpr UST n_tests = test_values.size();
+    constexpr auto test_values = get_default_test_values<TypeParam>();
+    constexpr UST  n_tests     = test_values.size();
 
     for (UST i = 0; i < n_tests; ++i)
         for (UST j = 0; j < n_tests; ++j)
@@ -133,19 +138,14 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_copy_sign) // NOLINT
 }
 
 
-// test negate --------------------------------------------------------------------------------------------------------
+// test negate_all ----------------------------------------------------------------------------------------------------
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_negate) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_negate_all) // NOLINT
 {
     constexpr UST n_e = num_elements<TypeParam>;
-    using EType       = ElementType<TypeParam>;
 
-    constexpr std::array<std::array<EType, 8>, 4> test_values = {{{{-1, 2, -3, -4, 5, 6, 7, 8}},
-                                                                  {{3, -0, 6, 2, -1, 9, -3, -5}},
-                                                                  {{-3, -1, -3, -5, -6, -2, -0, -1}},
-                                                                  {{6, 2, 5, 5, 1, 0, 6, 3}}}};
-
-    constexpr UST n_tests = test_values.size();
+    constexpr auto test_values = get_default_test_values<TypeParam>();
+    constexpr UST  n_tests     = test_values.size();
 
     for (UST i = 0; i < n_tests; ++i)
     {
@@ -155,7 +155,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_negate) // NOLINT
         for (UST j = 0; j < n_e; j++)
             set(a, j, test_case_values.at(j));
 
-        auto res = negate(a);
+        auto res = negate_all(a);
 
         for (UST j = 0; j < n_e; j++)
             EXPECT_EQ(get(res, j), -1 * test_case_values.at(j));
@@ -179,17 +179,13 @@ template <typename T_RegisterType>
 template <FloatVectorRegister T_RegisterType, UST t_test_case_index>
 inline void test_negate_selected_test_case()
 {
-    constexpr UST n_e = num_elements<T_RegisterType>;
-    using EType       = ElementType<T_RegisterType>;
+    using EType        = ElementType<T_RegisterType>;
+    constexpr UST  n_e = num_elements<T_RegisterType>;
+    constexpr auto b   = get_negate_index_array<T_RegisterType>(t_test_case_index);
 
-    constexpr std::array<std::array<EType, 8>, 4> test_values = {{{{-1, 2, -3, -4, 5, 6, 7, 8}},
-                                                                  {{3, -0, 6, 2, -1, 9, -3, -5}},
-                                                                  {{-3, -1, -3, -5, -6, -2, -0, -1}},
-                                                                  {{6, 2, 5, 5, 1, 0, 6, 3}}}};
+    constexpr auto test_values = get_default_test_values<T_RegisterType>();
+    constexpr UST  n_tests     = test_values.size();
 
-    constexpr auto b = get_negate_index_array<T_RegisterType>(t_test_case_index);
-
-    constexpr UST n_tests = test_values.size();
 
     for (UST i = 0; i < n_tests; ++i)
     {
