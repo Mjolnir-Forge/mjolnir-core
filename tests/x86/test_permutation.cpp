@@ -32,7 +32,7 @@ using namespace mjolnir::x86;
         set(a, i, static_cast<ElementType<TypeParam>>(i + 1));                                                         \
         set(b, i, static_cast<ElementType<TypeParam>>(i + 1 + num_elements<TypeParam>));                               \
     }
-#define TEST_CASE_ARGUMENTS a, b
+#define TEST_CASE_ARGUMENTS a, b // NOLINT
 
 
 // ====================================================================================================================

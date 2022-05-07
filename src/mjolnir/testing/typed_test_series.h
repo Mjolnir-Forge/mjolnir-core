@@ -66,7 +66,7 @@
             auto test_series = []<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)                \
             {                                                                                                          \
                 CREATE_TEST_CASE_INPUT_VALUES;                                                                         \
-                (void) std::initializer_list<I32>{(CALL_TEST_CASE_FUNC(test_func_name), 0)...};                        \
+                (void) std::initializer_list<I32>{(test_func_name<TypeParam, t_index>(TEST_CASE_ARGUMENTS), 0)...};    \
             };                                                                                                         \
             test_series(std::make_index_sequence<num_test_cases>());                                                   \
         };                                                                                                             \
@@ -74,9 +74,8 @@
 #else
 // NOLINTNEXTLINE
 #    define TYPED_TEST_SERIES(test_func_name, num_test_cases)                                                          \
-        constexpr UST t_index = 0;                                                                                     \
         CREATE_TEST_CASE_INPUT_VALUES;                                                                                 \
-        CALL_TEST_CASE_FUNC(test_func_name)
+        test_func_name<TypeParam, 0>(TEST_CASE_ARGUMENTS)
 #endif
 
 //! \cond DO_NOT_DOCUMENT
