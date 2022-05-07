@@ -254,29 +254,29 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_equal) // NOLI
 }
 
 
-// tast compare_all_in_sequence_equal ---------------------------------------------------------------------------------
+// tast compare_in_sequence_equal -------------------------------------------------------------------------------------
 
-SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_equal, compare_all_in_sequence_equal, ==)
+SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_equal, compare_in_sequence_equal, ==)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_equal) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = gauss_summation(n_e);
-    TYPED_TEST_SERIES(test_compare_all_in_sequence_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_in_sequence_equal, n_testcases)
 }
 
 
-// test compare_all_selected_equal ------------------------------------------------------------------------------------
+// test compare_selected_equal ----------------------------------------------------------------------------------------
 
-SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_equal, compare_all_selected_equal, ==)
+SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_equal, compare_selected_equal, ==)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_equal) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
-    TYPED_TEST_SERIES(test_compare_all_selected_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_selected_equal, n_testcases)
 }
 
 
@@ -295,29 +295,29 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_greater) // NO
 }
 
 
-// tast compare_all_in_sequence_greater -------------------------------------------------------------------------------
+// tast compare_in_sequence_greater -----------------------------------------------------------------------------------
 
-SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_greater, compare_all_in_sequence_greater, >)
+SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_greater, compare_in_sequence_greater, >)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_greater) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_greater) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = gauss_summation(n_e);
-    TYPED_TEST_SERIES(test_compare_all_in_sequence_greater, n_testcases)
+    TYPED_TEST_SERIES(test_compare_in_sequence_greater, n_testcases)
 }
 
 
-// test compare_all_selected_greater ----------------------------------------------------------------------------------
+// test compare_selected_greater --------------------------------------------------------------------------------------
 
-SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_greater, compare_all_selected_greater, >)
+SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_greater, compare_selected_greater, >)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_greater) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_greater) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
-    TYPED_TEST_SERIES(test_compare_all_selected_greater, n_testcases)
+    TYPED_TEST_SERIES(test_compare_selected_greater, n_testcases)
 }
 
 
@@ -336,30 +336,30 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_greater_equal)
 }
 
 
-// tast compare_all_in_sequence_greater_equal -------------------------------------------------------------------------
+// tast compare_in_sequence_greater_equal -----------------------------------------------------------------------------
 
-SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_greater_equal, compare_all_in_sequence_greater_equal, >=)
+SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_greater_equal, compare_in_sequence_greater_equal, >=)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_greater_equal) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_greater_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = gauss_summation(n_e);
-    TYPED_TEST_SERIES(test_compare_all_in_sequence_greater_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_in_sequence_greater_equal, n_testcases)
 }
 
 
-// test compare_all_selected_greater_equal
+// test compare_selected_greater_equal
 // -------------------------------------------------------------------------------
 
-SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_greater_equal, compare_all_selected_greater_equal, >=)
+SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_greater_equal, compare_selected_greater_equal, >=)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_greater_equal) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_greater_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
-    TYPED_TEST_SERIES(test_compare_all_selected_greater_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_selected_greater_equal, n_testcases)
 }
 
 
@@ -378,29 +378,29 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_less) // NOLIN
 }
 
 
-// tast compare_all_in_sequence_less ----------------------------------------------------------------------------------
+// tast compare_in_sequence_less --------------------------------------------------------------------------------------
 
-SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_less, compare_all_in_sequence_less, <)
+SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_less, compare_in_sequence_less, <)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_less) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_less) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = gauss_summation(n_e);
-    TYPED_TEST_SERIES(test_compare_all_in_sequence_less, n_testcases)
+    TYPED_TEST_SERIES(test_compare_in_sequence_less, n_testcases)
 }
 
 
-// test compare_all_selected_less -------------------------------------------------------------------------------------
+// test compare_selected_less -----------------------------------------------------------------------------------------
 
-SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_less, compare_all_selected_less, <)
+SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_less, compare_selected_less, <)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_less) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_less) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
-    TYPED_TEST_SERIES(test_compare_all_selected_less, n_testcases)
+    TYPED_TEST_SERIES(test_compare_selected_less, n_testcases)
 }
 
 
@@ -419,29 +419,29 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_less_equal) //
 }
 
 
-// tast compare_all_in_sequence_less_equal ----------------------------------------------------------------------------
+// tast compare_in_sequence_less_equal --------------------------------------------------------------------------------
 
-SEQUENTIAL_COMPARISON_TESTCASE(test_compare_all_in_sequence_less_equal, compare_all_in_sequence_less_equal, <=)
+SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_less_equal, compare_in_sequence_less_equal, <=)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_in_sequence_less_equal) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_less_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = gauss_summation(n_e);
-    TYPED_TEST_SERIES(test_compare_all_in_sequence_less_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_in_sequence_less_equal, n_testcases)
 }
 
 
-// test compare_all_selected_less_equal -------------------------------------------------------------------------------
+// test compare_selected_less_equal -----------------------------------------------------------------------------------
 
-SELECTIVE_COMPARISON_TESTCASE(test_compare_all_selected_less_equal, compare_all_selected_less_equal, <=)
+SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_less_equal, compare_selected_less_equal, <=)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_selected_less_equal) // NOLINT
+TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_less_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
-    TYPED_TEST_SERIES(test_compare_all_selected_less_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_selected_less_equal, n_testcases)
 }
 
 

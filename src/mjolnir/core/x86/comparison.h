@@ -98,7 +98,7 @@ template <UST                                            t_idx_first,
           FloatVectorRegister                            T_RegisterType,
           std::invocable<T_RegisterType, T_RegisterType> T_CompFunc>
 [[nodiscard]] inline auto
-compare_all_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept -> bool;
+compare_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept -> bool;
 
 
 //! @brief
@@ -119,7 +119,7 @@ compare_all_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc 
 //! @return
 //! `true` or `false`
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_in_sequence_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+[[nodiscard]] inline auto compare_in_sequence_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 
 //! @brief
@@ -140,7 +140,7 @@ template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
 //! @return
 //! `true` or `false`
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_in_sequence_greater(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+[[nodiscard]] inline auto compare_in_sequence_greater(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 
 //! @brief
@@ -161,8 +161,7 @@ template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
 //! @return
 //! `true` or `false`
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_in_sequence_greater_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept
-        -> bool;
+[[nodiscard]] inline auto compare_in_sequence_greater_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 
 //! @brief
@@ -183,7 +182,7 @@ template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
 //! @return
 //! `true` or `false`
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_in_sequence_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+[[nodiscard]] inline auto compare_in_sequence_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 
 //! @brief
@@ -204,7 +203,7 @@ template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
 //! @return
 //! `true` or `false`
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_in_sequence_less_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+[[nodiscard]] inline auto compare_in_sequence_less_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 
 //! @brief
@@ -263,8 +262,8 @@ template <FloatVectorRegister T_RegisterType>
 //! @return
 //! `true` or `false`
 template <bool... t_cmp, FloatVectorRegister T_RegisterType, std::invocable<T_RegisterType, T_RegisterType> T_CompFunc>
-[[nodiscard]] inline auto
-compare_all_selected_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept -> bool;
+[[nodiscard]] inline auto compare_selected_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept
+        -> bool;
 
 
 //! @brief
@@ -284,7 +283,7 @@ compare_all_selected_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc com
 //! @return
 //! `true` or `false`
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_selected_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+[[nodiscard]] inline auto compare_selected_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 
 //! @brief
@@ -304,7 +303,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 //! @return
 //! `true` or `false`
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_selected_greater(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+[[nodiscard]] inline auto compare_selected_greater(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 
 //! @brief
@@ -324,7 +323,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 //! @return
 //! `true` or `false`
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_selected_greater_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+[[nodiscard]] inline auto compare_selected_greater_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 
 //! @brief
@@ -344,7 +343,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 //! @return
 //! `true` or `false`
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_selected_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+[[nodiscard]] inline auto compare_selected_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 
 //! @brief
@@ -364,7 +363,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType>
 //! @return
 //! `true` or `false`
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_selected_less_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
+[[nodiscard]] inline auto compare_selected_less_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool;
 
 
 //! @brief
@@ -529,7 +528,7 @@ template <UST                                            t_idx_first,
           FloatVectorRegister                            T_RegisterType,
           std::invocable<T_RegisterType, T_RegisterType> T_CompFunc>
 [[nodiscard]] inline auto
-compare_all_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept -> bool
+compare_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept -> bool
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
 
@@ -547,58 +546,57 @@ compare_all_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc 
 
 
     if constexpr (is_m128d<T_RegisterType>)
-        return compare_all_selected_true<b[0], b[1]>(lhs, rhs, comp_func);
+        return compare_selected_true<b[0], b[1]>(lhs, rhs, comp_func);
     else if constexpr (is_m128<T_RegisterType> || is_m256d<T_RegisterType>)
-        return compare_all_selected_true<b[0], b[1], b[2], b[3]>(lhs, rhs, comp_func);
+        return compare_selected_true<b[0], b[1], b[2], b[3]>(lhs, rhs, comp_func);
     else
         // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-        return compare_all_selected_true<b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]>(lhs, rhs, comp_func);
+        return compare_selected_true<b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]>(lhs, rhs, comp_func);
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_in_sequence_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_in_sequence_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareEqual<T_RegisterType>());
+    return compare_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareEqual<T_RegisterType>());
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_in_sequence_greater(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_in_sequence_greater(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareGreater<T_RegisterType>());
+    return compare_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareGreater<T_RegisterType>());
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_in_sequence_greater_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_in_sequence_greater_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_in_sequence_true<t_idx_start, t_idx_end>(
-            lhs, rhs, internal::CompareGreaterEqual<T_RegisterType>());
+    return compare_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareGreaterEqual<T_RegisterType>());
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_in_sequence_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_in_sequence_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareLess<T_RegisterType>());
+    return compare_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareLess<T_RegisterType>());
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_idx_start, UST t_idx_end, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_in_sequence_less_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_in_sequence_less_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareLessEqual<T_RegisterType>());
+    return compare_in_sequence_true<t_idx_start, t_idx_end>(lhs, rhs, internal::CompareLessEqual<T_RegisterType>());
 }
 
 
@@ -623,8 +621,8 @@ template <FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_cmp, FloatVectorRegister T_RegisterType, std::invocable<T_RegisterType, T_RegisterType> T_CompFunc>
-[[nodiscard]] inline auto
-compare_all_selected_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept -> bool
+[[nodiscard]] inline auto compare_selected_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp_func) noexcept
+        -> bool
 {
     constexpr UST n_e    = num_elements<T_RegisterType>;
     constexpr UST n_bits = sizeof(ElementType<T_RegisterType>);
@@ -647,45 +645,45 @@ compare_all_selected_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc com
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_selected_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_selected_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_selected_true<t_cmp...>(lhs, rhs, internal::CompareEqual<T_RegisterType>());
+    return compare_selected_true<t_cmp...>(lhs, rhs, internal::CompareEqual<T_RegisterType>());
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_selected_greater(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_selected_greater(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_selected_true<t_cmp...>(lhs, rhs, internal::CompareGreater<T_RegisterType>());
+    return compare_selected_true<t_cmp...>(lhs, rhs, internal::CompareGreater<T_RegisterType>());
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_selected_greater_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_selected_greater_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_selected_true<t_cmp...>(lhs, rhs, internal::CompareGreaterEqual<T_RegisterType>());
+    return compare_selected_true<t_cmp...>(lhs, rhs, internal::CompareGreaterEqual<T_RegisterType>());
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_selected_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_selected_less(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_selected_true<t_cmp...>(lhs, rhs, internal::CompareLess<T_RegisterType>());
+    return compare_selected_true<t_cmp...>(lhs, rhs, internal::CompareLess<T_RegisterType>());
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_cmp, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto compare_all_selected_less_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
+[[nodiscard]] inline auto compare_selected_less_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept -> bool
 {
-    return compare_all_selected_true<t_cmp...>(lhs, rhs, internal::CompareLessEqual<T_RegisterType>());
+    return compare_selected_true<t_cmp...>(lhs, rhs, internal::CompareLessEqual<T_RegisterType>());
 }
 
 
@@ -696,7 +694,7 @@ template <FloatVectorRegister T_RegisterType, std::invocable<T_RegisterType, T_R
         -> bool
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
-    return compare_all_in_sequence_true<0, n_e>(lhs, rhs, comp_func);
+    return compare_in_sequence_true<0, n_e>(lhs, rhs, comp_func);
 }
 
 
