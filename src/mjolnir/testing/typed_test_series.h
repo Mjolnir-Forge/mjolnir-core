@@ -8,6 +8,9 @@
 #pragma once
 
 
+//! \addtogroup testing
+//! @{
+
 #ifndef STATIC_ANALYSIS
 
 //! @brief
@@ -39,20 +42,9 @@
 // NOLINTNEXTLINE
 #    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
         constexpr UST t_index = 0;                                                                                     \
-        CREATE_SOURCE_VALUES;                                                                                          \
+        CREATE_INPUT_VALUES;                                                                                           \
         CALL_TEST_CASE_FUNC(test_func)
 #endif
 
 
-
-//! \addtogroup testing
-//! @{
-
-
-
-//! \cond DO_NOT_DOCUMENT
-//! \endcond
-
-
 //! @}
-
