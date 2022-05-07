@@ -8,8 +8,8 @@
 #pragma once
 
 
-#include "mjolnir/core/x86/x86.h"
 #include "mjolnir/core/x86/definitions.h"
+#include "mjolnir/core/x86/x86.h"
 #include <gtest/gtest.h>
 
 
@@ -23,7 +23,7 @@
 //! Template variable for the register type
 template <mjolnir::x86::FloatVectorRegister T_RegisterType>
 class FloatingPointVectorRegisterTestSuite : public ::testing::Test
-{    
+{
 };
 
 
@@ -37,5 +37,3 @@ TYPED_TEST_SUITE(FloatingPointVectorRegisterTestSuite, VectorRegisterTestTypes, 
 
 
 //! @}
-
-
