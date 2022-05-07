@@ -20,3 +20,10 @@
 //!
 //! @brief
 //! This submodule of the core module provides x86 related functions and classes.
+
+
+
+//! @defgroup testing Testing
+//!
+//! @brief
+//! This module contains various things for testing.

@@ -4,6 +4,7 @@
 #include "mjolnir/core/utility/is_close.h"
 #include "mjolnir/core/x86/direct_access.h"
 #include "mjolnir/core/x86/math.h"
+#include "mjolnir/testing/x86/floating_point_vector_register_test_suite.h"
 #include <gtest/gtest.h>
 
 #include <array>
@@ -30,44 +31,12 @@ template <FloatVectorRegister T_RegisterType>
     return test_values;
 }
 
-// create test suites -------------------------------------------------------------------------------------------------
+// typed test series --------------------------------------------------------------------------------------------------
 
-template <FloatVectorRegister T_RegisterType>
-class TestFloatingPointVectorRegisterTypes : public ::testing::Test
-{
-};
+#include "mjolnir/testing/typed_test_series.h"
 
-
-using VectorRegisterTestTypes = ::testing::Types<__m128, __m128d, __m256, __m256d>; // NOLINT
-
-
-// cppcheck-suppress syntaxError
-TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, );
-
-
-// NOLINTNEXTLINE
-#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>()
-
-
-#ifndef STATIC_ANALYSIS
-// NOLINTNEXTLINE
-#    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
-        auto start_typed_test_series = []()                                                                            \
-        {                                                                                                              \
-            auto test_series = []<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)                \
-            {                                                                                                          \
-                (void) std::initializer_list<I32>{(CALL_TEST_CASE_FUNC(test_func), 0)...};                             \
-            };                                                                                                         \
-            test_series(std::make_index_sequence<num_test_cases>());                                                   \
-        };                                                                                                             \
-        start_typed_test_series();
-#else
-// NOLINTNEXTLINE
-#    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
-        constexpr UST t_index = 0;                                                                                     \
-        CALL_TEST_CASE_FUNC(test_func);
-#endif
-
+#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>() // NOLINT
+#define CREATE_INPUT_VALUES
 
 // ====================================================================================================================
 // Tests
@@ -76,7 +45,7 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
 
 // test abs -----------------------------------------------------------------------------------------------------------
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_abs) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_abs) // NOLINT
 {
     constexpr UST n_e = num_elements<TypeParam>;
 
@@ -101,7 +70,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_abs) // NOLINT
 
 // test copy_sign -----------------------------------------------------------------------------------------------------
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_copy_sign) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_copy_sign) // NOLINT
 {
     constexpr UST n_e = num_elements<TypeParam>;
 
@@ -140,7 +109,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_copy_sign) // NOLINT
 
 // test negate_all ----------------------------------------------------------------------------------------------------
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_negate_all) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_negate_all) // NOLINT
 {
     constexpr UST n_e = num_elements<TypeParam>;
 
@@ -213,8 +182,8 @@ inline void test_negate_selected_test_case()
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_negate_selected) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_negate_selected) // NOLINT
 {
     constexpr UST n_test_cases = power_of_2(num_elements<TypeParam>);
-    TYPED_TEST_SERIES(test_negate_selected_test_case, n_test_cases)
+    TYPED_TEST_SERIES(test_negate_selected_test_case, n_test_cases);
 }
