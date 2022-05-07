@@ -5,6 +5,7 @@
 #include "mjolnir/core/x86/direct_access.h"
 #include "mjolnir/core/x86/intrinsics.h"
 #include "mjolnir/core/x86/permutation.h"
+#include "mjolnir/testing/x86/floating_point_vector_register_test_suite.h"
 #include <gtest/gtest.h>
 #include <initializer_list>
 
@@ -17,23 +18,12 @@ using namespace mjolnir::x86;
 // Setup
 // ====================================================================================================================
 
-// create test suites -------------------------------------------------------------------------------------------------
+// typed test series --------------------------------------------------------------------------------------------------
 
-template <FloatVectorRegister T_RegisterType>
-class TestFloatingPointVectorRegisterTypes : public ::testing::Test
-{
-};
-
-
-using VectorRegisterTestTypes = ::testing::Types<__m128, __m128d, __m256, __m256d>; // NOLINT
-
-
-// cppcheck-suppress syntaxError
-TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, );
-
+#include "mjolnir/testing/typed_test_series.h"
 
 // NOLINTNEXTLINE
-#define CREATE_SOURCE_VALUES                                                                                           \
+#define CREATE_INPUT_VALUES                                                                                            \
     auto a = mm_setzero<TypeParam>();                                                                                  \
     auto b = mm_setzero<TypeParam>();                                                                                  \
                                                                                                                        \
@@ -43,31 +33,8 @@ TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, 
         set(b, i, static_cast<ElementType<TypeParam>>(i + 1 + num_elements<TypeParam>));                               \
     }
 
+#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>(a, b) // NOLINT
 
-// NOLINTNEXTLINE
-#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>(a, b)
-
-
-#ifndef STATIC_ANALYSIS
-// NOLINTNEXTLINE
-#    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
-        auto start_typed_test_series = []()                                                                            \
-        {                                                                                                              \
-            auto test_series = []<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)                \
-            {                                                                                                          \
-                CREATE_SOURCE_VALUES;                                                                                  \
-                (void) std::initializer_list<I32>{(CALL_TEST_CASE_FUNC(test_func), 0)...};                             \
-            };                                                                                                         \
-            test_series(std::make_index_sequence<num_test_cases>());                                                   \
-        };                                                                                                             \
-        start_typed_test_series();
-#else
-// NOLINTNEXTLINE
-#    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
-        constexpr UST t_index = 0;                                                                                     \
-        CREATE_SOURCE_VALUES;                                                                                          \
-        CALL_TEST_CASE_FUNC(test_func);
-#endif
 
 // ====================================================================================================================
 // Tests
@@ -99,9 +66,9 @@ void test_align_right_test_case(T_RegisterType a, T_RegisterType b)
         }
 }
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_align_right) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_align_right) // NOLINT
 {
-    TYPED_TEST_SERIES(test_align_right_test_case, num_lane_elements<TypeParam>)
+    TYPED_TEST_SERIES(test_align_right_test_case, num_lane_elements<TypeParam>);
 }
 
 
@@ -138,11 +105,11 @@ void test_blend_test_case(T_RegisterType a, T_RegisterType b)
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_blend) // NOLINT
 {
     //! @todo create power of 2 function in math header
 
-    TYPED_TEST_SERIES(test_blend_test_case, power_of_2(num_elements<TypeParam>))
+    TYPED_TEST_SERIES(test_blend_test_case, power_of_2(num_elements<TypeParam>));
 }
 
 
@@ -161,9 +128,9 @@ void test_blend_above_test_case(T_RegisterType a, T_RegisterType b)
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_above) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_blend_above) // NOLINT
 {
-    TYPED_TEST_SERIES(test_blend_above_test_case, num_elements<TypeParam>)
+    TYPED_TEST_SERIES(test_blend_above_test_case, num_elements<TypeParam>);
 }
 
 
@@ -182,9 +149,9 @@ void test_blend_at_test_case(T_RegisterType a, T_RegisterType b)
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_at) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_blend_at) // NOLINT
 {
-    TYPED_TEST_SERIES(test_blend_at_test_case, num_elements<TypeParam>)
+    TYPED_TEST_SERIES(test_blend_at_test_case, num_elements<TypeParam>);
 }
 
 
@@ -209,9 +176,9 @@ void test_blend_below_test_case(T_RegisterType a, T_RegisterType b)
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_below) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_blend_below) // NOLINT
 {
-    TYPED_TEST_SERIES(test_blend_below_test_case, num_elements<TypeParam>)
+    TYPED_TEST_SERIES(test_blend_below_test_case, num_elements<TypeParam>);
 }
 
 
@@ -250,9 +217,9 @@ void test_blend_from_to_test_case(T_RegisterType a, T_RegisterType b)
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_blend_from_to) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_blend_from_to) // NOLINT
 {
-    TYPED_TEST_SERIES(test_blend_from_to_test_case, gauss_summation(num_elements<TypeParam>))
+    TYPED_TEST_SERIES(test_blend_from_to_test_case, gauss_summation(num_elements<TypeParam>));
 }
 
 
@@ -291,9 +258,9 @@ void test_broadcast(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLI
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_broadcast) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_broadcast) // NOLINT
 {
-    TYPED_TEST_SERIES(test_broadcast, num_lane_elements<TypeParam>)
+    TYPED_TEST_SERIES(test_broadcast, num_lane_elements<TypeParam>);
 }
 
 
@@ -311,9 +278,9 @@ void test_broadcast_across_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_broadcast_across_lanes) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_broadcast_across_lanes) // NOLINT
 {
-    TYPED_TEST_SERIES(test_broadcast_across_lanes_test_case, num_elements<TypeParam>)
+    TYPED_TEST_SERIES(test_broadcast_across_lanes_test_case, num_elements<TypeParam>);
 }
 
 
@@ -341,9 +308,10 @@ void test_exchange_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_exchange) // NOLINT
-{TYPED_TEST_SERIES(test_exchange_test_case, power(num_elements<TypeParam>, 2))}
-
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_exchange) // NOLINT
+{
+    TYPED_TEST_SERIES(test_exchange_test_case, power(num_elements<TypeParam>, 2));
+}
 
 // --- test insert ----------------------------------------------------------------------------------------------------
 
@@ -436,9 +404,9 @@ void test_permute_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b)
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_permute) // NOLINT
 {
-    TYPED_TEST_SERIES(test_permute_test_case, power(num_lane_elements<TypeParam>, num_lane_elements<TypeParam>))
+    TYPED_TEST_SERIES(test_permute_test_case, power(num_lane_elements<TypeParam>, num_lane_elements<TypeParam>));
 }
 
 
@@ -528,11 +496,11 @@ void test_permute_accross_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_R
         EXPECT_DOUBLE_EQ(get(c, i), get(a, p.at(i)));
 }
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute_accross_lanes) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_permute_accross_lanes) // NOLINT
 {
     constexpr UST n_e     = num_elements<TypeParam>;
     constexpr UST n_extra = (is_m128d<TypeParam>) ? 2 : 6;
-    TYPED_TEST_SERIES(test_permute_accross_lanes_test_case, n_e + n_extra)
+    TYPED_TEST_SERIES(test_permute_accross_lanes_test_case, n_e + n_extra);
 }
 
 
@@ -559,11 +527,11 @@ void test_permute_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterT
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_permute_lanes) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_permute_lanes) // NOLINT
 {
     if constexpr (is_avx_register<TypeParam>)
     {
-        TYPED_TEST_SERIES(test_permute_lanes_test_case, 4)
+        TYPED_TEST_SERIES(test_permute_lanes_test_case, 4);
     }
 }
 
@@ -611,10 +579,10 @@ void test_shuffle_test_case(T_RegisterType a, T_RegisterType b) // NOLINT - comp
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_shuffle) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_shuffle) // NOLINT
 {
     constexpr UST n_le = num_lane_elements<TypeParam>;
-    TYPED_TEST_SERIES(test_shuffle_test_case, power(n_le, n_le))
+    TYPED_TEST_SERIES(test_shuffle_test_case, power(n_le, n_le));
 }
 
 
@@ -644,13 +612,13 @@ void test_shuffle_test_case_m256d(T_RegisterType a, T_RegisterType b) // NOLINT 
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_shuffle_m256_extra) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_shuffle_m256_extra) // NOLINT
 {
     if constexpr (is_m256d<TypeParam>)
     {
         constexpr UST n_e  = num_elements<TypeParam>;
         constexpr UST n_le = num_lane_elements<TypeParam>;
-        TYPED_TEST_SERIES(test_shuffle_test_case_m256d, power(n_le, n_e))
+        TYPED_TEST_SERIES(test_shuffle_test_case_m256d, power(n_le, n_e));
     }
 }
 
@@ -682,11 +650,11 @@ void test_shuffle_lanes_test_case(T_RegisterType a, T_RegisterType b) // NOLINT 
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_shuffle_lanes) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_shuffle_lanes) // NOLINT
 {
     if constexpr (is_avx_register<TypeParam>)
     {
-        TYPED_TEST_SERIES(test_shuffle_lanes_test_case, power(2, 4))
+        TYPED_TEST_SERIES(test_shuffle_lanes_test_case, power(2, 4));
     }
 }
 
@@ -711,16 +679,16 @@ void test_swap_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) //
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_swap) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_swap) // NOLINT
 {
     constexpr UST n_e = num_elements<TypeParam>;
-    TYPED_TEST_SERIES(test_swap_test_case, power(n_e, 2))
+    TYPED_TEST_SERIES(test_swap_test_case, power(n_e, 2));
 }
 
 
 // --- test swap_lanes ------------------------------------------------------------------------------------------------
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_swap_lanes) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_swap_lanes) // NOLINT
 {
     if constexpr (is_avx_register<TypeParam>)
     {
@@ -768,10 +736,10 @@ void test_swap_lanes_if_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterT
 }
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_swap_lanes_if) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_swap_lanes_if) // NOLINT
 {
     if constexpr (is_avx_register<TypeParam>)
     {
-        TYPED_TEST_SERIES(test_swap_lanes_if_test_case, 2)
+        TYPED_TEST_SERIES(test_swap_lanes_if_test_case, 2);
     }
 }

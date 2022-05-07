@@ -9,6 +9,20 @@
 
 
 #ifndef STATIC_ANALYSIS
+
+//! @brief
+//! Macro that generates a test series for typed tests.
+//!
+//! @details
+//! Insert details...
+//!
+//! @param test_func:
+//! The name of the function that defines a single test case. The function needs to be a template function with 2
+//! template parameters. The first one must be a variable type. The second one an unsigned integer. The integer values
+//! represent the number of the current test case. This number can be used to deduce other static test values like
+//! template parameters that should vary between test cases.
+//! @param num_test_cases:
+//! The number of test cases.
 // NOLINTNEXTLINE
 #    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
         auto start_typed_test_series = []()                                                                            \

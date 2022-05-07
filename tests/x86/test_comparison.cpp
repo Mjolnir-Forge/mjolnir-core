@@ -3,6 +3,7 @@
 #include "mjolnir/core/x86/comparison.h"
 #include "mjolnir/core/x86/definitions.h"
 #include "mjolnir/core/x86/direct_access.h"
+#include "mjolnir/testing/x86/floating_point_vector_register_test_suite.h"
 #include <gtest/gtest.h>
 
 #include <array>
@@ -15,43 +16,13 @@ using namespace mjolnir::x86;
 // Setup
 // ====================================================================================================================
 
-// create test suites -------------------------------------------------------------------------------------------------
 
-template <FloatVectorRegister T_RegisterType>
-class TestFloatingPointVectorRegisterTypes : public ::testing::Test
-{
-};
+// typed test series --------------------------------------------------------------------------------------------------
 
+#include "mjolnir/testing/typed_test_series.h"
 
-using VectorRegisterTestTypes = ::testing::Types<__m128, __m128d, __m256, __m256d>; // NOLINT
-
-
-// cppcheck-suppress syntaxError
-TYPED_TEST_SUITE(TestFloatingPointVectorRegisterTypes, VectorRegisterTestTypes, );
-
-
-// NOLINTNEXTLINE
-#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>()
-
-
-#ifndef STATIC_ANALYSIS
-// NOLINTNEXTLINE
-#    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
-        auto start_typed_test_series = []()                                                                            \
-        {                                                                                                              \
-            auto test_series = []<UST... t_index>([[maybe_unused]] std::index_sequence<t_index...> seq)                \
-            {                                                                                                          \
-                (void) std::initializer_list<I32>{(CALL_TEST_CASE_FUNC(test_func), 0)...};                             \
-            };                                                                                                         \
-            test_series(std::make_index_sequence<num_test_cases>());                                                   \
-        };                                                                                                             \
-        start_typed_test_series();
-#else
-// NOLINTNEXTLINE
-#    define TYPED_TEST_SERIES(test_func, num_test_cases)                                                               \
-        constexpr UST t_index = 0;                                                                                     \
-        CALL_TEST_CASE_FUNC(test_func);
-#endif
+#define CREATE_INPUT_VALUES
+#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>() // NOLINT
 
 
 // create test registers ----------------------------------------------------------------------------------------------
@@ -254,7 +225,7 @@ template <FloatVectorRegister T_RegisterType>
 FULL_COMPARISON_TESTCASE(test_compare_all_equal, compare_all_equal, ==)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_equal) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_all_equal) // NOLINT
 {
     test_compare_all_equal<TypeParam>();
 }
@@ -265,7 +236,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_equal) // NOLI
 FULL_COMPARISON_TESTCASE(test_compare_all_greater, compare_all_greater, >)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_greater) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_all_greater) // NOLINT
 {
     test_compare_all_greater<TypeParam>();
 }
@@ -276,7 +247,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_greater) // NO
 FULL_COMPARISON_TESTCASE(test_compare_all_greater_equal, compare_all_greater_equal, >=)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_greater_equal) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_all_greater_equal) // NOLINT
 {
     test_compare_all_greater_equal<TypeParam>();
 }
@@ -287,7 +258,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_greater_equal)
 FULL_COMPARISON_TESTCASE(test_compare_all_less, compare_all_less, <)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_less) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_all_less) // NOLINT
 {
     test_compare_all_less<TypeParam>();
 }
@@ -298,7 +269,7 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_less) // NOLIN
 FULL_COMPARISON_TESTCASE(test_compare_all_less_equal, compare_all_less_equal, <=)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_less_equal) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_all_less_equal) // NOLINT
 {
     test_compare_all_less_equal<TypeParam>();
 }
@@ -309,11 +280,11 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_all_less_equal) //
 SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_equal, compare_in_sequence_equal, ==)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_equal) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_in_sequence_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = gauss_summation(n_e);
-    TYPED_TEST_SERIES(test_compare_in_sequence_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_in_sequence_equal, n_testcases);
 }
 
 
@@ -322,11 +293,11 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_equal)
 SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_greater, compare_in_sequence_greater, >)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_greater) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_in_sequence_greater) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = gauss_summation(n_e);
-    TYPED_TEST_SERIES(test_compare_in_sequence_greater, n_testcases)
+    TYPED_TEST_SERIES(test_compare_in_sequence_greater, n_testcases);
 }
 
 
@@ -335,11 +306,11 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_greate
 SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_greater_equal, compare_in_sequence_greater_equal, >=)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_greater_equal) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_in_sequence_greater_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = gauss_summation(n_e);
-    TYPED_TEST_SERIES(test_compare_in_sequence_greater_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_in_sequence_greater_equal, n_testcases);
 }
 
 
@@ -348,11 +319,11 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_greate
 SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_less, compare_in_sequence_less, <)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_less) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_in_sequence_less) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = gauss_summation(n_e);
-    TYPED_TEST_SERIES(test_compare_in_sequence_less, n_testcases)
+    TYPED_TEST_SERIES(test_compare_in_sequence_less, n_testcases);
 }
 
 
@@ -361,11 +332,11 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_less) 
 SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_less_equal, compare_in_sequence_less_equal, <=)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_less_equal) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_in_sequence_less_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = gauss_summation(n_e);
-    TYPED_TEST_SERIES(test_compare_in_sequence_less_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_in_sequence_less_equal, n_testcases);
 }
 
 
@@ -374,11 +345,11 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_in_sequence_less_e
 SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_equal, compare_selected_equal, ==)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_equal) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_selected_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
-    TYPED_TEST_SERIES(test_compare_selected_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_selected_equal, n_testcases);
 }
 
 
@@ -387,11 +358,11 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_equal) //
 SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_greater, compare_selected_greater, >)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_greater) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_selected_greater) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
-    TYPED_TEST_SERIES(test_compare_selected_greater, n_testcases)
+    TYPED_TEST_SERIES(test_compare_selected_greater, n_testcases);
 }
 
 
@@ -400,11 +371,11 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_greater) 
 SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_greater_equal, compare_selected_greater_equal, >=)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_greater_equal) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_selected_greater_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
-    TYPED_TEST_SERIES(test_compare_selected_greater_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_selected_greater_equal, n_testcases);
 }
 
 
@@ -413,11 +384,11 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_greater_e
 SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_less, compare_selected_less, <)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_less) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_selected_less) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
-    TYPED_TEST_SERIES(test_compare_selected_less, n_testcases)
+    TYPED_TEST_SERIES(test_compare_selected_less, n_testcases);
 }
 
 
@@ -426,17 +397,17 @@ TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_less) // 
 SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_less_equal, compare_selected_less_equal, <=)
 
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_compare_selected_less_equal) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_selected_less_equal) // NOLINT
 {
     constexpr UST n_e         = num_elements<TypeParam>;
     constexpr UST n_testcases = power_of_2(n_e) - 1;
-    TYPED_TEST_SERIES(test_compare_selected_less_equal, n_testcases)
+    TYPED_TEST_SERIES(test_compare_selected_less_equal, n_testcases);
 }
 
 
 // test is_memory_zero ------------------------------------------------------------------------------------------------
 
-TYPED_TEST(TestFloatingPointVectorRegisterTypes, test_is_memory_zero) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_is_memory_zero) // NOLINT
 {
     using EType       = ElementType<TypeParam>;
     constexpr UST n_e = num_elements<TypeParam>;

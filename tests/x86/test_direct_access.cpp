@@ -3,6 +3,7 @@
 #include "mjolnir/core/x86/direct_access.h"
 #include "mjolnir/core/x86/intrinsics.h"
 #include "mjolnir/core/x86/x86.h"
+#include "mjolnir/testing/x86/floating_point_vector_register_test_suite.h"
 #include <gtest/gtest.h>
 
 #include <array>
@@ -14,20 +15,6 @@ using namespace mjolnir::x86;
 // Setup
 // ====================================================================================================================
 
-// create test suites -------------------------------------------------------------------------------------------------
-
-template <typename T_Type>
-class TypedTest : public ::testing::Test
-{
-};
-
-
-using VectorRegisterTestTypes = ::testing::Types<__m128, __m128d, __m256, __m256d>; // NOLINT
-
-
-// cppcheck-suppress syntaxError
-TYPED_TEST_SUITE(TypedTest, VectorRegisterTestTypes, );
-
 
 // ====================================================================================================================
 // Tests
@@ -36,7 +23,7 @@ TYPED_TEST_SUITE(TypedTest, VectorRegisterTestTypes, );
 // --------------------------------------------------------------------------------------------------------------------
 
 
-TYPED_TEST(TypedTest, test_get_dynamic_version) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_get_dynamic_version) // NOLINT
 {
     VectorDataArray<TypeParam> data = {{{0}}};
 
@@ -51,7 +38,7 @@ TYPED_TEST(TypedTest, test_get_dynamic_version) // NOLINT
 
 // --------------------------------------------------------------------------------------------------------------------
 
-TYPED_TEST(TypedTest, test_get_static_version) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_get_static_version) // NOLINT
 {
     VectorDataArray<TypeParam> data = {{{0}}};
 
@@ -79,7 +66,7 @@ TYPED_TEST(TypedTest, test_get_static_version) // NOLINT
 
 // --------------------------------------------------------------------------------------------------------------------
 
-TYPED_TEST(TypedTest, test_set_dynamic_version) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_set_dynamic_version) // NOLINT
 {
     auto a = mm_set1<TypeParam>(-1.);
 
@@ -96,7 +83,7 @@ TYPED_TEST(TypedTest, test_set_dynamic_version) // NOLINT
 
 // --------------------------------------------------------------------------------------------------------------------
 
-TYPED_TEST(TypedTest, test_set_static_version) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_set_static_version) // NOLINT
 {
     auto a = mm_set1<TypeParam>(-1.);
 

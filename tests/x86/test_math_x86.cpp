@@ -35,8 +35,8 @@ template <FloatVectorRegister T_RegisterType>
 
 #include "mjolnir/testing/typed_test_series.h"
 
-#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>() // NOLINT
 #define CREATE_INPUT_VALUES
+#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>() // NOLINT
 
 // ====================================================================================================================
 // Tests
