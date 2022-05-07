@@ -79,14 +79,5 @@
         test_func_name<TypeParam, 0>(TEST_CASE_ARGUMENTS) // NOLINT(bugprone-macro-parentheses)
 #endif
 
-//! \cond DO_NOT_DOCUMENT
-
-//! The purpose of this macro is to silence a clang-tidy warning since the currently used clang-tidy version in the CI
-//! pipelines does not support multi-line silencing of issues. Placing a `NOLINT` inside of a multi-line macro is not
-//! possible
-//!
-#define CALL_TEST_CASE_FUNC(func_name) func_name<TypeParam, t_index>(TEST_CASE_ARGUMENTS) // NOLINT
-
-//! \endcond
 
 //! @}
