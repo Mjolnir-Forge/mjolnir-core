@@ -253,6 +253,21 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Return the first element of `src`.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] src:
+//! The source register
+//!
+//! @return
+//! First element of `src`
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_cvt_float(T_RegisterType src) -> ElementType<T_RegisterType>;
+
+
+//! @brief
 //! Load data from an aligned memory location into a new register.
 //!
 //! @tparam T_RegisterType:
@@ -457,13 +472,13 @@ template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_add(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
 {
     if constexpr (is_m128<T_RegisterType>)
-        return _mm_add_ps(lhs, rhs);
+        return _mm_add_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
     else if constexpr (is_m128d<T_RegisterType>)
-        return _mm_add_pd(lhs, rhs);
+        return _mm_add_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
     else if constexpr (is_m256<T_RegisterType>)
-        return _mm256_add_ps(lhs, rhs);
+        return _mm256_add_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
     else
-        return _mm256_add_pd(lhs, rhs);
+        return _mm256_add_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
 }
 
 
@@ -643,6 +658,22 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_cmp_ps(lhs, rhs, _CMP_LT_OS);
     else
         return _mm256_cmp_pd(lhs, rhs, _CMP_LT_OS);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_cvt_float(T_RegisterType src) -> ElementType<T_RegisterType>
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_cvtss_f32(src);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_cvtsd_f64(src);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_cvtss_f32(src);
+    else
+        return _mm256_cvtsd_f64(src);
 }
 
 

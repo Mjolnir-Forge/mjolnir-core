@@ -123,4 +123,13 @@ namespace mjolnir::x86
 }
 
 
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto element_sum(T_RegisterType src) noexcept -> ElementType<T_RegisterType>
+{
+    T_RegisterType sum = broadcast_element_sum(src);
+    return mm_cvt_float(sum);
+}
+
 } // namespace mjolnir::x86

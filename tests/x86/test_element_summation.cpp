@@ -26,28 +26,47 @@ using namespace mjolnir::x86;
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_broadcast_element_sum) // NOLINT
 {
-    if constexpr (not is_m256d<TypeParam>)
+    using EType       = ElementType<TypeParam>;
+    constexpr UST n_e = num_elements<TypeParam>;
+
+    auto src = mm_setzero<TypeParam>();
+
+    EType exp{0.};
+
+    for (UST i = 0; i < n_e; ++i)
     {
-        using EType       = ElementType<TypeParam>;
-        constexpr UST n_e = num_elements<TypeParam>;
-
-        auto src = mm_setzero<TypeParam>();
-
-        EType exp{0.};
-
-        for (UST i = 0; i < n_e; ++i)
-        {
-            auto val = static_cast<EType>((3 * (i + 1)) % 8); // NOLINT - magic number
-            set(src, i, val);
-            exp += val;
-        }
-
-        TypeParam res = broadcast_element_sum(src);
-
-        for (UST i = 0; i < n_e; ++i)
-            EXPECT_DOUBLE_EQ(get(res, i), exp);
+        auto val = static_cast<EType>((3 * (i + 1)) % 8); // NOLINT - magic number
+        set(src, i, val);
+        exp += val;
     }
+
+    TypeParam res = broadcast_element_sum(src);
+
+    for (UST i = 0; i < n_e; ++i)
+        EXPECT_DOUBLE_EQ(get(res, i), exp);
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
+
+
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_element_sum) // NOLINT
+{
+    using EType       = ElementType<TypeParam>;
+    constexpr UST n_e = num_elements<TypeParam>;
+
+    auto src = mm_setzero<TypeParam>();
+
+    EType exp{0.};
+
+    for (UST i = 0; i < n_e; ++i)
+    {
+        auto val = static_cast<EType>((7 * (i + 1)) % 10); // NOLINT - magic number
+        set(src, i, val);
+        exp += val;
+    }
+
+    EType res = element_sum(src);
+
+    EXPECT_DOUBLE_EQ(res, exp);
+}
