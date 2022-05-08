@@ -21,6 +21,23 @@ namespace mjolnir::x86
 
 
 //! @brief
+//! Perform an element-wise addition of `lhs` and `rhs` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! Results of the element-wise addition.
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_add(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Compute the bitwise AND of `a` and `b`.
 //!
 //! @tparam T_RegisterType:
@@ -145,7 +162,8 @@ template <FloatVectorRegister T_RegisterTypeOut, IntegerVectorRegister T_Registe
 //! @param[in] rhs:
 //! The register right of the operator
 //!
-//! @return Register with the comparison results. See detailed description.
+//! @return
+//! Register with the comparison results. See detailed description.
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_cmp_eq(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
@@ -165,7 +183,8 @@ template <FloatVectorRegister T_RegisterType>
 //! @param[in] rhs:
 //! The register right of the operator
 //!
-//! @return Register with the comparison results. See detailed description.
+//! @return
+//! Register with the comparison results. See detailed description.
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_cmp_ge(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
@@ -185,7 +204,8 @@ template <FloatVectorRegister T_RegisterType>
 //! @param[in] rhs:
 //! The register right of the operator
 //!
-//! @return Register with the comparison results. See detailed description.
+//! @return
+//! Register with the comparison results. See detailed description.
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_cmp_gt(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
@@ -205,7 +225,8 @@ template <FloatVectorRegister T_RegisterType>
 //! @param[in] rhs:
 //! The register right of the operator
 //!
-//! @return Register with the comparison results. See detailed description.
+//! @return
+//! Register with the comparison results. See detailed description.
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_cmp_le(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
@@ -225,7 +246,8 @@ template <FloatVectorRegister T_RegisterType>
 //! @param[in] rhs:
 //! The register right of the operator
 //!
-//! @return Register with the comparison results. See detailed description.
+//! @return
+//! Register with the comparison results. See detailed description.
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_cmp_lt(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
@@ -429,6 +451,22 @@ template <FloatVectorRegister T_RegisterType>
 
 namespace mjolnir::x86
 {
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_add(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_add_ps(lhs, rhs);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_add_pd(lhs, rhs);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_add_ps(lhs, rhs);
+    else
+        return _mm256_add_pd(lhs, rhs);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
