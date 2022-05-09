@@ -584,7 +584,7 @@ template <std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
         return bit << static_cast<UST>(shift);
     }
 
-    assert(index >= internal::abs(shift)); // NOLINT
+    assert(index >= internal::abs(shift)); // NOLINT // LCOV_EXCL_LINE
     return bit >> static_cast<UST>(internal::abs(shift));
 }
 
@@ -655,11 +655,11 @@ template <UST t_num_bits, std::unsigned_integral T_Type, std::unsigned_integral 
 
     if (shift >= 0)
     {
-        assert(index + t_num_bits + shift <= num_bits<T_ReturnType>); // NOLINT
+        assert(index + t_num_bits + shift <= num_bits<T_ReturnType>); // NOLINT // LCOV_EXCL_LINE
         return bits << static_cast<UST>(shift);
     }
 
-    assert(index >= internal::abs(shift)); // NOLINT
+    assert(index >= internal::abs(shift)); // NOLINT // LCOV_EXCL_LINE
     return bits >> static_cast<UST>(internal::abs(shift));
 }
 
