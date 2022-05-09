@@ -78,8 +78,12 @@ set(MJOLNIR_CORE_COMPILE_FEATURES cxx_std_20
 
 # Set compile options
 if(MSVC)
-    set(MJOLNIR_CORE_COMPILE_OPTIONS /W4
+    set(MJOLNIR_CORE_COMPILE_OPTIONS /W4 /arch:AVX2
                                      ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
+    if(${MJOLNIR_CORE_ENABLE_TESTS})
+        set(MJOLNIR_CORE_COMPILE_OPTIONS ${MJOLNIR_CORE_COMPILE_OPTIONS}
+                                         /bigobj)
+    endif()
 else()
     set(MJOLNIR_CORE_COMPILE_OPTIONS
         -Wall
@@ -87,7 +91,22 @@ else()
         -Wpedantic
         -Wmissing-braces
         -Wshadow
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Wcast-align
+        -Wunused
+        -Woverloaded-virtual
+        -Wconversion
+        -Wsign-conversion
+        -Wmisleading-indentation
+        # -Wduplicated-cond -Wduplicated-branches -Wlogical-op
+        -Wnull-dereference
+        # -Wuseless-cast
+        -Wdouble-promotion
+        # -Wlifetime -Weverything
+        -pedantic
         -pthread
+        -march=native
         ${MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS})
 endif()
 

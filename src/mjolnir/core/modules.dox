@@ -3,7 +3,27 @@
 //! @brief
 //! This module contains the core functionality of the Mjolnir API.
 
+
+//! @defgroup core_math Core Math
+//!
+//! @brief
+//! This submodule of the core module contains math functions and classes.
+
+
 //! @defgroup core_utility Core Utility
 //!
 //! @brief
 //! This submodule of the core module contains various utility functions.
+
+
+//! @defgroup core_x86 Core x86
+//!
+//! @brief
+//! This submodule of the core module provides x86 related functions and classes.
+
+
+
+//! @defgroup testing Testing
+//!
+//! @brief
+//! This module contains various things for testing.

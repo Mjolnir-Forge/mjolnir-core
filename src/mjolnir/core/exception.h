@@ -10,21 +10,33 @@
 #include <cstring>
 #include <stdexcept>
 
-// ====================================================================================================================
+// === EXCEPTION MACROS ===============================================================================================
 
 //! \addtogroup core
 //! @{
 
-//! @brief Throw an exception and automatically add the function that caused it.
-//! @param[in] message: The exception message
-#define THROW_EXCEPTION(message) throw mjolnir::Exception(__PRETTY_FUNCTION__, message)
+//! @brief T
+//! hrow an exception and automatically add the function that caused it.
+//!
+//! @param[in] exception_type:
+//! The exception type
+//! @param[in] message:
+//! The exception message
+#define THROW_EXCEPTION(exception_type, message) throw exception_type(__PRETTY_FUNCTION__, message)
 
-//! @brief Throw an exception if the passed condition is met.
-//! @param[in] condition: If the passed condition validates as `true`, the exception is thrown.
-//! @param[in] message: The exception message
-#define THROW_EXCEPTION_IF(condition, message)                                                                         \
-    if (condition)                                                                                                     \
-    THROW_EXCEPTION(message)
+//! @brief
+//! Throw an exception if the passed condition is met.
+//!
+//! @param[in] condition:
+//! If the passed condition validates as `true`, the exception is thrown.
+//! @param[in] exception_type:
+//! The exception type
+//! @param[in] message:
+//! The exception message
+#define THROW_EXCEPTION_IF(condition, exception_type, message)                                                         \
+    if (condition) [[unlikely]]                                                                                        \
+    THROW_EXCEPTION(exception_type, message)
+
 
 //! @}
 
@@ -36,37 +48,59 @@ namespace mjolnir
 //! \addtogroup core
 //! @{
 
-//! @brief Stores origion and message of an exception
+//! @brief
+//! Stores origin and message of an exception
 class Exception : public std::runtime_error
 {
 public:
     Exception()           = delete;
     ~Exception() override = default;
 
-    //! @brief Copy contstructor
-    //! @param[in] other: Other instance that should be copied
+    //! @brief
+    //! Copy contstructor
+    //!
+    //! @param[in] other:
+    //! Other instance that should be copied
     Exception(const Exception& other) = default;
 
-    //! @brief Move constructor
-    //! @param[in, out] other: Other instance that should be moved
+    //! @brief
+    //! Move constructor
+    //!
+    //! @param[in, out] other:
+    //! Other instance that should be moved
     Exception(Exception&& other) = default;
 
-    //! @brief Copy assignment operator
-    //! @param[in] other: Other instance that should be copied
+    //! @brief
+    //! Copy assignment operator
+    //!
+    //! @param[in] other:
+    //! Other instance that should be copied
+    //!
     //! @return Reference to class instance
     auto operator=(const Exception& other) -> Exception& = default;
 
-    //! @brief Move assignment operator
-    //! @param[in, out] other: Other instance that should be moved
-    //! @return Reference to class instance
+    //! @brief
+    //! Move assignment operator
+    //!
+    //! @param[in, out] other:
+    //! Other instance that should be moved
+    //!
+    //! @return
+    //! Reference to class instance
     auto operator=(Exception&& other) -> Exception& = default;
 
 
-    //! @brief Constructor
-    //! @param[in] origin: Name of the function that caused the exception
-    //! @param[in] message: Exception message
+    //! @brief
+    //! Constructor
+    //!
+    //! @param[in] origin:
+    //! Name of the function that caused the exception
+    //!
+    //! @param[in] message:
+    //! Exception message
     Exception(const std::string& origin, const std::string& message);
 };
+
 
 //! @}
 } // namespace mjolnir
@@ -83,5 +117,6 @@ inline Exception::Exception(const std::string& origin, const std::string& messag
     : std::runtime_error{std::string("[") + origin + std::string("] ") + message}
 {
 }
+
 
 } // namespace mjolnir
