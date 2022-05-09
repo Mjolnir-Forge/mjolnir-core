@@ -3,7 +3,7 @@
 #include "mjolnir/core/utility/bit_operations.h"
 #include "mjolnir/core/utility/is_close.h"
 #include "mjolnir/core/x86/direct_access.h"
-#include "mjolnir/core/x86/math.h"
+#include "mjolnir/core/x86/sign_manipulation.h"
 #include "mjolnir/testing/x86/floating_point_vector_register_test_suite.h"
 #include <gtest/gtest.h>
 

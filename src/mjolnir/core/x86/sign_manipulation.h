@@ -1,5 +1,5 @@
 //! @file
-//! math.h
+//! sign_manipulation.h
 //!
 //! @brief
 //! Contains math functions for vector registers
