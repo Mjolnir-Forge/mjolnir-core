@@ -31,6 +31,8 @@ class FloatingPointVectorRegisterTestSuite : public ::testing::Test
 using VectorRegisterTestTypes = ::testing::Types<__m128, __m128d, __m256, __m256d>; // NOLINT
 
 
+//! The comma at the end of the typed test series call is necessary to suppress a warning. See the following link for
+//! more information: https://github.com/google/googletest/issues/2271
 // cppcheck-suppress syntaxError
 TYPED_TEST_SUITE(FloatingPointVectorRegisterTestSuite, VectorRegisterTestTypes, );
 //! \endcond
