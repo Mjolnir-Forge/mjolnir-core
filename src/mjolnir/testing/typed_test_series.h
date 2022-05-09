@@ -57,6 +57,12 @@
 //! @param num_test_cases:
 //! The number of test cases.
 //!
+//! @note
+//! If the preprocessor symbol `STATIC_ANALYSIS` is defined, the number of test cases will automatically set to 1. The
+//! reason is that clang-tidy evaluates each test case individually causing a massive overhead for some tests. This
+//! reduction in the number of test cases shouldn't have an impact on the results of the clang-tidy run. However, it
+//! results in a significantly decreased runtime.
+//!
 //! @todo
 //! Add example for function with parameters
 // NOLINTNEXTLINE

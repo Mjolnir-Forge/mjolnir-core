@@ -34,12 +34,20 @@ Adding `-j N` will accelerate the build process by using `N` processor cores.
 
 ## Build options
 
-The following options can be used to customize the build:
+The following CMake options can be used to customize the build:
 
 
 - `MJOLNIR_CORE_ENABLE_TESTS`: Enables the tests of the core module
 - `MJOLNIR_CORE_ENABLE_COMPILER_EXTENSIONS`: Enables compiler extensions for the core module
 - `MJOLNIR_CORE_ENABLE_LTO`: Enables link time optimizations for the core module
+
+The following preprocessor defines also affect the build:
+
+- `STATIC_ANALYSIS`: If defined, code sections that have no effect on the quality of the static
+   analysis but cause a huge overhead are removed or modified. An example would be the 
+   `TYPED_TEST_SERIES` macro defined in `mjolnir/testing/typed_test_series.h`. Have a look at 
+   its doxygen documentation for more information.
+
 
 ## Additional CMake parameters
 
@@ -56,3 +64,5 @@ command line in the form `-D<PARAMETER_NAME>=`:
   options that should be used during the build process of the core library
 - `MJOLNIR_ROOT_DIR`: Specifies the root directory of the full library
 - `MJOLNIR_CORE_ROOT_DIR`: Specifies the root directory of the core library
+
+
