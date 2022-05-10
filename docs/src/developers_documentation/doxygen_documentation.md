@@ -39,3 +39,4 @@ environment defined in `docs/environment.yml`.
 To learn how the setup works, have a look into
 [this Stack Overflow question](https://stackoverflow.com/q/36064976/6700329) and
 its answers.
+
