@@ -8,6 +8,6 @@ Closes # (add issue numbers)
 
 ## Checks
 
-  - [ ] updated changelog
-  - [ ] updated documentation
-  - [ ] updated tests
+-   [ ] updated changelog
+-   [ ] updated documentation
+-   [ ] updated tests
