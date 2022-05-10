@@ -1,4 +1,4 @@
-# Description
+## Description
 
 _Describe the purpose and changes of the pull request_
 
@@ -8,6 +8,6 @@ Closes # (add issue numbers)
 
 ## Checks
 
--   [ ] updated changelog
--   [ ] updated documentation
--   [ ] updated tests
+- [ ] updated changelog
+- [ ] updated documentation
+- [ ] updated tests
