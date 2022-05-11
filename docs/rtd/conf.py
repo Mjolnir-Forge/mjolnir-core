@@ -21,7 +21,7 @@ import subprocess  # nosec
 # -- Project information -----------------------------------------------------
 
 project = "Mjolnir-Core"
-copyright = "2021, Mjolnir-Forge"
+copyright = "2021, Mjolnir-Forge"  # nosec
 author = "Mjolnir-Forge"
 
 
