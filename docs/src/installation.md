@@ -74,5 +74,3 @@ via the command line in the form `-D<PARAMETER_NAME>=`:
 - `MJOLNIR_ROOT_DIR`: Specifies the root directory of the full library
 
 - `MJOLNIR_CORE_ROOT_DIR`: Specifies the root directory of the core library
-
-
