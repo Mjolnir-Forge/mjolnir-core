@@ -18,7 +18,7 @@ update of this documentation.
 Clang-format automatically refactors your code to match a specified format.
 It is possible to run it from the command line, for example with:
 
-~~~
+~~~ shell
 clang-format -i <FILE>
 ~~~
 
@@ -76,7 +76,7 @@ which tools are currently used to maintain a good code quality.
 The basic usage is mostly the same.
 Run CMake as follows:
 
-~~~
+~~~ shell
 cmake -DCMAKE_BUILD_TYPE=DEBUG \
       -DCMAKE_C_COMPILER=clang \
       -DCMAKE_CXX_COMPILER=clang++ \
@@ -90,14 +90,14 @@ The CMake variables `MJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS` and
 the specified options.
 Now run the following command to build:
 
-~~~
+~~~ shell
 cmake --build <BUILD_DIR> -j <NUM_THREADS>
 ~~~
 
 Finally, run the compiled code to see if there are any issues.
 In the GitHub actions, all tests are build and run with different tools:
 
-~~~
+~~~ shell
  ctest --output-on-failure
 ~~~
 
