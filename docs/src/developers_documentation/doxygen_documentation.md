@@ -9,7 +9,7 @@ In its current configuration, the `graphviz` package is also required to build
 without warnings or errors.
 If you are using a Linux system, just install both with:
 
-~~~
+~~~ shell
 sudo apt-get install doxygen graphviz
 ~~~
 
@@ -18,7 +18,7 @@ using Conda.
 A dedicated environment file is located at `docs/environment.yml`.
 Now navigate to the root directory and run:
 
-~~~
+~~~ shell
 doxygen .doxyfile
 ~~~
 
@@ -37,5 +37,5 @@ option `WARN_AS_ERROR` in the configuration file `.doxyfile` to `NO`.
 The documentation published on `readthedocs.org` is build using the Conda
 environment defined in `docs/environment.yml`.
 To learn how the setup works, have a look into
-[this Stack Overflow question](https://stackoverflow.com/q/36064976/6700329) and
-its answers.
+[this Stack Overflow question](https://stackoverflow.com/q/36064976/6700329)
+and its answers.
