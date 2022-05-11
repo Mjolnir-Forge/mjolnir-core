@@ -16,7 +16,7 @@
 
 
 import os
-import subprocess
+import subprocess  # nosec
 
 # -- Project information -----------------------------------------------------
 
