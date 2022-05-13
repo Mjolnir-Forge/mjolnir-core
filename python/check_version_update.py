@@ -122,7 +122,7 @@ def get_version_string(version: Union[None, List[int]]) -> str:
 
 
 repo = git.Repo(".")
-active_branch = repo.active_branch()
+active_branch = repo.active_branch
 # FNULL = open(os.devnull, "w")
 repo.git.checkout(source_branch)
 source_version = get_version_number(module_name)
