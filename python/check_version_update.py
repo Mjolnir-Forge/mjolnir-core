@@ -122,6 +122,10 @@ def get_version_string(version: Union[None, List[int]]) -> str:
 
 repo = git.Repo(".")
 active_branch = None
+
+# When used in the CI pipeline, `repo.active_branch` will raise the following
+# `TypeError` at this point, while there are no problems during local tests:
+# TypeError: HEAD is a detached symbolic reference as it points to ...
 try:
     active_branch = repo.active_branch
 except TypeError:
