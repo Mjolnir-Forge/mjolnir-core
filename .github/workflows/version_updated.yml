@@ -2,8 +2,8 @@ name: Version updated
 
 on:
   pull_request:
-    branches:
-    - master
+  #  branches:
+  #  - master
 
 jobs:
   check_version_updated:
