@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: install gitpython
+      run: |
+          pip install gitpython
     - name: Update remote branches
       run: |
           git remote update origin --prune  
