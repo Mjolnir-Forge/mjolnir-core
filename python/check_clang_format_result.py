@@ -1,9 +1,11 @@
 """Checks if all cpp files are formatted correctly."""
 
-import subprocess
 import sys
 
-result = subprocess.check_output(["git", "diff", "--name-only", "HEAD"]).decode("utf-8")
+import git
+
+repo = git.Repo(".")
+result = repo.git.diff("HEAD", name_only=True)
 
 if result:
     modified_files = result.splitlines()

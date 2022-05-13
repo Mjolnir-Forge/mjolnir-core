@@ -10,4 +10,4 @@ Closes # (add issue numbers)
 
 - [ ] updated changelog
 - [ ] updated documentation
-- [ ] updated tests 
+- [ ] updated tests

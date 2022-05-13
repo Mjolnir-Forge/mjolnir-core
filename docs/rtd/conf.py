@@ -16,12 +16,12 @@
 
 
 import os
-import subprocess
+import subprocess  # nosec
 
 # -- Project information -----------------------------------------------------
 
 project = "Mjolnir-Core"
-copyright = "2021, Mjolnir-Forge"
+copyright = "2021, Mjolnir-Forge"  # pylint: disable=W0622
 author = "Mjolnir-Forge"
 
 
@@ -69,8 +69,8 @@ os.chdir("../..")
 # with open(".doxyfile", "a") as file:
 #    file.write("WARN_AS_ERROR = NO")
 
-subprocess.run(["doxygen", "-v"])
-r = subprocess.run(["doxygen", ".doxyfile"])
+subprocess.run(["doxygen", "-v"])  # nosec
+r = subprocess.run(["doxygen", ".doxyfile"])  # nosec
 if r.returncode:
     raise Exception("The doxygen build failed")
 

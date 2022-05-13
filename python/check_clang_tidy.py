@@ -1,9 +1,9 @@
 """Checks if all cpp files pass the clang-tidy tests."""
 
+import sys
 import time
 from argparse import ArgumentParser
-from subprocess import run
-from sys import exit, stdout
+from subprocess import run  # nosec
 
 from mjolnir.files import get_cpp_files
 
@@ -38,7 +38,7 @@ if args.gtest_dir is None:
 
 cmd = f"clang-tidy-{args.version}"
 print(f"Running {cmd}\n")
-stdout.flush()
+sys.stdout.flush()
 
 error = False
 
@@ -67,9 +67,9 @@ for file in files:
     )
     print(f"Elapsed time: {round(time.time()-start_time, 2)}s")
     print("\n")
-    stdout.flush()
+    sys.stdout.flush()
     if r.returncode != 0:
         error = True
 
 if error:
-    exit(1)
+    sys.exit(1)
