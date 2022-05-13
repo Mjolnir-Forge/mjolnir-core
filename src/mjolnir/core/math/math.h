@@ -34,9 +34,6 @@ template <std::integral T_Type>
 [[nodiscard]] inline constexpr auto gauss_summation(T_Type n) -> T_Type;
 
 
-
-
-
 //! @brief
 //! Calculate the power of a number using an integer based exponent.
 //!
@@ -91,7 +88,7 @@ template <std::integral T_Type>
 {
     assert(n >= 0 && "n must be a positive number"); // NOLINT
 
-    return (n * n + n) / 2;
+      return (n * n + n) / 2;
 }
 
 
