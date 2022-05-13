@@ -88,7 +88,7 @@ template <std::integral T_Type>
 {
     assert(n >= 0 && "n must be a positive number"); // NOLINT
 
-    return (n * n + n) / 2;
+     return (n * n + n) / 2;
 }
 
 
