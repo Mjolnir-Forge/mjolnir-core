@@ -1,7 +1,6 @@
 """Checks if the version number is increased correctly."""
 
 import os
-import subprocess
 import sys
 from typing import List, Union
 
