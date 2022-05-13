@@ -34,6 +34,9 @@ template <std::integral T_Type>
 [[nodiscard]] inline constexpr auto gauss_summation(T_Type n) -> T_Type;
 
 
+
+
+
 //! @brief
 //! Calculate the power of a number using an integer based exponent.
 //!
