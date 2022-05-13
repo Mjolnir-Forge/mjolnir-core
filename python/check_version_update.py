@@ -147,8 +147,6 @@ if source_version is not None:
         f"{source_version[0]}.{source_version[1]}.{source_version[2]}."
         "{source_version[3]}"
     )
-else:
-    "None"
 
 print(f"Source version number is: {get_version_string(source_version)}")
 print(f"Target version number is: {get_version_string(target_version)}.")
