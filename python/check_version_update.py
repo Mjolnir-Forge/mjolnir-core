@@ -149,7 +149,7 @@ if source_version is not None:
     )
 
 print(f"Source version number is: {get_version_string(source_version)}")
-print(f"Target version number is: {get_version_string(target_version)}.")
+print(f"Target version number is: {get_version_string(target_version)}")
 
 
 if source_version is not None and target_version is not None:
