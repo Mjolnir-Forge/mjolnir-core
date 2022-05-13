@@ -813,11 +813,12 @@ namespace internal
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto swap_same_lane(T_RegisterType src) noexcept -> T_RegisterType
 {
-    constexpr UST n_e  = num_elements<T_RegisterType>;
-    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+    constexpr UST n_e = num_elements<T_RegisterType>;
 
     auto get_permute_index_array = []() constexpr->std::array<UST, n_e>
     {
+        constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
         std::array<UST, n_e> a = {{0}};
         for (UST i = 0; i < n_e; ++i)
             a[i] = ((t_idx_0 == i) ? t_idx_1 : (t_idx_1 == i) ? t_idx_0 : i) % n_le;
