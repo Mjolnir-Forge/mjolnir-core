@@ -732,6 +732,7 @@ void test_swap_lanes_if_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterT
         for (UST i = 0; i < num_elements<T_RegisterType>; ++i)
             EXPECT_DOUBLE_EQ(get(c, i), get(a, i));
     }
+    int unused = 0;
 }
 
 
@@ -739,7 +740,6 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_swap_lanes_if) // NOLINT
 {
     if constexpr (is_avx_register<TypeParam>)
     {
-        int a = 0;
         TYPED_TEST_SERIES(test_swap_lanes_if_test_case, 2);
     }
 }
