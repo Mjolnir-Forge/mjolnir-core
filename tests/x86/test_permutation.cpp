@@ -739,6 +739,7 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_swap_lanes_if) // NOLINT
 {
     if constexpr (is_avx_register<TypeParam>)
     {
+        int a = 0;
         TYPED_TEST_SERIES(test_swap_lanes_if_test_case, 2);
     }
 }
