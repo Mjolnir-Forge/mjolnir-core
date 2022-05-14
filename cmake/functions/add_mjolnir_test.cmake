@@ -76,6 +76,11 @@ function(add_mjolnir_test target module)
         add_to_list_after_keyword("${ARGN}" arguments LINK_LIBRARIES PRIVATE
                                   gtest_main)
 
+        if(NOT "${MJOLNIR_${module}_COMPILE_DEFINITIONS}" STREQUAL "")
+            add_to_list_after_keyword("${arguments}" arguments COMPILE_DEFINITIONS
+                                    PRIVATE ${MJOLNIR_${module}_COMPILE_DEFINITIONS})
+        endif()
+
         add_to_list_after_keyword("${arguments}" arguments COMPILE_FEATURES
                                   PRIVATE ${MJOLNIR_${module}_COMPILE_FEATURES})
 
