@@ -112,6 +112,7 @@ function(target_apply_setup target)
                 set(definitions ${definitions} ${item})
             endif()
         endforeach()
+
         target_compile_definitions(${target} ${definitions})
     endif()
 
