@@ -308,8 +308,5 @@ template <VectorRegister T_Type>
 }
 
 
-} // namespace internal
+} // namespace mjolnir::x86::internal
 //! \endcond
-
-
-} // namespace mjolnir::x86
