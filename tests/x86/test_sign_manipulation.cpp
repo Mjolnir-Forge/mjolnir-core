@@ -19,7 +19,7 @@ using namespace mjolnir::x86;
 // default test values ------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline constexpr auto get_default_test_values() noexcept
+[[nodiscard]] constexpr auto get_default_test_values() noexcept
         -> std::array<std::array<ElementType<T_RegisterType>, 8>, 4> // NOLINT - magic number
 {
     using EType = ElementType<T_RegisterType>;
@@ -135,7 +135,7 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_negate_all) // NOLINT
 // test negate_selected -----------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType>
-[[nodiscard]] constexpr inline auto get_negate_index_array(U32 test_case_index) noexcept
+[[nodiscard]] constexpr auto get_negate_index_array(U32 test_case_index) noexcept
         -> std::array<bool, num_elements<T_RegisterType>>
 {
     std::array<bool, num_elements<T_RegisterType>> a = {{0}};
