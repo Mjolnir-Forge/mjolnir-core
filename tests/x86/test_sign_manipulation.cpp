@@ -140,7 +140,7 @@ template <typename T_RegisterType>
 {
     std::array<bool, num_elements<T_RegisterType>> a = {{0}};
     for (UST i = 0; i < a.size(); ++i)
-        a.at(i) = not is_bit_set(test_case_index, i);
+        a.at(i) = ! is_bit_set(test_case_index, i);
     return a;
 }
 
@@ -184,6 +184,7 @@ inline void test_negate_selected_test_case()
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_negate_selected) // NOLINT
 {
-    constexpr UST n_test_cases = power_of_2(num_elements<TypeParam>);
+    [[maybe_unused]] constexpr UST n_test_cases = power_of_2(num_elements<TypeParam>);
+
     TYPED_TEST_SERIES(test_negate_selected_test_case, n_test_cases);
 }
