@@ -74,7 +74,7 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_align_right) // NOLINT
 // --- test_blend -----------------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType>
-[[nodiscard]] constexpr inline auto get_blend_index_array(U32 test_case_index) noexcept
+[[nodiscard]] constexpr auto get_blend_index_array(U32 test_case_index) noexcept
 {
     std::array<U32, num_elements<T_RegisterType>> a = {{0}};
     for (UST i = 0; i < a.size(); ++i)
@@ -184,7 +184,7 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_blend_below) // NOLINT
 // --- test_blend_from_to ---------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType>
-[[nodiscard]] constexpr inline auto get_blend_from_to_index_array(U32 test_case_index) noexcept
+[[nodiscard]] constexpr auto get_blend_from_to_index_array(U32 test_case_index) noexcept
 {
     std::array<UST, 2> indices = {{0}};
     for (UST i = 0; i < test_case_index; ++i)
@@ -350,7 +350,7 @@ TEST(TestM128, test_insert) // NOLINT
 // --- test permute ---------------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType>
-[[nodiscard]] constexpr inline auto get_permute_index_array(UST test_case_index) noexcept
+[[nodiscard]] constexpr auto get_permute_index_array(UST test_case_index) noexcept
 {
     std::array<U32, num_lane_elements<T_RegisterType>> a = {{0}};
 
@@ -412,7 +412,7 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_permute) // NOLINT
 // --- test permute_accross_lanes -------------------------------------------------------------------------------------
 
 template <typename T_RegisterType>
-[[nodiscard]] constexpr inline auto get_permute_accross_lanes_specific_indices(UST index) noexcept
+[[nodiscard]] constexpr auto get_permute_accross_lanes_specific_indices(UST index) noexcept
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
     using IndexArray  = std::array<U32, n_e>;
@@ -430,7 +430,7 @@ template <typename T_RegisterType>
 
 
 template <>
-[[nodiscard]] constexpr inline auto get_permute_accross_lanes_specific_indices<__m128d>(UST index) noexcept
+[[nodiscard]] constexpr auto get_permute_accross_lanes_specific_indices<__m128d>(UST index) noexcept
 {
     constexpr UST n_e = num_elements<__m128d>;
     using IndexArray  = std::array<U32, n_e>;
@@ -442,7 +442,7 @@ template <>
 
 
 template <>
-[[nodiscard]] constexpr inline auto get_permute_accross_lanes_specific_indices<__m256>(UST index) noexcept
+[[nodiscard]] constexpr auto get_permute_accross_lanes_specific_indices<__m256>(UST index) noexcept
 {
     constexpr UST n_e = num_elements<__m256>;
     using IndexArray  = std::array<U32, n_e>;
@@ -460,7 +460,7 @@ template <>
 
 
 template <typename T_RegisterType>
-[[nodiscard]] constexpr inline auto get_permute_accross_lanes_index_array(UST index) noexcept
+[[nodiscard]] constexpr auto get_permute_accross_lanes_index_array(UST index) noexcept
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
 
@@ -539,7 +539,7 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_permute_lanes) // NOLINT
 
 
 template <typename T_RegisterType, UST t_test_index>
-[[nodiscard]] constexpr inline auto get_shuffle_index_array() noexcept
+[[nodiscard]] constexpr auto get_shuffle_index_array() noexcept
 {
     std::array<UST, num_lane_elements<T_RegisterType>> a = {{0}};
 
@@ -585,7 +585,7 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_shuffle) // NOLINT
 }
 
 
-[[nodiscard]] constexpr inline auto get_shuffle_m256d_index_array(UST test_case_index) noexcept
+[[nodiscard]] constexpr auto get_shuffle_m256d_index_array(UST test_case_index) noexcept
 {
     std::array<UST, num_elements<__m256d>> a = {{0}};
     for (UST i = 0; i < a.size(); ++i)

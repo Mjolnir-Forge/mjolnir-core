@@ -172,11 +172,11 @@ namespace internal
 {
 //! Return the alignment in bytes for a register type.
 template <VectorRegister T_Type>
-[[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST;
+[[nodiscard]] consteval auto get_alignment_bytes() noexcept -> UST;
 
 //! Return the number of lanes of a register type.
 template <VectorRegister T_Type>
-[[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST;
+[[nodiscard]] consteval auto get_num_lanes() noexcept -> UST;
 
 
 } // namespace internal
@@ -283,7 +283,7 @@ namespace internal
 // --------------------------------------------------------------------------------------------------------------------
 
 template <VectorRegister T_Type>
-[[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST
+[[nodiscard]] consteval auto get_alignment_bytes() noexcept -> UST
 {
     constexpr UST alignment_bytes_sse = 16;
     constexpr UST alignment_bytes_avx = 32;
@@ -298,7 +298,7 @@ template <VectorRegister T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <VectorRegister T_Type>
-[[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST
+[[nodiscard]] consteval auto get_num_lanes() noexcept -> UST
 {
     constexpr UST num_lanes_sse = 1;
     constexpr UST num_lanes_avx = 2;
