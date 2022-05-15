@@ -39,7 +39,7 @@ namespace mjolnir
 //! @return
 //! `true` or `false`
 template <typename T_CommonType, T_CommonType... t_pack, std::invocable<T_CommonType> T_Func>
-[[nodiscard]] inline consteval auto pp_all(T_Func func) noexcept -> bool;
+[[nodiscard]] consteval auto pp_all(T_Func func) noexcept -> bool;
 
 
 //! @brief
@@ -54,7 +54,7 @@ template <typename T_CommonType, T_CommonType... t_pack, std::invocable<T_Common
 //! @return
 //! `true` or `false`
 template <UST... t_pack>
-[[nodiscard]] inline consteval auto pp_all_less(UST value) noexcept -> bool;
+[[nodiscard]] consteval auto pp_all_less(UST value) noexcept -> bool;
 
 
 //! @brief
@@ -66,7 +66,7 @@ template <UST... t_pack>
 //! @return
 //! `true` or `false`
 template <bool... t_pack>
-[[nodiscard]] inline consteval auto pp_all_false() noexcept -> bool;
+[[nodiscard]] consteval auto pp_all_false() noexcept -> bool;
 
 
 //! @brief
@@ -78,7 +78,7 @@ template <bool... t_pack>
 //! @return
 //! `true` or `false`
 template <bool... t_pack>
-[[nodiscard]] inline consteval auto pp_all_true() noexcept -> bool;
+[[nodiscard]] consteval auto pp_all_true() noexcept -> bool;
 
 
 //! @}
@@ -96,7 +96,7 @@ namespace mjolnir
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_CommonType, T_CommonType... t_pack, std::invocable<T_CommonType> T_Func>
-[[nodiscard]] inline consteval auto pp_all(T_Func func) noexcept -> bool
+[[nodiscard]] consteval auto pp_all(T_Func func) noexcept -> bool
 {
     constexpr UST                  size = sizeof...(t_pack);
     std::array<T_CommonType, size> a    = {{t_pack...}};
@@ -108,7 +108,7 @@ template <typename T_CommonType, T_CommonType... t_pack, std::invocable<T_Common
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST... t_pack>
-[[nodiscard]] inline consteval auto pp_all_less(UST value) noexcept -> bool
+[[nodiscard]] consteval auto pp_all_less(UST value) noexcept -> bool
 {
     auto f = [value](UST e) -> bool
     {
@@ -122,7 +122,7 @@ template <UST... t_pack>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_pack>
-[[nodiscard]] inline consteval auto pp_all_false() noexcept -> bool
+[[nodiscard]] consteval auto pp_all_false() noexcept -> bool
 {
     auto f = [](bool e) -> bool
     {
@@ -136,7 +136,7 @@ template <bool... t_pack>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_pack>
-[[nodiscard]] inline consteval auto pp_all_true() noexcept -> bool
+[[nodiscard]] consteval auto pp_all_true() noexcept -> bool
 {
     auto f = [](bool e) -> bool
     {
