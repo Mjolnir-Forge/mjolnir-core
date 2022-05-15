@@ -110,7 +110,7 @@ template <typename T_CommonType, T_CommonType... t_pack, std::invocable<T_Common
 template <UST... t_pack>
 [[nodiscard]] consteval auto pp_all_less(UST value) noexcept -> bool
 {
-    auto f = [value](UST e) -> bool
+    auto f = [value](UST e)
     {
         return e < value;
     };
@@ -124,9 +124,9 @@ template <UST... t_pack>
 template <bool... t_pack>
 [[nodiscard]] consteval auto pp_all_false() noexcept -> bool
 {
-    auto f = [](bool e) -> bool
+    auto f = [](bool e)
     {
-        return not e;
+        return ! e;
     };
 
     return pp_all<bool, t_pack...>(f);
@@ -138,7 +138,7 @@ template <bool... t_pack>
 template <bool... t_pack>
 [[nodiscard]] consteval auto pp_all_true() noexcept -> bool
 {
-    auto f = [](bool e) -> bool
+    auto f = [](bool e)
     {
         return e;
     };
