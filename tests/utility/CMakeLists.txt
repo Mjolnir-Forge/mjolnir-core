@@ -3,5 +3,3 @@ add_mjolnir_core_test(is_close)
 add_mjolnir_core_test(parameter_pack)
 add_mjolnir_core_test(pointer_operations)
 add_mjolnir_core_test(type)
-
-add_mjolnir_core_test(example)
