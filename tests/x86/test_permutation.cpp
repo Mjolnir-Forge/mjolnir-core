@@ -358,7 +358,7 @@ template <typename T_RegisterType>
         if constexpr (is_single_precision<T_RegisterType>)
             a.at(i) = static_cast<UST>(0b11) & (test_case_index >> (i * 2));
         else
-            a.at(i) = static_cast<UST>(0b1) & (test_case_index >> (i));
+            a.at(i) = static_cast<UST>(0b1) & (test_case_index >> i);
     return a;
 }
 
@@ -498,7 +498,7 @@ void test_permute_accross_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_R
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_permute_accross_lanes) // NOLINT
 {
     [[maybe_unused]] constexpr UST n_e     = num_elements<TypeParam>;
-    [[maybe_unused]] constexpr UST n_extra = (is_m128d<TypeParam>) ? 2 : 6;
+    [[maybe_unused]] constexpr UST n_extra = is_m128d<TypeParam> ? 2 : 6;
 
     TYPED_TEST_SERIES(test_permute_accross_lanes_test_case, n_e + n_extra);
 }
@@ -675,7 +675,12 @@ void test_swap_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) //
 
     for (UST i = 0; i < n_e; ++i)
     {
-        UST idx = (i == idx_0) ? idx_1 : (i == idx_1) ? idx_0 : i;
+        UST idx = i;
+        if (i == idx_0)
+            idx = idx_1;
+        else if (i == idx_1)
+            idx = idx_0;
+
         EXPECT_DOUBLE_EQ(get(c, i), get(a, idx));
     }
 }
