@@ -101,7 +101,7 @@ template <typename T_CommonType, T_CommonType... t_pack, std::invocable<T_Common
     constexpr UST                  size = sizeof...(t_pack);
     std::array<T_CommonType, size> a    = {{t_pack...}};
 
-    return std::all_of(a.begin(), a.end(), func);
+    return std::ranges::all_of(a, func);
 }
 
 
