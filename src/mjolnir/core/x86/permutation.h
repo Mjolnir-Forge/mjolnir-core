@@ -484,7 +484,7 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
         return src_0;
     else
     {
-        constexpr auto get_mask = [](UST index) -> UST
+        constexpr auto get_mask = [](UST index)
         {
             UST mask = 0;
             for (UST i = index + 1; i < num_elements<T_RegisterType>; ++i)
@@ -519,7 +519,7 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
         return src_0;
     else
     {
-        constexpr auto get_mask = [](UST index) -> UST
+        constexpr auto get_mask = [](UST index)
         {
             UST mask = 0;
             for (UST i = 0; i < index; ++i)
@@ -540,11 +540,11 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
     static_assert(t_index_first <= t_index_last, "`t_index_first` is larger than `t_index_last`.");
     static_assert(t_index_last < num_elements<T_RegisterType>, "`t_index_last` exceeds register size.");
 
-    if constexpr (t_index_first == 0 and t_index_last == num_elements<T_RegisterType> - 1)
+    if constexpr (t_index_first == 0 && t_index_last == num_elements<T_RegisterType> - 1)
         return src_1;
     else
     {
-        constexpr auto get_mask = [](UST idx_first, UST idx_last) -> UST
+        constexpr auto get_mask = [](UST idx_first, UST idx_last)
         {
             UST mask = 0;
             for (UST i = idx_first; i <= idx_last; ++i)
