@@ -141,7 +141,7 @@ print(f"Source branch: {source_branch}")
 print(f"Target branch: {target_branch}")
 if target_version is None:
     if source_version is None:
-        raise Exception("Both branches have no version header. Please add one.")
+        raise ValueError("Both branches have no version header. Please add one.")
     for i in [0, 1, 2, 3]:
         if source_version[i] != 0:
             raise ValueError(
