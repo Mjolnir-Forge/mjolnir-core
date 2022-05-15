@@ -551,7 +551,7 @@ template <UST t_index, I32 t_shift, std::unsigned_integral T_Type, std::unsigned
 {
     static_assert(t_index < num_bits<T_Type>, "Index exceeds number of bits");
 
-    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << (t_index)));
+    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << t_index));
 
     if constexpr (t_shift == 0)
         return bit;
@@ -576,7 +576,7 @@ template <std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
 {
     assert(index < num_bits<T_Type>); // NOLINT
 
-    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << (index)));
+    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << index));
 
     if (shift >= 0)
     {
@@ -596,7 +596,7 @@ template <UST t_index, bool t_shift_right, std::unsigned_integral T_Type, std::u
 {
     // cppcheck-suppress unreadVariable // false positive
     constexpr I32 shift =
-            (t_shift_right) ? -static_cast<I32>(t_index) : static_cast<I32>(num_bits<T_ReturnType> - t_index - 1);
+            t_shift_right ? -static_cast<I32>(t_index) : static_cast<I32>(num_bits<T_ReturnType> - t_index - 1);
     return get_bit<t_index, shift, T_Type, T_ReturnType>(integer);
 }
 
@@ -621,7 +621,7 @@ template <UST t_index, UST t_num_bits, I32 t_shift, std::unsigned_integral T_Typ
     static_assert(t_num_bits > 1, "Number of bits must be larger than 0.");
     static_assert(t_index + t_num_bits <= num_bits<T_Type>, "Required bits exceed maximum number of bits.");
 
-    constexpr UST mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << (t_index);
+    constexpr UST mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << t_index;
     auto          bits = static_cast<T_ReturnType>(integer & mask);
 
     if constexpr (t_shift == 0)
@@ -650,7 +650,7 @@ template <UST t_num_bits, std::unsigned_integral T_Type, std::unsigned_integral 
     static_assert(t_num_bits > 1, "Number of bits must be larger than 0.");
     assert(index + t_num_bits <= num_bits<T_Type>); // NOLINT
 
-    UST  mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << (index);
+    UST  mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << index;
     auto bits = static_cast<T_ReturnType>(integer & mask);
 
     if (shift >= 0)
@@ -674,8 +674,8 @@ template <UST                    t_index,
 [[nodiscard]] constexpr auto get_bits_shift_max(T_Type integer) noexcept -> T_ReturnType
 {
     // cppcheck-suppress unreadVariable // false positive
-    constexpr I32 shift = (t_shift_right) ? -static_cast<I32>(t_index)
-                                          : static_cast<I32>(num_bits<T_ReturnType> - t_index - t_num_bits);
+    constexpr I32 shift = t_shift_right ? -static_cast<I32>(t_index)
+                                        : static_cast<I32>(num_bits<T_ReturnType> - t_index - t_num_bits);
     return get_bits<t_index, t_num_bits, shift, T_Type, T_ReturnType>(integer);
 }
 
