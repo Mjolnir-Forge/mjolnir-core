@@ -689,7 +689,7 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType, std::invocable<T_Re
 
 
     auto           result = mm_movemask_epi8(mm_cast_fi(comp_func(lhs, rhs)));
-    constexpr auto ref    = bit_construct_from_ints<n_bits, decltype(result), (t_cmp * val)...>(true);
+    constexpr auto ref    = bit_construct_from_ints<n_bits, decltype(result), (static_cast<UST>(t_cmp) * val)...>(true);
 
     if constexpr (! pp_all_true<t_cmp...>())
         result &= ref; // Set bits of elements that shouldn't be compared to zero
