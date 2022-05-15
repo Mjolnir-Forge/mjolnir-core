@@ -127,6 +127,9 @@ template <UST t_alignment>
 //!
 //! @return
 //! Integer representation of the pointer
+//!
+//! @todo
+//! Replace reinterpret_cast with bit_cast (requires increase of compiler version)
 [[nodiscard]] inline auto pointer_to_integer(const volatile void* pointer) noexcept -> std::uintptr_t;
 
 
