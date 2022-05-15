@@ -69,7 +69,7 @@ os.chdir("../..")
 subprocess.run(["doxygen", "-v"])  # nosec
 r = subprocess.run(["doxygen", ".doxyfile"])  # nosec
 if r.returncode:
-    raise Exception("The doxygen build failed")
+    raise RuntimeError("The doxygen build failed")
 
 os.chdir(wd)
 
