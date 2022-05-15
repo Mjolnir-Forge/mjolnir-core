@@ -49,7 +49,7 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_get_static_version) // NOL
 
     EXPECT_DOUBLE_EQ(get<0>(a), 0.);
     EXPECT_DOUBLE_EQ(get<1>(a), 1.);
-    if constexpr (not is_m128d<TypeParam>)
+    if constexpr (! is_m128d<TypeParam>)
     {
         EXPECT_DOUBLE_EQ(get<2>(a), 2.);
         EXPECT_DOUBLE_EQ(get<3>(a), 3.);
@@ -90,7 +90,7 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_set_static_version) // NOL
     set<0>(a, 0.); // NOLINT
     set<1>(a, 1.); // NOLINT
 
-    if constexpr (not is_m128d<TypeParam>)
+    if constexpr (! is_m128d<TypeParam>)
     {
         set<2>(a, 2.); // NOLINT
         set<3>(a, 3.); // NOLINT
