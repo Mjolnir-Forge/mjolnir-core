@@ -815,13 +815,20 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
 
-    auto get_permute_index_array = []() constexpr->std::array<UST, n_e>
+    constexpr auto get_permute_index_array = []() constexpr
     {
-        constexpr UST n_le = num_lane_elements<T_RegisterType>;
+        constexpr UST        n_le = num_lane_elements<T_RegisterType>;
+        std::array<UST, n_e> a    = {{0}};
 
-        std::array<UST, n_e> a = {{0}};
         for (UST i = 0; i < n_e; ++i)
-            a[i] = ((t_idx_0 == i) ? t_idx_1 : (t_idx_1 == i) ? t_idx_0 : i) % n_le;
+        {
+            if (t_idx_0 == i)
+                a[i] = t_idx_1 % n_le;
+            else if (t_idx_1 == i)
+                a[i] = t_idx_0 % n_le;
+            else
+                a[i] = i % n_le;
+        }
         return a;
     };
     constexpr auto p = get_permute_index_array();
