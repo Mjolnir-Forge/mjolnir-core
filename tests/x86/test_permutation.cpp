@@ -485,7 +485,7 @@ void test_permute_accross_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_R
     auto c = mm_setzero<T_RegisterType>();
     if constexpr (is_m128d<T_RegisterType>)
         c = permute_accross_lanes<p[0], p[1]>(a);
-    else if constexpr (not is_m256<T_RegisterType>)
+    else if constexpr (! is_m256<T_RegisterType>)
         c = permute_accross_lanes<p[0], p[1], p[2], p[3]>(a);
     else
         c = permute_accross_lanes<p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]>(a); // NOLINT - magic number
@@ -497,8 +497,9 @@ void test_permute_accross_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_R
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_permute_accross_lanes) // NOLINT
 {
-    constexpr UST n_e     = num_elements<TypeParam>;
-    constexpr UST n_extra = (is_m128d<TypeParam>) ? 2 : 6;
+    [[maybe_unused]] constexpr UST n_e     = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_extra = (is_m128d<TypeParam>) ? 2 : 6;
+
     TYPED_TEST_SERIES(test_permute_accross_lanes_test_case, n_e + n_extra);
 }
 
@@ -580,7 +581,8 @@ void test_shuffle_test_case(T_RegisterType a, T_RegisterType b) // NOLINT - comp
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_shuffle) // NOLINT
 {
-    constexpr UST n_le = num_lane_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_le = num_lane_elements<TypeParam>;
+
     TYPED_TEST_SERIES(test_shuffle_test_case, power(n_le, n_le));
 }
 
@@ -615,8 +617,9 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_shuffle_m256_extra) // NOL
 {
     if constexpr (is_m256d<TypeParam>)
     {
-        constexpr UST n_e  = num_elements<TypeParam>;
-        constexpr UST n_le = num_lane_elements<TypeParam>;
+        [[maybe_unused]] constexpr UST n_e  = num_elements<TypeParam>;
+        [[maybe_unused]] constexpr UST n_le = num_lane_elements<TypeParam>;
+
         TYPED_TEST_SERIES(test_shuffle_test_case_m256d, power(n_le, n_e));
     }
 }
@@ -680,7 +683,8 @@ void test_swap_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) //
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_swap) // NOLINT
 {
-    constexpr UST n_e = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_e = num_elements<TypeParam>;
+
     TYPED_TEST_SERIES(test_swap_test_case, power(n_e, 2));
 }
 
