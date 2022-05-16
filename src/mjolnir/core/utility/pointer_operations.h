@@ -23,18 +23,23 @@ namespace mjolnir
 //!
 //! @tparam t_alignment:
 //! Required alignment
+//! @tparam T_Type
+//! The pointer type
 //!
 //! @param [in] pointer:
 //! Pointer that should be checked
 //!
 //! @return
 //! `true` or `false`
-template <UST t_alignment>
-[[nodiscard]] inline auto is_aligned(const volatile void* pointer) noexcept -> bool;
+template <UST t_alignment, typename T_Type>
+[[nodiscard]] inline auto is_aligned(const volatile T_Type* pointer) noexcept -> bool;
 
 
 //! @brief
 //! Check if a passed pointer is aligned.
+//!
+//! @tparam T_Type
+//! The pointer type
 //!
 //! @param [in] pointer:
 //! Pointer that should be checked
@@ -66,7 +71,8 @@ template <UST t_alignment>
 //! ~~~
 //! @remark
 //! Note that it consists of less instructions and that the expensive `div` instruction is removed.
-[[nodiscard]] inline auto is_aligned(const volatile void* pointer, UST alignment) noexcept -> bool;
+template <typename T_Type>
+[[nodiscard]] inline auto is_aligned(const volatile T_Type* pointer, UST alignment) noexcept -> bool;
 
 
 //! @brief
@@ -74,18 +80,23 @@ template <UST t_alignment>
 //!
 //! @tparam t_alignment:
 //! Required alignment
+//! @tparam T_Type
+//! The pointer type
 //!
 //! @param [in] pointer:
 //! Pointer that should be checked
 //!
 //! @return
 //! Misalignment of the pointer in bytes
-template <UST t_alignment>
-[[nodiscard]] inline auto misalignment(const volatile void* pointer) noexcept -> UST;
+template <UST t_alignment, typename T_Type>
+[[nodiscard]] inline auto misalignment(const volatile T_Type* pointer) noexcept -> UST;
 
 
 //! @brief
 //! Calculate the misalignment of a pointer.
+//!
+//! @tparam T_Type
+//! The pointer type
 //!
 //! @param [in] pointer:
 //! Pointer that should be checked
@@ -116,11 +127,15 @@ template <UST t_alignment>
 //! ~~~
 //! @remark
 //! Note that it consists of less instructions and that the expensive `div` instruction is removed.
-[[nodiscard]] inline auto misalignment(const volatile void* pointer, UST alignment) noexcept -> UST;
+template <typename T_Type>
+[[nodiscard]] inline auto misalignment(const volatile T_Type* pointer, UST alignment) noexcept -> UST;
 
 
 //! @brief
 //! Turn a pointer into an integer.
+//!
+//! @tparam T_Type
+//! The pointer type
 //!
 //! @param [in] pointer:
 //! Pointer that should be converted
@@ -130,7 +145,8 @@ template <UST t_alignment>
 //!
 //! @todo
 //! Replace reinterpret_cast with bit_cast (requires increase of compiler version)
-[[nodiscard]] inline auto pointer_to_integer(const volatile void* pointer) noexcept -> std::uintptr_t;
+template <typename T_Type>
+[[nodiscard]] inline auto pointer_to_integer(const volatile T_Type* pointer) noexcept -> std::uintptr_t;
 
 
 //! @}
@@ -143,8 +159,8 @@ namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-template <UST t_alignment>
-[[nodiscard]] inline auto is_aligned(const volatile void* pointer) noexcept -> bool
+template <UST t_alignment, typename T_Type>
+[[nodiscard]] inline auto is_aligned(const volatile T_Type* pointer) noexcept -> bool
 {
     // https://stackoverflow.com/a/28678613
     return misalignment<t_alignment>(pointer) == 0;
@@ -153,7 +169,8 @@ template <UST t_alignment>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline auto is_aligned(const volatile void* pointer, UST alignment) noexcept -> bool
+template <typename T_Type>
+[[nodiscard]] inline auto is_aligned(const volatile T_Type* pointer, UST alignment) noexcept -> bool
 {
     // https://stackoverflow.com/a/28678613
     return misalignment(pointer, alignment) == 0;
@@ -162,8 +179,8 @@ template <UST t_alignment>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <UST t_alignment>
-[[nodiscard]] inline auto misalignment(const volatile void* pointer) noexcept -> UST
+template <UST t_alignment, typename T_Type>
+[[nodiscard]] inline auto misalignment(const volatile T_Type* pointer) noexcept -> UST
 {
     return pointer_to_integer(pointer) % t_alignment;
 }
@@ -171,7 +188,8 @@ template <UST t_alignment>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline auto misalignment(const volatile void* pointer, UST alignment) noexcept -> UST
+template <typename T_Type>
+[[nodiscard]] inline auto misalignment(const volatile T_Type* pointer, UST alignment) noexcept -> UST
 {
     return pointer_to_integer(pointer) % alignment;
 }
@@ -179,7 +197,8 @@ template <UST t_alignment>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline auto pointer_to_integer(const volatile void* pointer) noexcept -> std::uintptr_t
+template <typename T_Type>
+[[nodiscard]] inline auto pointer_to_integer(const volatile T_Type* pointer) noexcept -> std::uintptr_t
 {
     // https://stackoverflow.com/a/26586211
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) intentional, see link above
