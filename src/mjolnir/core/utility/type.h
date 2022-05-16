@@ -31,7 +31,7 @@ namespace mjolnir
 //! @return
 //! `true` if `T_Type` is identical to `T_OtherType` or any of the types in `T_TypeList` and `false` otherwise.
 template <typename T_Type, typename T_OtherType, typename... T_TypeList>
-[[nodiscard]] inline consteval auto is_any_of() noexcept -> bool;
+[[nodiscard]] consteval auto is_any_of() noexcept -> bool;
 
 
 //! @}
@@ -48,9 +48,9 @@ namespace mjolnir
 
 
 template <typename T_Type, typename T_OtherType, typename... T_TypeList>
-[[nodiscard]] inline consteval auto is_any_of() noexcept -> bool
+[[nodiscard]] consteval auto is_any_of() noexcept -> bool
 {
-    if constexpr (not std::is_same<T_Type, T_OtherType>::value)
+    if constexpr (! std::is_same_v<T_Type, T_OtherType>)
     {
         if constexpr (sizeof...(T_TypeList) != 0)
             return is_any_of<T_Type, T_TypeList...>();

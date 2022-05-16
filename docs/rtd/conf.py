@@ -59,20 +59,17 @@ html_static_path = []
 # breathe_default_project = "mjolnir_core"
 # breathe_projects = dict(mjolnir_core="../build/xml/")
 
-
+# To check if the current build is a RTD build use:
 # read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
 
 wd = os.getcwd()
 os.chdir("../..")
 
-# with open(".doxyfile", "a") as file:
-#    file.write("WARN_AS_ERROR = NO")
-
 subprocess.run(["doxygen", "-v"])  # nosec
 r = subprocess.run(["doxygen", ".doxyfile"])  # nosec
 if r.returncode:
-    raise Exception("The doxygen build failed")
+    raise RuntimeError("The doxygen build failed")
 
 os.chdir(wd)
 

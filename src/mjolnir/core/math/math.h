@@ -31,7 +31,7 @@ namespace mjolnir
 //! @return
 //! The sum of the first `n` positive numbers
 template <std::integral T_Type>
-[[nodiscard]] inline constexpr auto gauss_summation(T_Type n) -> T_Type;
+[[nodiscard]] constexpr auto gauss_summation(T_Type n) -> T_Type;
 
 
 //! @brief
@@ -48,7 +48,7 @@ template <std::integral T_Type>
 //! @return
 //! The result of the power function
 template <Number T_Type>
-[[nodiscard]] inline constexpr auto power(T_Type base, std::integral auto exponent) noexcept -> T_Type;
+[[nodiscard]] constexpr auto power(T_Type base, std::integral auto exponent) noexcept -> T_Type;
 
 
 //! @brief
@@ -66,7 +66,7 @@ template <Number T_Type>
 //! @return
 //! The result of the power function
 template <Number T_Type = UST>
-[[nodiscard]] inline constexpr auto power_of_2(std::integral auto exponent) noexcept -> T_Type;
+[[nodiscard]] constexpr auto power_of_2(std::integral auto exponent) noexcept -> T_Type;
 
 
 //! @}
@@ -84,7 +84,7 @@ namespace mjolnir
 // --------------------------------------------------------------------------------------------------------------------
 
 template <std::integral T_Type>
-[[nodiscard]] inline constexpr auto gauss_summation(T_Type n) -> T_Type
+[[nodiscard]] constexpr auto gauss_summation(T_Type n) -> T_Type
 {
     assert(n >= 0 && "n must be a positive number"); // NOLINT
 
@@ -96,7 +96,7 @@ template <std::integral T_Type>
 
 template <Number T_Type>
 // NOLINTNEXTLINE(misc-no-recursion)
-[[nodiscard]] inline constexpr auto power(T_Type base, std::integral auto exponent) noexcept -> T_Type
+[[nodiscard]] constexpr auto power(T_Type base, std::integral auto exponent) noexcept -> T_Type
 {
     assert(exponent >= 0 && "exponent must be a positive number"); // NOLINT
 
@@ -111,7 +111,7 @@ template <Number T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <Number T_Type>
-[[nodiscard]] inline constexpr auto power_of_2(std::integral auto exponent) noexcept -> T_Type
+[[nodiscard]] constexpr auto power_of_2(std::integral auto exponent) noexcept -> T_Type
 {
     assert(exponent >= 0 && "exponent must be a positive number"); // NOLINT
 

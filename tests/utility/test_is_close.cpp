@@ -37,7 +37,7 @@ TYPED_TEST(IsCloseTemplateTester, is_close_abs) // NOLINT
 {
     const auto a              = static_cast<TypeParam>(20.56);
     const auto tolerance      = static_cast<TypeParam>(5.1);
-    const U32  tolerance_uint = static_cast<U32>(tolerance);
+    const auto tolerance_uint = static_cast<U32>(tolerance);
 
     // check inside tolerance
     for (U32 i = 0; i <= tolerance_uint; ++i)

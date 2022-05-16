@@ -775,13 +775,13 @@ template <FloatVectorRegister T_RegisterType, typename... T_Args>
     using EType = ElementType<T_RegisterType>;
 
     if constexpr (is_m128<T_RegisterType>)
-        return _mm_setr_ps(static_cast<EType>(std::forward<T_Args>(args))...);
+        return _mm_setr_ps(static_cast<EType>(args)...);
     else if constexpr (is_m128d<T_RegisterType>)
-        return _mm_setr_pd(static_cast<EType>(std::forward<T_Args>(args))...);
+        return _mm_setr_pd(static_cast<EType>(args)...);
     else if constexpr (is_m256<T_RegisterType>)
-        return _mm256_setr_ps(static_cast<EType>(std::forward<T_Args>(args))...);
+        return _mm256_setr_ps(static_cast<EType>(args)...);
     else
-        return _mm256_setr_pd(static_cast<EType>(std::forward<T_Args>(args))...);
+        return _mm256_setr_pd(static_cast<EType>(args)...);
 }
 
 

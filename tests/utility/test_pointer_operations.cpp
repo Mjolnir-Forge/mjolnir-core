@@ -44,12 +44,12 @@ TYPED_TEST_SUITE(PointerOperationTemplateTester, pointer_operation_template_test
 
 constexpr UST alignment = 4;
 
-auto get_offset_pointer(UST offset) -> U8*
+auto get_offset_pointer(UST offset) -> std::byte*
 {
     alignas(alignment) static std::array<U32, 2> instance = {{0}};
 
-    U8* ptr = reinterpret_cast<U8*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    ptr += offset;                              // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    auto* ptr = reinterpret_cast<std::byte*>(&instance); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    ptr += offset;                                       // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
     return ptr;
 }
@@ -67,7 +67,7 @@ TEST_P(PointerOperationTester, test_is_aligned) // NOLINT cert-err58-cpp
     const UST  pointer_offset = GetParam();
     const bool expected       = (pointer_offset % alignment) == 0;
 
-    const U8* ptr = get_offset_pointer(pointer_offset);
+    const std::byte* ptr = get_offset_pointer(pointer_offset);
 
     EXPECT_EQ(expected, is_aligned(ptr, alignment));
 }
@@ -80,7 +80,7 @@ TYPED_TEST(PointerOperationTemplateTester, is_aligned) // NOLINT
     static constexpr UST pointer_offset = TypeParam::value;
     constexpr bool       expected       = (pointer_offset % alignment) == 0;
 
-    const U8* ptr = get_offset_pointer(pointer_offset);
+    const std::byte* ptr = get_offset_pointer(pointer_offset);
 
     EXPECT_EQ(expected, is_aligned<alignment>(ptr));
 }
@@ -93,7 +93,7 @@ TEST_P(PointerOperationTester, test_misalignment) // NOLINT
     const UST pointer_offset = GetParam();
     const UST expected       = pointer_offset % alignment;
 
-    const U8* ptr = get_offset_pointer(pointer_offset);
+    const std::byte* ptr = get_offset_pointer(pointer_offset);
 
     EXPECT_EQ(expected, misalignment(ptr, alignment));
 }
@@ -106,7 +106,7 @@ TYPED_TEST(PointerOperationTemplateTester, misalignment) // NOLINT
     static constexpr UST pointer_offset = TypeParam::value;
     constexpr UST        expected       = pointer_offset % alignment;
 
-    const U8* ptr = get_offset_pointer(pointer_offset);
+    const std::byte* ptr = get_offset_pointer(pointer_offset);
 
     EXPECT_EQ(expected, misalignment<alignment>(ptr));
 }

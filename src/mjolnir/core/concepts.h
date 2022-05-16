@@ -20,7 +20,7 @@ namespace mjolnir
 //! @tparam T_Type
 //! Type
 template <typename T_Type>
-concept Number = std::is_integral<T_Type>::value || std::is_floating_point<T_Type>::value;
+concept Number = std::is_integral_v<T_Type> || std::is_floating_point_v<T_Type>;
 
 
 //! @}

@@ -72,7 +72,7 @@ concept IntegerVectorRegister = is_any_of<T_Type, __m128i, __m256i>();
 //! @tparam T_Type:
 //! Type
 template <typename T_Type>
-inline constexpr bool is_m128 = std::is_same<T_Type, __m128>::value;
+inline constexpr bool is_m128 = std::is_same_v<T_Type, __m128>;
 
 
 //! @brief
@@ -81,7 +81,7 @@ inline constexpr bool is_m128 = std::is_same<T_Type, __m128>::value;
 //! @tparam T_Type:
 //! Type
 template <typename T_Type>
-inline constexpr bool is_m128d = std::is_same<T_Type, __m128d>::value;
+inline constexpr bool is_m128d = std::is_same_v<T_Type, __m128d>;
 
 
 //! @brief
@@ -90,7 +90,7 @@ inline constexpr bool is_m128d = std::is_same<T_Type, __m128d>::value;
 //! @tparam T_Type:
 //! Type
 template <typename T_Type>
-inline constexpr bool is_m128i = std::is_same<T_Type, __m128i>::value;
+inline constexpr bool is_m128i = std::is_same_v<T_Type, __m128i>;
 
 
 //! @brief
@@ -99,7 +99,7 @@ inline constexpr bool is_m128i = std::is_same<T_Type, __m128i>::value;
 //! @tparam T_Type:
 //! Type
 template <typename T_Type>
-inline constexpr bool is_m256 = std::is_same<T_Type, __m256>::value;
+inline constexpr bool is_m256 = std::is_same_v<T_Type, __m256>;
 
 
 //! @brief
@@ -108,7 +108,7 @@ inline constexpr bool is_m256 = std::is_same<T_Type, __m256>::value;
 //! @tparam T_Type:
 //! Type
 template <typename T_Type>
-inline constexpr bool is_m256d = std::is_same<T_Type, __m256d>::value;
+inline constexpr bool is_m256d = std::is_same_v<T_Type, __m256d>;
 
 
 //! @brief
@@ -117,7 +117,7 @@ inline constexpr bool is_m256d = std::is_same<T_Type, __m256d>::value;
 //! @tparam T_Type:
 //! Type
 template <typename T_Type>
-inline constexpr bool is_m256i = std::is_same<T_Type, __m256i>::value;
+inline constexpr bool is_m256i = std::is_same_v<T_Type, __m256i>;
 
 
 //! @brief
@@ -172,11 +172,11 @@ namespace internal
 {
 //! Return the alignment in bytes for a register type.
 template <VectorRegister T_Type>
-[[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST;
+[[nodiscard]] consteval auto get_alignment_bytes() noexcept -> UST;
 
 //! Return the number of lanes of a register type.
 template <VectorRegister T_Type>
-[[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST;
+[[nodiscard]] consteval auto get_num_lanes() noexcept -> UST;
 
 
 } // namespace internal
@@ -191,7 +191,7 @@ template <VectorRegister T_Type>
 //! @tparam T_RegisterType:
 //! Register type
 template <FloatVectorRegister T_RegisterType>
-using ElementType = typename std::conditional<is_any_of<T_RegisterType, __m128d, __m256d>(), F64, F32>::type;
+using ElementType = typename std::conditional_t<is_any_of<T_RegisterType, __m128d, __m256d>(), F64, F32>;
 
 
 //! @brief
@@ -275,15 +275,13 @@ struct alignas(alignment_bytes<T_RegisterType>) VectorDataArray
 
 // === DEFINITIONS ====================================================================================================
 
-namespace mjolnir::x86
-{
 //! \cond DO_NOT_DOCUMENT
-namespace internal
+namespace mjolnir::x86::internal
 {
 // --------------------------------------------------------------------------------------------------------------------
 
 template <VectorRegister T_Type>
-[[nodiscard]] inline consteval auto get_alignment_bytes() noexcept -> UST
+[[nodiscard]] consteval auto get_alignment_bytes() noexcept -> UST
 {
     constexpr UST alignment_bytes_sse = 16;
     constexpr UST alignment_bytes_avx = 32;
@@ -298,7 +296,7 @@ template <VectorRegister T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <VectorRegister T_Type>
-[[nodiscard]] inline consteval auto get_num_lanes() noexcept -> UST
+[[nodiscard]] consteval auto get_num_lanes() noexcept -> UST
 {
     constexpr UST num_lanes_sse = 1;
     constexpr UST num_lanes_avx = 2;
@@ -310,8 +308,5 @@ template <VectorRegister T_Type>
 }
 
 
-} // namespace internal
+} // namespace mjolnir::x86::internal
 //! \endcond
-
-
-} // namespace mjolnir::x86

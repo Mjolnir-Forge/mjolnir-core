@@ -124,7 +124,7 @@ template <bool t_all_mag_positive, FloatVectorRegister T_RegisterType>
 
     T_RegisterType sign = mm_and(src_sign, mask);
 
-    if constexpr (not t_all_mag_positive)
+    if constexpr (! t_all_mag_positive)
         src_magnitude = mm_andnot(mask, src_magnitude);
 
     assert(is_memory_zero(mm_and(src_magnitude, mask)) && "Signed bit of one or more values set."); // NOLINT

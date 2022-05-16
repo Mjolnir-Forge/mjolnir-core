@@ -121,7 +121,7 @@ template <typename T_RegisterType, UST t_test_case_index>
 
     std::array<bool, n_e> a = {{0}};
     for (UST i = 0; i < n_e; ++i)
-        a.at(i) = not is_bit_set(t_test_case_index, i);
+        a.at(i) = ! is_bit_set(t_test_case_index, i);
     return a;
 }
 
@@ -172,7 +172,7 @@ template <typename T_RegisterType, UST t_test_case_index>
 
 
 template <FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline constexpr auto get_idx_start(UST test_case_idx) noexcept -> UST
+[[nodiscard]] constexpr auto get_idx_start(UST test_case_idx) noexcept -> UST
 {
     constexpr UST n_e       = num_elements<T_RegisterType>;
     UST           idx_start = 0;
@@ -282,8 +282,9 @@ SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_equal, compare_in_sequen
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_in_sequence_equal) // NOLINT
 {
-    constexpr UST n_e         = num_elements<TypeParam>;
-    constexpr UST n_testcases = gauss_summation(n_e);
+    constexpr UST                  n_e         = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_testcases = gauss_summation(n_e);
+
     TYPED_TEST_SERIES(test_compare_in_sequence_equal, n_testcases);
 }
 
@@ -295,8 +296,9 @@ SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_greater, compare_in_sequ
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_in_sequence_greater) // NOLINT
 {
-    constexpr UST n_e         = num_elements<TypeParam>;
-    constexpr UST n_testcases = gauss_summation(n_e);
+    constexpr UST                  n_e         = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_testcases = gauss_summation(n_e);
+
     TYPED_TEST_SERIES(test_compare_in_sequence_greater, n_testcases);
 }
 
@@ -308,8 +310,9 @@ SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_greater_equal, compare_i
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_in_sequence_greater_equal) // NOLINT
 {
-    constexpr UST n_e         = num_elements<TypeParam>;
-    constexpr UST n_testcases = gauss_summation(n_e);
+    constexpr UST                  n_e         = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_testcases = gauss_summation(n_e);
+
     TYPED_TEST_SERIES(test_compare_in_sequence_greater_equal, n_testcases);
 }
 
@@ -321,8 +324,9 @@ SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_less, compare_in_sequenc
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_in_sequence_less) // NOLINT
 {
-    constexpr UST n_e         = num_elements<TypeParam>;
-    constexpr UST n_testcases = gauss_summation(n_e);
+    constexpr UST                  n_e         = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_testcases = gauss_summation(n_e);
+
     TYPED_TEST_SERIES(test_compare_in_sequence_less, n_testcases);
 }
 
@@ -334,8 +338,9 @@ SEQUENTIAL_COMPARISON_TESTCASE(test_compare_in_sequence_less_equal, compare_in_s
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_in_sequence_less_equal) // NOLINT
 {
-    constexpr UST n_e         = num_elements<TypeParam>;
-    constexpr UST n_testcases = gauss_summation(n_e);
+    constexpr UST                  n_e         = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_testcases = gauss_summation(n_e);
+
     TYPED_TEST_SERIES(test_compare_in_sequence_less_equal, n_testcases);
 }
 
@@ -347,8 +352,9 @@ SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_equal, compare_selected_equa
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_selected_equal) // NOLINT
 {
-    constexpr UST n_e         = num_elements<TypeParam>;
-    constexpr UST n_testcases = power_of_2(n_e) - 1;
+    constexpr UST                  n_e         = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_testcases = power_of_2(n_e) - 1;
+
     TYPED_TEST_SERIES(test_compare_selected_equal, n_testcases);
 }
 
@@ -360,8 +366,9 @@ SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_greater, compare_selected_gr
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_selected_greater) // NOLINT
 {
-    constexpr UST n_e         = num_elements<TypeParam>;
-    constexpr UST n_testcases = power_of_2(n_e) - 1;
+    constexpr UST                  n_e         = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_testcases = power_of_2(n_e) - 1;
+
     TYPED_TEST_SERIES(test_compare_selected_greater, n_testcases);
 }
 
@@ -373,8 +380,9 @@ SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_greater_equal, compare_selec
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_selected_greater_equal) // NOLINT
 {
-    constexpr UST n_e         = num_elements<TypeParam>;
-    constexpr UST n_testcases = power_of_2(n_e) - 1;
+    constexpr UST                  n_e         = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_testcases = power_of_2(n_e) - 1;
+
     TYPED_TEST_SERIES(test_compare_selected_greater_equal, n_testcases);
 }
 
@@ -386,8 +394,9 @@ SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_less, compare_selected_less,
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_selected_less) // NOLINT
 {
-    constexpr UST n_e         = num_elements<TypeParam>;
-    constexpr UST n_testcases = power_of_2(n_e) - 1;
+    constexpr UST                  n_e         = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_testcases = power_of_2(n_e) - 1;
+
     TYPED_TEST_SERIES(test_compare_selected_less, n_testcases);
 }
 
@@ -399,8 +408,9 @@ SELECTIVE_COMPARISON_TESTCASE(test_compare_selected_less_equal, compare_selected
 
 TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_compare_selected_less_equal) // NOLINT
 {
-    constexpr UST n_e         = num_elements<TypeParam>;
-    constexpr UST n_testcases = power_of_2(n_e) - 1;
+    constexpr UST                  n_e         = num_elements<TypeParam>;
+    [[maybe_unused]] constexpr UST n_testcases = power_of_2(n_e) - 1;
+
     TYPED_TEST_SERIES(test_compare_selected_less_equal, n_testcases);
 }
 

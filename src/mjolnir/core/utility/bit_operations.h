@@ -52,7 +52,7 @@ inline constexpr UST num_bits = sizeof(T_Type) * CHAR_BIT;
 //! @return
 //! The constructed integer value
 template <std::unsigned_integral T_Type, UST... t_bit_values>
-[[nodiscard]] consteval inline auto bit_construct([[maybe_unused]] bool left_is_low = false) noexcept -> T_Type;
+[[nodiscard]] consteval auto bit_construct([[maybe_unused]] bool left_is_low = false) noexcept -> T_Type;
 
 
 //! @brief
@@ -77,7 +77,7 @@ template <std::unsigned_integral T_Type, UST... t_bit_values>
 //! @return
 //! The constructed integer value
 template <UST t_num_int_bits, std::unsigned_integral T_Type, UST... t_integers>
-[[nodiscard]] consteval inline auto bit_construct_from_ints(bool left_is_low = false) noexcept -> T_Type;
+[[nodiscard]] consteval auto bit_construct_from_ints(bool left_is_low = false) noexcept -> T_Type;
 
 
 //! @brief
@@ -94,7 +94,7 @@ template <UST t_num_int_bits, std::unsigned_integral T_Type, UST... t_integers>
 //! @note
 //! Source: https://stackoverflow.com/a/45352771/6700329
 template <std::unsigned_integral T_Type, UST t_num_bits>
-[[nodiscard]] constexpr inline auto bit_construct_set_first_n_bits() noexcept -> T_Type;
+[[nodiscard]] constexpr auto bit_construct_set_first_n_bits() noexcept -> T_Type;
 
 
 //! @brief
@@ -108,7 +108,7 @@ template <std::unsigned_integral T_Type, UST t_num_bits>
 //! @param[in] index
 //! The index of the bit that should be modified
 template <std::unsigned_integral T_Type>
-constexpr inline void clear_bit(T_Type& integer, UST index) noexcept;
+constexpr void clear_bit(T_Type& integer, UST index) noexcept;
 
 
 //! @brief
@@ -124,7 +124,7 @@ constexpr inline void clear_bit(T_Type& integer, UST index) noexcept;
 //! @param[in] index
 //! The index of the first bit that should be modified
 template <UST t_num_bits, std::unsigned_integral T_Type>
-constexpr inline void clear_bits(T_Type& integer, UST index) noexcept;
+constexpr void clear_bits(T_Type& integer, UST index) noexcept;
 
 
 //! @brief
@@ -149,7 +149,7 @@ template <UST                    t_index,
           I32                    t_shift      = 0,
           std::unsigned_integral T_Type       = UST,
           std::unsigned_integral T_ReturnType = T_Type>
-[[nodiscard]] constexpr inline auto get_bit(T_Type integer) noexcept -> T_ReturnType;
+[[nodiscard]] constexpr auto get_bit(T_Type integer) noexcept -> T_ReturnType;
 
 
 //! @brief
@@ -171,7 +171,7 @@ template <UST                    t_index,
 //! @return
 //! An integer containing the extracted and shifted bit value.
 template <std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
-[[nodiscard]] constexpr inline auto get_bit(T_Type integer, UST index, I32 shift = 0) noexcept -> T_ReturnType;
+[[nodiscard]] constexpr auto get_bit(T_Type integer, UST index, I32 shift = 0) noexcept -> T_ReturnType;
 
 
 //! @brief
@@ -195,7 +195,7 @@ template <UST                    t_index,
           bool                   t_shift_right = true,
           std::unsigned_integral T_Type        = UST,
           std::unsigned_integral T_ReturnType  = T_Type>
-[[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer) noexcept -> T_ReturnType;
+[[nodiscard]] constexpr auto get_bit_shift_max(T_Type integer) noexcept -> T_ReturnType;
 
 
 //! @brief
@@ -216,7 +216,7 @@ template <UST                    t_index,
 //! @return
 //! An integer containing the extracted and shifted bit value.
 template <bool t_shift_right = true, std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
-[[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType;
+[[nodiscard]] constexpr auto get_bit_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType;
 
 
 //! @brief
@@ -245,7 +245,7 @@ template <UST                    t_index,
           I32                    t_shift      = 0,
           std::unsigned_integral T_Type       = UST,
           std::unsigned_integral T_ReturnType = T_Type>
-[[nodiscard]] constexpr inline auto get_bits(T_Type integer) noexcept -> T_ReturnType;
+[[nodiscard]] constexpr auto get_bits(T_Type integer) noexcept -> T_ReturnType;
 
 
 //! @brief
@@ -270,7 +270,7 @@ template <UST                    t_index,
 //! @return
 //! An integer containing the extracted and shifted bit pattern.
 template <UST t_num_bits, std::unsigned_integral T_Type = UST, std::unsigned_integral T_ReturnType = T_Type>
-[[nodiscard]] constexpr inline auto get_bits(T_Type integer, UST index, I32 shift = 0) noexcept -> T_ReturnType;
+[[nodiscard]] constexpr auto get_bits(T_Type integer, UST index, I32 shift = 0) noexcept -> T_ReturnType;
 
 
 //! @brief
@@ -297,7 +297,7 @@ template <UST                    t_index,
           bool                   t_shift_right = true,
           std::unsigned_integral T_Type        = UST,
           std::unsigned_integral T_ReturnType  = T_Type>
-[[nodiscard]] constexpr inline auto get_bits_shift_max(T_Type integer) noexcept -> T_ReturnType;
+[[nodiscard]] constexpr auto get_bits_shift_max(T_Type integer) noexcept -> T_ReturnType;
 
 
 //! @brief
@@ -323,7 +323,7 @@ template <UST                    t_num_bits,
           bool                   t_shift_right = true,
           std::unsigned_integral T_Type        = UST,
           std::unsigned_integral T_ReturnType  = T_Type>
-[[nodiscard]] constexpr inline auto get_bits_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType;
+[[nodiscard]] constexpr auto get_bits_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType;
 
 //! @brief
 //! Return `true` if a specific bit is set and `false` otherwise
@@ -339,7 +339,7 @@ template <UST                    t_num_bits,
 //! @return
 //! `true` or `false`
 template <typename T_Type>
-[[nodiscard]] constexpr inline auto is_bit_set(T_Type integer, UST index) noexcept -> bool;
+[[nodiscard]] constexpr auto is_bit_set(T_Type integer, UST index) noexcept -> bool;
 
 
 //! @brief
@@ -353,7 +353,7 @@ template <typename T_Type>
 //! @param[in] index
 //! The index of the bit that should be modified
 template <std::unsigned_integral T_Type>
-constexpr inline void set_bit(T_Type& integer, UST index) noexcept;
+constexpr void set_bit(T_Type& integer, UST index) noexcept;
 
 
 //! @brief
@@ -369,7 +369,7 @@ constexpr inline void set_bit(T_Type& integer, UST index) noexcept;
 //! @param[in] index
 //! The index of the bit that should be modified
 template <UST t_value, std::unsigned_integral T_Type>
-constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept;
+constexpr void set_bit_to(T_Type& integer, UST index) noexcept;
 
 
 //! @brief
@@ -385,7 +385,7 @@ constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept;
 //! @param[in] index:
 //! The index of the first bit that should be modified
 template <UST t_num_bits, std::unsigned_integral T_Type>
-constexpr inline void set_bits(T_Type& integer, UST index) noexcept;
+constexpr void set_bits(T_Type& integer, UST index) noexcept;
 
 
 //! @brief
@@ -406,7 +406,7 @@ constexpr inline void set_bits(T_Type& integer, UST index) noexcept;
 //! @param[in] value:
 //! The source integer
 template <UST t_num_bits, bool t_clear_bits = true, std::unsigned_integral T_Type>
-constexpr inline void set_bits_with_int(T_Type& integer, UST index, UST value) noexcept;
+constexpr void set_bits_with_int(T_Type& integer, UST index, UST value) noexcept;
 
 
 //! @}
@@ -432,7 +432,7 @@ namespace internal
 //! @note
 //! This function is necessary because `std::abs` is not `constepr` in the currently used compiler/STL versions.
 template <std::integral T_Type>
-[[nodiscard]] constexpr inline auto abs(T_Type value) noexcept -> T_Type
+[[nodiscard]] constexpr auto abs(T_Type value) noexcept -> T_Type
 {
     if constexpr (std::is_unsigned_v<T_Type>)
     {
@@ -456,7 +456,7 @@ template <std::integral T_Type>
 
 
 template <std::unsigned_integral T_Type, UST... t_bit_values>
-[[nodiscard]] consteval inline auto bit_construct([[maybe_unused]] bool left_is_low) noexcept -> T_Type
+[[nodiscard]] consteval auto bit_construct([[maybe_unused]] bool left_is_low) noexcept -> T_Type
 {
     static_assert(sizeof...(t_bit_values) <= num_bits<T_Type>, "Number of bit values exceeds number of type bits.");
 
@@ -481,7 +481,7 @@ template <std::unsigned_integral T_Type, UST... t_bit_values>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <std::unsigned_integral T_Type, UST t_num_bits>
-[[nodiscard]] constexpr inline auto bit_construct_set_first_n_bits() noexcept -> T_Type
+[[nodiscard]] constexpr auto bit_construct_set_first_n_bits() noexcept -> T_Type
 {
     // INFO:
     // The static_cast for the `true` case is actually needed because the `~` operator seems to perform a promotion to
@@ -496,7 +496,7 @@ template <std::unsigned_integral T_Type, UST t_num_bits>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_num_int_bits, std::unsigned_integral T_Type, UST... t_integers>
-[[nodiscard]] consteval inline auto bit_construct_from_ints(bool left_is_low) noexcept -> T_Type
+[[nodiscard]] consteval auto bit_construct_from_ints(bool left_is_low) noexcept -> T_Type
 {
     static_assert(sizeof...(t_integers) * t_num_int_bits <= num_bits<T_Type>,
                   "Totoal number of provided bits exceeds number of type bits.");
@@ -524,7 +524,7 @@ template <UST t_num_int_bits, std::unsigned_integral T_Type, UST... t_integers>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <std::unsigned_integral T_Type>
-constexpr inline void clear_bit(T_Type& integer, UST index) noexcept
+constexpr void clear_bit(T_Type& integer, UST index) noexcept
 {
     assert(index < num_bits<T_Type> && "Index exceeds number of bits."); // NOLINT
 
@@ -535,7 +535,7 @@ constexpr inline void clear_bit(T_Type& integer, UST index) noexcept
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_num_bits, std::unsigned_integral T_Type>
-constexpr inline void clear_bits(T_Type& integer, UST index) noexcept
+constexpr void clear_bits(T_Type& integer, UST index) noexcept
 {
     assert(index + t_num_bits <= num_bits<T_Type>); // NOLINT
 
@@ -547,11 +547,11 @@ constexpr inline void clear_bits(T_Type& integer, UST index) noexcept
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_index, I32 t_shift, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
-[[nodiscard]] constexpr inline auto get_bit(T_Type integer) noexcept -> T_ReturnType
+[[nodiscard]] constexpr auto get_bit(T_Type integer) noexcept -> T_ReturnType
 {
     static_assert(t_index < num_bits<T_Type>, "Index exceeds number of bits");
 
-    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << (t_index)));
+    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << t_index));
 
     if constexpr (t_shift == 0)
         return bit;
@@ -572,11 +572,11 @@ template <UST t_index, I32 t_shift, std::unsigned_integral T_Type, std::unsigned
 
 
 template <std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
-[[nodiscard]] constexpr inline auto get_bit(T_Type integer, UST index, I32 shift) noexcept -> T_ReturnType
+[[nodiscard]] constexpr auto get_bit(T_Type integer, UST index, I32 shift) noexcept -> T_ReturnType
 {
     assert(index < num_bits<T_Type>); // NOLINT
 
-    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << (index)));
+    T_ReturnType bit = (integer & static_cast<T_Type>(UST(1) << index));
 
     if (shift >= 0)
     {
@@ -592,11 +592,11 @@ template <std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_index, bool t_shift_right, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
-[[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer) noexcept -> T_ReturnType
+[[nodiscard]] constexpr auto get_bit_shift_max(T_Type integer) noexcept -> T_ReturnType
 {
     // cppcheck-suppress unreadVariable // false positive
     constexpr I32 shift =
-            (t_shift_right) ? -static_cast<I32>(t_index) : static_cast<I32>(num_bits<T_ReturnType> - t_index - 1);
+            t_shift_right ? -static_cast<I32>(t_index) : static_cast<I32>(num_bits<T_ReturnType> - t_index - 1);
     return get_bit<t_index, shift, T_Type, T_ReturnType>(integer);
 }
 
@@ -604,7 +604,7 @@ template <UST t_index, bool t_shift_right, std::unsigned_integral T_Type, std::u
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool t_shift_right, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
-[[nodiscard]] constexpr inline auto get_bit_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType
+[[nodiscard]] constexpr auto get_bit_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType
 {
     if constexpr (t_shift_right)
         return get_bit<T_Type, T_ReturnType>(integer, index, -static_cast<I32>(index));
@@ -616,12 +616,12 @@ template <bool t_shift_right, std::unsigned_integral T_Type, std::unsigned_integ
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_index, UST t_num_bits, I32 t_shift, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
-[[nodiscard]] constexpr inline auto get_bits(T_Type integer) noexcept -> T_ReturnType
+[[nodiscard]] constexpr auto get_bits(T_Type integer) noexcept -> T_ReturnType
 {
     static_assert(t_num_bits > 1, "Number of bits must be larger than 0.");
     static_assert(t_index + t_num_bits <= num_bits<T_Type>, "Required bits exceed maximum number of bits.");
 
-    constexpr UST mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << (t_index);
+    constexpr UST mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << t_index;
     auto          bits = static_cast<T_ReturnType>(integer & mask);
 
     if constexpr (t_shift == 0)
@@ -645,12 +645,12 @@ template <UST t_index, UST t_num_bits, I32 t_shift, std::unsigned_integral T_Typ
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_num_bits, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
-[[nodiscard]] constexpr inline auto get_bits(T_Type integer, UST index, I32 shift) noexcept -> T_ReturnType
+[[nodiscard]] constexpr auto get_bits(T_Type integer, UST index, I32 shift) noexcept -> T_ReturnType
 {
     static_assert(t_num_bits > 1, "Number of bits must be larger than 0.");
     assert(index + t_num_bits <= num_bits<T_Type>); // NOLINT
 
-    UST  mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << (index);
+    UST  mask = bit_construct_set_first_n_bits<UST, t_num_bits>() << index;
     auto bits = static_cast<T_ReturnType>(integer & mask);
 
     if (shift >= 0)
@@ -671,11 +671,11 @@ template <UST                    t_index,
           bool                   t_shift_right,
           std::unsigned_integral T_Type,
           std::unsigned_integral T_ReturnType>
-[[nodiscard]] constexpr inline auto get_bits_shift_max(T_Type integer) noexcept -> T_ReturnType
+[[nodiscard]] constexpr auto get_bits_shift_max(T_Type integer) noexcept -> T_ReturnType
 {
     // cppcheck-suppress unreadVariable // false positive
-    constexpr I32 shift = (t_shift_right) ? -static_cast<I32>(t_index)
-                                          : static_cast<I32>(num_bits<T_ReturnType> - t_index - t_num_bits);
+    constexpr I32 shift = t_shift_right ? -static_cast<I32>(t_index)
+                                        : static_cast<I32>(num_bits<T_ReturnType> - t_index - t_num_bits);
     return get_bits<t_index, t_num_bits, shift, T_Type, T_ReturnType>(integer);
 }
 
@@ -683,7 +683,7 @@ template <UST                    t_index,
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_num_bits, bool t_shift_right, std::unsigned_integral T_Type, std::unsigned_integral T_ReturnType>
-[[nodiscard]] constexpr inline auto get_bits_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType
+[[nodiscard]] constexpr auto get_bits_shift_max(T_Type integer, UST index) noexcept -> T_ReturnType
 {
     if constexpr (t_shift_right)
         return get_bits<t_num_bits, T_Type, T_ReturnType>(integer, index, -static_cast<I32>(index));
@@ -696,7 +696,7 @@ template <UST t_num_bits, bool t_shift_right, std::unsigned_integral T_Type, std
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_Type>
-[[nodiscard]] constexpr inline auto is_bit_set(T_Type integer, UST index) noexcept -> bool
+[[nodiscard]] constexpr auto is_bit_set(T_Type integer, UST index) noexcept -> bool
 {
     return static_cast<bool>(get_bit(integer, index));
 }
@@ -705,7 +705,7 @@ template <typename T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <std::unsigned_integral T_Type>
-constexpr inline void set_bit(T_Type& integer, UST index) noexcept
+constexpr void set_bit(T_Type& integer, UST index) noexcept
 {
     assert(index < num_bits<T_Type> && "Index exceeds number of bits."); // NOLINT
 
@@ -716,7 +716,7 @@ constexpr inline void set_bit(T_Type& integer, UST index) noexcept
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_value, std::unsigned_integral T_Type>
-constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept
+constexpr void set_bit_to(T_Type& integer, UST index) noexcept
 {
     static_assert(t_value <= 1UL, "Bit value must either be 0 or 1.");
 
@@ -730,7 +730,7 @@ constexpr inline void set_bit_to(T_Type& integer, UST index) noexcept
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_num_bits, std::unsigned_integral T_Type>
-constexpr inline void set_bits(T_Type& integer, UST index) noexcept
+constexpr void set_bits(T_Type& integer, UST index) noexcept
 {
     assert(index + t_num_bits <= num_bits<T_Type>); // NOLINT
 
@@ -742,7 +742,7 @@ constexpr inline void set_bits(T_Type& integer, UST index) noexcept
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_num_bits, bool t_clear_bits, std::unsigned_integral T_Type>
-constexpr inline void set_bits_with_int(T_Type& integer, UST index, UST value) noexcept
+constexpr void set_bits_with_int(T_Type& integer, UST index, UST value) noexcept
 {
     [[maybe_unused]] constexpr UST max_value = bit_construct_set_first_n_bits<UST, t_num_bits>();
 
