@@ -4,6 +4,7 @@
 #include "mjolnir/core/utility/is_close.h"
 #include "mjolnir/core/x86/direct_access.h"
 #include "mjolnir/core/x86/sign_manipulation.h"
+#include "mjolnir/testing/typed_test_series.h"
 #include "mjolnir/testing/x86/floating_point_vector_register_test_suite.h"
 #include <gtest/gtest.h>
 
@@ -15,6 +16,12 @@ using namespace mjolnir::x86;
 // ====================================================================================================================
 // Setup
 // ====================================================================================================================
+
+// typed test series --------------------------------------------------------------------------------------------------
+
+#define CREATE_TEST_CASE_INPUT_VALUES
+#define TEST_CASE_ARGUMENTS
+
 
 // default test values ------------------------------------------------------------------------------------------------
 
@@ -31,12 +38,6 @@ template <FloatVectorRegister T_RegisterType>
     return test_values;
 }
 
-// typed test series --------------------------------------------------------------------------------------------------
-
-#include "mjolnir/testing/typed_test_series.h"
-
-#define CREATE_TEST_CASE_INPUT_VALUES
-#define TEST_CASE_ARGUMENTS
 
 // ====================================================================================================================
 // Tests

@@ -3,6 +3,7 @@
 #include "mjolnir/core/x86/comparison.h"
 #include "mjolnir/core/x86/definitions.h"
 #include "mjolnir/core/x86/direct_access.h"
+#include "mjolnir/testing/typed_test_series.h"
 #include "mjolnir/testing/x86/floating_point_vector_register_test_suite.h"
 #include <gtest/gtest.h>
 
@@ -18,8 +19,6 @@ using namespace mjolnir::x86;
 
 
 // typed test series --------------------------------------------------------------------------------------------------
-
-#include "mjolnir/testing/typed_test_series.h"
 
 #define CREATE_TEST_CASE_INPUT_VALUES
 #define TEST_CASE_ARGUMENTS
