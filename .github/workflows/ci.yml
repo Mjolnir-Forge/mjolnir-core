@@ -21,7 +21,7 @@ jobs:
       run: cmake --build build -j 2
     - name: Run tests
       run: |
-        cd build  
+        cd build
         ctest  --output-on-failure
 
   GCC_Ubuntu_Coverage:
@@ -107,7 +107,7 @@ jobs:
 #    - uses: actions/checkout@v2
 #    - name: Reinstall latest MinGW
 #      shell: bash -l {0}
-#      run: 
+#      run:
 #        choco install mingw --force
 #    - name: Run CMake
 #      shell: bash -l {0}

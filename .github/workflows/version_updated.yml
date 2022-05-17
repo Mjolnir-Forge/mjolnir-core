@@ -16,7 +16,7 @@ jobs:
           pip install gitpython
     - name: Update remote branches
       run: |
-          git remote update origin --prune  
+          git remote update origin --prune
     - name: Check version number update
       run: |
           python3 python/check_version_update.py core ${{ github.head_ref }} ${{ github.base_ref }}

@@ -5,6 +5,7 @@
 #include "mjolnir/core/x86/direct_access.h"
 #include "mjolnir/core/x86/intrinsics.h"
 #include "mjolnir/core/x86/permutation.h"
+#include "mjolnir/testing/typed_test_series.h"
 #include "mjolnir/testing/x86/floating_point_vector_register_test_suite.h"
 #include <gtest/gtest.h>
 #include <initializer_list>
@@ -19,8 +20,6 @@ using namespace mjolnir::x86;
 // ====================================================================================================================
 
 // typed test series --------------------------------------------------------------------------------------------------
-
-#include "mjolnir/testing/typed_test_series.h"
 
 // NOLINTNEXTLINE
 #define CREATE_TEST_CASE_INPUT_VALUES                                                                                  \
