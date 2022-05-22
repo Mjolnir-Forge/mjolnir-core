@@ -37,7 +37,7 @@ T_Type pack_type(T_Type...);
 //! @tparam t_pack
 //! The parameter pack
 template <auto... t_pack>
-using PackType = decltype(pack_type(t_pack...));
+using PackType = decltype(internal::pack_type(t_pack...));
 
 
 //! @brief
