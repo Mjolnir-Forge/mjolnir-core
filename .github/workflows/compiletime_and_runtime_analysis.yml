@@ -1,4 +1,4 @@
-name: Compiletime + runtime analysis
+name: Compile time + runtime analysis
 
 on: [push]
 

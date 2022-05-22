@@ -22,7 +22,7 @@ namespace mjolnir
 //! \cond DO_NOT_DOCUMENT
 namespace internal
 {
-//! Helper function declaration to determine the type of a parameter pack. There is no definiton since it is never
+//! Helper function declaration to determine the type of a parameter pack. There is no definition since it is never
 //! called.
 template <typename T_Type>
 auto pack_type(T_Type...) -> T_Type;

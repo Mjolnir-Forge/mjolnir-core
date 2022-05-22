@@ -38,13 +38,13 @@ inline constexpr UST num_bits = sizeof(T_Type) * CHAR_BIT;
 //! @details
 //! The function sets the first N lowest bits of the returned integer where N is the number of provided template
 //! parameters. Each parameter defines the value of a single bit. Depending on the value of `left_is_low`, the bits can
-//! either be specified in ascending or decending order. Or in other words, `left_is_low` controls if the lowest bit is
+//! either be specified in ascending or descending order. Or in other words, `left_is_low` controls if the lowest bit is
 //! represented by the first or last parameter.
 //!
 //! @tparam T_Type:
 //! An unsigned integer type
 //! @tparam t_bit_values:
-//! The individuel bits (see detailed description). Values other than 0 or 1 will trigger a static assertion.
+//! The individual bits (see detailed description). Values other than 0 or 1 will trigger a static assertion.
 //!
 //! @param[in] left_is_low:
 //! If `true`, the first value represents the lowest bit. Otherwise, the last value represents the lowest bit.
@@ -68,7 +68,7 @@ template <std::unsigned_integral T_Type, UST... t_bit_values>
 //! @tparam T_Type:
 //! An unsigned integer type
 //! @tparam t_integers:
-//! The individuel integer values (see detailed description). Values exceeding the bit size  will trigger an assertion.
+//! The individual integer values (see detailed description). Values exceeding the bit size  will trigger an assertion.
 //!
 //! @param[in] left_is_low:
 //! If `true`, the first value represents the lowest bit pattern. Otherwise, the last value represents the lowest bit
@@ -329,7 +329,7 @@ template <UST                    t_num_bits,
 //! Return `true` if a specific bit is set and `false` otherwise
 //!
 //! @tparam T_Type
-//! Type of the cheched variable
+//! Type of the checked variable
 //!
 //! @param[in] integer:
 //! The integer that should be checked

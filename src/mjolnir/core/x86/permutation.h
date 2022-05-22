@@ -66,7 +66,7 @@ template <UST... t_args, FloatVectorRegister T_RegisterType>
 //! Get a register where elements with a higher index than `t_index` are copied from `src_1`and the rest from `src_0`.
 //!
 //! @tparam t_index:
-//! Up to the speciefied value, all elemets of the result register are identical to `src_0`. All other values are taken
+//! Up to the specified value, all elements of the result register are identical to `src_0`. All other values are taken
 //! from `src_1`
 //! @tparam T_RegisterType:
 //! The register type
@@ -86,7 +86,7 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 //! Get a new register where the element with index `t_index` is taken from `src_1` and the rest from `src_0`
 //!
 //! @tparam t_index:
-//! Index that specifies the index of the only elemet that is taken from `src_1`
+//! Index that specifies the index of the only element that is taken from `src_1`
 //! @tparam T_RegisterType:
 //! The register type
 //!
@@ -105,7 +105,7 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 //! Get a register where elements with a lower index than `t_index` are copied from `src_1`and the rest from `src_0`.
 //!
 //! @tparam t_index:
-//! All elemets of the result register with a lower index than this value are copied from `src_1`. All other values are
+//! All elements of the result register with a lower index than this value are copied from `src_1`. All other values are
 //! taken from `src_0`
 //! @tparam T_RegisterType:
 //! The register type
@@ -271,14 +271,14 @@ inline auto insert(__m128 src, __m128 dst) noexcept -> __m128;
 //! New register with shuffled values
 //!
 //! @todo
-//! assert that the 8 indices for the __m256 case do not exceed number of lane elemets. Maybe write a generalized
+//! assert that the 8 indices for the __m256 case do not exceed number of lane elements. Maybe write a generalized
 //! function for integer based parameter packs
 template <UST... t_indices, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto permute(T_RegisterType src) noexcept -> T_RegisterType;
 
 
 //! @brief
-//! Shuffle the elements of a vector register accross lanes using indices and return the result in a new register.
+//! Shuffle the elements of a vector register across lanes using indices and return the result in a new register.
 //!
 //! @tparam t_indices
 //! A set of indices equal to the number of register elements. The N-th index selects the value for the N-th
@@ -293,7 +293,7 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 //! @return
 //! New register with shuffled values
 template <UST... t_indices, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto permute_accross_lanes(T_RegisterType src) noexcept -> T_RegisterType;
+[[nodiscard]] inline auto permute_across_lanes(T_RegisterType src) noexcept -> T_RegisterType;
 
 
 //! @brief
@@ -590,7 +590,7 @@ template <UST t_index_0, UST t_index_1, FloatAVXRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-//! @todo: check if using permute_accross lanes is faster in the last branch
+//! @todo: check if using permute_across lanes is faster in the last branch
 template <UST t_index, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto broadcast_across_lanes(T_RegisterType src) noexcept -> T_RegisterType
 {
@@ -729,7 +729,7 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST... t_indices, FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto permute_accross_lanes(T_RegisterType src) noexcept -> T_RegisterType
+[[nodiscard]] inline auto permute_across_lanes(T_RegisterType src) noexcept -> T_RegisterType
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
 
@@ -846,7 +846,7 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 
 // --------------------------------------------------------
 
-//! Branch of the swap function that handles cases where elements are swapped accross lanes.
+//! Branch of the swap function that handles cases where elements are swapped across lanes.
 template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto swap_different_lane(T_RegisterType src) noexcept -> T_RegisterType
 {

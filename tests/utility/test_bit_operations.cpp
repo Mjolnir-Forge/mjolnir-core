@@ -481,7 +481,7 @@ TEST(test_bit_operations, set_bits_with_int) // NOLINT
     set_bits_with_int<4>(a, 3, 0b1001); // NOLINT - magic number
     EXPECT_EQ(a, 0b01001100);
 
-    // test writing whithout clearing
+    // test writing without clearing
     set_bits_with_int<3, false>(a, 1, 0b101); // NOLINT - magic number
     EXPECT_EQ(a, 0b01001110);
 

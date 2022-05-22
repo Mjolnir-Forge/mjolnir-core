@@ -79,3 +79,14 @@ jobs:
     - name: Run cmake-lint
       run: |
         python3 python/check_cmake_lint.py
+
+  codespell:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install codespell
+      run: |
+        pip install codespell
+    - name: Run codespell
+      run: |
+        codespell -f

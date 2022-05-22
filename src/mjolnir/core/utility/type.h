@@ -18,7 +18,7 @@ namespace mjolnir
 //!
 //! @details
 //! The first template parameter is the type that should be tested. All additional types passed as template
-//! parameters are compared to the first one. If any of them is identical, the funciton returns `true`. If no match is
+//! parameters are compared to the first one. If any of them is identical, the function returns `true`. If no match is
 //! found, `false` is returned.
 //!
 //! @tparam T_Type:

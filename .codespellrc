@@ -1,0 +1,2 @@
+[codespell]
+skip = ./build*,./docs/build,./.git/*,./python/.mypy_cache*

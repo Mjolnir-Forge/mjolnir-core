@@ -231,7 +231,7 @@ inline constexpr UST num_lanes = internal::get_num_lanes<T_RegisterType>();
 
 
 //! @brief
-//! Number of register elemnts.
+//! Number of register elements.
 //!
 //! @tparam T_RegisterType:
 //! Register type
