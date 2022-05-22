@@ -107,6 +107,11 @@ jobs:
     - name: test
       run: |
         typos --type-list
+
+    - name: test
+      run: |
+        typos
+
     #- name: Use custom config file
       #uses: crate-ci/typos@master
       #with:
