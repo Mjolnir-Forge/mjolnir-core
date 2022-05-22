@@ -103,7 +103,7 @@ jobs:
       #  files: ./file.txt
     - name: test
       run: |
-      typos --type-list
+        typos --type-list
     #- name: Use custom config file
       #uses: crate-ci/typos@master
       #with:
