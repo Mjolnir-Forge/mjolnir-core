@@ -406,10 +406,10 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_permute) // NOLINT
 }
 
 
-// --- test permute_accross_lanes -------------------------------------------------------------------------------------
+// --- test permute_across_lanes --------------------------------------------------------------------------------------
 
 template <typename T_RegisterType>
-[[nodiscard]] constexpr auto get_permute_accross_lanes_specific_indices(UST index) noexcept
+[[nodiscard]] constexpr auto get_permute_across_lanes_specific_indices(UST index) noexcept
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
     using IndexArray  = std::array<U32, n_e>;
@@ -427,7 +427,7 @@ template <typename T_RegisterType>
 
 
 template <>
-[[nodiscard]] constexpr auto get_permute_accross_lanes_specific_indices<__m128d>(UST index) noexcept
+[[nodiscard]] constexpr auto get_permute_across_lanes_specific_indices<__m128d>(UST index) noexcept
 {
     constexpr UST n_e = num_elements<__m128d>;
     using IndexArray  = std::array<U32, n_e>;
@@ -439,7 +439,7 @@ template <>
 
 
 template <>
-[[nodiscard]] constexpr auto get_permute_accross_lanes_specific_indices<__m256>(UST index) noexcept
+[[nodiscard]] constexpr auto get_permute_across_lanes_specific_indices<__m256>(UST index) noexcept
 {
     constexpr UST n_e = num_elements<__m256>;
     using IndexArray  = std::array<U32, n_e>;
@@ -457,7 +457,7 @@ template <>
 
 
 template <typename T_RegisterType>
-[[nodiscard]] constexpr auto get_permute_accross_lanes_index_array(UST index) noexcept
+[[nodiscard]] constexpr auto get_permute_across_lanes_index_array(UST index) noexcept
 {
     constexpr UST n_e = num_elements<T_RegisterType>;
 
@@ -469,14 +469,14 @@ template <typename T_RegisterType>
         return a;
     }
 
-    return get_permute_accross_lanes_specific_indices<T_RegisterType>(index - n_e);
+    return get_permute_across_lanes_specific_indices<T_RegisterType>(index - n_e);
 }
 
 template <typename T_RegisterType, UST t_index>
-void test_permute_accross_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT - complexity
+void test_permute_across_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_RegisterType b) // NOLINT - complexity
 {
     constexpr UST  n_e = num_elements<T_RegisterType>;
-    constexpr auto p   = get_permute_accross_lanes_index_array<T_RegisterType>(t_index);
+    constexpr auto p   = get_permute_across_lanes_index_array<T_RegisterType>(t_index);
 
 
     auto c = mm_setzero<T_RegisterType>();
@@ -492,12 +492,12 @@ void test_permute_accross_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_R
         EXPECT_DOUBLE_EQ(get(c, i), get(a, p.at(i)));
 }
 
-TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_permute_accross_lanes) // NOLINT
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_permute_across_lanes) // NOLINT
 {
     [[maybe_unused]] constexpr UST n_e     = num_elements<TypeParam>;
     [[maybe_unused]] constexpr UST n_extra = is_m128d<TypeParam> ? 2 : 6;
 
-    TYPED_TEST_SERIES(test_permute_accross_lanes_test_case, n_e + n_extra);
+    TYPED_TEST_SERIES(test_permute_across_lanes_test_case, n_e + n_extra);
 }
 
 
