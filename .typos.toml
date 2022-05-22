@@ -1,6 +1,6 @@
-#[default.extend-words]
+[default.extend-words]
 # use the following pattern to add new words
-# word = "word"
+accross = "accross"
 
 [files]
-extend-exclude = ["./*comparison.h"]
+extend-exclude = ["*comparison.h"]
