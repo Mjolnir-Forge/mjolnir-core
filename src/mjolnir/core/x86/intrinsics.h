@@ -92,10 +92,10 @@ template <I32 t_mask, FloatVectorRegister T_RegisterType>
 
 
 //! @brief
-//! Broadcasts the lowest floating point element accross lanes to all elements of the returned register.
+//! Broadcasts the lowest floating point element across lanes to all elements of the returned register.
 //!
 //! @warning
-//! Since the value is broadcastet accross lanes, the latency of this operation is much higher for multi-lane registers
+//! Since the value is broadcastet across lanes, the latency of this operation is much higher for multi-lane registers
 //! (AVX) than for single lane registers (SSE).
 //!
 //! @tparam T_RegisterType

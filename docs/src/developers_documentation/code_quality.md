@@ -23,7 +23,7 @@ clang-format -i <FILE>
 ~~~
 
 However, most IDEs support clang-format so that your code gets formatted
-everytime the file is saved.
+every time the file is saved.
 If you use QtCreator, enable the beautifier plugin in the C++ section.
 This generates a new submenu in the Options where you can select and configure
 clang-format.
