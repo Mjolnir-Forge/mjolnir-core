@@ -94,5 +94,22 @@ jobs:
   typos_action:
     runs-on: ubuntu-latest
     steps:
-    - name: typos-action
-    - uses: crate-ci/typos@v1.0.4
+    - name: Checkout Actions Repository
+      uses: actions/checkout@v2
+
+    - name: Check spelling of file.txt
+      uses: crate-ci/typos@master
+      #with:
+      #  files: ./file.txt
+
+    #- name: Use custom config file
+      #uses: crate-ci/typos@master
+      #with:
+      #  files: ./file.txt
+      #  config: ./myconfig.toml
+
+    - name: Ignore implicit configuration file
+      uses: crate-ci/typos@master
+      #with:
+        #files: ./file.txt
+        #isolated: true
