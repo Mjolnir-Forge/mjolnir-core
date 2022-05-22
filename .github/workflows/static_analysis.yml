@@ -97,8 +97,11 @@ jobs:
     - name: Checkout Actions Repository
       uses: actions/checkout@v2
 
-    - name: Check spelling of file.txt
-      uses: crate-ci/typos@master
+    - name: Install typos
+      run: |
+        cargo install typos-cli
+    #- name: Check spelling of file.txt
+    #  uses: crate-ci/typos@master
       #with:
       #  files: ./file.txt
     - name: test
