@@ -101,15 +101,17 @@ jobs:
       uses: crate-ci/typos@master
       #with:
       #  files: ./file.txt
-
+    - name: test
+      run: |
+      typos --type-list
     #- name: Use custom config file
       #uses: crate-ci/typos@master
       #with:
       #  files: ./file.txt
       #  config: ./myconfig.toml
 
-    - name: Ignore implicit configuration file
-      uses: crate-ci/typos@master
+    #- name: Ignore implicit configuration file
+    #  uses: crate-ci/typos@master
       #with:
         #files: ./file.txt
         #isolated: true
