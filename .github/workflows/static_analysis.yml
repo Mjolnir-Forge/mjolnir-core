@@ -89,4 +89,4 @@ jobs:
         pip install codespell
     - name: Run codespell
       run: |
-        codespell
+        codespell -f
