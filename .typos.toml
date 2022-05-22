@@ -1,2 +1,3 @@
 [default.extend-words]
-accross = "accross"
+# use the following pattern to add new words
+# word = "word"
