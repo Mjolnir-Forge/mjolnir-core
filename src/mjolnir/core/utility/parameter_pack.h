@@ -58,7 +58,7 @@ using PackType = decltype(internal::pack_type(t_pack...));
 //! @return
 //! `true` or `false`
 template <auto... t_pack, std::invocable<PackType<t_pack...>> T_Func>
-[[nodiscard]] consteval auto pp_all(T_Func func) noexcept -> bool;
+[[nodiscard]] consteval auto pack_all(T_Func func) noexcept -> bool;
 
 
 //! @brief
@@ -73,7 +73,7 @@ template <auto... t_pack, std::invocable<PackType<t_pack...>> T_Func>
 //! @return
 //! `true` or `false`
 template <UST... t_pack>
-[[nodiscard]] consteval auto pp_all_less(UST value) noexcept -> bool;
+[[nodiscard]] consteval auto pack_all_less(UST value) noexcept -> bool;
 
 
 //! @brief
@@ -85,7 +85,7 @@ template <UST... t_pack>
 //! @return
 //! `true` or `false`
 template <bool... t_pack>
-[[nodiscard]] consteval auto pp_all_false() noexcept -> bool;
+[[nodiscard]] consteval auto pack_all_false() noexcept -> bool;
 
 
 //! @brief
@@ -97,7 +97,7 @@ template <bool... t_pack>
 //! @return
 //! `true` or `false`
 template <bool... t_pack>
-[[nodiscard]] consteval auto pp_all_true() noexcept -> bool;
+[[nodiscard]] consteval auto pack_all_true() noexcept -> bool;
 
 
 //! @}
@@ -115,7 +115,7 @@ namespace mjolnir
 // --------------------------------------------------------------------------------------------------------------------
 
 template <auto... t_pack, std::invocable<PackType<t_pack...>> T_Func>
-[[nodiscard]] consteval auto pp_all(T_Func func) noexcept -> bool
+[[nodiscard]] consteval auto pack_all(T_Func func) noexcept -> bool
 {
     using Type         = PackType<t_pack...>;
     constexpr UST size = sizeof...(t_pack);
@@ -129,42 +129,42 @@ template <auto... t_pack, std::invocable<PackType<t_pack...>> T_Func>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST... t_pack>
-[[nodiscard]] consteval auto pp_all_less(UST value) noexcept -> bool
+[[nodiscard]] consteval auto pack_all_less(UST value) noexcept -> bool
 {
     auto f = [value](UST e)
     {
         return e < value;
     };
 
-    return pp_all<t_pack...>(f);
+    return pack_all<t_pack...>(f);
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_pack>
-[[nodiscard]] consteval auto pp_all_false() noexcept -> bool
+[[nodiscard]] consteval auto pack_all_false() noexcept -> bool
 {
     auto f = [](bool e)
     {
         return ! e;
     };
 
-    return pp_all<t_pack...>(f);
+    return pack_all<t_pack...>(f);
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool... t_pack>
-[[nodiscard]] consteval auto pp_all_true() noexcept -> bool
+[[nodiscard]] consteval auto pack_all_true() noexcept -> bool
 {
     auto f = [](bool e)
     {
         return e;
     };
 
-    return pp_all<t_pack...>(f);
+    return pack_all<t_pack...>(f);
 }
 
 

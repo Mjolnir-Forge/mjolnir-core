@@ -467,7 +467,7 @@ template <UST... t_args, FloatVectorRegister T_RegisterType>
 {
     static_assert(sizeof...(t_args) == num_elements<T_RegisterType>,
                   "Number of template parameters must be equal to the number of register elements.");
-    static_assert(pp_all_less<t_args...>(2), "All template values must be in the range [0, 1]");
+    static_assert(pack_all_less<t_args...>(2), "All template values must be in the range [0, 1]");
 
     return mm_blend<bit_construct<UST, t_args...>(true)>(src_0, src_1);
 }
@@ -711,7 +711,7 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 
     static_assert(sizeof...(t_indices) == n_le || (is_avx_register<T_RegisterType> && sizeof...(t_indices) == n_e),
                   "Number of indices must be identical to the number of elements or the number of lane elements.");
-    static_assert(pp_all_less<t_indices...>(n_le),
+    static_assert(pack_all_less<t_indices...>(n_le),
                   "All index values must be in the range [0, number of lane elements]");
 
     if constexpr (is_m256d<T_RegisterType> && sizeof...(t_indices) == n_le)
@@ -734,7 +734,7 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
     constexpr UST n_e = num_elements<T_RegisterType>;
 
     static_assert(sizeof...(t_indices) == n_e, "Number of indices must be equal to the number of register elements.");
-    static_assert(pp_all_less<t_indices...>(n_e),
+    static_assert(pack_all_less<t_indices...>(n_e),
                   "All template values must be in the range [0, number of register elements]");
 
     if constexpr (num_lanes<T_RegisterType> == 1)
@@ -771,7 +771,7 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 
     static_assert(sizeof...(t_indices) == n_le || (is_m256d<T_RegisterType> && sizeof...(t_indices) == n_e),
                   "Number of indices must be identical to the number of lane elements (or elements for __m256d).");
-    static_assert(pp_all_less<t_indices...>(n_le),
+    static_assert(pack_all_less<t_indices...>(n_le),
                   "All index values must be in the range [0, number of lane elements]");
 
     constexpr auto get_mask = []() -> UST
@@ -793,7 +793,7 @@ template <UST... t_indices, FloatVectorRegister T_RegisterType>
 template <UST t_src_0, UST t_lane_0, UST t_src_1, UST t_lane_1, FloatAVXRegister T_RegisterType>
 [[nodiscard]] inline auto shuffle_lanes(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType
 {
-    static_assert(pp_all_less<t_src_0, t_lane_0, t_src_1, t_lane_1>(2),
+    static_assert(pack_all_less<t_src_0, t_lane_0, t_src_1, t_lane_1>(2),
                   "All template values must be in the range [0, 1]");
 
     constexpr UST sel_0 = bit_construct<UST, t_src_0, t_lane_0>();

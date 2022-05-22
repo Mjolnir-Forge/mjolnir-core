@@ -685,13 +685,13 @@ template <bool... t_cmp, FloatVectorRegister T_RegisterType, std::invocable<T_Re
     constexpr UST val    = power_of_2(n_bits) - 1;
 
     static_assert(sizeof...(t_cmp) == n_e, "Number of template parameters must be equal to the number of elements.");
-    static_assert(! pp_all_false<t_cmp...>(), "At least one template parameter must be `true`.");
+    static_assert(! pack_all_false<t_cmp...>(), "At least one template parameter must be `true`.");
 
 
     auto           result = mm_movemask_epi8(mm_cast_fi(comp_func(lhs, rhs)));
     constexpr auto ref    = bit_construct_from_ints<n_bits, decltype(result), (static_cast<UST>(t_cmp) * val)...>(true);
 
-    if constexpr (! pp_all_true<t_cmp...>())
+    if constexpr (! pack_all_true<t_cmp...>())
         result &= ref; // Set bits of elements that shouldn't be compared to zero
 
     return result == ref;
