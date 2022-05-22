@@ -19,6 +19,26 @@ namespace mjolnir
 //! \addtogroup core_utility
 //! @{
 
+//! \cond DO_NOT_DOCUMENT
+namespace internal
+{
+//! Helper function to determine the type of a parameter pack.
+template <typename T_Type>
+T_Type pack_type(T_Type...);
+
+
+} // namespace internal
+//! \endcond
+
+
+//! @brief
+//! The type of a parameter pack that consist of values and not of types.
+//!
+//! @tparam t_pack
+//! The parameter pack
+template <auto... t_pack>
+using PackType = decltype(pack_type(t_pack...));
+
 
 //! @brief
 //! Return `true` if the passed function object returns `true` for all parameter pack values as input.
@@ -26,8 +46,6 @@ namespace mjolnir
 //! @details
 //! All values of the parameter pack need to be of the same type.
 //!
-//! @tparam T_CommonType:
-//! The common type of all parameter pack elements.
 //! @tparam t_pack:
 //! The parameter pack that should be checked
 //! @tparam T_Func:
@@ -38,7 +56,7 @@ namespace mjolnir
 //!
 //! @return
 //! `true` or `false`
-template <typename T_CommonType, T_CommonType... t_pack, std::invocable<T_CommonType> T_Func>
+template <auto... t_pack, std::invocable<PackType<t_pack...>> T_Func>
 [[nodiscard]] consteval auto pp_all(T_Func func) noexcept -> bool;
 
 
@@ -95,11 +113,13 @@ namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_CommonType, T_CommonType... t_pack, std::invocable<T_CommonType> T_Func>
+template <auto... t_pack, std::invocable<PackType<t_pack...>> T_Func>
 [[nodiscard]] consteval auto pp_all(T_Func func) noexcept -> bool
 {
-    constexpr UST                  size = sizeof...(t_pack);
-    std::array<T_CommonType, size> a    = {{t_pack...}};
+    using Type         = PackType<t_pack...>;
+    constexpr UST size = sizeof...(t_pack);
+
+    std::array<Type, size> a = {{t_pack...}};
 
     return std::ranges::all_of(a, func);
 }
@@ -115,7 +135,7 @@ template <UST... t_pack>
         return e < value;
     };
 
-    return pp_all<UST, t_pack...>(f);
+    return pp_all<t_pack...>(f);
 }
 
 
@@ -129,7 +149,7 @@ template <bool... t_pack>
         return ! e;
     };
 
-    return pp_all<bool, t_pack...>(f);
+    return pp_all<t_pack...>(f);
 }
 
 
@@ -143,7 +163,7 @@ template <bool... t_pack>
         return e;
     };
 
-    return pp_all<bool, t_pack...>(f);
+    return pp_all<t_pack...>(f);
 }
 
 
