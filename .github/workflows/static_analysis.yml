@@ -90,3 +90,14 @@ jobs:
     - name: Run codespell
       run: |
         codespell -f
+
+  typos_action:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Actions Repository
+      uses: actions/checkout@v2
+
+    - name: Run typos action
+      uses: crate-ci/typos@master
+      with:
+        config: ./.typos.toml

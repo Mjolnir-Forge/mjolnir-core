@@ -609,14 +609,14 @@ compare_in_sequence_true(T_RegisterType lhs, T_RegisterType rhs, T_CompFunc comp
     static_assert(t_length > 0, "At least 1 element must be compared.");
     static_assert(t_idx_first + t_length <= n_e, "Sequence exceeds data length.");
 
-    constexpr auto get_boolen_array = []() constexpr->std::array<bool, n_e>
+    constexpr auto get_boolean_array = []() constexpr->std::array<bool, n_e>
     {
         std::array<bool, n_e> arr = {{{0}}};
         for (UST i = t_idx_first; i < t_idx_first + t_length; ++i)
             arr.at(i) = true;
         return arr;
     };
-    constexpr auto b = get_boolen_array();
+    constexpr auto b = get_boolean_array();
 
 
     if constexpr (is_m128d<T_RegisterType>)

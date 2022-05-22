@@ -1,0 +1,7 @@
+[default.extend-words]
+# use the following pattern to add new words
+# word = "word"
+
+[files]
+# eclude files with
+# extend-exclude = ["*file.h", "other.h"]
