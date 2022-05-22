@@ -66,7 +66,7 @@ template <UST... t_args, FloatVectorRegister T_RegisterType>
 //! Get a register where elements with a higher index than `t_index` are copied from `src_1`and the rest from `src_0`.
 //!
 //! @tparam t_index:
-//! Up to the speciefied value, all elemets of the result register are identical to `src_0`. All other values are taken
+//! Up to the specified value, all elements of the result register are identical to `src_0`. All other values are taken
 //! from `src_1`
 //! @tparam T_RegisterType:
 //! The register type
