@@ -90,3 +90,9 @@ jobs:
     - name: Run codespell
       run: |
         codespell -f
+
+  typos_action:
+    runs-on: ubuntu-latest
+    steps:
+    - name: typos-action
+    - uses: crate-ci/typos@v1.0.4
