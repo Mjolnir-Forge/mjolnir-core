@@ -481,11 +481,11 @@ void test_permute_accross_lanes_test_case(T_RegisterType a, [[maybe_unused]] T_R
 
     auto c = mm_setzero<T_RegisterType>();
     if constexpr (is_m128d<T_RegisterType>)
-        c = permute_accross_lanes<p[0], p[1]>(a);
+        c = permute_across_lanes<p[0], p[1]>(a);
     else if constexpr (! is_m256<T_RegisterType>)
-        c = permute_accross_lanes<p[0], p[1], p[2], p[3]>(a);
+        c = permute_across_lanes<p[0], p[1], p[2], p[3]>(a);
     else
-        c = permute_accross_lanes<p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]>(a); // NOLINT - magic number
+        c = permute_across_lanes<p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]>(a); // NOLINT - magic number
 
 
     for (UST i = 0; i < n_e; ++i)
