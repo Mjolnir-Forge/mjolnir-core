@@ -1,0 +1,103 @@
+name: Static analysis
+
+on: [push]
+
+jobs:
+  clang_format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: DoozyX/clang-format-lint-action@v0.12
+      with:
+        source: '.'
+        # exclude: ''
+        extensions: 'h,cpp'
+        clangFormatVersion: 12
+        style: file
+    - name: install gitpython
+      run: |
+        pip install gitpython
+    - name: Check result
+      run: |
+        python3 python/check_clang_format_result.py
+
+  clang_tidy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install clang-tidy
+      run:
+        sudo apt-get install clang-tidy-11
+    - name: Run CMake to fetch googletest
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=DEBUG
+        -DIGNORE_CXX_COMPILER_COMPATIBILITY=True
+        -S . -B build
+    - name: List all checks
+      run:
+        clang-tidy-11 --list-checks
+    - name: Run clang-tidy
+      run:
+        python python/check_clang_tidy.py --version 11
+
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cppcheck
+      run: |
+        sudo apt-get install cppcheck
+    - name: Print cppcheck version
+      run: |
+        cppcheck --version
+    - name: Run cppcheck with config file
+      run: |
+        cppcheck --project=.cppcheck --dump --inline-suppr --std=c++20 --error-exitcode=1
+    - name: Run cppcheck with manual commands (temporary backup to test if the config file is set up correctly)
+      run: |
+        cppcheck -Isrc --inline-suppr --enable=all --suppress=missingIncludeSystem --error-exitcode=1 --std=c++20 tests src
+
+  cmake_format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cmakelang
+      run: |
+        pip install cmakelang
+    - name: Run cmake-format
+      run: |
+        python3 python/check_cmake_format.py
+
+  cmake_lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cmakelang
+      run: |
+        pip install cmakelang
+    - name: Run cmake-lint
+      run: |
+        python3 python/check_cmake_lint.py
+
+  codespell:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install codespell
+      run: |
+        pip install codespell
+    - name: Run codespell
+      run: |
+        codespell -f
+
+  typos_action:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Actions Repository
+      uses: actions/checkout@v2
+
+    - name: Run typos action
+      uses: crate-ci/typos@master
+      with:
+        config: ./.typos.toml

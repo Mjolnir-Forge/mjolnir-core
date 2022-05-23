@@ -1,0 +1,14 @@
+name: mjolnir
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - black
+  - flake8
+  - isort
+  - pydocstyle
+  - pyyaml
+  - pip
+  - pip:
+    - cmakelang

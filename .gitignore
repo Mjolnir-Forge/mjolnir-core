@@ -1,0 +1,6 @@
+build*
+*.user
+.idea*
+
+*__pycache__*
+*mypy_cache*

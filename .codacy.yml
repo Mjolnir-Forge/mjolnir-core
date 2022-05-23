@@ -1,0 +1,8 @@
+---
+engines:
+  remark-lint:
+    exclude_paths:
+      - .github/**
+  markdownlint:
+    exclude_paths:
+      - .github/**

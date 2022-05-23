@@ -1,0 +1,5 @@
+add_mjolnir_core_test(comparison)
+add_mjolnir_core_test(direct_access)
+add_mjolnir_core_test(element_summation)
+add_mjolnir_core_test(permutation)
+add_mjolnir_core_test(sign_manipulation)

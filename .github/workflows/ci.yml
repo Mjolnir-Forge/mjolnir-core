@@ -1,0 +1,123 @@
+name: CI
+
+on: [push]
+
+jobs:
+  GCC_Ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_type: [RELEASE]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run CMake
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+        -DCMAKE_C_COMPILER=gcc-10
+        -DCMAKE_CXX_COMPILER=g++-10
+        -S . -B build
+    - name: Build
+      run: cmake --build build -j 2
+    - name: Run tests
+      run: |
+        cd build
+        ctest  --output-on-failure
+
+  GCC_Ubuntu_Coverage:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_type: [DEBUG]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Intstall lcov
+      run:
+        sudo apt-get install lcov
+    - name: Run CMake
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+        -DCMAKE_C_COMPILER=gcc-10
+        -DCMAKE_CXX_COMPILER=g++-10
+        -DCMAKE_CXX_FLAGS="--coverage"
+        -S . -B build
+    - name: Build
+      run: cmake --build build -j 2
+    - name: Run tests
+      run: |
+        cd build
+        ctest  --output-on-failure
+    - name: Create coverage report
+      run: |
+        lcov --directory . --capture --output-file ../coverage.info
+        lcov --remove ../coverage.info 'usr/*' --output-file ../coverage.info
+        lcov --remove ../coverage.info '*/tests/*' --output-file ../coverage.info
+        bash <(curl -s https://codecov.io/bash)
+
+
+  Clang_Ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_type: [DEBUG, RELEASE]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run CMake
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+        -DCMAKE_C_COMPILER=clang-12
+        -DCMAKE_CXX_COMPILER=clang++-12
+        -S . -B build
+    - name: Build
+      run: cmake --build build -j 2
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
+
+  MSVC_Windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        build_type: [DEBUG, RELEASE]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run CMake
+      shell: bash -l {0}
+      run:
+        cmake
+        -DCMAKE_C_COMPILER=MSVC
+        -DCMAKE_CXX_COMPILER=MSVC
+        -S . -B build
+    - name: Build
+      run: cmake --build build --config ${{matrix.build_type}} -j 2
+    - name: Run tests
+      run: |
+        cd build
+        ctest -C ${{matrix.build_type}} --output-on-failure
+
+#  MinGW_Windows:
+#    runs-on: windows-latest
+#    strategy:
+#      matrix:
+#        build_type: [DEBUG, RELEASE]
+#    steps:
+#    - uses: actions/checkout@v2
+#    - name: Reinstall latest MinGW
+#      shell: bash -l {0}
+#      run:
+#        choco install mingw --force
+#    - name: Run CMake
+#      shell: bash -l {0}
+#      run:
+#        cmake
+#        -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+#        -G "MinGW Makefiles" -S . -B build
+#    - name: Build
+#      run: cmake --build build -j 2
+#    - name: Run tests
+#      run: |
+#        cd build
+#        ctest  --output-on-failure

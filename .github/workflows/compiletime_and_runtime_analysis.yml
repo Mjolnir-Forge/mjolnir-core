@@ -1,0 +1,90 @@
+name: Compile time + runtime analysis
+
+on: [push]
+
+jobs:
+  address_and_leak_sanitizer:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run CMake
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=DEBUG
+        -DCMAKE_C_COMPILER=clang-12
+        -DCMAKE_CXX_COMPILER=clang++-12
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=address;-fno-omit-frame-pointer"
+        -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=address"
+        -S . -B build
+    - name: Build
+      run: cmake --build build -j 2
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
+
+
+  thread_sanitizer:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run CMake
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=DEBUG
+        -DCMAKE_C_COMPILER=clang-12
+        -DCMAKE_CXX_COMPILER=clang++-12
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=thread"
+        -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=thread"
+        -S . -B build
+    - name: Build
+      run: cmake --build build -j 2
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
+
+
+  undefined_behavior_sanitizer:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run CMake
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=DEBUG
+        -DCMAKE_C_COMPILER=clang-12
+        -DCMAKE_CXX_COMPILER=clang++-12
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=undefined;-fno-sanitize-recover=undefined"
+        -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=undefined"
+        -S . -B build
+    - name: Build
+      run: cmake --build build -j 2
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
+
+  clang_static_analyzer:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install clang-tools
+      run: |
+        sudo apt-get install clang-tools-11
+    - name: Update default compiler
+      run : |
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 50
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 50
+    - name: Run CMake
+      run: |
+        mkdir build
+        cd build
+        scan-build-11 --status-bugs cmake -DCMAKE_BUILD_TYPE=DEBUG -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-DSTATIC_ANALYSIS" ..
+    - name: Build / Check
+      run: |
+        cd build
+        scan-build-11 --status-bugs make -j2
+
+
+# cmake -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=memory;-fPIE;-pie;-fsanitize-memory-track-origins=2;-fno-omit-frame-pointer" -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=memory;-fPIE;-pie"  ../../code/
