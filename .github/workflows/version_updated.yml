@@ -2,12 +2,15 @@ name: Version updated
 
 on:
   pull_request:
+    types: [labeled, unlabeled, opened, synchronize, reopened, ready_for_review]
     branches:
     - master
 
 jobs:
   check_version_updated:
-
+    if: |
+      !contains(github.event.pull_request.labels.*.name, 'skip_version_update') &&
+      github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
