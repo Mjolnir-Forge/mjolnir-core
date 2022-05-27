@@ -12,6 +12,16 @@
 
 // === EXCEPTION MACROS ===============================================================================================
 
+
+#if defined(_MSC_VER)
+#    define FUNCTION_SIG __FUNCSIG__
+#elif defined(__GNUC__)
+#    define FUNCTION_SIG __PRETTY_FUNCTION__
+#else
+static_assert(false, "Incompatible compiler");
+#endif
+
+
 //! \addtogroup core
 //! @{
 
@@ -22,7 +32,7 @@
 //! The exception type
 //! @param[in] message:
 //! The exception message
-#define THROW_EXCEPTION(exception_type, message) throw exception_type(__PRETTY_FUNCTION__, message)
+#define THROW_EXCEPTION(exception_type, message) throw exception_type(FUNCTION_SIG, message)
 
 //! @brief
 //! Throw an exception if the passed condition is met.
