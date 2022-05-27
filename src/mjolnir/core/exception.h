@@ -15,8 +15,8 @@
 //! \addtogroup core
 //! @{
 
-//! @brief T
-//! hrow an exception and automatically add the function that caused it.
+//! @brief
+//! Throw an exception and automatically add the function that caused it.
 //!
 //! @param[in] exception_type:
 //! The exception type
