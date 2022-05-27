@@ -10,6 +10,12 @@
 //! This submodule of the core module contains math functions and classes.
 
 
+//! @defgroup core_memory Core Memory
+//!
+//! @brief
+//! Classes and functions that allocate and manage memory.
+
+
 //! @defgroup core_utility Core Utility
 //!
 //! @brief
