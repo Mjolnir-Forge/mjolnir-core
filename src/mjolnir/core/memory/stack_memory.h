@@ -26,7 +26,7 @@ namespace mjolnir
 //! is located directly behind the previously allocated memory block. Memory is only freed if the passed pointer during
 //! deallocated points to the last allocated memory or if the intenal allocation counter becomes 0. In the latter case,
 //! all memory is freed at once. As a consequence, deallocations should happen in the opposite order than the
-//! allocations took place (last in, first out). Otherwhise, not all memory can be freed until the number of
+//! allocations took place (last in, first out). Otherwise, not all memory can be freed until the number of
 //! deallocations matches the number of allocations or the memory is flushed by calling `flush`.
 //!
 //! If you know, that deallocations will occur in random order, you can disable the mechanism to free the memory of the
