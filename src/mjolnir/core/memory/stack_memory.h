@@ -65,8 +65,8 @@ public:
     //! The desired size of the memory stack. Note that the memory is not allocated until the `initialize` method is
     //! called.
     //!
-    //! @exception
-    //! `Exception` if the passed size is `0`
+    //! @exception Exception
+    //! If the passed size is `0`
     explicit StackMemory(UST size_in_bytes);
 
 
@@ -87,6 +87,11 @@ public:
     //!
     //! @details
     //! Resets the internal variables and frees the memory.
+    //!
+    //! @exception Exception
+    //! Memory is already deinitialized
+    //! @exception Exception
+    //! Memory is still in use (number of allocations != number of deallocations)
     void deinitialize();
 
     //! @brief
@@ -102,6 +107,9 @@ public:
 
     //! @brief
     //! Initialize the memory.
+    //!
+    //! @exception Exception
+    //! Memory is already initialized
     void initialize();
 
 
