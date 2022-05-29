@@ -16,7 +16,8 @@
 #if defined(_MSC_VER)
 #    define FUNCTION_SIG __FUNCSIG__
 #elif defined(__GNUC__)
-#    define FUNCTION_SIG __PRETTY_FUNCTION__
+// NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
+#    define FUNCTION_SIG __PRETTY_FUNCTION__ // NOLINT(cppcoreguidelines-macro-usage)
 #else
 static_assert(false, "Incompatible compiler");
 #endif

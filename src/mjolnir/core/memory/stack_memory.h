@@ -44,19 +44,21 @@ namespace mjolnir
 template <bool t_free_last = false, bool t_thread_safe = false>
 class StackMemory
 {
-    UST                          m_memory_size;
-    UST                          m_num_allocations    = {0};
-    std::byte*                   m_current_memory_ptr = {nullptr};
-    std::unique_ptr<std::byte[]> m_memory             = {nullptr};
+    UST        m_memory_size;
+    UST        m_num_allocations    = {0};
+    std::byte* m_current_memory_ptr = {nullptr};
+
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+    std::unique_ptr<std::byte[]> m_memory = {nullptr};
 
 
 public:
     StackMemory()                   = delete;
     StackMemory(const StackMemory&) = delete;
     StackMemory(StackMemory&&)      = delete;
-    StackMemory& operator=(const StackMemory&) = delete;
-    StackMemory& operator=(StackMemory&&) = delete;
-    ~StackMemory()                        = default;
+    ~StackMemory()                  = default;
+    auto operator=(const StackMemory&) -> StackMemory& = delete;
+    auto operator=(StackMemory&&) -> StackMemory& = delete;
 
     //! @brief
     //! Construct a new instance with the specified memory size.
@@ -163,7 +165,7 @@ void StackMemory<t_free_last, t_thread_safe>::initialize_internal()
 {
     THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
 
-    m_memory.reset(new std::byte[m_memory_size]);
+    m_memory.reset(new std::byte[m_memory_size]); // NOLINT(cppcoreguidelines-owning-memory)
     m_num_allocations    = 0;
     m_current_memory_ptr = m_memory.get();
 }
