@@ -292,6 +292,9 @@ inline void HeapAllocationCounter::print_num_calls() const noexcept
 
 // === Overloads of new ===============================================================================================
 
+
+//! \cond DO_NOT_DOCUMENT
+
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
 void* operator new(std::size_t size)
 {
@@ -327,7 +330,7 @@ void* operator new[](std::size_t size, const std::nothrow_t&) noexcept
 
 void* operator new(std::size_t size, std::align_val_t al)
 {
-    void* p = aligned_alloc(static_cast<size_t>(al), size);
+    void* p = std::aligned_alloc(static_cast<size_t>(al), size);
     if (! p)
         throw std::bad_alloc(); // LCOV_EXCL_LINE
 
@@ -337,7 +340,7 @@ void* operator new(std::size_t size, std::align_val_t al)
 
 void* operator new[](std::size_t size, std::align_val_t al)
 {
-    void* p = aligned_alloc(static_cast<size_t>(al), size);
+    void* p = std::aligned_alloc(static_cast<size_t>(al), size);
     if (! p)
         throw std::bad_alloc(); // LCOV_EXCL_LINE
 
@@ -348,13 +351,13 @@ void* operator new[](std::size_t size, std::align_val_t al)
 void* operator new(std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept
 {
     mjolnir::HeapAllocationCounter::increase_total_new_calls();
-    return aligned_alloc(static_cast<size_t>(al), size);
+    return std::aligned_alloc(static_cast<size_t>(al), size);
 }
 
 void* operator new[](std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept
 {
     mjolnir::HeapAllocationCounter::increase_total_new_calls();
-    return aligned_alloc(static_cast<size_t>(al), size);
+    return std::aligned_alloc(static_cast<size_t>(al), size);
 }
 
 void operator delete(void* ptr) noexcept
@@ -437,3 +440,5 @@ void operator delete[](void*                                  ptr,
 }
 
 #endif // DISABLE_HEAP_ALLOCATION_COUNTER
+
+//! \endcond
