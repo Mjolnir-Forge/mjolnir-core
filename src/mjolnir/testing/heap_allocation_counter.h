@@ -11,6 +11,7 @@
 #include "mjolnir/core/fundamental_types.h"
 
 #include <atomic>
+#include <cstdlib>
 #include <iostream>
 
 
