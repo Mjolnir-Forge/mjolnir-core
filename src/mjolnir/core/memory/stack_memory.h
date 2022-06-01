@@ -60,6 +60,7 @@ public:
     auto operator=(const StackMemory&) -> StackMemory& = delete;
     auto operator=(StackMemory&&) -> StackMemory& = delete;
 
+
     //! @brief
     //! Construct a new instance with the specified memory size.
     //!
@@ -95,6 +96,7 @@ public:
     //! @exception Exception
     //! Memory is still in use (number of allocations != number of deallocations)
     void deinitialize();
+
 
     //! @brief
     //! Get the size of the allocated memory.
