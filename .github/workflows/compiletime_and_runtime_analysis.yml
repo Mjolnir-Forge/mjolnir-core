@@ -36,6 +36,7 @@ jobs:
         -DCMAKE_C_COMPILER=clang-12
         -DCMAKE_CXX_COMPILER=clang++-12
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=thread"
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_DEFINITIONS="DISABLE_HEAP_ALLOCATION_COUNTER"
         -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=thread"
         -S . -B build
     - name: Build
