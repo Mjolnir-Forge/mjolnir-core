@@ -167,7 +167,7 @@ void StackMemory<t_free_last, t_thread_safe>::initialize_internal()
 {
     THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
 
-    m_memory.reset(new std::byte[m_memory_size]); // NOLINT(cppcoreguidelines-owning-memory)
+    m_memory             = std::make_unique<std::byte[]>(m_memory_size); // NOLINT(cppcoreguidelines-owning-memory)
     m_num_allocations    = 0;
     m_current_memory_ptr = m_memory.get();
 }
