@@ -403,7 +403,6 @@ void operator delete(void* ptr, [[maybe_unused]] std::size_t sz) noexcept
 {
     mjolnir::HeapAllocationCounter::increase_total_delete_calls();
     free(ptr);
-    ptr = nullptr;
 }
 
 void operator delete[](void* ptr, [[maybe_unused]] std::size_t sz) noexcept
