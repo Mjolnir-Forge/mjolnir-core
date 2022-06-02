@@ -11,8 +11,20 @@
 #include "mjolnir/core/fundamental_types.h"
 
 #include <atomic>
-#include <cstdlib>
 #include <iostream>
+
+
+#if defined(_MSC_VER)
+#    include <malloc.h>
+#    define ALIGNED_ALLOC(alignment, size) _aligned_malloc(size, alignment)
+#    define ALIGNED_FREE _aligned_free
+#elif defined(__GNUC__)
+#    include <cstdlib>
+#    define ALIGNED_ALLOC(alignment, size) std::aligned_alloc(alignment, size)
+#    define ALIGNED_FREE free
+#else
+static_assert(false, "Incompatible compiler");
+#endif
 
 
 namespace mjolnir
@@ -331,7 +343,7 @@ void* operator new[](std::size_t size, const std::nothrow_t&) noexcept
 
 void* operator new(std::size_t size, std::align_val_t al)
 {
-    void* p = std::aligned_alloc(static_cast<size_t>(al), size);
+    void* p = ALIGNED_ALLOC(static_cast<size_t>(al), size);
     if (! p)
         throw std::bad_alloc(); // LCOV_EXCL_LINE
 
@@ -341,7 +353,7 @@ void* operator new(std::size_t size, std::align_val_t al)
 
 void* operator new[](std::size_t size, std::align_val_t al)
 {
-    void* p = std::aligned_alloc(static_cast<size_t>(al), size);
+    void* p = ALIGNED_ALLOC(static_cast<size_t>(al), size);
     if (! p)
         throw std::bad_alloc(); // LCOV_EXCL_LINE
 
@@ -352,13 +364,13 @@ void* operator new[](std::size_t size, std::align_val_t al)
 void* operator new(std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept
 {
     mjolnir::HeapAllocationCounter::increase_total_new_calls();
-    return std::aligned_alloc(static_cast<size_t>(al), size);
+    return ALIGNED_ALLOC(static_cast<size_t>(al), size);
 }
 
 void* operator new[](std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept
 {
     mjolnir::HeapAllocationCounter::increase_total_new_calls();
-    return std::aligned_alloc(static_cast<size_t>(al), size);
+    return ALIGNED_ALLOC(static_cast<size_t>(al), size);
 }
 
 void operator delete(void* ptr) noexcept
@@ -415,13 +427,13 @@ void operator delete[](void* ptr, [[maybe_unused]] std::size_t sz, [[maybe_unuse
 void operator delete(void* ptr, [[maybe_unused]] std::align_val_t al) noexcept
 {
     mjolnir::HeapAllocationCounter::increase_total_delete_calls();
-    free(ptr);
+    ALIGNED_FREE(ptr);
 }
 
 void operator delete[](void* ptr, [[maybe_unused]] std::align_val_t al) noexcept
 {
     mjolnir::HeapAllocationCounter::increase_total_delete_calls();
-    free(ptr);
+    ALIGNED_FREE(ptr);
 }
 
 void operator delete(void*                                  ptr,
@@ -429,7 +441,7 @@ void operator delete(void*                                  ptr,
                      [[maybe_unused]] const std::nothrow_t& tag) noexcept
 {
     mjolnir::HeapAllocationCounter::increase_total_delete_calls();
-    free(ptr);
+    ALIGNED_FREE(ptr);
 }
 
 void operator delete[](void*                                  ptr,
@@ -437,7 +449,7 @@ void operator delete[](void*                                  ptr,
                        [[maybe_unused]] const std::nothrow_t& tag) noexcept
 {
     mjolnir::HeapAllocationCounter::increase_total_delete_calls();
-    free(ptr);
+    ALIGNED_FREE(ptr);
 }
 
 #endif // DISABLE_HEAP_ALLOCATION_COUNTER
