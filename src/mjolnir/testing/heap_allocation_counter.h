@@ -47,8 +47,8 @@ class HeapAllocationCounter
     std::atomic<I32> m_num_new_at_construction    = -1;
     std::atomic<I32> m_num_delete_at_construction = -1;
 
-    static std::atomic<I32> m_num_new_global;
-    static std::atomic<I32> m_num_delete_global;
+    inline static std::atomic<I32> m_num_new_global    = 0;
+    inline static std::atomic<I32> m_num_delete_global = 0;
 
 
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
@@ -185,10 +185,6 @@ public:
 
 namespace mjolnir
 {
-std::atomic<I32> HeapAllocationCounter::m_num_new_global    = 0;
-std::atomic<I32> HeapAllocationCounter::m_num_delete_global = 0;
-
-
 // --------------------------------------------------------------------------------------------------------------------
 
 HeapAllocationCounter::HeapAllocationCounter()
