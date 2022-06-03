@@ -20,8 +20,8 @@
 #    define ALIGNED_FREE _aligned_free
 #elif defined(__GNUC__)
 #    include <cstdlib>
-#    define ALIGNED_ALLOC(alignment, size) std::aligned_alloc(alignment, size)
-#    define ALIGNED_FREE free
+#    define ALIGNED_ALLOC(alignment, size) std::aligned_alloc(alignment, size) // NOLINT(cppcoreguidelines-macro-usage)
+#    define ALIGNED_FREE free                                                  // NOLINT(cppcoreguidelines-macro-usage)
 #else
 static_assert(false, "Incompatible compiler");
 #endif
@@ -44,11 +44,11 @@ namespace mjolnir
 //! Define `DISABLE_HEAP_ALLOCATION_COUNTER` if you like to run them on files that include this class.
 class HeapAllocationCounter
 {
-    std::atomic<I32> m_num_new_at_construction    = -1;
-    std::atomic<I32> m_num_delete_at_construction = -1;
+    std::atomic<I32> m_num_new_at_construction = -1;
+    std::atomic<I32> m_num_del_at_construction = -1;
 
-    inline static std::atomic<I32> m_num_new_global    = 0;
-    inline static std::atomic<I32> m_num_delete_global = 0;
+    inline static std::atomic<I32> m_num_new_global = 0; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    inline static std::atomic<I32> m_num_del_global = 0; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
@@ -78,7 +78,7 @@ class HeapAllocationCounter
 
 
 public:
-    HeapAllocationCounter();
+    inline HeapAllocationCounter();
     HeapAllocationCounter(const HeapAllocationCounter&) = delete;
     HeapAllocationCounter(HeapAllocationCounter&&)      = delete;
     ~HeapAllocationCounter()                            = default;
@@ -90,12 +90,12 @@ public:
 private:
     //! @brief
     //! Increases the delete counter
-    static void increase_total_delete_calls() noexcept;
+    static inline void increase_total_delete_calls() noexcept;
 
 
     //! @brief
     //! Increases the new counter
-    static void increase_total_new_calls() noexcept;
+    static inline void increase_total_new_calls() noexcept;
 
 
     //! @brief
@@ -106,7 +106,7 @@ private:
     //!
     //! @return
     //! Passed value or -1
-    [[nodiscard]] static auto return_value([[maybe_unused]] I32 value) noexcept -> I32;
+    [[nodiscard]] static inline auto return_value([[maybe_unused]] I32 value) noexcept -> I32;
 
 
 public:
@@ -115,7 +115,7 @@ public:
     //!
     //! @return
     //! Number of delete calls since the construction of the instance
-    [[nodiscard]] auto get_num_delete_calls() const noexcept -> I32;
+    [[nodiscard]] inline auto get_num_delete_calls() const noexcept -> I32;
 
 
     //! @brief
@@ -123,7 +123,7 @@ public:
     //!
     //! @return
     //! Number of new calls since the construction of the instance
-    [[nodiscard]] auto get_num_new_calls() const noexcept -> I32;
+    [[nodiscard]] inline auto get_num_new_calls() const noexcept -> I32;
 
 
     //! @brief
@@ -131,7 +131,7 @@ public:
     //!
     //! @return
     //! Total number of delete calls of the program
-    [[nodiscard]] static auto get_total_num_delete_calls() noexcept -> I32;
+    [[nodiscard]] inline static auto get_total_num_delete_calls() noexcept -> I32;
 
 
     //! @brief
@@ -139,7 +139,7 @@ public:
     //!
     //! @return
     //! Total number of new calls of the program
-    [[nodiscard]] static auto get_total_num_new_calls() noexcept -> I32;
+    [[nodiscard]] static inline auto get_total_num_new_calls() noexcept -> I32;
 
 
     //! @brief
@@ -153,7 +153,7 @@ public:
     //!
     //! @remark
     //! Returns always `true` if `DISABLE_HEAP_ALLOCATION_COUNTER` is defined
-    [[nodiscard]] auto is_num_delete_calls_equal_to([[maybe_unused]] I32 exp_num_delete) const noexcept -> bool;
+    [[nodiscard]] inline auto is_num_delete_calls_equal_to([[maybe_unused]] I32 exp_num_delete) const noexcept -> bool;
 
 
     //! @brief
@@ -167,12 +167,12 @@ public:
     //!
     //! @remark
     //! Returns always `true` if `DISABLE_HEAP_ALLOCATION_COUNTER` is defined
-    [[nodiscard]] auto is_num_new_calls_equal_to([[maybe_unused]] I32 exp_num_new) const noexcept -> bool;
+    [[nodiscard]] inline auto is_num_new_calls_equal_to([[maybe_unused]] I32 exp_num_new) const noexcept -> bool;
 
 
     //! @brief
     //! Prints the number of new and delete calls since the construction of the class instance
-    void print_num_calls() const noexcept;
+    inline void print_num_calls() const noexcept;
 };
 
 
@@ -187,9 +187,9 @@ namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-HeapAllocationCounter::HeapAllocationCounter()
+inline HeapAllocationCounter::HeapAllocationCounter()
     : m_num_new_at_construction(m_num_new_global.load())
-    , m_num_delete_at_construction(m_num_delete_global.load())
+    , m_num_del_at_construction(m_num_del_global.load())
 {
 }
 
@@ -198,7 +198,7 @@ HeapAllocationCounter::HeapAllocationCounter()
 
 inline void HeapAllocationCounter::increase_total_delete_calls() noexcept
 {
-    ++m_num_delete_global;
+    ++m_num_del_global;
 }
 
 
@@ -212,7 +212,7 @@ inline void HeapAllocationCounter::increase_total_new_calls() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline auto HeapAllocationCounter::return_value(I32 value) noexcept -> I32
+[[nodiscard]] inline auto HeapAllocationCounter::return_value([[maybe_unused]] I32 value) noexcept -> I32
 {
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
     return value;
@@ -226,7 +226,7 @@ inline void HeapAllocationCounter::increase_total_new_calls() noexcept
 
 [[nodiscard]] inline auto HeapAllocationCounter::get_num_delete_calls() const noexcept -> I32
 {
-    return return_value(m_num_delete_global - m_num_delete_at_construction);
+    return return_value(m_num_del_global - m_num_del_at_construction);
 }
 
 
@@ -242,7 +242,7 @@ inline void HeapAllocationCounter::increase_total_new_calls() noexcept
 
 [[nodiscard]] inline auto HeapAllocationCounter::get_total_num_delete_calls() noexcept -> I32
 {
-    return return_value(m_num_delete_global);
+    return return_value(m_num_del_global);
 }
 
 
@@ -256,7 +256,8 @@ inline void HeapAllocationCounter::increase_total_new_calls() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] auto
+[[nodiscard]] inline auto
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 HeapAllocationCounter::is_num_delete_calls_equal_to([[maybe_unused]] I32 exp_num_delete) const noexcept -> bool
 {
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
@@ -269,8 +270,9 @@ HeapAllocationCounter::is_num_delete_calls_equal_to([[maybe_unused]] I32 exp_num
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] auto HeapAllocationCounter::is_num_new_calls_equal_to([[maybe_unused]] I32 exp_num_new) const noexcept
-        -> bool
+[[nodiscard]] inline auto
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+HeapAllocationCounter::is_num_new_calls_equal_to([[maybe_unused]] I32 exp_num_new) const noexcept -> bool
 {
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
     return get_num_new_calls() == exp_num_new;
@@ -282,6 +284,8 @@ HeapAllocationCounter::is_num_delete_calls_equal_to([[maybe_unused]] I32 exp_num
 
 // --------------------------------------------------------------------------------------------------------------------
 
+
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 inline void HeapAllocationCounter::print_num_calls() const noexcept
 {
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
