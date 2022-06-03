@@ -45,7 +45,7 @@ static_assert(false, "Incompatible compiler");
 //! @param[in] message:
 //! The exception message
 #define THROW_EXCEPTION_IF(condition, exception_type, message)                                                         \
-    if (condition) [[unlikely]]                                                                                        \
+    if (condition) [[unlikely]] /* NOLINT(clang-diagnostic-unknown-attributes) */                                      \
     THROW_EXCEPTION(exception_type, message)
 
 
