@@ -155,8 +155,8 @@ void StackMemory<t_free_last, t_thread_safe>::deinitialize_internal()
     THROW_EXCEPTION_IF(! is_initialized(), Exception, "Memory already deinitialized.");
     THROW_EXCEPTION_IF(m_num_allocations > 0, Exception, "Can't deinitialize. Memory still in use.");
 
-    m_memory.reset(nullptr);
-    m_current_memory_ptr = {nullptr};
+    m_memory             = nullptr;
+    m_current_memory_ptr = nullptr;
 }
 
 
