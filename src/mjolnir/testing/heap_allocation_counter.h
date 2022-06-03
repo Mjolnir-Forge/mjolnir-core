@@ -90,12 +90,12 @@ public:
 private:
     //! @brief
     //! Increases the delete counter
-    static inline void increase_total_delete_calls() noexcept;
+    static void increase_total_delete_calls() noexcept;
 
 
     //! @brief
     //! Increases the new counter
-    static inline void increase_total_new_calls() noexcept;
+    static void increase_total_new_calls() noexcept;
 
 
     //! @brief
@@ -106,7 +106,7 @@ private:
     //!
     //! @return
     //! Passed value or -1
-    [[nodiscard]] static inline auto return_value([[maybe_unused]] I32 value) noexcept -> I32;
+    [[nodiscard]] static auto return_value([[maybe_unused]] I32 value) noexcept -> I32;
 
 
 public:
@@ -115,7 +115,7 @@ public:
     //!
     //! @return
     //! Number of delete calls since the construction of the instance
-    [[nodiscard]] inline auto get_num_delete_calls() const noexcept -> I32;
+    [[nodiscard]] auto get_num_delete_calls() const noexcept -> I32;
 
 
     //! @brief
@@ -123,7 +123,7 @@ public:
     //!
     //! @return
     //! Number of new calls since the construction of the instance
-    [[nodiscard]] inline auto get_num_new_calls() const noexcept -> I32;
+    [[nodiscard]] auto get_num_new_calls() const noexcept -> I32;
 
 
     //! @brief
@@ -131,7 +131,7 @@ public:
     //!
     //! @return
     //! Total number of delete calls of the program
-    [[nodiscard]] inline static auto get_total_num_delete_calls() noexcept -> I32;
+    [[nodiscard]] static auto get_total_num_delete_calls() noexcept -> I32;
 
 
     //! @brief
@@ -139,7 +139,7 @@ public:
     //!
     //! @return
     //! Total number of new calls of the program
-    [[nodiscard]] static inline auto get_total_num_new_calls() noexcept -> I32;
+    [[nodiscard]] static auto get_total_num_new_calls() noexcept -> I32;
 
 
     //! @brief
@@ -153,7 +153,7 @@ public:
     //!
     //! @remark
     //! Returns always `true` if `DISABLE_HEAP_ALLOCATION_COUNTER` is defined
-    [[nodiscard]] inline auto is_num_delete_calls_equal_to([[maybe_unused]] I32 exp_num_delete) const noexcept -> bool;
+    [[nodiscard]] auto is_num_delete_calls_equal_to([[maybe_unused]] I32 exp_num_delete) const noexcept -> bool;
 
 
     //! @brief
@@ -167,12 +167,12 @@ public:
     //!
     //! @remark
     //! Returns always `true` if `DISABLE_HEAP_ALLOCATION_COUNTER` is defined
-    [[nodiscard]] inline auto is_num_new_calls_equal_to([[maybe_unused]] I32 exp_num_new) const noexcept -> bool;
+    [[nodiscard]] auto is_num_new_calls_equal_to([[maybe_unused]] I32 exp_num_new) const noexcept -> bool;
 
 
     //! @brief
     //! Prints the number of new and delete calls since the construction of the class instance
-    inline void print_num_calls() const noexcept;
+    void print_num_calls() const noexcept;
 };
 
 
