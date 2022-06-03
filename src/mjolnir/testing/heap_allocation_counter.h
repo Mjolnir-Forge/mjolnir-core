@@ -52,22 +52,22 @@ class HeapAllocationCounter
 
 
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
-    friend void* ::operator new(std::size_t size);
-    friend void* ::operator new(std::size_t size, std::align_val_t al);
-    friend void* ::operator new(std::size_t size, const std::nothrow_t&) noexcept;
-    friend void* ::operator new(std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept;
-    friend void* ::operator new[](std::size_t size);
-    friend void* ::operator new[](std::size_t size, std::align_val_t al);
-    friend void* ::operator new[](std::size_t size, const std::nothrow_t&) noexcept;
-    friend void* ::operator new[](std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept;
-    friend void :: operator delete(void* ptr) noexcept;
-    friend void :: operator delete(void* ptr, const std::nothrow_t&) noexcept;
-    friend void :: operator delete[](void* ptr) noexcept;
-    friend void :: operator delete[](void* ptr, const std::nothrow_t&) noexcept;
-    friend void :: operator delete(void* ptr, std::align_val_t al) noexcept;
-    friend void :: operator delete[](void* ptr, std::align_val_t al) noexcept;
-    friend void :: operator delete(void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept;
-    friend void :: operator delete[](void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept;
+    friend auto ::operator new(std::size_t size) -> void*;
+    friend auto ::operator new(std::size_t size, std::align_val_t al) -> void*;
+    friend auto ::operator new(std::size_t size, const std::nothrow_t&) noexcept -> void*;
+    friend auto ::operator new(std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept -> void*;
+    friend auto ::operator new[](std::size_t size) -> void*;
+    friend auto ::operator new[](std::size_t size, std::align_val_t al) -> void*;
+    friend auto ::operator new[](std::size_t size, const std::nothrow_t&) noexcept -> void*;
+    friend auto ::operator new[](std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept -> void*;
+    friend void ::operator delete(void* ptr) noexcept;
+    friend void ::operator delete(void* ptr, const std::nothrow_t&) noexcept;
+    friend void ::operator delete[](void* ptr) noexcept;
+    friend void ::operator delete[](void* ptr, const std::nothrow_t&) noexcept;
+    friend void ::operator delete(void* ptr, std::align_val_t al) noexcept;
+    friend void ::operator delete[](void* ptr, std::align_val_t al) noexcept;
+    friend void ::operator delete(void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept;
+    friend void ::operator delete[](void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept;
 #    ifdef __cpp_sized_deallocation
     friend void ::operator delete(void* ptr, std::size_t sz) noexcept;
     friend void ::operator delete[](void* ptr, std::size_t sz) noexcept;
@@ -309,7 +309,7 @@ inline void HeapAllocationCounter::print_num_calls() const noexcept
 //! \cond DO_NOT_DOCUMENT
 
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
-void* operator new(std::size_t size)
+auto operator new(std::size_t size) -> void*
 {
     void* p = malloc(size);
     if (! p)
@@ -319,7 +319,7 @@ void* operator new(std::size_t size)
     return p;
 }
 
-void* operator new[](std::size_t size)
+auto operator new[](std::size_t size) -> void*
 {
     void* p = malloc(size);
     if (! p)
@@ -329,19 +329,19 @@ void* operator new[](std::size_t size)
     return p;
 }
 
-void* operator new(std::size_t size, const std::nothrow_t&) noexcept
+auto operator new(std::size_t size, const std::nothrow_t&) noexcept -> void*
 {
     mjolnir::HeapAllocationCounter::increase_total_new_calls();
     return malloc(size);
 }
 
-void* operator new[](std::size_t size, const std::nothrow_t&) noexcept
+auto operator new[](std::size_t size, const std::nothrow_t&) noexcept -> void*
 {
     mjolnir::HeapAllocationCounter::increase_total_new_calls();
     return malloc(size);
 }
 
-void* operator new(std::size_t size, std::align_val_t al)
+auto operator new(std::size_t size, std::align_val_t al) -> void*
 {
     void* p = ALIGNED_ALLOC(static_cast<size_t>(al), size);
     if (! p)
@@ -351,7 +351,7 @@ void* operator new(std::size_t size, std::align_val_t al)
     return p;
 }
 
-void* operator new[](std::size_t size, std::align_val_t al)
+auto operator new[](std::size_t size, std::align_val_t al) -> void*
 {
     void* p = ALIGNED_ALLOC(static_cast<size_t>(al), size);
     if (! p)
@@ -361,13 +361,13 @@ void* operator new[](std::size_t size, std::align_val_t al)
     return p;
 }
 
-void* operator new(std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept
+auto operator new(std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept -> void*
 {
     mjolnir::HeapAllocationCounter::increase_total_new_calls();
     return ALIGNED_ALLOC(static_cast<size_t>(al), size);
 }
 
-void* operator new[](std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept
+auto operator new[](std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept -> void*
 {
     mjolnir::HeapAllocationCounter::increase_total_new_calls();
     return ALIGNED_ALLOC(static_cast<size_t>(al), size);
