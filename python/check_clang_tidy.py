@@ -58,6 +58,7 @@ for file in files:
             "--extra-arg=-std=gnu++20",
             "--extra-arg=-pthread",
             "--extra-arg=-DSTATIC_ANALYSIS",
+            "--extra-arg=-DDISABLE_HEAP_ALLOCATION_COUNTER",
             "--",
             "-I",
             "src",
