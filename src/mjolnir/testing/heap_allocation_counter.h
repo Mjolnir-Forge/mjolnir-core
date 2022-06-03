@@ -78,7 +78,7 @@ class HeapAllocationCounter
 
 
 public:
-    inline HeapAllocationCounter();
+    HeapAllocationCounter();
     HeapAllocationCounter(const HeapAllocationCounter&) = delete;
     HeapAllocationCounter(HeapAllocationCounter&&)      = delete;
     ~HeapAllocationCounter()                            = default;
