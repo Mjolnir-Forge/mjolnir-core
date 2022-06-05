@@ -234,14 +234,14 @@ TEST(test_heap_allocation_counter_macros, std_vector) // NOLINT
 {
     COUNT_NEW_AND_DELETE;
     {
-        std::vector<F32> v{};
-        EXPECT_NUM_NEW_AND_DELETE_EQ(0, 0);
-
-        v.push_back(3.F);
+        std::vector<F32> v{0};
         EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
 
-        v.reserve(20);
+        v.push_back(2.F); // NOLINT --- magic number
         EXPECT_NUM_NEW_AND_DELETE_EQ(2, 1);
+
+        v.reserve(3);
+        EXPECT_NUM_NEW_AND_DELETE_EQ(3, 2);
     }
-    EXPECT_NUM_NEW_AND_DELETE_EQ(2, 2);
+    EXPECT_NUM_NEW_AND_DELETE_EQ(3, 3);
 }
