@@ -71,10 +71,34 @@ static_assert(false, "Incompatible compiler");
 #    define EXPECT_NUM_DELETE_EQ(num_delete_exp) EXPECT_EQ(new_delete_counter.get_num_delete_calls(), num_delete_exp)
 
 
+// --------------------------------------------------------------------------------------------------------------------
+
+//! @brief
+//! Check if the number of new and delete calls are equal to the passed numbers
+//!
+//! @details
+//! Requires a variable with name `new_delete_counter` and the type `NewDeleteCounter` that is valid in the current
+//! scope. The macro `COUNT_NEW_AND_DELETE` performs the required initialization. This macro should only be
+//! used in a test using `gtest.h` and relies on `EXPECT_EQ`. The test is passed if the number of new and delete calls
+//! since the macro `COUNT_NEW_AND_DELETE` was used are equal to the passed numbers. Otherwise, the test fails.
+//!
+//!
+//! If `DISABLE_NEW_DELETE_COUNTER` is defined, this macro does nothing.
+//!
+//! @param num_new_exp:
+//! Expected number of new calls
+//! @param num_delete_exp:
+//! Expected number of delete calls
+#    define EXPECT_NUM_NEW_AND_DELETE_EQ(num_new_exp, num_delete_exp)                                                  \
+        EXPECT_NUM_NEW_EQ(num_new_exp);                                                                                \
+        EXPECT_NUM_DELETE_EQ(num_delete_exp)
+
+
 #else
 #    define COUNT_NEW_AND_DELETE
 #    define EXPECT_NUM_NEW_EQ(num_new_exp)
 #    define EXPECT_NUM_DELETE_EQ(num_delete_exp)
+#    define EXPECT_NUM_NEW_AND_DELETE_EQ(num_new_exp, num_delete_exp)
 #endif
 
 

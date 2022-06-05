@@ -1,0 +1,1 @@
+add_mjolnir_core_test(new_delete_counter)
