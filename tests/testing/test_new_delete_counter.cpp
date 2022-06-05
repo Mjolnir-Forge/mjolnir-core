@@ -226,22 +226,3 @@ TEST(test_heap_allocation_counter_macros, multiple_allocations) // NOLINT
     ::operator delete(d);
     EXPECT_NUM_NEW_AND_DELETE_EQ(4, 4);
 }
-
-
-// --- test with std::vector ------------------------------------------------------------------------------------------
-
-TEST(test_heap_allocation_counter_macros, std_vector) // NOLINT
-{
-    COUNT_NEW_AND_DELETE;
-    {
-        std::vector<F32> v{0};
-        EXPECT_NUM_NEW_AND_DELETE_EQ(2, 0);
-
-        v.push_back(2.F); // NOLINT --- magic number
-        EXPECT_NUM_NEW_AND_DELETE_EQ(2, 1);
-
-        v.reserve(3);
-        EXPECT_NUM_NEW_AND_DELETE_EQ(3, 2);
-    }
-    EXPECT_NUM_NEW_AND_DELETE_EQ(3, 3);
-}
