@@ -17,7 +17,7 @@ TEST(test_construction, check_state) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    START_COUNTING_NEW_AND_DELETE;
+    COUNT_NEW_AND_DELETE;
 
     // todo:
     // test free memory is 0
@@ -44,7 +44,7 @@ TEST(test_initialization, check_state) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    START_COUNTING_NEW_AND_DELETE;
+    COUNT_NEW_AND_DELETE;
 
     auto mem = StackMemory(num_bytes);
     mem.initialize();
@@ -81,7 +81,7 @@ TEST(test_deinitialization, check_state) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    START_COUNTING_NEW_AND_DELETE;
+    COUNT_NEW_AND_DELETE;
 
     auto mem = StackMemory(num_bytes);
     mem.initialize();

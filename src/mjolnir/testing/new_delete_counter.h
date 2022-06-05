@@ -17,19 +17,62 @@
 #elif defined(__GNUC__)
 #    include <cstdlib>
 #    define ALIGNED_ALLOC(alignment, size) std::aligned_alloc(alignment, size) // NOLINT(cppcoreguidelines-macro-usage)
-#    define ALIGNED_FREE free                                                  // NOLINT(cppcoreguidelines-macro-usage)
+#    define ALIGNED_FREE std::free                                             // NOLINT(cppcoreguidelines-macro-usage)
 #else
 static_assert(false, "Incompatible compiler");
 #endif
 
 
-#ifndef DISABLE_HEAP_ALLOCATION_COUNTER
-#    include <gtest/gtest.h>
-#    define START_COUNTING_NEW_AND_DELETE auto new_delete_counter = NewDeleteCounter()
+#ifndef DISABLE_NEW_DELETE_COUNTER
+
+
+//! @brief
+//! Creates a new `NewDeleteCounter` and stores it in a variable with a specific name that is needed by other macros.
+//!
+//! @details
+//! If `DISABLE_NEW_DELETE_COUNTER` is defined, this macro does nothing.
+#    define COUNT_NEW_AND_DELETE auto new_delete_counter = NewDeleteCounter()
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+//! @brief
+//! Check if the number of new calls are equal to the passed number
+//!
+//! @details
+//! Requires a variable with name `new_delete_counter` and the type `NewDeleteCounter` that is valid in the current
+//! scope. The macro `COUNT_NEW_AND_DELETE` performs the required initialization. This macro should only be
+//! used in a test using `gtest.h` and relies on `EXPECT_EQ`. The test is passed if the number of new calls since the
+//! macro `COUNT_NEW_AND_DELETE` was used is equal to the passed number. Otherwise, the test fails.
+//!
+//! If `DISABLE_NEW_DELETE_COUNTER` is defined, this macro does nothing.
+//!
+//! @param num_new_exp:
+//! Expected number of new calls
 #    define EXPECT_NUM_NEW_EQ(num_new_exp) EXPECT_EQ(new_delete_counter.get_num_new_calls(), num_new_exp)
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+//! @brief
+//! Check if the number of delete calls are equal to the passed number
+//!
+//! @details
+//! Requires a variable with name `new_delete_counter` and the type `NewDeleteCounter` that is valid in the current
+//! scope. The macro `COUNT_NEW_AND_DELETE` performs the required initialization. This macro should only be
+//! used in a test using `gtest.h` and relies on `EXPECT_EQ`. The test is passed if the number of delete calls since the
+//! macro `COUNT_NEW_AND_DELETE` was used is equal to the passed number. Otherwise, the test fails.
+//!
+//!
+//! If `DISABLE_NEW_DELETE_COUNTER` is defined, this macro does nothing.
+//!
+//! @param num_delete_exp:
+//! Expected number of delete calls
 #    define EXPECT_NUM_DELETE_EQ(num_delete_exp) EXPECT_EQ(new_delete_counter.get_num_delete_calls(), num_delete_exp)
+
+
 #else
-#    define START_COUNTING_NEW_AND_DELETE
+#    define COUNT_NEW_AND_DELETE
 #    define EXPECT_NUM_NEW_EQ(num_new_exp)
 #    define EXPECT_NUM_DELETE_EQ(num_delete_exp)
 #endif
@@ -58,7 +101,7 @@ namespace mjolnir
 //!
 //! @remark
 //! The necessary overloads of `new` and `delete` interfere with valgrind and other tools that override those operators.
-//! Define `DISABLE_HEAP_ALLOCATION_COUNTER` if you like to run them on files that include this class.
+//! Define `DISABLE_NEW_DELETE_COUNTER` if you like to run them on files that include this class.
 class NewDeleteCounter
 {
     std::atomic<I32> m_num_new_at_construction = -1;
@@ -68,7 +111,7 @@ class NewDeleteCounter
     inline static std::atomic<I32> m_num_del_global = 0; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 
-#ifndef DISABLE_HEAP_ALLOCATION_COUNTER
+#ifndef DISABLE_NEW_DELETE_COUNTER
     friend auto ::operator new(std::size_t size) -> void*;
     friend auto ::operator new(std::size_t size, std::align_val_t al) -> void*;
     friend auto ::operator new(std::size_t size, const std::nothrow_t&) noexcept -> void*;
@@ -91,7 +134,7 @@ class NewDeleteCounter
     friend void ::operator delete(void* ptr, std::size_t sz, std::align_val_t al) noexcept;
     friend void ::operator delete[](void* ptr, std::size_t sz, std::align_val_t al) noexcept;
 #    endif // __cpp_sized_deallocation
-#endif     // DISABLE_HEAP_ALLOCATION_COUNTER
+#endif     // DISABLE_NEW_DELETE_COUNTER
 
 
 public:
@@ -116,7 +159,7 @@ private:
 
 
     //! @brief
-    //! Return `-1` if `DISABLE_HEAP_ALLOCATION_COUNTER` is defined and the passed value otherwise.
+    //! Return `-1` if `DISABLE_NEW_DELETE_COUNTER` is defined and the passed value otherwise.
     //!
     //! @param[in] value:
     //! Value that should be returned
@@ -203,11 +246,11 @@ inline void NewDeleteCounter::increase_total_new_calls() noexcept
 
 [[nodiscard]] inline auto NewDeleteCounter::return_value([[maybe_unused]] I32 value) noexcept -> I32
 {
-#ifndef DISABLE_HEAP_ALLOCATION_COUNTER
+#ifndef DISABLE_NEW_DELETE_COUNTER
     return value;
 #else
     return -1;
-#endif // DISABLE_HEAP_ALLOCATION_COUNTER
+#endif // DISABLE_NEW_DELETE_COUNTER
 }
 
 
@@ -248,12 +291,12 @@ inline void NewDeleteCounter::increase_total_new_calls() noexcept
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 inline void NewDeleteCounter::print_num_calls() const noexcept
 {
-#ifndef DISABLE_HEAP_ALLOCATION_COUNTER
+#ifndef DISABLE_NEW_DELETE_COUNTER
     std::cout << "Number of new calls    : " << get_num_new_calls() << std::endl;
     std::cout << "Number of delete calls : " << get_num_delete_calls() << std::endl;
 #else
     std::cout << "Global new counter disabled." << std::endl;
-#endif // DISABLE_HEAP_ALLOCATION_COUNTER
+#endif // DISABLE_NEW_DELETE_COUNTER
 }
 
 
@@ -268,7 +311,7 @@ inline void NewDeleteCounter::print_num_calls() const noexcept
 
 //! \cond DO_NOT_DOCUMENT
 
-#ifndef DISABLE_HEAP_ALLOCATION_COUNTER
+#ifndef DISABLE_NEW_DELETE_COUNTER
 auto operator new(std::size_t size) -> void*
 {
     void* p = malloc(size);
@@ -412,6 +455,6 @@ void operator delete[](void*                                  ptr,
     ALIGNED_FREE(ptr);
 }
 
-#endif // DISABLE_HEAP_ALLOCATION_COUNTER
+#endif // DISABLE_NEW_DELETE_COUNTER
 
 //! \endcond
