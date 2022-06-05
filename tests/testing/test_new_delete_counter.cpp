@@ -216,13 +216,13 @@ TEST(test_heap_allocation_counter_macros, multiple_allocations) // NOLINT
     auto* b = new I32(1); // NOLINT(cppcoreguidelines-owning-memory)
     auto* c = new I32(1); // NOLINT(cppcoreguidelines-owning-memory)
     ::    operator delete(a);
-    EXPECT_NUM_NEW_AND_DELETE_EQ(3, 1);
+    ASSERT_NUM_NEW_AND_DELETE_EQ(3, 1);
 
     auto* d = new I32(1); // NOLINT(cppcoreguidelines-owning-memory)
-    EXPECT_NUM_NEW_AND_DELETE_EQ(4, 1);
+    ASSERT_NUM_NEW_AND_DELETE_EQ(4, 1);
 
     ::operator delete(b);
     ::operator delete(c);
     ::operator delete(d);
-    EXPECT_NUM_NEW_AND_DELETE_EQ(4, 4);
+    ASSERT_NUM_NEW_AND_DELETE_EQ(4, 4);
 }
