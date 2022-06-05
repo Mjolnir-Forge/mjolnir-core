@@ -25,8 +25,7 @@ TEST(test_construction, check_state) // NOLINT
 
     EXPECT_EQ(mem.get_memory_size(), 0);
     EXPECT_FALSE(mem.is_initialized());
-    EXPECT_NUM_NEW_EQ(0);
-    EXPECT_NUM_DELETE_EQ(0);
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
 
 
@@ -51,8 +50,7 @@ TEST(test_initialization, check_state) // NOLINT
 
     EXPECT_EQ(mem.get_memory_size(), num_bytes);
     EXPECT_TRUE(mem.is_initialized());
-    EXPECT_NUM_NEW_EQ(1);
-    EXPECT_NUM_DELETE_EQ(0);
+    ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
 
     // todo:
     // test free memory is num_bytes
@@ -89,8 +87,7 @@ TEST(test_deinitialization, check_state) // NOLINT
 
     EXPECT_EQ(mem.get_memory_size(), 0);
     EXPECT_FALSE(mem.is_initialized());
-    EXPECT_NUM_NEW_EQ(1);
-    EXPECT_NUM_DELETE_EQ(1);
+    ASSERT_NUM_NEW_AND_DELETE_EQ(1, 1);
 
     // todo:
     // test free memory 0
