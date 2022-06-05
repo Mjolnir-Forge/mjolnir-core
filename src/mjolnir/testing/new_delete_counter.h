@@ -2,17 +2,13 @@
 //! heap_allocation_counter.h
 //!
 //! @brief
-//! Contains a class that keeps track of the number of heap allocations.
+//! Contains a class that keeps track of the number of new and delete calls.
 
 
 #pragma once
 
 
-#include "mjolnir/core/fundamental_types.h"
-
-#include <atomic>
-#include <iostream>
-
+// === MACROS =========================================================================================================
 
 #if defined(_MSC_VER)
 #    include <malloc.h>
@@ -25,6 +21,27 @@
 #else
 static_assert(false, "Incompatible compiler");
 #endif
+
+
+#ifndef DISABLE_HEAP_ALLOCATION_COUNTER
+#    include <gtest/gtest.h>
+#    define START_COUNTING_NEW_AND_DELETE auto new_delete_counter = NewDeleteCounter()
+#    define EXPECT_NUM_NEW_EQ(num_new_exp) EXPECT_EQ(new_delete_counter.get_num_new_calls(), num_new_exp)
+#    define EXPECT_NUM_DELETE_EQ(num_delete_exp) EXPECT_EQ(new_delete_counter.get_num_delete_calls(), num_delete_exp)
+#else
+#    define START_COUNTING_NEW_AND_DELETE
+#    define EXPECT_NUM_NEW_EQ(num_new_exp)
+#    define EXPECT_NUM_DELETE_EQ(num_delete_exp)
+#endif
+
+
+// === DECLARATIONS ===================================================================================================
+
+
+#include "mjolnir/core/fundamental_types.h"
+
+#include <atomic>
+#include <iostream>
 
 
 namespace mjolnir
@@ -42,7 +59,7 @@ namespace mjolnir
 //! @remark
 //! The necessary overloads of `new` and `delete` interfere with valgrind and other tools that override those operators.
 //! Define `DISABLE_HEAP_ALLOCATION_COUNTER` if you like to run them on files that include this class.
-class HeapAllocationCounter
+class NewDeleteCounter
 {
     std::atomic<I32> m_num_new_at_construction = -1;
     std::atomic<I32> m_num_del_at_construction = -1;
@@ -78,13 +95,13 @@ class HeapAllocationCounter
 
 
 public:
-    HeapAllocationCounter();
-    HeapAllocationCounter(const HeapAllocationCounter&) = delete;
-    HeapAllocationCounter(HeapAllocationCounter&&)      = delete;
-    ~HeapAllocationCounter()                            = default;
+    NewDeleteCounter();
+    NewDeleteCounter(const NewDeleteCounter&) = delete;
+    NewDeleteCounter(NewDeleteCounter&&)      = delete;
+    ~NewDeleteCounter()                       = default;
 
-    auto operator=(const HeapAllocationCounter&) -> HeapAllocationCounter& = delete;
-    auto operator=(HeapAllocationCounter&&) -> HeapAllocationCounter& = delete;
+    auto operator=(const NewDeleteCounter&) -> NewDeleteCounter& = delete;
+    auto operator=(NewDeleteCounter&&) -> NewDeleteCounter& = delete;
 
 
 private:
@@ -143,34 +160,6 @@ public:
 
 
     //! @brief
-    //! Return `true` if the number of delete calls is equal to the passed value and `false` otherwise.
-    //!
-    //! @param[in] exp_num_delete:
-    //! The expected number of delete calls
-    //!
-    //! @return
-    //! `true` or `false`
-    //!
-    //! @remark
-    //! Returns always `true` if `DISABLE_HEAP_ALLOCATION_COUNTER` is defined
-    [[nodiscard]] auto is_num_delete_calls_equal_to([[maybe_unused]] I32 exp_num_delete) const noexcept -> bool;
-
-
-    //! @brief
-    //! Return `true` if the number of new calls is equal to the passed value and `false` otherwise.
-    //!
-    //! @param[in] exp_num_new:
-    //! The expected number of new calls
-    //!
-    //! @return
-    //! `true` or `false`
-    //!
-    //! @remark
-    //! Returns always `true` if `DISABLE_HEAP_ALLOCATION_COUNTER` is defined
-    [[nodiscard]] auto is_num_new_calls_equal_to([[maybe_unused]] I32 exp_num_new) const noexcept -> bool;
-
-
-    //! @brief
     //! Prints the number of new and delete calls since the construction of the class instance
     void print_num_calls() const noexcept;
 };
@@ -180,14 +169,14 @@ public:
 } // namespace mjolnir
 
 
-// ====================================================================================================================
+// === DEFINITIONS ====================================================================================================
 
 
 namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-inline HeapAllocationCounter::HeapAllocationCounter()
+inline NewDeleteCounter::NewDeleteCounter()
     : m_num_new_at_construction(m_num_new_global.load())
     , m_num_del_at_construction(m_num_del_global.load())
 {
@@ -196,7 +185,7 @@ inline HeapAllocationCounter::HeapAllocationCounter()
 
 // --------------------------------------------------------------------------------------------------------------------
 
-inline void HeapAllocationCounter::increase_total_delete_calls() noexcept
+inline void NewDeleteCounter::increase_total_delete_calls() noexcept
 {
     ++m_num_del_global;
 }
@@ -204,7 +193,7 @@ inline void HeapAllocationCounter::increase_total_delete_calls() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-inline void HeapAllocationCounter::increase_total_new_calls() noexcept
+inline void NewDeleteCounter::increase_total_new_calls() noexcept
 {
     ++m_num_new_global;
 }
@@ -212,7 +201,7 @@ inline void HeapAllocationCounter::increase_total_new_calls() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline auto HeapAllocationCounter::return_value([[maybe_unused]] I32 value) noexcept -> I32
+[[nodiscard]] inline auto NewDeleteCounter::return_value([[maybe_unused]] I32 value) noexcept -> I32
 {
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
     return value;
@@ -224,7 +213,7 @@ inline void HeapAllocationCounter::increase_total_new_calls() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline auto HeapAllocationCounter::get_num_delete_calls() const noexcept -> I32
+[[nodiscard]] inline auto NewDeleteCounter::get_num_delete_calls() const noexcept -> I32
 {
     return return_value(m_num_del_global - m_num_del_at_construction);
 }
@@ -232,7 +221,7 @@ inline void HeapAllocationCounter::increase_total_new_calls() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline auto HeapAllocationCounter::get_num_new_calls() const noexcept -> I32
+[[nodiscard]] inline auto NewDeleteCounter::get_num_new_calls() const noexcept -> I32
 {
     return return_value(m_num_new_global - m_num_new_at_construction);
 }
@@ -240,7 +229,7 @@ inline void HeapAllocationCounter::increase_total_new_calls() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline auto HeapAllocationCounter::get_total_num_delete_calls() noexcept -> I32
+[[nodiscard]] inline auto NewDeleteCounter::get_total_num_delete_calls() noexcept -> I32
 {
     return return_value(m_num_del_global);
 }
@@ -248,7 +237,7 @@ inline void HeapAllocationCounter::increase_total_new_calls() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline auto HeapAllocationCounter::get_total_num_new_calls() noexcept -> I32
+[[nodiscard]] inline auto NewDeleteCounter::get_total_num_new_calls() noexcept -> I32
 {
     return return_value(m_num_new_global);
 }
@@ -256,37 +245,8 @@ inline void HeapAllocationCounter::increase_total_new_calls() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline auto
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-HeapAllocationCounter::is_num_delete_calls_equal_to([[maybe_unused]] I32 exp_num_delete) const noexcept -> bool
-{
-#ifndef DISABLE_HEAP_ALLOCATION_COUNTER
-    return get_num_delete_calls() == exp_num_delete;
-#else
-    return true;
-#endif // DISABLE_HEAP_ALLOCATION_COUNTER
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-[[nodiscard]] inline auto
-// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-HeapAllocationCounter::is_num_new_calls_equal_to([[maybe_unused]] I32 exp_num_new) const noexcept -> bool
-{
-#ifndef DISABLE_HEAP_ALLOCATION_COUNTER
-    return get_num_new_calls() == exp_num_new;
-#else
-    return true;
-#endif // DISABLE_HEAP_ALLOCATION_COUNTER
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-
-// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-inline void HeapAllocationCounter::print_num_calls() const noexcept
+inline void NewDeleteCounter::print_num_calls() const noexcept
 {
 #ifndef DISABLE_HEAP_ALLOCATION_COUNTER
     std::cout << "Number of new calls    : " << get_num_new_calls() << std::endl;
@@ -315,7 +275,7 @@ auto operator new(std::size_t size) -> void*
     if (! p)
         throw std::bad_alloc(); // LCOV_EXCL_LINE
 
-    mjolnir::HeapAllocationCounter::increase_total_new_calls();
+    mjolnir::NewDeleteCounter::increase_total_new_calls();
     return p;
 }
 
@@ -325,19 +285,19 @@ auto operator new[](std::size_t size) -> void*
     if (! p)
         throw std::bad_alloc(); // LCOV_EXCL_LINE
 
-    mjolnir::HeapAllocationCounter::increase_total_new_calls();
+    mjolnir::NewDeleteCounter::increase_total_new_calls();
     return p;
 }
 
 auto operator new(std::size_t size, const std::nothrow_t&) noexcept -> void*
 {
-    mjolnir::HeapAllocationCounter::increase_total_new_calls();
+    mjolnir::NewDeleteCounter::increase_total_new_calls();
     return malloc(size);
 }
 
 auto operator new[](std::size_t size, const std::nothrow_t&) noexcept -> void*
 {
-    mjolnir::HeapAllocationCounter::increase_total_new_calls();
+    mjolnir::NewDeleteCounter::increase_total_new_calls();
     return malloc(size);
 }
 
@@ -347,7 +307,7 @@ auto operator new(std::size_t size, std::align_val_t al) -> void*
     if (! p)
         throw std::bad_alloc(); // LCOV_EXCL_LINE
 
-    mjolnir::HeapAllocationCounter::increase_total_new_calls();
+    mjolnir::NewDeleteCounter::increase_total_new_calls();
     return p;
 }
 
@@ -357,43 +317,43 @@ auto operator new[](std::size_t size, std::align_val_t al) -> void*
     if (! p)
         throw std::bad_alloc(); // LCOV_EXCL_LINE
 
-    mjolnir::HeapAllocationCounter::increase_total_new_calls();
+    mjolnir::NewDeleteCounter::increase_total_new_calls();
     return p;
 }
 
 auto operator new(std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept -> void*
 {
-    mjolnir::HeapAllocationCounter::increase_total_new_calls();
+    mjolnir::NewDeleteCounter::increase_total_new_calls();
     return ALIGNED_ALLOC(static_cast<size_t>(al), size);
 }
 
 auto operator new[](std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept -> void*
 {
-    mjolnir::HeapAllocationCounter::increase_total_new_calls();
+    mjolnir::NewDeleteCounter::increase_total_new_calls();
     return ALIGNED_ALLOC(static_cast<size_t>(al), size);
 }
 
 void operator delete(void* ptr) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     free(ptr);
 }
 
 void operator delete[](void* ptr) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     free(ptr);
 }
 
 void operator delete(void* ptr, const std::nothrow_t&) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     free(ptr);
 }
 
 void operator delete[](void* ptr, const std::nothrow_t&) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     free(ptr);
 }
 
@@ -401,38 +361,38 @@ void operator delete[](void* ptr, const std::nothrow_t&) noexcept
 #    ifdef __cpp_sized_deallocation
 void operator delete(void* ptr, [[maybe_unused]] std::size_t sz) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     free(ptr);
 }
 
 void operator delete[](void* ptr, [[maybe_unused]] std::size_t sz) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     free(ptr);
 }
 
 void operator delete(void* ptr, [[maybe_unused]] std::size_t sz, [[maybe_unused]] std::align_val_t al) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     free(ptr);
 }
 
 void operator delete[](void* ptr, [[maybe_unused]] std::size_t sz, [[maybe_unused]] std::align_val_t al) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     free(ptr);
 }
 #    endif // __cpp_sized_deallocation
 
 void operator delete(void* ptr, [[maybe_unused]] std::align_val_t al) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     ALIGNED_FREE(ptr);
 }
 
 void operator delete[](void* ptr, [[maybe_unused]] std::align_val_t al) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     ALIGNED_FREE(ptr);
 }
 
@@ -440,7 +400,7 @@ void operator delete(void*                                  ptr,
                      [[maybe_unused]] std::align_val_t      al,
                      [[maybe_unused]] const std::nothrow_t& tag) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     ALIGNED_FREE(ptr);
 }
 
@@ -448,7 +408,7 @@ void operator delete[](void*                                  ptr,
                        [[maybe_unused]] std::align_val_t      al,
                        [[maybe_unused]] const std::nothrow_t& tag) noexcept
 {
-    mjolnir::HeapAllocationCounter::increase_total_delete_calls();
+    mjolnir::NewDeleteCounter::increase_total_delete_calls();
     ALIGNED_FREE(ptr);
 }
 
