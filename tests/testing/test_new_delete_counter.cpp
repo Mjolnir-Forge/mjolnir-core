@@ -5,6 +5,12 @@
 
 using namespace mjolnir;
 
+constexpr UST alignment = 32;
+struct alignas(alignment) AlignedStruct
+{
+    I32 m_member = 0;
+};
+
 
 // === TESTS ==========================================================================================================
 
@@ -24,7 +30,7 @@ TEST(test_heap_allocation_counter_macros, new_delete_object) // NOLINT
 {
     COUNT_NEW_AND_DELETE;
 
-    I32* a = new I32(1); // NOLINT(cppcoreguidelines-owning-memory)
+    auto* a = new I32(1); // NOLINT(cppcoreguidelines-owning-memory)
     EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
 
     ::operator delete(a);
@@ -39,7 +45,7 @@ TEST(test_heap_allocation_counter_macros, new_delete_array) // NOLINT
     COUNT_NEW_AND_DELETE;
 
     // If the array is not initialized with a value, GCC behaves weird and calls new and delete very often
-    F32* a = new F32[3]{0}; // NOLINT(cppcoreguidelines-owning-memory)
+    auto* a = new F32[3]{0}; // NOLINT(cppcoreguidelines-owning-memory)
     EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
 
     ::operator delete[](a);
@@ -53,7 +59,7 @@ TEST(test_heap_allocation_counter_macros, new_delete_object_nothrow) // NOLINT
 {
     COUNT_NEW_AND_DELETE;
 
-    I32* a = new (std::nothrow) I32(1); // NOLINT(cppcoreguidelines-owning-memory)
+    auto* a = new (std::nothrow) I32(1); // NOLINT(cppcoreguidelines-owning-memory)
     EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
 
     ::operator delete(a, std::nothrow);
@@ -67,9 +73,67 @@ TEST(test_heap_allocation_counter_macros, new_delete_array_nothrow) // NOLINT
 {
     COUNT_NEW_AND_DELETE;
 
-    F32* a = new (std::nothrow) F32[3]{0}; // NOLINT(cppcoreguidelines-owning-memory)
+    auto* a = new (std::nothrow) F32[3]{0}; // NOLINT(cppcoreguidelines-owning-memory)
     EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
 
     ::operator delete[](a, std::nothrow);
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
+}
+
+
+// --- test new delete with object (aligned) --------------------------------------------------------------------------
+
+TEST(test_heap_allocation_counter_macros, new_delete_aligned_object) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+
+    auto* a = new AlignedStruct; // NOLINT(cppcoreguidelines-owning-memory)
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
+
+    ::operator delete(a, static_cast<std::align_val_t>(alignof(AlignedStruct)));
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
+}
+
+
+// --- test new delete with array (aligned) ---------------------------------------------------------------------------
+
+TEST(test_heap_allocation_counter_macros, new_delete_aligned_array) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+
+    // If the array is not initialized with a value, GCC behaves weird and calls new and delete very often
+    auto* a = new AlignedStruct[3]; // NOLINT(cppcoreguidelines-owning-memory)
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
+
+    ::operator delete[](a, static_cast<std::align_val_t>(alignof(AlignedStruct)));
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
+}
+
+
+// --- test new delete with object (aligned nothrow) ------------------------------------------------------------------
+
+TEST(test_heap_allocation_counter_macros, new_delete_aligned_object_nothrow) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+
+    auto* a = new (std::nothrow) AlignedStruct; // NOLINT(cppcoreguidelines-owning-memory)
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
+
+    ::operator delete(a, static_cast<std::align_val_t>(alignof(AlignedStruct)), std::nothrow);
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
+}
+
+
+// --- test new delete with array (aligned nothrow) -------------------------------------------------------------------
+
+TEST(test_heap_allocation_counter_macros, new_delete_aligned_array_nothrow) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+
+    // If the array is not initialized with a value, GCC behaves weird and calls new and delete very often
+    auto* a = new (std::nothrow) AlignedStruct[3]; // NOLINT(cppcoreguidelines-owning-memory)
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
+
+    ::operator delete[](a, static_cast<std::align_val_t>(alignof(AlignedStruct)), std::nothrow);
     EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
 }
