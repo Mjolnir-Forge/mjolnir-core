@@ -110,9 +110,14 @@ static_assert(false, "Incompatible compiler");
 //!
 //! @param num_delete_exp:
 //! Expected number of delete calls
+//!
+//! @remark
+//! In case that a check fails, `EXPECT_EQ` will perform a lot of allocations. In result, all subsequent checks will not
+//! only fail too but the presented number of calls will also be significantly higher than expected.
 #    define EXPECT_NUM_DELETE_EQ(num_delete_exp) EXPECT_EQ(new_delete_counter.get_num_delete_calls(), num_delete_exp)
-// --------------------------------------------------------------------------------------------------------------------
 
+
+// --------------------------------------------------------------------------------------------------------------------
 
 //! @brief
 //! Check if the number of new and delete calls are equal to the passed numbers
@@ -130,6 +135,10 @@ static_assert(false, "Incompatible compiler");
 //! Expected number of new calls
 //! @param num_delete_exp:
 //! Expected number of delete calls
+//!
+//! @remark
+//! In case that a check fails, `EXPECT_EQ` will perform a lot of allocations. In result, all subsequent checks will not
+//! only fail too but the presented number of calls will also be significantly higher than expected.
 #    define EXPECT_NUM_NEW_AND_DELETE_EQ(num_new_exp, num_delete_exp)                                                  \
         EXPECT_NUM_NEW_EQ(num_new_exp);                                                                                \
         EXPECT_NUM_DELETE_EQ(num_delete_exp)
@@ -150,6 +159,10 @@ static_assert(false, "Incompatible compiler");
 //!
 //! @param num_new_exp:
 //! Expected number of new calls
+//!
+//! @remark
+//! In case that a check fails, `EXPECT_EQ` will perform a lot of allocations. In result, all subsequent checks will not
+//! only fail too but the presented number of calls will also be significantly higher than expected.
 #    define EXPECT_NUM_NEW_EQ(num_new_exp) EXPECT_EQ(new_delete_counter.get_num_new_calls(), num_new_exp)
 
 
