@@ -173,12 +173,19 @@ TEST(test_heap_allocation_counter_macros, sized_delete_array) // NOLINT
 
 TEST(test_heap_allocation_counter_macros, sized_delete_aligned_object) // NOLINT
 {
-    COUNT_NEW_AND_DELETE;
+    try
+    {
+        COUNT_NEW_AND_DELETE;
 
-    auto* a = new AlignedStruct; // NOLINT(cppcoreguidelines-owning-memory)
+        auto* a = new AlignedStruct; // NOLINT(cppcoreguidelines-owning-memory)
 
-    ::operator delete(a, sizeof(AlignedStruct), static_cast<std::align_val_t>(alignof(AlignedStruct)));
-    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
+        ::operator delete(a, sizeof(AlignedStruct), static_cast<std::align_val_t>(alignof(AlignedStruct)));
+        EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
+    }
+    catch (std::exception e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 }
 
 
