@@ -182,7 +182,7 @@ TEST(test_heap_allocation_counter_macros, sized_delete_aligned_object) // NOLINT
         ::operator delete(a, sizeof(AlignedStruct), static_cast<std::align_val_t>(alignof(AlignedStruct)));
         EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
     }
-    catch (std::exception e)
+    catch (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
