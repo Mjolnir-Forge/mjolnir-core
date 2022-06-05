@@ -44,3 +44,31 @@ TEST(test_heap_allocation_counter_macros, new_delete_array) // NOLINT
     ::operator delete[](a);
     EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
 }
+
+
+// --- test new delete with object (nothrow) --------------------------------------------------------------------------
+
+TEST(test_heap_allocation_counter_macros, new_delete_object_nothrow) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+
+    I32* a = new (std::nothrow) I32(1); // NOLINT(cppcoreguidelines-owning-memory)
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
+
+    ::operator delete(a, std::nothrow);
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
+}
+
+
+// --- test new delete with array (nothrow) ---------------------------------------------------------------------------
+
+TEST(test_heap_allocation_counter_macros, new_delete_array_nothrow) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+
+    F32* a = new (std::nothrow) F32[3]; // NOLINT(cppcoreguidelines-owning-memory)
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
+
+    ::operator delete[](a, std::nothrow);
+    EXPECT_NUM_NEW_AND_DELETE_EQ(1, 1);
+}
