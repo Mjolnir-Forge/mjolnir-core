@@ -1,6 +1,8 @@
 #include "mjolnir/testing/new_delete_counter.h"
 #include <gtest/gtest.h>
 
+#include "vector"
+
 // === SETUP ==========================================================================================================
 
 using namespace mjolnir;
@@ -206,7 +208,6 @@ TEST(test_heap_allocation_counter_macros, sized_delete_aligned_array) // NOLINT
 
 // --- test multiple allocations --------------------------------------------------------------------------------------
 
-
 TEST(test_heap_allocation_counter_macros, multiple_allocations) // NOLINT
 {
     COUNT_NEW_AND_DELETE;
@@ -224,4 +225,23 @@ TEST(test_heap_allocation_counter_macros, multiple_allocations) // NOLINT
     ::operator delete(c);
     ::operator delete(d);
     EXPECT_NUM_NEW_AND_DELETE_EQ(4, 4);
+}
+
+
+// --- test with std::vector ------------------------------------------------------------------------------------------
+
+TEST(test_heap_allocation_counter_macros, std_vector) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+    {
+        std::vector<F32> v;
+        EXPECT_NUM_NEW_AND_DELETE_EQ(0, 0);
+
+        v.push_back(3.F);
+        EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
+
+        v.reserve(20);
+        EXPECT_NUM_NEW_AND_DELETE_EQ(2, 1);
+    }
+    EXPECT_NUM_NEW_AND_DELETE_EQ(2, 2);
 }
