@@ -85,19 +85,19 @@ TEST(test_allocation, allocation) // NOLINT
     mem.initialize();
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    [[maybe_unused]] void* a = mem.allocate(24);
+    [[maybe_unused]] void* a = mem.allocate(24); // cppcheck-suppress unreadVariable
     EXPECT_EQ(mem.get_free_memory_size(), 1000);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    [[maybe_unused]] void* b = mem.allocate(16);
+    [[maybe_unused]] void* b = mem.allocate(16); // cppcheck-suppress unreadVariable
     EXPECT_EQ(mem.get_free_memory_size(), 984);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    [[maybe_unused]] void* c = mem.allocate(64);
+    [[maybe_unused]] void* c = mem.allocate(64); // cppcheck-suppress unreadVariable
     EXPECT_EQ(mem.get_free_memory_size(), 920);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    [[maybe_unused]] void* d = mem.allocate(920);
+    [[maybe_unused]] void* d = mem.allocate(920); // cppcheck-suppress unreadVariable
     EXPECT_EQ(mem.get_free_memory_size(), 0);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
@@ -118,7 +118,7 @@ TEST(test_allocation, exceptions) // NOLINT
     EXPECT_THROW([[maybe_unused]] auto m = mem.allocate(num_bytes + 1), Exception);
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
 
-    [[maybe_unused]] void* a = mem.allocate(num_bytes);
+    [[maybe_unused]] void* a = mem.allocate(num_bytes); // cppcheck-suppress unreadVariable
     EXPECT_EQ(mem.get_free_memory_size(), 0);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto,hicpp-avoid-goto)
@@ -144,9 +144,6 @@ TEST(test_deinitialization, check_state) // NOLINT
     EXPECT_EQ(mem.get_free_memory_size(), 0);
     EXPECT_FALSE(mem.is_initialized());
     ASSERT_NUM_NEW_AND_DELETE_EQ(1, 1);
-
-    // todo:
-    // test free memory 0
 }
 
 
