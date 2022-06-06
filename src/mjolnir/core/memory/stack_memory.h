@@ -8,7 +8,9 @@
 #pragma once
 
 #include "mjolnir/core/fundamental_types.h"
+#include "mjolnir/core/utility/pointer_operations.h"
 
+#include <cassert>
 #include <cstddef>
 #include <memory>
 
@@ -75,6 +77,19 @@ public:
 
 private:
     //! @brief
+    //! Allocate a new memory block and return a pointer that points to it.
+    //!
+    //! @param[in] size:
+    //! Size of the allocation
+    //! @param[in] alignment:
+    //! Required alignment of the memory
+    //!
+    //! @return
+    //! Pointer to the newly allocated memory
+    [[nodiscard]] auto allocate_internal(UST size, UST alignment) -> void*;
+
+
+    //! @brief
     //! Initialize the memory.
     void deinitialize_internal();
 
@@ -86,6 +101,19 @@ private:
 
 public:
     //! @brief
+    //! Allocate a new memory block and return a pointer that points to it.
+    //!
+    //! @param[in] size:
+    //! Size of the allocation
+    //! @param[in] alignment:
+    //! Required alignment of the memory
+    //!
+    //! @return
+    //! Pointer to the newly allocated memory
+    [[nodiscard]] auto allocate(UST size, UST alignment = 1) -> void*;
+
+
+    //! @brief
     //! Deinitialize the memory.
     //!
     //! @details
@@ -96,6 +124,16 @@ public:
     //! @exception Exception
     //! Memory is still in use (number of allocations != number of deallocations)
     void deinitialize();
+
+    //! @brief
+    //! Get the size of the free memory.
+    //!
+    //! @details
+    //! If the memory was not initialized using `initialize`, this method will return 0
+    //!
+    //! @return
+    //! Size of the free memory
+    [[nodiscard]] auto get_free_memory_size() const noexcept -> UST;
 
 
     //! @brief
@@ -150,6 +188,33 @@ StackMemory<t_free_last, t_thread_safe>::StackMemory(UST size_in_bytes) : m_memo
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool t_free_last, bool t_thread_safe>
+auto StackMemory<t_free_last, t_thread_safe>::allocate_internal(UST size, UST alignment) -> void*
+{
+    assert(size != 0 && "Allocated memory size is 0.");             // NOLINT
+    assert(is_initialized() && "Stack memory is not initialized."); // NOLINT
+    // todo -> implement assert
+    // assert(IsPowerOf2(alignment), "Alignment must be a power of 2.");
+
+    UST ptr_misalignment = misalignment(m_current_memory_ptr, alignment);
+    UST correction       = ((ptr_misalignment + alignment - 1) / alignment) * alignment - ptr_misalignment;
+
+    THROW_EXCEPTION_IF(get_free_memory_size() < size + correction, Exception, "No more memory available.");
+
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    std::byte* allocated_memory_ptr = m_current_memory_ptr + correction;
+
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    m_current_memory_ptr = allocated_memory_ptr + size;
+
+    ++m_num_allocations;
+
+    return static_cast<void*>(allocated_memory_ptr);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_free_last, bool t_thread_safe>
 void StackMemory<t_free_last, t_thread_safe>::deinitialize_internal()
 {
     THROW_EXCEPTION_IF(! is_initialized(), Exception, "Memory already deinitialized.");
@@ -177,9 +242,31 @@ void StackMemory<t_free_last, t_thread_safe>::initialize_internal()
 // --------------------------------------------------------------------------------------------------------------------
 
 template <bool t_free_last, bool t_thread_safe>
+auto StackMemory<t_free_last, t_thread_safe>::allocate(UST size, UST alignment) -> void*
+{
+    return allocate_internal(size, alignment);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_free_last, bool t_thread_safe>
 void StackMemory<t_free_last, t_thread_safe>::deinitialize()
 {
     deinitialize_internal();
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_free_last, bool t_thread_safe>
+auto StackMemory<t_free_last, t_thread_safe>::get_free_memory_size() const noexcept -> UST
+{
+    if (! m_memory)
+        return 0;
+
+    auto alloc_size = static_cast<UST>(pointer_to_integer(m_current_memory_ptr) - pointer_to_integer(m_memory.get()));
+    return m_memory_size - alloc_size;
 }
 
 
