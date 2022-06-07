@@ -110,6 +110,48 @@ TEST(test_allocation, allocation) // NOLINT
 
 // --- test allocation ------------------------------------------------------------------------------------------------
 
+TEST(test_allocation, aligned_allocation) // NOLINT
+{
+    constexpr UST num_bytes  = 1024;
+    constexpr UST alloc_size = 8;
+
+    auto mem = StackMemory(num_bytes);
+
+    COUNT_NEW_AND_DELETE;
+
+    mem.initialize();
+
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    void* a = mem.allocate(alloc_size, 64);
+    EXPECT_TRUE(is_aligned<64>(a));
+
+    UST exp_free_mem     = num_bytes - alloc_size;
+    UST current_free_mem = mem.get_free_memory_size();
+    EXPECT_LE(current_free_mem, exp_free_mem);
+
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    void* b = mem.allocate(alloc_size, 8);
+    EXPECT_TRUE(is_aligned<8>(b));
+
+    exp_free_mem     = current_free_mem - alloc_size;
+    current_free_mem = mem.get_free_memory_size();
+    EXPECT_LE(current_free_mem, exp_free_mem);
+
+
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    void* c = mem.allocate(alloc_size, 32);
+    EXPECT_TRUE(is_aligned<32>(c));
+
+    exp_free_mem     = current_free_mem - alloc_size;
+    current_free_mem = mem.get_free_memory_size();
+    EXPECT_LE(current_free_mem, exp_free_mem);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
+}
+
+
+// --- test allocation ------------------------------------------------------------------------------------------------
+
 TEST(test_allocation, exceptions) // NOLINT
 {
     constexpr UST num_bytes = 1024;
