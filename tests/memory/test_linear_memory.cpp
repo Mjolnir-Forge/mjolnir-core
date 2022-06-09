@@ -209,12 +209,19 @@ TEST(test_deallocation, deallocation) // NOLINT
 
 TEST(test_deinitialization, check_state) // NOLINT
 {
-    constexpr UST num_bytes = 1024;
+    constexpr UST num_bytes  = 1024;
+    constexpr UST alloc_size = 36;
 
     COUNT_NEW_AND_DELETE;
 
     auto mem = LinearMemory(num_bytes);
     mem.initialize();
+
+    void* a = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    void* b = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    mem.deallocate(a, alloc_size);
+    mem.deallocate(b, alloc_size);
+
     mem.deinitialize();
 
     EXPECT_EQ(mem.get_memory_size(), 0);
@@ -232,7 +239,6 @@ TEST(test_deinitialization, exceptions) // NOLINT
 
     auto mem = LinearMemory(num_bytes);
     mem.initialize();
-    // todo: test exception if memory still allocated
     mem.deinitialize();
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto,hicpp-avoid-goto)
