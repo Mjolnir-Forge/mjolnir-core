@@ -108,7 +108,7 @@ TEST(test_allocation, allocation) // NOLINT
 }
 
 
-// --- test allocation ------------------------------------------------------------------------------------------------
+// --- test aligned allocation ----------------------------------------------------------------------------------------
 
 TEST(test_allocation, aligned_allocation) // NOLINT
 {
@@ -150,7 +150,7 @@ TEST(test_allocation, aligned_allocation) // NOLINT
 }
 
 
-// --- test allocation ------------------------------------------------------------------------------------------------
+// --- test allocation exceptions -------------------------------------------------------------------------------------
 
 TEST(test_allocation, exceptions) // NOLINT
 {
@@ -173,7 +173,37 @@ TEST(test_allocation, exceptions) // NOLINT
     EXPECT_EQ(mem.get_free_memory_size(), 0);
 }
 
-// todo -> test aligned allocations
+// --- test deallocation ----------------------------------------------------------------------------------------------
+
+TEST(test_deallocation, deallocation) // NOLINT
+{
+    constexpr UST num_bytes  = 1024;
+    constexpr UST alloc_size = 36;
+
+    auto mem = LinearMemory(num_bytes);
+
+    COUNT_NEW_AND_DELETE;
+
+    mem.initialize();
+
+
+    void* a = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    void* b = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    void* c = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    void* d = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+
+    constexpr UST exp_free_mem = num_bytes - 4 * alloc_size;
+    EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
+
+    mem.deallocate(a, alloc_size);
+    mem.deallocate(b, alloc_size);
+    mem.deallocate(c, alloc_size);
+    mem.deallocate(d, alloc_size);
+
+    EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
+}
 
 // --- test deinitialization ------------------------------------------------------------------------------------------
 

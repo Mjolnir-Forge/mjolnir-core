@@ -67,6 +67,18 @@ public:
     //! Pointer to the newly allocated memory
     [[nodiscard]] auto allocate(UST size, UST alignment = 1) -> void*;
 
+    //! @brief
+    //! Deallocate memory.
+    //!
+    //! @details
+    //! In release builds this function does nothing. In debug builds some additional checks are performed.
+    //!
+    //! @param[in] ptr:
+    //! Pointer to the memory that should be freed
+    //! @param[in] size:
+    //! Size of the memory that should be freed.
+    void deallocate([[maybe_unused]] void* ptr, [[maybe_unused]] UST size) const noexcept;
+
 
     //! @brief
     //! Deinitialize the memory.
@@ -152,7 +164,7 @@ private:
     std::unique_ptr<std::byte[]> m_memory = {nullptr};
 
 #ifndef NDEBUG
-    UST m_num_allocations = {0};
+    mutable UST m_num_allocations = {0};
 #endif
 };
 
@@ -187,6 +199,20 @@ template <bool t_thread_safe>
 auto LinearMemory<t_thread_safe>::allocate(UST size, UST alignment) -> void*
 {
     return allocate_internal(size, alignment);
+}
+
+template <bool t_thread_safe>
+void LinearMemory<t_thread_safe>::deallocate([[maybe_unused]] void* ptr, [[maybe_unused]] UST size) const noexcept
+{
+#ifndef NDEBUG
+    UPT addr         = pointer_to_integer(ptr);
+    UPT memory_start = get_start_address();
+
+    // NOLINTNEXTLINE
+    assert(addr >= memory_start && addr <= memory_start + m_memory_size && "Pointer doesn't belong to this memory.");
+
+    --m_num_allocations;
+#endif
 }
 
 
