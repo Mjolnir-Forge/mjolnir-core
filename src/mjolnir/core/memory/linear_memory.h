@@ -24,28 +24,15 @@ namespace mjolnir
 //! @{
 
 //! @brief
-//! A stack based memory system
+//! A linear memory system
 //!
 //! @details
-//! This memory system manages its memory in a stack based fashion. Every allocation yields a pointer to the memory that
-//! is located directly behind the previously allocated memory block. Memory is only freed if the passed pointer during
-//! deallocated points to the last allocated memory or if the intenal allocation counter becomes 0. In the latter case,
-//! all memory is freed at once. As a consequence, deallocations should happen in the opposite order than the
-//! allocations took place (last in, first out). Otherwise, not all memory can be freed until the number of
-//! deallocations matches the number of allocations or the memory is flushed by calling `flush`.
+//! This memory system manages its memory in a linear fashion. Every allocation yields a pointer to the memory that
+//! is located directly behind the previously allocated memory block. Memory can only be freed all at once and must be
+//! done manually.
 //!
-//! If you know, that deallocations will occur in random order, you can disable the mechanism to free the memory of the
-//! last allocated memory block setting the template parameter `t_free_last` to `false`. This increases the speed of the
-//! deallocations.
-//!
-//! @tparam t_free_last:
-//! If `true`, memory is freed in case the passed pointer during deallocation matches the pointer to the last allocated
-//! memory block.
 //! @tparam t_thread_safe:
 //! If `true`, a thread safety mechanism is added.
-//!
-//! @todo
-//! set `t_free_last` default to `true`
 template <bool t_thread_safe = false>
 class LinearMemory
 {
@@ -262,9 +249,10 @@ auto LinearMemory<t_thread_safe>::allocate_internal(UST size, UST alignment) -> 
     // todo -> implement assert
     // assert(IsPowerOf2(alignment), "Alignment must be a power of 2.");
 
-
-    UPT allocated_addr = (m_current_addr + (alignment - 1)) & -alignment;
-    UPT next_addr      = allocated_addr + size;
+    auto mask           = -static_cast<IPT>(alignment);
+    auto offset_addr    = static_cast<IPT>(m_current_addr + (alignment - 1));
+    UPT  allocated_addr = static_cast<UPT>(offset_addr & mask);
+    UPT  next_addr      = allocated_addr + size;
     THROW_EXCEPTION_IF(get_start_address() + m_memory_size < next_addr, Exception, "No more memory available.");
 
     m_current_addr = next_addr;
