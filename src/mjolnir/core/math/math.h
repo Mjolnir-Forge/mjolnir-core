@@ -99,7 +99,7 @@ namespace mjolnir
 template <std::integral T_Type>
 [[nodiscard]] constexpr auto is_power_of_2(T_Type value) noexcept -> bool
 {
-    return (value != 0) && ! (value & (value - 1));
+    return (value > 0) && ! (value & (value - 1));
 }
 
 
