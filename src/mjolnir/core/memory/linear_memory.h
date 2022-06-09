@@ -2,7 +2,7 @@
 //! memory/stack_memory.h
 //!
 //! @brief
-//! Defines a management class for stack based memory
+//! Defines classes that deal with linear memory management
 
 
 #pragma once
@@ -166,6 +166,7 @@ private:
 // === DEFINITIONS ====================================================================================================
 
 #include "mjolnir/core/exception.h"
+#include "mjolnir/core/memory/utility.h"
 
 
 namespace mjolnir
@@ -246,13 +247,10 @@ auto LinearMemory<t_thread_safe>::allocate_internal(UST size, UST alignment) -> 
 {
     assert(size != 0 && "Allocated memory size is 0.");             // NOLINT
     assert(is_initialized() && "Stack memory is not initialized."); // NOLINT
-    // todo -> implement assert
-    // assert(IsPowerOf2(alignment), "Alignment must be a power of 2.");
 
-    auto mask           = -static_cast<IPT>(alignment);
-    auto offset_addr    = static_cast<IPT>(m_current_addr + (alignment - 1));
-    UPT  allocated_addr = static_cast<UPT>(offset_addr & mask);
-    UPT  next_addr      = allocated_addr + size;
+    UPT allocated_addr = get_aligned_address(m_current_addr, alignment);
+    UPT next_addr      = allocated_addr + size;
+
     THROW_EXCEPTION_IF(get_start_address() + m_memory_size < next_addr, Exception, "No more memory available.");
 
     m_current_addr = next_addr;
