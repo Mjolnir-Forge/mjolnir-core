@@ -248,7 +248,7 @@ auto LinearMemory<t_thread_safe>::allocate_internal(UST size, UST alignment) -> 
     assert(size != 0 && "Allocated memory size is 0.");             // NOLINT
     assert(is_initialized() && "Stack memory is not initialized."); // NOLINT
 
-    UPT allocated_addr = get_aligned_address(m_current_addr, alignment);
+    UPT allocated_addr = align_address(m_current_addr, alignment);
     UPT next_addr      = allocated_addr + size;
 
     THROW_EXCEPTION_IF(get_start_address() + m_memory_size < next_addr, Exception, "No more memory available.");

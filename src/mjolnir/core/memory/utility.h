@@ -13,7 +13,6 @@
 #include "mjolnir/core/fundamental_types.h"
 
 
-
 namespace mjolnir
 {
 //! \addtogroup core_memory
@@ -32,7 +31,7 @@ namespace mjolnir
 //!
 //! @return
 //! Aligned pointer address
-[[nodiscard]] inline constexpr auto get_aligned_address(UPT address, UST alignment) noexcept -> UPT;
+[[nodiscard]] inline constexpr auto align_address(UPT address, UST alignment) noexcept -> UPT;
 
 
 //! @}
@@ -42,23 +41,21 @@ namespace mjolnir
 // === DEFINITIONS ====================================================================================================
 
 
-
 namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline constexpr auto get_aligned_address(UPT address, UST alignment) noexcept -> UPT
+[[nodiscard]] inline constexpr auto align_address(UPT address, UST alignment) noexcept -> UPT
 {
     // todo -> implement assert
     // assert(IsPowerOf2(alignment), "Alignment must be a power of 2."); // NOLINT
 
     // source: https://stackoverflow.com/a/4840428/6700329
     // The original code was slightly modified since MSVC complained about the unary minus on an unsigned type.
-    UST decr_align = alignment-1;
+    UST decr_align = alignment - 1;
 
     return address + decr_align & ~decr_align;
 }
-
 
 
 } // namespace mjolnir
