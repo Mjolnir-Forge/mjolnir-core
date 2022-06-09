@@ -7,6 +7,9 @@
 
 #pragma once
 
+
+// === DECLARATIONS ===================================================================================================
+
 #include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/utility/pointer_operations.h"
 
@@ -46,15 +49,6 @@ namespace mjolnir
 template <bool t_thread_safe = false>
 class LinearMemory
 {
-    UST m_memory_size;
-    UST m_num_allocations = {0};
-    UPT m_current_addr    = {0};
-
-
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-    std::unique_ptr<std::byte[]> m_memory = {nullptr};
-
-
 public:
     LinearMemory()                    = delete;
     LinearMemory(const LinearMemory&) = delete;
@@ -76,31 +70,6 @@ public:
     explicit LinearMemory(UST size_in_bytes);
 
 
-private:
-    //! @brief
-    //! Allocate a new memory block and return a pointer that points to it.
-    //!
-    //! @param[in] size:
-    //! Size of the allocation
-    //! @param[in] alignment:
-    //! Required alignment of the memory
-    //!
-    //! @return
-    //! Pointer to the newly allocated memory
-    [[nodiscard]] auto allocate_internal(UST size, UST alignment) -> void*;
-
-
-    //! @brief
-    //! Initialize the memory.
-    void deinitialize_internal();
-
-
-    //! @brief
-    //! Initialize the memory.
-    void initialize_internal();
-
-
-public:
     //! @brief
     //! Allocate a new memory block and return a pointer that points to it.
     //!
@@ -162,6 +131,44 @@ public:
     //! @return
     //! `true` or `false`
     [[nodiscard]] auto is_initialized() const noexcept -> bool;
+
+
+private:
+    //! @brief
+    //! Allocate a new memory block and return a pointer that points to it.
+    //!
+    //! @param[in] size:
+    //! Size of the allocation
+    //! @param[in] alignment:
+    //! Required alignment of the memory
+    //!
+    //! @return
+    //! Pointer to the newly allocated memory
+    [[nodiscard]] auto allocate_internal(UST size, UST alignment) -> void*;
+
+
+    //! @brief
+    //! Initialize the memory.
+    void deinitialize_internal();
+
+
+    //! @brief
+    //! Initialize the memory.
+    void initialize_internal();
+
+    //! @brief
+    //! Get the start address of the internal memory
+    [[nodiscard]] auto get_start_address() const noexcept -> UPT;
+
+
+    UST m_memory_size;
+    UPT m_current_addr = {0};
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+    std::unique_ptr<std::byte[]> m_memory = {nullptr};
+
+#ifndef NDEBUG
+    UST m_num_allocations = {0};
+#endif
 };
 
 
@@ -169,8 +176,7 @@ public:
 } // namespace mjolnir
 
 
-// ====================================================================================================================
-
+// === DEFINITIONS ====================================================================================================
 
 #include "mjolnir/core/exception.h"
 
@@ -183,57 +189,6 @@ template <bool t_thread_safe>
 LinearMemory<t_thread_safe>::LinearMemory(UST size_in_bytes) : m_memory_size{size_in_bytes}
 {
     THROW_EXCEPTION_IF(m_memory_size < 1, Exception, "Memory size can't be 0.");
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <bool t_thread_safe>
-auto LinearMemory<t_thread_safe>::allocate_internal(UST size, UST alignment) -> void*
-{
-    assert(size != 0 && "Allocated memory size is 0.");             // NOLINT
-    assert(is_initialized() && "Stack memory is not initialized."); // NOLINT
-    // todo -> implement assert
-    // assert(IsPowerOf2(alignment), "Alignment must be a power of 2.");
-
-
-    UPT allocated_addr = (m_current_addr + (alignment - 1)) & -alignment;
-    THROW_EXCEPTION_IF(pointer_to_integer(m_memory.get()) + m_memory_size < allocated_addr + size,
-                       Exception,
-                       "No more memory available.");
-
-    m_current_addr = allocated_addr + size;
-
-    ++m_num_allocations;
-
-    return integer_to_pointer(allocated_addr);
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <bool t_thread_safe>
-void LinearMemory<t_thread_safe>::deinitialize_internal()
-{
-    THROW_EXCEPTION_IF(! is_initialized(), Exception, "Memory already deinitialized.");
-    THROW_EXCEPTION_IF(m_num_allocations > 0, Exception, "Can't deinitialize. Memory still in use.");
-
-    m_memory       = nullptr;
-    m_current_addr = 0;
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <bool t_thread_safe>
-void LinearMemory<t_thread_safe>::initialize_internal()
-{
-    THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
-
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-    m_memory          = std::make_unique<std::byte[]>(m_memory_size);
-    m_num_allocations = 0;
-    m_current_addr    = pointer_to_integer(m_memory.get());
 }
 
 
@@ -263,7 +218,7 @@ auto LinearMemory<t_thread_safe>::get_free_memory_size() const noexcept -> UST
     if (! m_memory)
         return 0;
 
-    auto alloc_size = m_current_addr - pointer_to_integer(m_memory.get());
+    auto alloc_size = m_current_addr - get_start_address();
     return m_memory_size - alloc_size;
 }
 
@@ -294,6 +249,66 @@ template <bool t_thread_safe>
 [[nodiscard]] auto LinearMemory<t_thread_safe>::is_initialized() const noexcept -> bool
 {
     return m_memory != nullptr;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_thread_safe>
+auto LinearMemory<t_thread_safe>::allocate_internal(UST size, UST alignment) -> void*
+{
+    assert(size != 0 && "Allocated memory size is 0.");             // NOLINT
+    assert(is_initialized() && "Stack memory is not initialized."); // NOLINT
+    // todo -> implement assert
+    // assert(IsPowerOf2(alignment), "Alignment must be a power of 2.");
+
+
+    UPT allocated_addr = (m_current_addr + (alignment - 1)) & -alignment;
+    UPT next_addr      = allocated_addr + size;
+    THROW_EXCEPTION_IF(get_start_address() + m_memory_size < next_addr, Exception, "No more memory available.");
+
+    m_current_addr = next_addr;
+
+#ifndef NDEBUG
+    ++m_num_allocations;
+#endif
+
+    return integer_to_pointer(allocated_addr);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_thread_safe>
+void LinearMemory<t_thread_safe>::deinitialize_internal()
+{
+    THROW_EXCEPTION_IF(! is_initialized(), Exception, "Memory already deinitialized.");
+    assert(m_num_allocations == 0 && "Memory still in use."); // NOLINT
+
+    m_memory       = nullptr;
+    m_current_addr = 0;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_thread_safe>
+void LinearMemory<t_thread_safe>::initialize_internal()
+{
+    THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
+
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+    m_memory       = std::make_unique<std::byte[]>(m_memory_size);
+    m_current_addr = get_start_address();
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_thread_safe>
+auto LinearMemory<t_thread_safe>::get_start_address() const noexcept -> UPT
+{
+    return pointer_to_integer(m_memory.get());
 }
 
 

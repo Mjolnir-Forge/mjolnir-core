@@ -7,6 +7,9 @@
 
 #pragma once
 
+
+// === DECLARATIONS ===================================================================================================
+
 #include "mjolnir/core/fundamental_types.h"
 
 #include <cstdint>
@@ -170,14 +173,14 @@ template <typename T_Type>
 } // namespace mjolnir
 
 
-// ====================================================================================================================
+// === DEFINITIONS ====================================================================================================
 
 namespace mjolnir
 {
 template <typename T_Type>
 [[nodiscard]] inline auto integer_to_pointer(UPT integer) noexcept -> T_Type*
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) intentional, see link above
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,performance-no-int-to-ptr)
     return reinterpret_cast<T_Type*>(integer);
 }
 

@@ -203,39 +203,6 @@ namespace mjolnir
 //! Define `DISABLE_NEW_DELETE_COUNTER` if you like to run them on files that include this class.
 class NewDeleteCounter
 {
-    std::atomic<I32> m_num_new_at_construction = -1;
-    std::atomic<I32> m_num_del_at_construction = -1;
-
-    inline static std::atomic<I32> m_num_new_global = 0; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-    inline static std::atomic<I32> m_num_del_global = 0; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-
-
-#ifndef DISABLE_NEW_DELETE_COUNTER
-    friend auto ::operator new(std::size_t size) -> void*;
-    friend auto ::operator new(std::size_t size, std::align_val_t al) -> void*;
-    friend auto ::operator new(std::size_t size, const std::nothrow_t&) noexcept -> void*;
-    friend auto ::operator new(std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept -> void*;
-    friend auto ::operator new[](std::size_t size) -> void*;
-    friend auto ::operator new[](std::size_t size, std::align_val_t al) -> void*;
-    friend auto ::operator new[](std::size_t size, const std::nothrow_t&) noexcept -> void*;
-    friend auto ::operator new[](std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept -> void*;
-    friend void ::operator delete(void* ptr) noexcept;
-    friend void ::operator delete(void* ptr, const std::nothrow_t&) noexcept;
-    friend void ::operator delete[](void* ptr) noexcept;
-    friend void ::operator delete[](void* ptr, const std::nothrow_t&) noexcept;
-    friend void ::operator delete(void* ptr, std::align_val_t al) noexcept;
-    friend void ::operator delete[](void* ptr, std::align_val_t al) noexcept;
-    friend void ::operator delete(void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept;
-    friend void ::operator delete[](void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept;
-#    ifdef __cpp_sized_deallocation
-    friend void ::operator delete(void* ptr, std::size_t sz) noexcept;
-    friend void ::operator delete[](void* ptr, std::size_t sz) noexcept;
-    friend void ::operator delete(void* ptr, std::size_t sz, std::align_val_t al) noexcept;
-    friend void ::operator delete[](void* ptr, std::size_t sz, std::align_val_t al) noexcept;
-#    endif // __cpp_sized_deallocation
-#endif     // DISABLE_NEW_DELETE_COUNTER
-
-
 public:
     NewDeleteCounter();
     NewDeleteCounter(const NewDeleteCounter&) = delete;
@@ -246,29 +213,6 @@ public:
     auto operator=(NewDeleteCounter&&) -> NewDeleteCounter& = delete;
 
 
-private:
-    //! @brief
-    //! Increases the delete counter
-    static void increase_total_delete_calls() noexcept;
-
-
-    //! @brief
-    //! Increases the new counter
-    static void increase_total_new_calls() noexcept;
-
-
-    //! @brief
-    //! Return `-1` if `DISABLE_NEW_DELETE_COUNTER` is defined and the passed value otherwise.
-    //!
-    //! @param[in] value:
-    //! Value that should be returned
-    //!
-    //! @return
-    //! Passed value or -1
-    [[nodiscard]] static auto return_value([[maybe_unused]] I32 value) noexcept -> I32;
-
-
-public:
     //! @brief
     //! Gets the number of delete calls since the construction of the instance.
     //!
@@ -304,6 +248,61 @@ public:
     //! @brief
     //! Prints the number of new and delete calls since the construction of the class instance
     void print_num_calls() const noexcept;
+
+
+private:
+    //! @brief
+    //! Increases the delete counter
+    static void increase_total_delete_calls() noexcept;
+
+
+    //! @brief
+    //! Increases the new counter
+    static void increase_total_new_calls() noexcept;
+
+
+    //! @brief
+    //! Return `-1` if `DISABLE_NEW_DELETE_COUNTER` is defined and the passed value otherwise.
+    //!
+    //! @param[in] value:
+    //! Value that should be returned
+    //!
+    //! @return
+    //! Passed value or -1
+    [[nodiscard]] static auto return_value([[maybe_unused]] I32 value) noexcept -> I32;
+
+
+    std::atomic<I32> m_num_new_at_construction = -1;
+    std::atomic<I32> m_num_del_at_construction = -1;
+
+    inline static std::atomic<I32> m_num_new_global = 0; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    inline static std::atomic<I32> m_num_del_global = 0; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+
+
+#ifndef DISABLE_NEW_DELETE_COUNTER
+    friend auto ::operator new(std::size_t size) -> void*;
+    friend auto ::operator new(std::size_t size, std::align_val_t al) -> void*;
+    friend auto ::operator new(std::size_t size, const std::nothrow_t&) noexcept -> void*;
+    friend auto ::operator new(std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept -> void*;
+    friend auto ::operator new[](std::size_t size) -> void*;
+    friend auto ::operator new[](std::size_t size, std::align_val_t al) -> void*;
+    friend auto ::operator new[](std::size_t size, const std::nothrow_t&) noexcept -> void*;
+    friend auto ::operator new[](std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept -> void*;
+    friend void ::operator delete(void* ptr) noexcept;
+    friend void ::operator delete(void* ptr, const std::nothrow_t&) noexcept;
+    friend void ::operator delete[](void* ptr) noexcept;
+    friend void ::operator delete[](void* ptr, const std::nothrow_t&) noexcept;
+    friend void ::operator delete(void* ptr, std::align_val_t al) noexcept;
+    friend void ::operator delete[](void* ptr, std::align_val_t al) noexcept;
+    friend void ::operator delete(void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept;
+    friend void ::operator delete[](void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept;
+#    ifdef __cpp_sized_deallocation
+    friend void ::operator delete(void* ptr, std::size_t sz) noexcept;
+    friend void ::operator delete[](void* ptr, std::size_t sz) noexcept;
+    friend void ::operator delete(void* ptr, std::size_t sz, std::align_val_t al) noexcept;
+    friend void ::operator delete[](void* ptr, std::size_t sz, std::align_val_t al) noexcept;
+#    endif // __cpp_sized_deallocation
+#endif     // DISABLE_NEW_DELETE_COUNTER
 };
 
 
@@ -322,34 +321,6 @@ inline NewDeleteCounter::NewDeleteCounter()
     : m_num_new_at_construction(m_num_new_global.load())
     , m_num_del_at_construction(m_num_del_global.load())
 {
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-inline void NewDeleteCounter::increase_total_delete_calls() noexcept
-{
-    ++m_num_del_global;
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-inline void NewDeleteCounter::increase_total_new_calls() noexcept
-{
-    ++m_num_new_global;
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-[[nodiscard]] inline auto NewDeleteCounter::return_value([[maybe_unused]] I32 value) noexcept -> I32
-{
-#ifndef DISABLE_NEW_DELETE_COUNTER
-    return value;
-#else
-    return -1;
-#endif // DISABLE_NEW_DELETE_COUNTER
 }
 
 
@@ -395,6 +366,34 @@ inline void NewDeleteCounter::print_num_calls() const noexcept
     std::cout << "Number of delete calls : " << get_num_delete_calls() << std::endl;
 #else
     std::cout << "Global new counter disabled." << std::endl;
+#endif // DISABLE_NEW_DELETE_COUNTER
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+inline void NewDeleteCounter::increase_total_delete_calls() noexcept
+{
+    ++m_num_del_global;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+inline void NewDeleteCounter::increase_total_new_calls() noexcept
+{
+    ++m_num_new_global;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+[[nodiscard]] inline auto NewDeleteCounter::return_value([[maybe_unused]] I32 value) noexcept -> I32
+{
+#ifndef DISABLE_NEW_DELETE_COUNTER
+    return value;
+#else
+    return -1;
 #endif // DISABLE_NEW_DELETE_COUNTER
 }
 
