@@ -1,1 +1,1 @@
-add_mjolnir_core_test(stack_memory)
+add_mjolnir_core_test(linear_memory)

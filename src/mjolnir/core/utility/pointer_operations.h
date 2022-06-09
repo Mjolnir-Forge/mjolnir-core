@@ -17,6 +17,23 @@ namespace mjolnir
 //! \addtogroup core_utility
 //! @{
 
+//! @brief
+//! Turn an integer into a pointer of the chosen type.
+//!
+//! @tparam T_Type:
+//! The pointer type
+//!
+//! @param[in] integer:
+//! The integer that should be converted
+//!
+//! @return
+//! Converted pointer.
+//!
+//! @todo
+//! Replace reinterpret_cast with bit_cast (requires increase of compiler version)
+template <typename T_Type = void>
+[[nodiscard]] inline auto integer_to_pointer(UPT integer) noexcept -> T_Type*;
+
 
 //! @brief
 //! Check if a passed pointer is aligned.
@@ -146,7 +163,7 @@ template <typename T_Type>
 //! @todo
 //! Replace reinterpret_cast with bit_cast (requires increase of compiler version)
 template <typename T_Type>
-[[nodiscard]] inline auto pointer_to_integer(const volatile T_Type* pointer) noexcept -> std::uintptr_t;
+[[nodiscard]] inline auto pointer_to_integer(const volatile T_Type* pointer) noexcept -> UPT;
 
 
 //! @}
@@ -157,6 +174,14 @@ template <typename T_Type>
 
 namespace mjolnir
 {
+template <typename T_Type>
+[[nodiscard]] inline auto integer_to_pointer(UPT integer) noexcept -> T_Type*
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) intentional, see link above
+    return reinterpret_cast<T_Type*>(integer);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_alignment, typename T_Type>
@@ -198,11 +223,11 @@ template <typename T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_Type>
-[[nodiscard]] inline auto pointer_to_integer(const volatile T_Type* pointer) noexcept -> std::uintptr_t
+[[nodiscard]] inline auto pointer_to_integer(const volatile T_Type* pointer) noexcept -> UPT
 {
     // https://stackoverflow.com/a/26586211
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) intentional, see link above
-    return reinterpret_cast<std::uintptr_t>(pointer);
+    return reinterpret_cast<UPT>(pointer);
 }
 
 
