@@ -19,7 +19,19 @@ namespace mjolnir
 //! \addtogroup core_memory
 //! @{
 
-
+//! @brief
+//! Get the next pointer address after the passed one that fulfills the given alignment requirements.
+//!
+//! @details
+//! If the passed address is already aligned correctly, it will be returned instead.
+//!
+//! @param[in] address:
+//! The reference address
+//! @param[in] alignment:
+//! The required alignment
+//!
+//! @return
+//! Aligned pointer address
 [[nodiscard]] inline constexpr auto get_aligned_address(UPT address, UST alignment) noexcept -> UPT;
 
 
@@ -39,10 +51,12 @@ namespace mjolnir
 {
     // todo -> implement assert
     // assert(IsPowerOf2(alignment), "Alignment must be a power of 2."); // NOLINT
-    auto mask           = -static_cast<IPT>(alignment);
-    auto offset_addr    = static_cast<IPT>(address + (alignment - 1));
 
-    return static_cast<UPT>(offset_addr & mask);
+    // source: https://stackoverflow.com/a/4840428/6700329
+    // The original code was slightly modified since MSVC complained about the unary minus on an unsigned type.
+    UST decr_align = alignment-1;
+
+    return address + decr_align & ~decr_align;
 }
 
 
