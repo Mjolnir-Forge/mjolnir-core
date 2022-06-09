@@ -20,6 +20,21 @@ namespace mjolnir
 
 
 //! @brief
+//! Return `true` if the passed value is a power of 2.
+//!
+//! @tparam T_Type:
+//! Type of the passed value
+//!
+//! @param[in] value:
+//! The value that should be checked
+//!
+//! @return
+//! `true` or `false`
+template <std::integral T_Type>
+[[nodiscard]] constexpr auto is_power_of_2(T_Type value) noexcept -> bool;
+
+
+//! @brief
 //! Calculate the sum of the first `n` positive numbers.
 //!
 //! @tparam T_Type
@@ -81,6 +96,13 @@ template <Number T_Type = UST>
 
 namespace mjolnir
 {
+template <std::integral T_Type>
+[[nodiscard]] constexpr auto is_power_of_2(T_Type value) noexcept -> bool
+{
+    return (value != 0) && ! (value & (value - 1));
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 
 template <std::integral T_Type>
