@@ -7,6 +7,15 @@
 
 #pragma once
 
+
+// === DECLARATIONS ===================================================================================================
+
+#include "mjolnir/core/concepts.h"
+#include "mjolnir/core/fundamental_types.h"
+#include <type_traits>
+
+#include <concepts>
+
 namespace mjolnir
 {
 //! \addtogroup core_utility
@@ -34,13 +43,30 @@ template <typename T_Type, typename T_OtherType, typename... T_TypeList>
 [[nodiscard]] consteval auto is_any_of() noexcept -> bool;
 
 
+//! @brief
+//! Cast an integer to an equally sized unsigned type.
+//!
+//! @details
+//! If the original type is already unsigned, the input is returned unmodified.
+//!
+//! @tparam T_Type
+//! Type of the input value
+//!
+//! @param[in] value:
+//! Integer value that should be cast
+//!
+//! @return
+//! Unsigned value
+template <std::integral T_Type>
+[[nodiscard]] constexpr auto signed_to_unsigned(T_Type value) -> EquallySizedUnsignedType<T_Type>;
+
+
 //! @}
 } // namespace mjolnir
 
 
-// ====================================================================================================================
+// === DEFINITIONS ====================================================================================================
 
-#include <type_traits>
 
 namespace mjolnir
 {
@@ -59,6 +85,18 @@ template <typename T_Type, typename T_OtherType, typename... T_TypeList>
     }
     else
         return true;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <std::integral T_Type>
+[[nodiscard]] constexpr auto signed_to_unsigned(T_Type value) -> EquallySizedUnsignedType<T_Type>
+{
+    if constexpr (std::is_signed_v<T_Type>)
+        return static_cast<EquallySizedUnsignedType<T_Type>>(value);
+    else
+        return value;
 }
 
 } // namespace mjolnir

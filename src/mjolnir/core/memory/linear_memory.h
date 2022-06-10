@@ -1,5 +1,5 @@
 //! @file
-//! memory/stack_memory.h
+//! memory/linear_memory.h
 //!
 //! @brief
 //! Defines classes that deal with linear memory management
