@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "mjolnir/core/concepts.h"
+#include "mjolnir/core/definitions.h"
 
 namespace mjolnir
 {

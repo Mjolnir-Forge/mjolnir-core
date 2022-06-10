@@ -1,8 +1,8 @@
 //! @file
-//! concepts.h
+//! definitions.h
 //!
 //! @brief
-//! Contains some basic concepts that are frequently needed
+//! Contains some basic definitions and concepts that are frequently needed
 
 
 #pragma once
@@ -16,14 +16,6 @@ namespace mjolnir
 {
 //! \addtogroup core
 //! @{
-
-//! @brief
-//! Concept for a number type
-//!
-//! @tparam T_Type:
-//! Type
-template <typename T_Type>
-concept Number = std::is_integral_v<T_Type> || std::is_floating_point_v<T_Type>;
 
 
 //! @brief
@@ -39,6 +31,15 @@ using EquallySizedUnsignedType = typename std::conditional_t<std::is_unsigned_v<
                                           std::conditional_t<sizeof(T_Type) == 2,         U16,
                                           std::conditional_t<sizeof(T_Type) == 4,         U32, U64>>>>>;
 // clang-format on
+
+
+//! @brief
+//! Concept for a number type
+//!
+//! @tparam T_Type:
+//! Type
+template <typename T_Type>
+concept Number = std::is_integral_v<T_Type> || std::is_floating_point_v<T_Type>;
 
 
 //! @}

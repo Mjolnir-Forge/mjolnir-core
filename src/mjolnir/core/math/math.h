@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "mjolnir/core/concepts.h"
+#include "mjolnir/core/definitions.h"
 #include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/utility/type.h"
 

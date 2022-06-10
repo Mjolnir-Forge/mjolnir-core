@@ -10,7 +10,7 @@
 
 // === DECLARATIONS ===================================================================================================
 
-#include "mjolnir/core/concepts.h"
+#include "mjolnir/core/definitions.h"
 #include "mjolnir/core/fundamental_types.h"
 #include <type_traits>
 
