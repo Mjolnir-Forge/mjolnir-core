@@ -218,7 +218,7 @@ void LinearMemory<t_thread_safe>::deallocate([[maybe_unused]] void* ptr, [[maybe
     UPT memory_start = get_start_address();
 
     // NOLINTNEXTLINE
-    assert(addr >= memory_start && addr <= memory_start + m_memory_size && "Pointer doesn't belong to this memory.");
+    assert(addr >= memory_start && addr < memory_start + m_memory_size && "Pointer doesn't belong to this memory.");
 
     --m_num_allocations;
 #endif
