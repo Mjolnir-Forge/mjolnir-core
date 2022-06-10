@@ -11,6 +11,18 @@ using namespace mjolnir;
 // Setup
 // ====================================================================================================================
 
+
+// --- Test suites ----------------------------------------------------------------------------------------------------
+
+template <class T_Type>
+class IsAnyOfTestSuite : public ::testing::Test
+{
+};
+using IsAnyOfTestCases = ::testing::Types<I8, I32, I64, U32, U64, UST, F32, F64>;
+// cppcheck-suppress syntaxError
+TYPED_TEST_SUITE(IsAnyOfTestSuite, IsAnyOfTestCases, ); // NOLINT
+
+
 template <std::signed_integral T_Type>
 class SignedTestSuite : public ::testing::Test
 {
@@ -37,27 +49,15 @@ TYPED_TEST_SUITE(UnsignedTestSuite, UnsignedTestTypes, );
 // test_is_any_of -----------------------------------------------------------------------------------------------------
 
 // define support class for expected results
-template <class T_Type>
-struct TestIsAnyOf : public ::testing::Test
-{
-};
 
-// define test
-TYPED_TEST_SUITE_P(TestIsAnyOf);     // NOLINT
-TYPED_TEST_P(TestIsAnyOf, test_case) // NOLINT
+
+TYPED_TEST(IsAnyOfTestSuite, testcase) // NOLINT
 {
     constexpr bool result     = mjolnir::is_any_of<TypeParam, I32, UST, F64>();
     constexpr bool exp_result = std::is_same<TypeParam, I32>::value || std::is_same<TypeParam, UST>::value
                                 || std::is_same<TypeParam, F64>::value;
     EXPECT_EQ(result, exp_result);
 }
-REGISTER_TYPED_TEST_SUITE_P(TestIsAnyOf, test_case); // NOLINT
-
-
-// define test cases
-using IsAnyOfTestCases = ::testing::Types<I8, I32, I64, U32, U64, UST, F32, F64>;
-// cppcheck-suppress syntaxError
-INSTANTIATE_TYPED_TEST_SUITE_P(is_any_of_test_suite, TestIsAnyOf, IsAnyOfTestCases, ); // NOLINT
 
 
 // test signed_to_unsigned --------------------------------------------------------------------------------------------
