@@ -129,6 +129,15 @@ public:
     //! `true` or `false`
     [[nodiscard]] auto is_initialized() const noexcept -> bool;
 
+    //! @brief
+    //! Reset the internal memory
+    //!
+    //! @details
+    //! Resets the internal pointer to the start of the memory block so that it can be reused. Only debug builds will
+    //! check if the number of deallocations matches the number of allocations. In release builds the memory is reset
+    //! without any further tests. So make sure none of the memory is used anymore.
+    void reset() noexcept;
+
 
 private:
     //! @brief
@@ -264,6 +273,17 @@ template <bool t_thread_safe>
 [[nodiscard]] auto LinearMemory<t_thread_safe>::is_initialized() const noexcept -> bool
 {
     return m_memory != nullptr;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_thread_safe>
+void LinearMemory<t_thread_safe>::reset() noexcept
+{
+    assert(m_num_allocations == 0 && "Memory still in use."); // NOLINT
+
+    m_current_addr = get_start_address();
 }
 
 

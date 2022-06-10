@@ -1,5 +1,6 @@
 #include "mjolnir/core/exception.h"
 #include "mjolnir/core/memory/linear_memory.h"
+#include "mjolnir/core/utility/pointer_operations.h"
 #include "mjolnir/testing/new_delete_counter.h"
 #include <gtest/gtest.h>
 
@@ -14,7 +15,7 @@ using namespace mjolnir;
 
 // --- test construction ----------------------------------------------------------------------------------------------
 
-TEST(test_construction, check_state) // NOLINT
+TEST(test_linear_memory, construction) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
@@ -31,7 +32,7 @@ TEST(test_construction, check_state) // NOLINT
 
 // --- test construction exceptions -----------------------------------------------------------------------------------
 
-TEST(test_construction, exceptions) // NOLINT
+TEST(test_linear_memory, construction_exceptions) // NOLINT
 {
     EXPECT_THROW(LinearMemory(0), Exception); // NOLINT
 }
@@ -39,7 +40,7 @@ TEST(test_construction, exceptions) // NOLINT
 
 // --- test initialization --------------------------------------------------------------------------------------------
 
-TEST(test_initialization, check_state) // NOLINT
+TEST(test_linear_memory, initialization) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
@@ -57,7 +58,7 @@ TEST(test_initialization, check_state) // NOLINT
 
 // --- test initialization exceptions ---------------------------------------------------------------------------------
 
-TEST(test_initialization, exceptions) // NOLINT
+TEST(test_linear_memory, initialization_exceptions) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
@@ -74,7 +75,7 @@ TEST(test_initialization, exceptions) // NOLINT
 
 // --- test allocation ------------------------------------------------------------------------------------------------
 
-TEST(test_allocation, allocation) // NOLINT
+TEST(test_linear_memory, allocation) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
@@ -110,7 +111,7 @@ TEST(test_allocation, allocation) // NOLINT
 
 // --- test aligned allocation ----------------------------------------------------------------------------------------
 
-TEST(test_allocation, aligned_allocation) // NOLINT
+TEST(test_linear_memory, aligned_allocation) // NOLINT
 {
     constexpr UST num_bytes  = 1024;
     constexpr UST alloc_size = 8;
@@ -136,6 +137,7 @@ TEST(test_allocation, aligned_allocation) // NOLINT
     exp_free_mem     = current_free_mem - alloc_size;
     current_free_mem = mem.get_free_memory_size();
     EXPECT_LE(current_free_mem, exp_free_mem);
+    EXPECT_GT(pointer_to_integer(b), pointer_to_integer(a));
 
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
@@ -145,6 +147,7 @@ TEST(test_allocation, aligned_allocation) // NOLINT
     exp_free_mem     = current_free_mem - alloc_size;
     current_free_mem = mem.get_free_memory_size();
     EXPECT_LE(current_free_mem, exp_free_mem);
+    EXPECT_GT(pointer_to_integer(c), pointer_to_integer(b));
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
 }
@@ -152,7 +155,7 @@ TEST(test_allocation, aligned_allocation) // NOLINT
 
 // --- test allocation exceptions -------------------------------------------------------------------------------------
 
-TEST(test_allocation, exceptions) // NOLINT
+TEST(test_linear_memory, allocation_exceptions) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
@@ -175,7 +178,7 @@ TEST(test_allocation, exceptions) // NOLINT
 
 // --- test deallocation ----------------------------------------------------------------------------------------------
 
-TEST(test_deallocation, deallocation) // NOLINT
+TEST(test_linear_memory, deallocation) // NOLINT
 {
     constexpr UST num_bytes  = 1024;
     constexpr UST alloc_size = 36;
@@ -205,9 +208,10 @@ TEST(test_deallocation, deallocation) // NOLINT
     ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
 }
 
+
 // --- test deinitialization ------------------------------------------------------------------------------------------
 
-TEST(test_deinitialization, check_state) // NOLINT
+TEST(test_linear_memory, deinitialization) // NOLINT
 {
     constexpr UST num_bytes  = 1024;
     constexpr UST alloc_size = 36;
@@ -233,7 +237,7 @@ TEST(test_deinitialization, check_state) // NOLINT
 
 // --- test deinitialization ------------------------------------------------------------------------------------------
 
-TEST(test_deinitialization, exceptions) // NOLINT
+TEST(test_linear_memory, deinitialization_exceptions) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
@@ -246,4 +250,37 @@ TEST(test_deinitialization, exceptions) // NOLINT
 
     EXPECT_EQ(mem.get_memory_size(), 0);
     EXPECT_FALSE(mem.is_initialized());
+}
+
+
+// --- test reset -----------------------------------------------------------------------------------------------------
+
+TEST(test_linear_memory, reset) // NOLINT
+{
+    constexpr UST num_bytes  = 1024;
+    constexpr UST alloc_size = 64;
+
+    auto mem = LinearMemory(num_bytes);
+
+    COUNT_NEW_AND_DELETE;
+
+    mem.initialize();
+
+
+    void* a = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    void* b = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    mem.deallocate(a, alloc_size);
+    mem.deallocate(b, alloc_size);
+
+    constexpr UST exp_free_mem = num_bytes - 2 * alloc_size;
+    EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
+
+    mem.reset();
+
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
+    void* c = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+
+    EXPECT_EQ(pointer_to_integer(a), pointer_to_integer(c));
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
 }
