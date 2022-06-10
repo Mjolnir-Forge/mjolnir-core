@@ -18,9 +18,9 @@ template <class T_Type>
 class IsAnyOfTestSuite : public ::testing::Test
 {
 };
-using IsAnyOfTestCases = ::testing::Types<I8, I32, I64, U32, U64, UST, F32, F64>;
+using IsAnyOfTestTypes = ::testing::Types<I8, I32, I64, U32, U64, UST, F32, F64>;
 // cppcheck-suppress syntaxError
-TYPED_TEST_SUITE(IsAnyOfTestSuite, IsAnyOfTestCases, ); // NOLINT
+TYPED_TEST_SUITE(IsAnyOfTestSuite, IsAnyOfTestTypes, ); // NOLINT
 
 
 template <std::signed_integral T_Type>
@@ -28,7 +28,6 @@ class SignedTestSuite : public ::testing::Test
 {
 };
 using SignedTestTypes = ::testing::Types<I8, I16, I32, I64, IPT, int>; // NOLINT
-// cppcheck-suppress syntaxError
 TYPED_TEST_SUITE(SignedTestSuite, SignedTestTypes, );
 
 
@@ -37,7 +36,6 @@ class UnsignedTestSuite : public ::testing::Test
 {
 };
 using UnsignedTestTypes = ::testing::Types<U8, U16, U32, U64, UPT, unsigned int>; // NOLINT
-// cppcheck-suppress syntaxError
 TYPED_TEST_SUITE(UnsignedTestSuite, UnsignedTestTypes, );
 
 
