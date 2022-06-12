@@ -9,8 +9,8 @@
 using namespace mjolnir;
 
 
-constexpr UST alignment = 32;
-struct alignas(alignment) AlignedStruct
+constexpr UST struct_alignment = 32;
+struct alignas(struct_alignment) AlignedStruct
 {
     I64 m_member_a = 0;
     I64 m_member_b = 0;
