@@ -374,31 +374,38 @@ TEST(test_linear_allocator, std_vector) // NOLINT
 
     auto allocator = LinearAllocator<F32>(mem);
 
-    auto vec = std::vector<F32, LinearAllocator<F32>>{0, allocator};
-    EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
+    std::vector<F32, LinearAllocator<F32>> vec(0, allocator);
+
+    UST exp_memory_size = mem.get_free_memory_size();
 
     vec.reserve(1);
     vec.push_back(1.F);
 
-    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(F32));
+    exp_memory_size -= sizeof(F32);
+
+    EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
     EXPECT_EQ(vec[0], 1.F);
 
     vec.reserve(3);
     vec.push_back(2.F); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     vec.push_back(3.F); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    exp_memory_size -= 3 * sizeof(F32);
 
-    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32));
+    EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
     EXPECT_EQ(vec[0], 1.F);
     EXPECT_EQ(vec[1], 2.F);
     EXPECT_EQ(vec[2], 3.F);
 
 
-    auto vec_other_type = std::vector<UST, LinearAllocator<UST>>(0, LinearAllocator<UST>(allocator));
+    std::vector<UST, LinearAllocator<UST>> vec_other_type(0, LinearAllocator<UST>(allocator));
+    exp_memory_size = mem.get_free_memory_size();
+
     vec_other_type.reserve(2);
     vec_other_type.push_back(1);
     vec_other_type.push_back(num_bytes);
+    exp_memory_size -= 2 * sizeof(UST);
 
-    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32) - 2 * sizeof(UST));
+    EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
     EXPECT_EQ(vec_other_type[0], 1);
     EXPECT_EQ(vec_other_type[1], num_bytes);
 
@@ -408,7 +415,7 @@ TEST(test_linear_allocator, std_vector) // NOLINT
     vec_other_type.clear();
     vec_other_type.shrink_to_fit();
 
-    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32) - 2 * sizeof(UST));
+    EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
