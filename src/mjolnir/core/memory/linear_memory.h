@@ -18,6 +18,8 @@
 
 namespace mjolnir
 {
+// --- LinearMemory ---------------------------------------------------------------------------------------------------
+
 //! \addtogroup core_memory
 //! @{
 
@@ -35,12 +37,12 @@ template <bool t_thread_safe = false>
 class LinearMemory
 {
 public:
-    LinearMemory()                    = delete;
-    LinearMemory(const LinearMemory&) = delete;
-    LinearMemory(LinearMemory&&)      = delete;
-    ~LinearMemory()                   = default;
+    LinearMemory()                        = delete;
+    LinearMemory(const LinearMemory&)     = delete;
+    LinearMemory(LinearMemory&&) noexcept = delete;
+    ~LinearMemory()                       = default;
     auto operator=(const LinearMemory&) -> LinearMemory& = delete;
-    auto operator=(LinearMemory&&) -> LinearMemory& = delete;
+    auto operator=(LinearMemory&&) noexcept -> LinearMemory& = delete;
 
 
     //! @brief
@@ -77,7 +79,11 @@ public:
     //! Pointer to the memory that should be freed
     //! @param[in] size:
     //! Size of the memory that should be freed.
-    void deallocate([[maybe_unused]] void* ptr, [[maybe_unused]] UST size) const noexcept;
+    //! @param[in] alignment:
+    //! Alignment of the pointer.
+    void deallocate([[maybe_unused]] void* ptr,
+                    [[maybe_unused]] UST   size,
+                    [[maybe_unused]] UST   alignment = 1) const noexcept;
 
 
     //! @brief
@@ -178,6 +184,87 @@ private:
 };
 
 
+// --- LinearAllocator ------------------------------------------------------------------------------------------------
+
+//! @brief
+//! STL compatible allocator that uses linear memory.
+//!
+//! @tparam T_Type:
+//! Type of the allocated object
+//! @tparam t_thread_safe:
+//! Set to `true` if the used linear memory is thread safe.
+template <typename T_Type, bool t_thread_safe = false>
+class LinearAllocator
+{
+public:
+    //! \cond DO_NOT_DOCUMENT
+
+    //! Required class members for allocators
+    using value_type = T_Type; // NOLINT(readability-identifier-naming)
+
+    template <typename T_OtherType>
+    struct rebind // NOLINT(readability-identifier-naming)
+    {
+        using other = LinearAllocator<T_OtherType, t_thread_safe>; // NOLINT(readability-identifier-naming)
+    };
+
+
+    LinearAllocator()                           = delete;
+    LinearAllocator(const LinearAllocator&)     = default;
+    LinearAllocator(LinearAllocator&&) noexcept = default;
+    ~LinearAllocator()                          = default;
+    auto operator=(const LinearAllocator&) -> LinearAllocator& = default;
+    auto operator=(LinearAllocator&&) noexcept -> LinearAllocator& = default;
+    //! \endcond
+
+    //! @brief
+    //! Construct a new allocator with the passes `LinearMemory` instance
+    //!
+    //! @param[in] linear_memory:
+    //! `LinearMemory` instance that provides the memory for the allocations
+    explicit LinearAllocator(LinearMemory<t_thread_safe>& linear_memory) noexcept;
+
+    //! @brief
+    //! Construct a new allocator using the same `LinearMemory` instance as the passed allocator.
+    //!
+    //! @tparam T_OtherType
+    //! Object type of the other allocator
+    //!
+    //! @param[in] other:
+    //! Other allocator that provides a reference to the `LinearMemory` instance that should be used
+    template <class T_OtherType>
+    explicit LinearAllocator(const LinearAllocator<T_OtherType, t_thread_safe>& other) noexcept;
+
+    //! @brief
+    //! Allocate memory for one or more instances of the allocators `T_Type`.
+    //!
+    //! @param[in] num_instances:
+    //! Specifies the number of instances of `T_Type` that should fit into the allocated memory
+    //!
+    //! @return
+    //! Pointer to the allocated memory
+    [[nodiscard]] auto allocate(UST num_instances) -> T_Type*;
+
+    //! @brief
+    //! Deallocates the memory of the passed pointer.
+    //!
+    //! @details
+    //! Due to the mechanics of the internally used `LinearMemory` this function does nothing.
+    //!
+    //! @param[in] pointer:
+    //! Pointer to the memory that should be freed
+    //! @param[in] num_instances:
+    //! Specifies how many instances of `T_Type` fitted into the allocated memory.
+    void deallocate([[maybe_unused]] T_Type* pointer, UST num_instances);
+
+private:
+    LinearMemory<t_thread_safe>& m_memory;
+
+    template <typename T_OtherType, bool t_other_thread_safe>
+    friend class LinearAllocator;
+};
+
+
 //! @}
 } // namespace mjolnir
 
@@ -211,7 +298,9 @@ auto LinearMemory<t_thread_safe>::allocate(UST size, UST alignment) -> void*
 }
 
 template <bool t_thread_safe>
-void LinearMemory<t_thread_safe>::deallocate([[maybe_unused]] void* ptr, [[maybe_unused]] UST size) const noexcept
+void LinearMemory<t_thread_safe>::deallocate([[maybe_unused]] void* ptr,
+                                             [[maybe_unused]] UST   size,
+                                             [[maybe_unused]] UST   alignment) const noexcept
 {
 #ifndef NDEBUG
     UPT addr         = pointer_to_integer(ptr);
@@ -344,5 +433,42 @@ auto LinearMemory<t_thread_safe>::get_start_address() const noexcept -> UPT
     return pointer_to_integer(m_memory.get());
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, bool t_thread_safe>
+LinearAllocator<T_Type, t_thread_safe>::LinearAllocator(LinearMemory<t_thread_safe>& linear_memory) noexcept
+    : m_memory{linear_memory}
+{
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, bool t_thread_safe>
+template <class T_OtherType>
+LinearAllocator<T_Type, t_thread_safe>::LinearAllocator(
+        const LinearAllocator<T_OtherType, t_thread_safe>& other) noexcept
+    : m_memory{other.m_memory}
+{
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, bool t_thread_safe>
+[[nodiscard]] auto LinearAllocator<T_Type, t_thread_safe>::allocate(UST num_instances) -> T_Type*
+{
+    return static_cast<T_Type*>(m_memory.allocate(num_instances * sizeof(T_Type), alignof(T_Type)));
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, bool t_thread_safe>
+void LinearAllocator<T_Type, t_thread_safe>::deallocate(T_Type* pointer, UST num_instances)
+{
+    m_memory.deallocate(pointer, num_instances * sizeof(T_Type), alignof(T_Type));
+}
 
 } // namespace mjolnir

@@ -13,6 +13,8 @@ using namespace mjolnir;
 
 // todo -> use templated tests where it makes sense
 
+// ~~~ LinearMemory ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // --- test construction ----------------------------------------------------------------------------------------------
 
 TEST(test_linear_memory, construction) // NOLINT
@@ -283,4 +285,130 @@ TEST(test_linear_memory, reset) // NOLINT
     EXPECT_EQ(pointer_to_integer(a), pointer_to_integer(c));
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
+}
+
+
+// ~~~ LinearAllocator ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// --- test constructor -----------------------------------------------------------------------------------------------
+
+TEST(test_linear_allocator, constructor) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    [[maybe_unused]] auto allocator = LinearAllocator<F32>(mem);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// --- test allocate --------------------------------------------------------------------------------------------------
+
+TEST(test_linear_allocator, allocate) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto allocator = LinearAllocator<F32>(mem);
+
+    auto* a = allocator.allocate(1);
+    *a      = static_cast<F32>(num_bytes);
+
+    EXPECT_TRUE((std::is_same_v<decltype(a), F32*>) );
+    EXPECT_EQ(*a, static_cast<F32>(num_bytes));
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(F32));
+
+    [[maybe_unused]] auto* b = allocator.allocate(3);
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32));
+
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// --- test deallocate ------------------------------------------------------------------------------------------------
+
+TEST(test_linear_allocator, deallocate) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto allocator = LinearAllocator<F32>(mem);
+
+    auto* a = allocator.allocate(1);
+    auto* b = allocator.allocate(3);
+
+    allocator.deallocate(a, 1);
+    allocator.deallocate(b, 3);
+
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32));
+
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// --- test std::vector -----------------------------------------------------------------------------------------------
+
+TEST(test_linear_allocator, std_vector) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto allocator = LinearAllocator<F32>(mem);
+
+    auto vec = std::vector<F32, LinearAllocator<F32>>{allocator};
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
+
+    vec.reserve(1);
+    vec.push_back(1.F);
+
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(F32));
+    EXPECT_EQ(vec[0], 1.F);
+
+    vec.reserve(3);
+    vec.push_back(2.F); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    vec.push_back(3.F); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32));
+    EXPECT_EQ(vec[0], 1.F);
+    EXPECT_EQ(vec[1], 2.F);
+    EXPECT_EQ(vec[2], 3.F);
+
+
+    auto vec_other_type = std::vector<UST, LinearAllocator<UST>>(LinearAllocator<UST>(allocator));
+    vec_other_type.reserve(2);
+    vec_other_type.push_back(1);
+    vec_other_type.push_back(num_bytes);
+
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32) - 2 * sizeof(UST));
+    EXPECT_EQ(vec_other_type[0], 1);
+    EXPECT_EQ(vec_other_type[1], num_bytes);
+
+    vec.clear();
+    vec.shrink_to_fit();
+
+    vec_other_type.clear();
+    vec_other_type.shrink_to_fit();
+
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32) - 2 * sizeof(UST));
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
