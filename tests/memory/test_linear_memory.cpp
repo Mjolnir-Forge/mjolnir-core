@@ -332,7 +332,6 @@ TEST(test_linear_allocator, allocate) // NOLINT
     [[maybe_unused]] auto* b = allocator.allocate(3);
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32));
 
-
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
 
@@ -358,7 +357,6 @@ TEST(test_linear_allocator, deallocate) // NOLINT
 
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32));
 
-
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
 
@@ -376,7 +374,7 @@ TEST(test_linear_allocator, std_vector) // NOLINT
 
     auto allocator = LinearAllocator<F32>(mem);
 
-    auto vec = std::vector<F32, LinearAllocator<F32>>{allocator};
+    auto vec = std::vector<F32, LinearAllocator<F32>>{0, allocator};
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
 
     vec.reserve(1);
@@ -395,7 +393,7 @@ TEST(test_linear_allocator, std_vector) // NOLINT
     EXPECT_EQ(vec[2], 3.F);
 
 
-    auto vec_other_type = std::vector<UST, LinearAllocator<UST>>(LinearAllocator<UST>(allocator));
+    auto vec_other_type = std::vector<UST, LinearAllocator<UST>>(0, LinearAllocator<UST>(allocator));
     vec_other_type.reserve(2);
     vec_other_type.push_back(1);
     vec_other_type.push_back(num_bytes);
