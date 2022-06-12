@@ -397,6 +397,7 @@ TEST(test_linear_allocator, std_vector) // NOLINT
     EXPECT_EQ(vec[2], 3.F);
 
 
+    // todo: move to own test
     std::vector<UST, LinearAllocator<UST>> vec_other_type(0, LinearAllocator<UST>(allocator));
     exp_memory_size = mem.get_free_memory_size();
 
@@ -416,6 +417,43 @@ TEST(test_linear_allocator, std_vector) // NOLINT
     vec_other_type.shrink_to_fit();
 
     EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// --- test std::map --------------------------------------------------------------------------------------------------
+
+TEST(test_linear_allocator, std_map) // NOLINT
+{
+    using AllocatorType = LinearAllocator<std::pair<const UST, F32>>;
+
+    constexpr UST num_bytes    = 1024;
+    constexpr UST num_elements = 5;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto allocator = AllocatorType(mem);
+
+    std::map<UST, F32, std::less<>, AllocatorType> map(allocator);
+
+    for (UST i = 0; i < num_elements; ++i)
+        map.emplace(i, static_cast<F32>(i));
+
+    for (UST i = 0; i < num_elements; ++i)
+    {
+        const auto& entry = map.find(i);
+        EXPECT_NE(entry, map.end());
+        EXPECT_EQ(entry->second, static_cast<F32>(i));
+    }
+
+    UST minimal_alloc_size = sizeof(AllocatorType::value_type) * num_elements;
+    EXPECT_LT(mem.get_free_memory_size(), num_bytes - minimal_alloc_size);
+
+    map.clear();
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
