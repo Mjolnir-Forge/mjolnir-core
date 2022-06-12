@@ -9,6 +9,16 @@
 using namespace mjolnir;
 
 
+constexpr UST alignment = 32;
+struct alignas(alignment) AlignedStruct
+{
+    I64 m_member_a = 0;
+    I64 m_member_b = 0;
+    I64 m_member_c = 0;
+    I64 m_member_d = 0;
+};
+
+
 // === TESTS ==========================================================================================================
 
 // todo -> use templated tests where it makes sense
@@ -290,9 +300,9 @@ TEST(test_linear_memory, reset) // NOLINT
 
 // ~~~ LinearAllocator ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// --- test constructor -----------------------------------------------------------------------------------------------
+// --- test constructor (number of bytes) -----------------------------------------------------------------------------
 
-TEST(test_linear_allocator, constructor) // NOLINT
+TEST(test_linear_allocator, constructor_num_bytes) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
@@ -303,6 +313,26 @@ TEST(test_linear_allocator, constructor) // NOLINT
 
     // cppcheck-suppress unreadVariable
     [[maybe_unused]] auto allocator = LinearAllocator<F32>(mem);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// --- test constructor (other value type) ----------------------------------------------------------------------------
+
+TEST(test_linear_allocator, constructor_allocator_other_value_type) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto allocator = LinearAllocator<F32>(mem);
+
+    // cppcheck-suppress unreadVariable
+    [[maybe_unused]] auto allocator_other_type = LinearAllocator<UST>(allocator);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
@@ -373,8 +403,7 @@ TEST(test_linear_allocator, std_vector) // NOLINT
     COUNT_NEW_AND_DELETE;
 
     auto allocator = LinearAllocator<F32>(mem);
-
-    std::vector<F32, LinearAllocator<F32>> vec(0, allocator);
+    auto vec       = std::vector<F32, LinearAllocator<F32>>(0, allocator);
 
     UST exp_memory_size = mem.get_free_memory_size();
 
@@ -396,27 +425,35 @@ TEST(test_linear_allocator, std_vector) // NOLINT
     EXPECT_EQ(vec[1], 2.F);
     EXPECT_EQ(vec[2], 3.F);
 
-
-    // todo: move to own test
-    std::vector<UST, LinearAllocator<UST>> vec_other_type(0, LinearAllocator<UST>(allocator));
-    exp_memory_size = mem.get_free_memory_size();
-
-    vec_other_type.reserve(2);
-    vec_other_type.push_back(1);
-    vec_other_type.push_back(num_bytes);
-    exp_memory_size -= 2 * sizeof(UST);
-
-    EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
-    EXPECT_EQ(vec_other_type[0], 1);
-    EXPECT_EQ(vec_other_type[1], num_bytes);
-
     vec.clear();
     vec.shrink_to_fit();
 
-    vec_other_type.clear();
-    vec_other_type.shrink_to_fit();
-
     EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// --- test std::vector with aligned object ---------------------------------------------------------------------------
+
+TEST(test_linear_allocator, std_vector_aligned_object) // NOLINT
+{
+    constexpr UST num_bytes    = 1024;
+    constexpr UST num_elements = 5;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto allocator = LinearAllocator<AlignedStruct>(mem);
+    auto vec       = std::vector<AlignedStruct, LinearAllocator<AlignedStruct>>(0, allocator);
+
+    for (UST i = 0; i < num_elements; ++i)
+        vec.emplace_back();
+
+    for (UST i = 0; i < num_elements; ++i)
+        EXPECT_TRUE(is_aligned(&vec[i], alignof(AlignedStruct)));
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
@@ -437,8 +474,7 @@ TEST(test_linear_allocator, std_map) // NOLINT
     COUNT_NEW_AND_DELETE;
 
     auto allocator = AllocatorType(mem);
-
-    std::map<UST, F32, std::less<>, AllocatorType> map(allocator);
+    auto map       = std::map<UST, F32, std::less<>, AllocatorType>(allocator);
 
     for (UST i = 0; i < num_elements; ++i)
         map.emplace(i, static_cast<F32>(i));

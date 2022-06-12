@@ -10,8 +10,12 @@
 
 // === DECLARATIONS ===================================================================================================
 
+#include "mjolnir/core/exception.h"
 #include "mjolnir/core/fundamental_types.h"
+#include "mjolnir/core/memory/utility.h"
+#include "mjolnir/core/utility/pointer_operations.h"
 
+#include <cassert>
 #include <cstddef>
 #include <memory>
 
@@ -275,12 +279,6 @@ private:
 
 
 // === DEFINITIONS ====================================================================================================
-
-#include "mjolnir/core/exception.h"
-#include "mjolnir/core/memory/utility.h"
-#include "mjolnir/core/utility/pointer_operations.h"
-
-#include <cassert>
 
 
 namespace mjolnir
