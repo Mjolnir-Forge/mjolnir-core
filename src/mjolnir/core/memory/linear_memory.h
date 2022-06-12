@@ -217,12 +217,14 @@ public:
     auto operator=(LinearAllocator&&) noexcept -> LinearAllocator& = default;
     //! \endcond
 
+
     //! @brief
     //! Construct a new allocator with the passes `LinearMemory` instance
     //!
     //! @param[in] linear_memory:
     //! `LinearMemory` instance that provides the memory for the allocations
     explicit LinearAllocator(LinearMemory<t_thread_safe>& linear_memory) noexcept;
+
 
     //! @brief
     //! Construct a new allocator using the same `LinearMemory` instance as the passed allocator.
@@ -235,6 +237,7 @@ public:
     template <class T_OtherType>
     explicit LinearAllocator(const LinearAllocator<T_OtherType, t_thread_safe>& other) noexcept;
 
+
     //! @brief
     //! Allocate memory for one or more instances of the allocators `T_Type`.
     //!
@@ -244,6 +247,7 @@ public:
     //! @return
     //! Pointer to the allocated memory
     [[nodiscard]] auto allocate(UST num_instances) -> T_Type*;
+
 
     //! @brief
     //! Deallocates the memory of the passed pointer.
@@ -256,6 +260,7 @@ public:
     //! @param[in] num_instances:
     //! Specifies how many instances of `T_Type` fitted into the allocated memory.
     void deallocate([[maybe_unused]] T_Type* pointer, UST num_instances);
+
 
 private:
     LinearMemory<t_thread_safe>& m_memory;
