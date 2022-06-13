@@ -4,6 +4,9 @@
 #include "mjolnir/testing/new_delete_counter.h"
 #include <gtest/gtest.h>
 
+#include <memory>
+
+
 // === SETUP ==========================================================================================================
 
 using namespace mjolnir;
@@ -513,12 +516,42 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
     auto map       = std::map<UST, AlignedStruct, std::less<>, AllocatorType>(allocator);
 
     for (UST i = 0; i < num_elements; ++i)
+#pragma warning(suppress : 2220)
         map.emplace(i, AlignedStruct());
 
     for (auto const& [key, val] : map)
         EXPECT_TRUE(is_aligned(&val, alignof(AlignedStruct)));
 
     map.clear();
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// ~~~ LinearDeleter $$~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// --- test std::map --------------------------------------------------------------------------------------------------
+
+TEST(test_linear_deleter, std_unique_ptr) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto deleter = LinearDeleter<F32>(mem);
+
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    F32* ptr = new (mem.allocate(sizeof(F32), alignof(F32))) F32(2.); // NOLINT(cppcoreguidelines-owning-memory)
+    EXPECT_EQ(*ptr, 2.0);
+
+    auto u_ptr = std::unique_ptr<F32, LinearDeleter<F32>>(ptr, deleter);
+    mem.deallocate(ptr, 1);
+
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(F32));
+
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }

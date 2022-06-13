@@ -274,6 +274,49 @@ private:
 };
 
 
+template <typename T_Type, bool t_thread_safe = false>
+class LinearDeleter
+{
+public:
+    //! \cond DO_NOT_DOCUMENT
+
+    //! Required class members for allocators
+    using value_type = T_Type; // NOLINT(readability-identifier-naming)
+
+    template <typename T_OtherType>
+    struct rebind // NOLINT(readability-identifier-naming)
+    {
+        using other = LinearAllocator<T_OtherType, t_thread_safe>; // NOLINT(readability-identifier-naming)
+    };
+
+
+    LinearDeleter()                         = delete;
+    LinearDeleter(const LinearDeleter&)     = default;
+    LinearDeleter(LinearDeleter&&) noexcept = default;
+    ~LinearDeleter()                        = default;
+    auto operator=(const LinearDeleter&) -> LinearDeleter& = default;
+    auto operator=(LinearDeleter&&) noexcept -> LinearDeleter& = default;
+    //! \endcond
+
+
+    //! @brief
+    //! Construct a new deleter with the passes `LinearMemory` instance
+    //!
+    //! @param[in] linear_memory:
+    //! `LinearMemory` that provided the memory for the opject that should be deleted
+    explicit LinearDeleter(LinearMemory<t_thread_safe>& linear_memory) noexcept;
+
+    void operator()(T_Type* pointer);
+
+
+private:
+    LinearMemory<t_thread_safe>& m_memory;
+
+    template <typename T_OtherType, bool t_other_thread_safe>
+    friend class LinearAllocator;
+};
+
+
 //! @}
 } // namespace mjolnir
 
@@ -473,5 +516,25 @@ void LinearAllocator<T_Type, t_thread_safe>::deallocate(T_Type* pointer, UST num
 {
     m_memory.deallocate(pointer, num_instances * sizeof(T_Type), alignof(T_Type));
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, bool t_thread_safe>
+LinearDeleter<T_Type, t_thread_safe>::LinearDeleter(LinearMemory<t_thread_safe>& linear_memory) noexcept
+    : m_memory(linear_memory)
+{
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, bool t_thread_safe>
+void LinearDeleter<T_Type, t_thread_safe>::operator()(T_Type* pointer)
+{
+    pointer->~T_Type();
+    m_memory.deallocate(pointer, sizeof(T_Type), alignof(T_Type));
+}
+
 
 } // namespace mjolnir
