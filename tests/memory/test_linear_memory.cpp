@@ -525,7 +525,7 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
     for (UST i = 0; i < num_elements; ++i)
     {
 #if defined(_MSC_VER)
-#    pragma warning(suppress : C4324)
+#    pragma warning(suppress : 4324)
 #endif
         map.emplace(i, AlignedStruct());
     }
