@@ -516,7 +516,7 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
     auto map       = std::map<UST, AlignedStruct, std::less<>, AllocatorType>(allocator);
 
     for (UST i = 0; i < num_elements; ++i)
-#pragma warning(suppress : 2220)
+#pragma warning(suppress : 4324)
         map.emplace(i, AlignedStruct());
 
     for (auto const& [key, val] : map)
