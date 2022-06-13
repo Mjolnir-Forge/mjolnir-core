@@ -493,3 +493,32 @@ TEST(test_linear_allocator, std_map) // NOLINT
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
+
+
+// --- test std::map (aligned object) ---------------------------------------------------------------------------------
+
+TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
+{
+    using AllocatorType = LinearAllocator<std::pair<const UST, AlignedStruct>>;
+
+    constexpr UST num_bytes    = 1024;
+    constexpr UST num_elements = 5;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto allocator = AllocatorType(mem);
+    auto map       = std::map<UST, AlignedStruct, std::less<>, AllocatorType>(allocator);
+
+    for (UST i = 0; i < num_elements; ++i)
+        map.emplace(i, AlignedStruct());
+
+    for (auto const& [key, val] : map)
+        EXPECT_TRUE(is_aligned(&val, alignof(AlignedStruct)));
+
+    map.clear();
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
