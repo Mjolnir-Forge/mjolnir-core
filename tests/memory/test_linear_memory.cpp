@@ -7,11 +7,11 @@
 #include <memory>
 
 
-#if defined(_MSC_VER)
-#    define SUPPRESS_MSVC_WARNING(number) #    pragma warning(suppress : number)
-#else
-#    define SUPPRESS_MSVC_WARNING(number)
-#endif
+//#if defined(_MSC_VER)
+//#    define SUPPRESS_MSVC_WARNING(number) #    pragma warning(suppress : number)
+//#else
+//#    define SUPPRESS_MSVC_WARNING(number)
+//#endif
 
 
 // === SETUP ==========================================================================================================
@@ -524,7 +524,9 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
 
     for (UST i = 0; i < num_elements; ++i)
     {
-        SUPPRESS_MSVC_WARNING(C4324)
+#if defined(_MSC_VER)
+#    pragma warning(suppress : C4324)
+#endif
         map.emplace(i, AlignedStruct());
     }
 
@@ -557,6 +559,9 @@ TEST(test_linear_deleter, std_unique_ptr) // NOLINT
     EXPECT_EQ(*ptr, 2.0);
 
     auto u_ptr = std::unique_ptr<F32, LinearDeleter<F32>>(ptr, deleter);
+
+    u_ptr.reset(nullptr);
+
     mem.deallocate(ptr, 1);
 
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(F32));
