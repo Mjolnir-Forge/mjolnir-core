@@ -7,6 +7,13 @@
 #include <memory>
 
 
+#if defined(_MSC_VER)
+#    define SUPPRESS_MSVC_WARNING(number) #    pragma warning(suppress : number)
+#else
+#    define SUPPRESS_MSVC_WARNING(number)
+#endif
+
+
 // === SETUP ==========================================================================================================
 
 using namespace mjolnir;
@@ -516,8 +523,10 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
     auto map       = std::map<UST, AlignedStruct, std::less<>, AllocatorType>(allocator);
 
     for (UST i = 0; i < num_elements; ++i)
-#pragma warning(suppress : 4324)
+    {
+        SUPPRESS_MSVC_WARNING(C4324)
         map.emplace(i, AlignedStruct());
+    }
 
     for (auto const& [key, val] : map)
         EXPECT_TRUE(is_aligned(&val, alignof(AlignedStruct)));
