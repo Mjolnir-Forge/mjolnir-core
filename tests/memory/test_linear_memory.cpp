@@ -1,3 +1,7 @@
+#if defined(_MSC_VER)
+#    pragma warning(suppress : 4324)
+#endif
+
 #include "mjolnir/core/exception.h"
 #include "mjolnir/core/memory/linear_memory.h"
 #include "mjolnir/core/utility/pointer_operations.h"
@@ -523,12 +527,8 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
     auto map       = std::map<UST, AlignedStruct, std::less<>, AllocatorType>(allocator);
 
     for (UST i = 0; i < num_elements; ++i)
-    {
-#if defined(_MSC_VER)
-#    pragma warning(suppress : c4324)
-#endif
         map.emplace(i, AlignedStruct());
-    }
+
 
     for (auto const& [key, val] : map)
         EXPECT_TRUE(is_aligned(&val, alignof(AlignedStruct)));
