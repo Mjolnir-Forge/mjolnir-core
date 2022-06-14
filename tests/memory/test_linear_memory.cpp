@@ -1,5 +1,5 @@
 #if defined(_MSC_VER)
-#    pragma warning(suppress : C4324)
+#    pragma warning(disable : 4324)
 #endif
 
 #include "mjolnir/core/exception.h"
