@@ -274,21 +274,18 @@ private:
 };
 
 
+//! @brief
+//! STL compatible deleter that uses linear memory.
+//!
+//! @tparam T_Type:
+//! Type of the allocated object
+//! @tparam t_thread_safe:
+//! Set to `true` if the used linear memory is thread safe.
 template <typename T_Type, bool t_thread_safe = false>
 class LinearDeleter
 {
 public:
     //! \cond DO_NOT_DOCUMENT
-
-    //! Required class members for allocators
-    using value_type = T_Type; // NOLINT(readability-identifier-naming)
-
-    template <typename T_OtherType>
-    struct rebind // NOLINT(readability-identifier-naming)
-    {
-        using other = LinearAllocator<T_OtherType, t_thread_safe>; // NOLINT(readability-identifier-naming)
-    };
-
 
     LinearDeleter()                         = delete;
     LinearDeleter(const LinearDeleter&)     = default;
@@ -300,20 +297,22 @@ public:
 
 
     //! @brief
-    //! Construct a new deleter with the passes `LinearMemory` instance
+    //! Construct a new deleter with the passes `LinearMemory` instance.
     //!
     //! @param[in] linear_memory:
     //! `LinearMemory` that provided the memory for the opject that should be deleted
     explicit LinearDeleter(LinearMemory<t_thread_safe>& linear_memory) noexcept;
 
-    void operator()(T_Type* pointer);
+    //! @brief
+    //! Destroy the object at the passed memory address and deallocate the memory.
+    //!
+    //! @param[in] pointer:
+    //! Pointer to the object that should be destroyed and the memory that should be deallocated.
+    void operator()(T_Type* pointer) noexcept;
 
 
 private:
     LinearMemory<t_thread_safe>& m_memory;
-
-    template <typename T_OtherType, bool t_other_thread_safe>
-    friend class LinearAllocator;
 };
 
 
@@ -530,7 +529,7 @@ LinearDeleter<T_Type, t_thread_safe>::LinearDeleter(LinearMemory<t_thread_safe>&
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_Type, bool t_thread_safe>
-void LinearDeleter<T_Type, t_thread_safe>::operator()(T_Type* pointer)
+void LinearDeleter<T_Type, t_thread_safe>::operator()(T_Type* pointer) noexcept
 {
     pointer->~T_Type();
     m_memory.deallocate(pointer, sizeof(T_Type), alignof(T_Type));

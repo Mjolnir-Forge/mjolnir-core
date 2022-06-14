@@ -1,5 +1,5 @@
 #if defined(_MSC_VER)
-#    pragma warning(disable : 4324)
+#    pragma warning(disable : 4324) // Some objects trigger this warning more or less on purpose during alignment tests
 #endif
 
 #include "mjolnir/core/exception.h"
@@ -9,13 +9,6 @@
 #include <gtest/gtest.h>
 
 #include <memory>
-
-
-//#if defined(_MSC_VER)
-//#    define SUPPRESS_MSVC_WARNING(number) #    pragma warning(suppress : number)
-//#else
-//#    define SUPPRESS_MSVC_WARNING(number)
-//#endif
 
 
 // === SETUP ==========================================================================================================
@@ -28,8 +21,6 @@ struct alignas(struct_alignment) AlignedStruct
 {
     I64 m_member_a = 0;
     I64 m_member_b = 0;
-    I64 m_member_c = 0;
-    I64 m_member_d = 0;
 };
 
 
@@ -467,7 +458,7 @@ TEST(test_linear_allocator, std_vector_aligned_object) // NOLINT
         vec.emplace_back();
 
     for (UST i = 0; i < num_elements; ++i)
-        EXPECT_TRUE(is_aligned(&vec[i], alignof(AlignedStruct)));
+        EXPECT_TRUE(is_aligned(&vec[i], struct_alignment));
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
@@ -531,7 +522,7 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
 
 
     for (auto const& [key, val] : map)
-        EXPECT_TRUE(is_aligned(&val, alignof(AlignedStruct)));
+        EXPECT_TRUE(is_aligned(&val, struct_alignment));
 
     map.clear();
 
@@ -541,7 +532,9 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
 
 // ~~~ LinearDeleter $$~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// --- test std::map --------------------------------------------------------------------------------------------------
+//! todo: construction test + delete test
+
+// --- test std::unique_ptr -------------------------------------------------------------------------------------------
 
 TEST(test_linear_deleter, std_unique_ptr) // NOLINT
 {
