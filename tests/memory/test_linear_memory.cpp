@@ -24,6 +24,29 @@ struct alignas(struct_alignment) AlignedStruct
 };
 
 
+//! This class is used to test if a custom deleter calls the destructor during deletion. It takes a reference to an
+//! integer during construction and increases it by 1 if the class gets destroyed.
+class DeleterTester
+{
+public:
+    DeleterTester()                         = delete;
+    DeleterTester(const DeleterTester&)     = default;
+    DeleterTester(DeleterTester&&) noexcept = default;
+    auto operator=(const DeleterTester&) -> DeleterTester& = delete;
+    auto operator=(DeleterTester&&) noexcept -> DeleterTester& = delete;
+    ~DeleterTester()
+    {
+        ++m_destruction_count;
+    }
+
+    explicit DeleterTester(UST& destruction_count) : m_destruction_count{destruction_count} {};
+
+
+private:
+    UST& m_destruction_count;
+};
+
+
 // === TESTS ==========================================================================================================
 
 // todo -> use templated tests where it makes sense
@@ -305,9 +328,9 @@ TEST(test_linear_memory, reset) // NOLINT
 
 // ~~~ LinearAllocator ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// --- test constructor (number of bytes) -----------------------------------------------------------------------------
+// --- test constructor -----------------------------------------------------------------------------------------------
 
-TEST(test_linear_allocator, constructor_num_bytes) // NOLINT
+TEST(test_linear_allocator, constructor) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
@@ -534,9 +557,9 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
 
 //! todo: construction test + delete test
 
-// --- test std::unique_ptr -------------------------------------------------------------------------------------------
+// --- test constructor -----------------------------------------------------------------------------------------------
 
-TEST(test_linear_deleter, std_unique_ptr) // NOLINT
+TEST(test_linear_deleter, constructor) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
@@ -545,19 +568,72 @@ TEST(test_linear_deleter, std_unique_ptr) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto deleter = LinearDeleter<F32>(mem);
+    // cppcheck-suppress unreadVariable
+    [[maybe_unused]] auto allocator = LinearDeleter<F32>(mem);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    F32* ptr = new (mem.allocate(sizeof(F32), alignof(F32))) F32(2.); // NOLINT(cppcoreguidelines-owning-memory)
-    EXPECT_EQ(*ptr, 2.0);
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
 
-    auto u_ptr = std::unique_ptr<F32, LinearDeleter<F32>>(ptr, deleter);
+
+// --- test call deleter ----------------------------------------------------------------------------------------------
+
+TEST(test_linear_deleter, call_deleter) // NOLINT
+{
+    constexpr UST num_bytes     = 1024;
+    UST           num_destroyed = 0;
+
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto deleter = LinearDeleter<DeleterTester>(mem);
+
+    // todo: replace with create method from linear memory
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers, cppcoreguidelines-owning-memory)
+    auto* ptr = new (mem.allocate(sizeof(DeleterTester), alignof(DeleterTester))) DeleterTester(num_destroyed);
+
+    EXPECT_EQ(num_destroyed, 0);
+
+    deleter(ptr);
+    ptr = nullptr;
+
+    EXPECT_EQ(num_destroyed, 1);
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(DeleterTester));
+
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// --- test std::unique_ptr -------------------------------------------------------------------------------------------
+
+TEST(test_linear_deleter, std_unique_ptr) // NOLINT
+{
+    constexpr UST num_bytes     = 1024;
+    UST           num_destroyed = 0;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto deleter = LinearDeleter<DeleterTester>(mem);
+
+    // todo: replace with create method from linear memory
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers, cppcoreguidelines-owning-memory)
+    auto* ptr = new (mem.allocate(sizeof(DeleterTester), alignof(DeleterTester))) DeleterTester(num_destroyed);
+
+    auto u_ptr = std::unique_ptr<DeleterTester, LinearDeleter<DeleterTester>>(ptr, deleter);
+    ptr        = nullptr;
+
+    EXPECT_EQ(num_destroyed, 0);
 
     u_ptr.reset(nullptr);
 
-    mem.deallocate(ptr, 1);
-
-    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(F32));
+    EXPECT_EQ(num_destroyed, 1);
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(DeleterTester));
 
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
