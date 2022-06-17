@@ -249,6 +249,29 @@ TEST(test_linear_memory, create) // NOLINT
 }
 
 
+// --- test create aligned --------------------------------------------------------------------------------------------
+
+TEST(test_linear_memory, create_aligned) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory(num_bytes);
+
+    COUNT_NEW_AND_DELETE;
+
+    mem.initialize();
+
+    auto* a = mem.create<AlignedStruct>();
+
+    UST exp_free_mem = num_bytes - sizeof(AlignedStruct);
+
+    EXPECT_TRUE(is_aligned(a, struct_alignment));
+    EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
+}
+
+
 // --- test deallocation ----------------------------------------------------------------------------------------------
 
 TEST(test_linear_memory, deallocation) // NOLINT
@@ -279,6 +302,33 @@ TEST(test_linear_memory, deallocation) // NOLINT
     EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
+}
+
+
+// --- test destroy ---------------------------------------------------------------------------------------------------
+
+TEST(test_linear_memory, destroy) // NOLINT
+{
+    constexpr UST num_bytes     = 1024;
+    UST           num_destroyed = 0;
+
+    auto mem = LinearMemory(num_bytes);
+    mem.initialize();
+
+    COUNT_NEW_AND_DELETE;
+
+    auto* a = mem.create<DeleterTester>(num_destroyed);
+
+    EXPECT_EQ(num_destroyed, 0);
+
+    mem.destroy(a);
+    a = nullptr;
+
+    EXPECT_EQ(num_destroyed, 1);
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(DeleterTester));
+
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
 
 

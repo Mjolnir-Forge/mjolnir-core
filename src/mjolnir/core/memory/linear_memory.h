@@ -88,7 +88,19 @@ public:
     //! @return
     //! Pointer to the created instance of `T_Type`
     template <typename T_Type, typename... T_Args>
-    [[nodiscard]] auto create(T_Args... args) -> T_Type*;
+    [[nodiscard]] auto create(T_Args&&... args) -> T_Type*;
+
+
+    //! @brief
+    //! Destroy the passed object and release its memory.
+    //!
+    //! @tparam T_Type
+    //! Type of the passed object
+    //!
+    //! @param[in] pointer:
+    //! Pointer to the object that should be destroyed
+    template <typename T_Type>
+    void destroy(T_Type* pointer) const noexcept;
 
     //! @brief
     //! Deallocate memory.
@@ -364,10 +376,10 @@ auto LinearMemory<t_thread_safe>::allocate(UST size, UST alignment) -> void*
 
 template <bool t_thread_safe>
 template <typename T_Type, typename... T_Args>
-auto LinearMemory<t_thread_safe>::create(T_Args... args) -> T_Type*
+auto LinearMemory<t_thread_safe>::create(T_Args&&... args) -> T_Type*
 {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-    return new (allocate(sizeof(T_Type), alignof(T_Type))) T_Type(args...);
+    return new (allocate(sizeof(T_Type), alignof(T_Type))) T_Type(std::forward<T_Args>(args)...);
 }
 
 
@@ -387,6 +399,16 @@ void LinearMemory<t_thread_safe>::deallocate([[maybe_unused]] void* ptr,
 
     --m_num_allocations;
 #endif
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_thread_safe>
+template <typename T_Type>
+void LinearMemory<t_thread_safe>::destroy(T_Type* pointer) const noexcept
+{
+    pointer->~T_Type();
+    deallocate(pointer, sizeof(T_Type), alignof(T_Type));
 }
 
 
@@ -506,6 +528,7 @@ void LinearMemory<t_thread_safe>::initialize_internal()
 template <bool t_thread_safe>
 auto LinearMemory<t_thread_safe>::get_start_address() const noexcept -> UPT
 {
+    auto* test = m_memory.get();
     return pointer_to_integer(m_memory.get());
 }
 
@@ -562,8 +585,7 @@ LinearDeleter<T_Type, t_thread_safe>::LinearDeleter(LinearMemory<t_thread_safe>&
 template <typename T_Type, bool t_thread_safe>
 void LinearDeleter<T_Type, t_thread_safe>::operator()(T_Type* pointer) noexcept
 {
-    pointer->~T_Type();
-    m_memory.deallocate(pointer, sizeof(T_Type), alignof(T_Type));
+    m_memory.destroy(pointer);
 }
 
 
