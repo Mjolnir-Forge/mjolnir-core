@@ -528,7 +528,6 @@ void LinearMemory<t_thread_safe>::initialize_internal()
 template <bool t_thread_safe>
 auto LinearMemory<t_thread_safe>::get_start_address() const noexcept -> UPT
 {
-    auto* test = m_memory.get();
     return pointer_to_integer(m_memory.get());
 }
 
