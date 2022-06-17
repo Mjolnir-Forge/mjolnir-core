@@ -73,6 +73,23 @@ public:
     //! Pointer to the newly allocated memory
     [[nodiscard]] auto allocate(UST size, UST alignment = 1) -> void*;
 
+
+    //! @brief
+    //! Create an instance of `T_Type` inside a newly allocated memory block and return the pointer to it.
+    //!
+    //! @tparam T_Type:
+    //! The type that should be created
+    //! @tparam T_Args:
+    //! Types of the constructor arguments
+    //!
+    //! @param[in] args:
+    //! Arguments that should be passed to the constructor of the created type.
+    //!
+    //! @return
+    //! Pointer to the created instance of `T_Type`
+    template <typename T_Type, typename... T_Args>
+    [[nodiscard]] auto create(T_Args... args) -> T_Type*;
+
     //! @brief
     //! Deallocate memory.
     //!
@@ -341,6 +358,20 @@ auto LinearMemory<t_thread_safe>::allocate(UST size, UST alignment) -> void*
 {
     return allocate_internal(size, alignment);
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <bool t_thread_safe>
+template <typename T_Type, typename... T_Args>
+auto LinearMemory<t_thread_safe>::create(T_Args... args) -> T_Type*
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    return new (allocate(sizeof(T_Type), alignof(T_Type))) T_Type(args...);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
 
 template <bool t_thread_safe>
 void LinearMemory<t_thread_safe>::deallocate([[maybe_unused]] void* ptr,

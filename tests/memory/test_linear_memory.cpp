@@ -216,6 +216,39 @@ TEST(test_linear_memory, allocation_exceptions) // NOLINT
     EXPECT_EQ(mem.get_free_memory_size(), 0);
 }
 
+
+// --- test create ----------------------------------------------------------------------------------------------------
+
+TEST(test_linear_memory, create) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory(num_bytes);
+
+    COUNT_NEW_AND_DELETE;
+
+    mem.initialize();
+
+
+    auto* a = mem.create<UST>(num_bytes);
+
+    UST exp_free_mem = num_bytes - sizeof(UST);
+
+    EXPECT_EQ(*a, num_bytes);
+    EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
+
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    auto* b = mem.create<F32>(3.14F);
+
+    exp_free_mem -= sizeof(F32);
+
+    EXPECT_EQ(*b, 3.14F);
+    EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
+}
+
+
 // --- test deallocation ----------------------------------------------------------------------------------------------
 
 TEST(test_linear_memory, deallocation) // NOLINT
