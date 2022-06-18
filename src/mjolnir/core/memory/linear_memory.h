@@ -35,11 +35,13 @@ namespace mjolnir
 //! is located directly behind the previously allocated memory block. Memory can only be freed all at once and must be
 //! done manually.
 //!
-//! @tparam t_thread_safe:
-//! If `true`, a thread safety mechanism is added.
-template <bool t_thread_safe = false>
+//! @tparam T_Lock:
+//! The type of lock that should be used for thread safety. If the type is set to `void`, the memory is not protected.
+template <typename T_Lock = void>
 class LinearMemory
 {
+    static_assert(std::is_same_v<T_Lock, void>, "Not implemented yet");
+
 public:
     LinearMemory()                        = delete;
     LinearMemory(const LinearMemory&)     = delete;
@@ -224,9 +226,9 @@ private:
 //!
 //! @tparam T_Type:
 //! Type of the allocated object
-//! @tparam t_thread_safe:
+//! @tparam T_Lock:
 //! Set to `true` if the used linear memory is thread safe.
-template <typename T_Type, bool t_thread_safe = false>
+template <typename T_Type, typename T_Lock = void>
 class LinearAllocator
 {
 public:
@@ -238,7 +240,7 @@ public:
     template <typename T_OtherType>
     struct rebind // NOLINT(readability-identifier-naming)
     {
-        using other = LinearAllocator<T_OtherType, t_thread_safe>; // NOLINT(readability-identifier-naming)
+        using other = LinearAllocator<T_OtherType, T_Lock>; // NOLINT(readability-identifier-naming)
     };
 
 
@@ -256,7 +258,7 @@ public:
     //!
     //! @param[in] linear_memory:
     //! `LinearMemory` instance that provides the memory for the allocations
-    explicit LinearAllocator(LinearMemory<t_thread_safe>& linear_memory) noexcept;
+    explicit LinearAllocator(LinearMemory<T_Lock>& linear_memory) noexcept;
 
 
     //! @brief
@@ -268,7 +270,7 @@ public:
     //! @param[in] other:
     //! Other allocator that provides a reference to the `LinearMemory` instance that should be used
     template <class T_OtherType>
-    explicit LinearAllocator(const LinearAllocator<T_OtherType, t_thread_safe>& other) noexcept;
+    explicit LinearAllocator(const LinearAllocator<T_OtherType, T_Lock>& other) noexcept;
 
 
     //! @brief
@@ -296,9 +298,9 @@ public:
 
 
 private:
-    LinearMemory<t_thread_safe>& m_memory;
+    LinearMemory<T_Lock>& m_memory;
 
-    template <typename T_OtherType, bool t_other_thread_safe>
+    template <typename T_OtherType, typename T_OtherLock>
     friend class LinearAllocator;
 };
 
@@ -308,9 +310,9 @@ private:
 //!
 //! @tparam T_Type:
 //! Type of the allocated object
-//! @tparam t_thread_safe:
+//! @tparam T_Lock:
 //! Set to `true` if the used linear memory is thread safe.
-template <typename T_Type, bool t_thread_safe = false>
+template <typename T_Type, typename T_Lock = void>
 class LinearDeleter
 {
 public:
@@ -330,7 +332,7 @@ public:
     //!
     //! @param[in] linear_memory:
     //! `LinearMemory` that provided the memory for the opject that should be deleted
-    explicit LinearDeleter(LinearMemory<t_thread_safe>& linear_memory) noexcept;
+    explicit LinearDeleter(LinearMemory<T_Lock>& linear_memory) noexcept;
 
     //! @brief
     //! Destroy the object at the passed memory address and deallocate the memory.
@@ -341,7 +343,7 @@ public:
 
 
 private:
-    LinearMemory<t_thread_safe>& m_memory;
+    LinearMemory<T_Lock>& m_memory;
 };
 
 
@@ -356,8 +358,8 @@ namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-LinearMemory<t_thread_safe>::LinearMemory(UST size_in_bytes) : m_memory_size{size_in_bytes}
+template <typename T_Lock>
+LinearMemory<T_Lock>::LinearMemory(UST size_in_bytes) : m_memory_size{size_in_bytes}
 {
     THROW_EXCEPTION_IF(m_memory_size < 1, Exception, "Memory size can't be 0.");
 }
@@ -365,8 +367,8 @@ LinearMemory<t_thread_safe>::LinearMemory(UST size_in_bytes) : m_memory_size{siz
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-auto LinearMemory<t_thread_safe>::allocate(UST size, UST alignment) -> void*
+template <typename T_Lock>
+auto LinearMemory<T_Lock>::allocate(UST size, UST alignment) -> void*
 {
     return allocate_internal(size, alignment);
 }
@@ -374,9 +376,9 @@ auto LinearMemory<t_thread_safe>::allocate(UST size, UST alignment) -> void*
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
+template <typename T_Lock>
 template <typename T_Type, typename... T_Args>
-auto LinearMemory<t_thread_safe>::create(T_Args&&... args) -> T_Type*
+auto LinearMemory<T_Lock>::create(T_Args&&... args) -> T_Type*
 {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return new (allocate(sizeof(T_Type), alignof(T_Type))) T_Type(std::forward<T_Args>(args)...);
@@ -385,10 +387,10 @@ auto LinearMemory<t_thread_safe>::create(T_Args&&... args) -> T_Type*
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-void LinearMemory<t_thread_safe>::deallocate([[maybe_unused]] void* ptr,
-                                             [[maybe_unused]] UST   size,
-                                             [[maybe_unused]] UST   alignment) const noexcept
+template <typename T_Lock>
+void LinearMemory<T_Lock>::deallocate([[maybe_unused]] void* ptr,
+                                      [[maybe_unused]] UST   size,
+                                      [[maybe_unused]] UST   alignment) const noexcept
 {
 #ifndef NDEBUG
     UPT addr         = pointer_to_integer(ptr);
@@ -403,9 +405,9 @@ void LinearMemory<t_thread_safe>::deallocate([[maybe_unused]] void* ptr,
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
+template <typename T_Lock>
 template <typename T_Type>
-void LinearMemory<t_thread_safe>::destroy(T_Type* pointer) const noexcept
+void LinearMemory<T_Lock>::destroy(T_Type* pointer) const noexcept
 {
     pointer->~T_Type();
     deallocate(pointer, sizeof(T_Type), alignof(T_Type));
@@ -414,8 +416,8 @@ void LinearMemory<t_thread_safe>::destroy(T_Type* pointer) const noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-void LinearMemory<t_thread_safe>::deinitialize()
+template <typename T_Lock>
+void LinearMemory<T_Lock>::deinitialize()
 {
     deinitialize_internal();
 }
@@ -423,8 +425,8 @@ void LinearMemory<t_thread_safe>::deinitialize()
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-auto LinearMemory<t_thread_safe>::get_free_memory_size() const noexcept -> UST
+template <typename T_Lock>
+auto LinearMemory<T_Lock>::get_free_memory_size() const noexcept -> UST
 {
     if (! m_memory)
         return 0;
@@ -436,8 +438,8 @@ auto LinearMemory<t_thread_safe>::get_free_memory_size() const noexcept -> UST
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-[[nodiscard]] auto LinearMemory<t_thread_safe>::get_memory_size() const noexcept -> UST
+template <typename T_Lock>
+[[nodiscard]] auto LinearMemory<T_Lock>::get_memory_size() const noexcept -> UST
 {
     if (m_memory)
         return m_memory_size;
@@ -447,8 +449,8 @@ template <bool t_thread_safe>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-void LinearMemory<t_thread_safe>::initialize()
+template <typename T_Lock>
+void LinearMemory<T_Lock>::initialize()
 {
     initialize_internal();
 }
@@ -456,8 +458,8 @@ void LinearMemory<t_thread_safe>::initialize()
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-[[nodiscard]] auto LinearMemory<t_thread_safe>::is_initialized() const noexcept -> bool
+template <typename T_Lock>
+[[nodiscard]] auto LinearMemory<T_Lock>::is_initialized() const noexcept -> bool
 {
     return m_memory != nullptr;
 }
@@ -465,8 +467,8 @@ template <bool t_thread_safe>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-void LinearMemory<t_thread_safe>::reset() noexcept
+template <typename T_Lock>
+void LinearMemory<T_Lock>::reset() noexcept
 {
     assert(m_num_allocations == 0 && "Memory still in use."); // NOLINT
 
@@ -476,8 +478,8 @@ void LinearMemory<t_thread_safe>::reset() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-auto LinearMemory<t_thread_safe>::allocate_internal(UST size, UST alignment) -> void*
+template <typename T_Lock>
+auto LinearMemory<T_Lock>::allocate_internal(UST size, UST alignment) -> void*
 {
     assert(size != 0 && "Allocated memory size is 0.");             // NOLINT
     assert(is_initialized() && "Stack memory is not initialized."); // NOLINT
@@ -499,8 +501,8 @@ auto LinearMemory<t_thread_safe>::allocate_internal(UST size, UST alignment) -> 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-void LinearMemory<t_thread_safe>::deinitialize_internal()
+template <typename T_Lock>
+void LinearMemory<T_Lock>::deinitialize_internal()
 {
     THROW_EXCEPTION_IF(! is_initialized(), Exception, "Memory already deinitialized.");
     assert(m_num_allocations == 0 && "Memory still in use."); // NOLINT
@@ -512,8 +514,8 @@ void LinearMemory<t_thread_safe>::deinitialize_internal()
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-void LinearMemory<t_thread_safe>::initialize_internal()
+template <typename T_Lock>
+void LinearMemory<T_Lock>::initialize_internal()
 {
     THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
 
@@ -525,8 +527,8 @@ void LinearMemory<t_thread_safe>::initialize_internal()
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <bool t_thread_safe>
-auto LinearMemory<t_thread_safe>::get_start_address() const noexcept -> UPT
+template <typename T_Lock>
+auto LinearMemory<T_Lock>::get_start_address() const noexcept -> UPT
 {
     return pointer_to_integer(m_memory.get());
 }
@@ -534,19 +536,17 @@ auto LinearMemory<t_thread_safe>::get_start_address() const noexcept -> UPT
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, bool t_thread_safe>
-LinearAllocator<T_Type, t_thread_safe>::LinearAllocator(LinearMemory<t_thread_safe>& linear_memory) noexcept
-    : m_memory{linear_memory}
+template <typename T_Type, typename T_Lock>
+LinearAllocator<T_Type, T_Lock>::LinearAllocator(LinearMemory<T_Lock>& linear_memory) noexcept : m_memory{linear_memory}
 {
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, bool t_thread_safe>
+template <typename T_Type, typename T_Lock>
 template <class T_OtherType>
-LinearAllocator<T_Type, t_thread_safe>::LinearAllocator(
-        const LinearAllocator<T_OtherType, t_thread_safe>& other) noexcept
+LinearAllocator<T_Type, T_Lock>::LinearAllocator(const LinearAllocator<T_OtherType, T_Lock>& other) noexcept
     : m_memory{other.m_memory}
 {
 }
@@ -554,8 +554,8 @@ LinearAllocator<T_Type, t_thread_safe>::LinearAllocator(
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, bool t_thread_safe>
-[[nodiscard]] auto LinearAllocator<T_Type, t_thread_safe>::allocate(UST num_instances) -> T_Type*
+template <typename T_Type, typename T_Lock>
+[[nodiscard]] auto LinearAllocator<T_Type, T_Lock>::allocate(UST num_instances) -> T_Type*
 {
     return static_cast<T_Type*>(m_memory.allocate(num_instances * sizeof(T_Type), alignof(T_Type)));
 }
@@ -563,8 +563,8 @@ template <typename T_Type, bool t_thread_safe>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, bool t_thread_safe>
-void LinearAllocator<T_Type, t_thread_safe>::deallocate(T_Type* pointer, UST num_instances)
+template <typename T_Type, typename T_Lock>
+void LinearAllocator<T_Type, T_Lock>::deallocate(T_Type* pointer, UST num_instances)
 {
     m_memory.deallocate(pointer, num_instances * sizeof(T_Type), alignof(T_Type));
 }
@@ -572,17 +572,16 @@ void LinearAllocator<T_Type, t_thread_safe>::deallocate(T_Type* pointer, UST num
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, bool t_thread_safe>
-LinearDeleter<T_Type, t_thread_safe>::LinearDeleter(LinearMemory<t_thread_safe>& linear_memory) noexcept
-    : m_memory(linear_memory)
+template <typename T_Type, typename T_Lock>
+LinearDeleter<T_Type, T_Lock>::LinearDeleter(LinearMemory<T_Lock>& linear_memory) noexcept : m_memory(linear_memory)
 {
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, bool t_thread_safe>
-void LinearDeleter<T_Type, t_thread_safe>::operator()(T_Type* pointer) noexcept
+template <typename T_Type, typename T_Lock>
+void LinearDeleter<T_Type, T_Lock>::operator()(T_Type* pointer) noexcept
 {
     m_memory.destroy(pointer);
 }
