@@ -26,20 +26,20 @@ struct alignas(struct_alignment) AlignedStruct
 
 //! This class is used to test if a custom deleter calls the destructor during deletion. It takes a reference to an
 //! integer during construction and increases it by 1 if the class gets destroyed.
-class DeleterTester
+class DestructionTester
 {
 public:
-    DeleterTester()                         = delete;
-    DeleterTester(const DeleterTester&)     = default;
-    DeleterTester(DeleterTester&&) noexcept = default;
-    auto operator=(const DeleterTester&) -> DeleterTester& = delete;
-    auto operator=(DeleterTester&&) noexcept -> DeleterTester& = delete;
-    ~DeleterTester()
+    DestructionTester()                             = delete;
+    DestructionTester(const DestructionTester&)     = default;
+    DestructionTester(DestructionTester&&) noexcept = default;
+    auto operator=(const DestructionTester&) -> DestructionTester& = delete;
+    auto operator=(DestructionTester&&) noexcept -> DestructionTester& = delete;
+    ~DestructionTester()
     {
         ++m_destruction_count;
     }
 
-    explicit DeleterTester(UST& destruction_count) : m_destruction_count{destruction_count} {};
+    explicit DestructionTester(UST& destruction_count) : m_destruction_count{destruction_count} {};
 
 
 private:
@@ -266,7 +266,7 @@ TEST(test_linear_memory, create_aligned) // NOLINT
     UST exp_free_mem = num_bytes - sizeof(AlignedStruct);
 
     EXPECT_TRUE(is_aligned(a, struct_alignment));
-    EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
+    EXPECT_LE(mem.get_free_memory_size(), exp_free_mem);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
 }
@@ -317,7 +317,7 @@ TEST(test_linear_memory, destroy) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto* a = mem.create<DeleterTester>(num_destroyed);
+    auto* a = mem.create<DestructionTester>(num_destroyed);
 
     EXPECT_EQ(num_destroyed, 0);
 
@@ -325,7 +325,7 @@ TEST(test_linear_memory, destroy) // NOLINT
     a = nullptr;
 
     EXPECT_EQ(num_destroyed, 1);
-    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(DeleterTester));
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(DestructionTester));
 
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
@@ -638,8 +638,6 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
 
 // ~~~ LinearDeleter $$~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//! todo: construction test + delete test
-
 // --- test constructor -----------------------------------------------------------------------------------------------
 
 TEST(test_linear_deleter, constructor) // NOLINT
@@ -671,11 +669,9 @@ TEST(test_linear_deleter, call_deleter) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto deleter = LinearDeleter<DeleterTester>(mem);
+    auto deleter = LinearDeleter<DestructionTester>(mem);
 
-    // todo: replace with create method from linear memory
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers, cppcoreguidelines-owning-memory)
-    auto* ptr = new (mem.allocate(sizeof(DeleterTester), alignof(DeleterTester))) DeleterTester(num_destroyed);
+    auto* ptr = mem.create<DestructionTester>(num_destroyed);
 
     EXPECT_EQ(num_destroyed, 0);
 
@@ -683,7 +679,7 @@ TEST(test_linear_deleter, call_deleter) // NOLINT
     ptr = nullptr;
 
     EXPECT_EQ(num_destroyed, 1);
-    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(DeleterTester));
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(DestructionTester));
 
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
@@ -702,21 +698,18 @@ TEST(test_linear_deleter, std_unique_ptr) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto deleter = LinearDeleter<DeleterTester>(mem);
+    auto deleter = LinearDeleter<DestructionTester>(mem);
 
-    // todo: replace with create method from linear memory
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers, cppcoreguidelines-owning-memory)
-    auto* ptr = new (mem.allocate(sizeof(DeleterTester), alignof(DeleterTester))) DeleterTester(num_destroyed);
-
-    auto u_ptr = std::unique_ptr<DeleterTester, LinearDeleter<DeleterTester>>(ptr, deleter);
-    ptr        = nullptr;
+    auto* ptr   = mem.create<DestructionTester>(num_destroyed);
+    auto  u_ptr = std::unique_ptr<DestructionTester, LinearDeleter<DestructionTester>>(ptr, deleter);
+    ptr         = nullptr;
 
     EXPECT_EQ(num_destroyed, 0);
 
     u_ptr.reset(nullptr);
 
     EXPECT_EQ(num_destroyed, 1);
-    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(DeleterTester));
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(DestructionTester));
 
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
