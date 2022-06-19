@@ -135,7 +135,43 @@ TEST(test_linear_memory, initialization_exceptions) // NOLINT
 }
 
 
-// todo test exceptions other init
+// --- test initialization_with_external_memory_exceptions ------------------------------------------------------------
+
+TEST(test_linear_memory, initialization_with_external_memory_exceptions) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    I32 exp_num_new = 0;
+    I32 exp_num_del = 0;
+
+    COUNT_NEW_AND_DELETE;
+    {
+        auto* mem_ptr = new std::byte[num_bytes]; // NOLINT(cppcoreguidelines-owning-memory)
+        EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
+
+        auto mem = LinearMemory();
+        EXPECT_THROW(mem.initialize(0, mem_ptr), Exception); // NOLINT
+
+        EXPECT_EQ(mem.get_memory_size(), 0);
+        EXPECT_EQ(mem.get_free_memory_size(), 0);
+        EXPECT_FALSE(mem.is_initialized());
+
+        mem.initialize(num_bytes, mem_ptr);
+
+
+        EXPECT_THROW(mem.initialize(num_bytes, mem_ptr), Exception); // NOLINT
+
+        EXPECT_EQ(mem.get_memory_size(), num_bytes);
+        EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
+        EXPECT_TRUE(mem.is_initialized());
+
+#ifndef DISABLE_NEW_DELETE_COUNTER
+        exp_num_new = new_delete_counter.get_num_new_calls();
+        exp_num_del = new_delete_counter.get_num_delete_calls() + 1;
+#endif
+    }
+    ASSERT_NUM_NEW_AND_DELETE_EQ(exp_num_new, exp_num_del);
+}
 
 // --- test allocation ------------------------------------------------------------------------------------------------
 
