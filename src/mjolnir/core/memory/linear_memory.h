@@ -22,6 +22,14 @@
 
 namespace mjolnir
 {
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+using DefaultMemoryDeleter = std::default_delete<std::byte[]>;
+
+template <typename, typename>
+class LinearAllocator;
+template <typename, typename>
+class LinearDeleter;
+
 // --- LinearMemory ---------------------------------------------------------------------------------------------------
 
 //! \addtogroup core_memory
@@ -37,13 +45,23 @@ namespace mjolnir
 //!
 //! @tparam T_Lock:
 //! The type of lock that should be used for thread safety. If the type is set to `void`, the memory is not protected.
-template <typename T_Lock = void>
+template <typename T_Lock = void, typename T_Deleter = DefaultMemoryDeleter>
 class LinearMemory
 {
     static_assert(std::is_same_v<T_Lock, void>, "Not implemented yet");
 
 public:
-    LinearMemory()                        = delete;
+    // template <typename T_Type>
+    // using AllocatorType = LinearAllocator<T_Type, T_Lock>;
+
+    //! @brief
+    //! Compatible deleter type that can be used with `std::unique_ptr` etc.
+    //!
+    //! @tparam T_Type:
+    //! Type of the object that should be deleted.
+    template <typename T_Type>
+    using DeleterType = LinearDeleter<T_Type, LinearMemory<T_Lock, T_Deleter>>;
+
     LinearMemory(const LinearMemory&)     = delete;
     LinearMemory(LinearMemory&&) noexcept = delete;
     ~LinearMemory()                       = default;
@@ -52,16 +70,11 @@ public:
 
 
     //! @brief
-    //! Construct a new instance with the specified memory size.
+    //! Construct a new instance
     //!
-    //! @param[in] size_in_bytes:
-    //! The desired size of the memory stack. Note that the memory is not allocated until the `initialize` method is
-    //! called.
-    //!
-    //! @exception Exception
-    //! If the passed size is `0`
-    explicit LinearMemory(UST size_in_bytes);
-
+    //! @param[in] deleter:
+    //! A deleter that is used to free the internal memory.
+    explicit LinearMemory(T_Deleter deleter = DefaultMemoryDeleter());
 
     //! @brief
     //! Allocate a new memory block and return a pointer that points to it.
@@ -156,11 +169,30 @@ public:
 
 
     //! @brief
-    //! Initialize the memory.
+    //! Initialize the class.
+    //!
+    //! @details
+    //! This function allocates memory from the heap that is further managed by the class.
+    //!
+    //! @param[in] size:
+    //! Desired size of the internal memory.
     //!
     //! @exception Exception
     //! Memory is already initialized
-    void initialize();
+    void initialize(UST size);
+
+
+    //! @brief
+    //! Initialize the class.
+    //!
+    //! @details
+    //! This function passes the given memory to the class so that it can be used internally.
+    //!
+    //! @param[in] size:
+    //! Size of the passed memory.
+    //! @param[in] memory_ptr:
+    //! Pointer to the memory that the class should use internally
+    void initialize(UST size, std::byte* memory_ptr);
 
 
     //! @brief
@@ -201,17 +233,17 @@ private:
 
     //! @brief
     //! Initialize the memory.
-    void initialize_internal();
+    void initialize_internal(UST size);
 
     //! @brief
     //! Get the start address of the internal memory
     [[nodiscard]] auto get_start_address() const noexcept -> UPT;
 
 
-    UST m_memory_size;
+    UST m_memory_size  = {0};
     UPT m_current_addr = {0};
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-    std::unique_ptr<std::byte[]> m_memory = {nullptr};
+    std::unique_ptr<std::byte[], T_Deleter> m_memory;
 
 #ifndef NDEBUG
     mutable UST m_num_allocations = {0};
@@ -312,9 +344,11 @@ private:
 //! Type of the allocated object
 //! @tparam T_Lock:
 //! Set to `true` if the used linear memory is thread safe.
-template <typename T_Type, typename T_Lock = void>
+template <typename T_Type, typename T_MemoryType = void>
 class LinearDeleter
 {
+    // todo: generalize -> DefaultDeleter
+
 public:
     //! \cond DO_NOT_DOCUMENT
 
@@ -332,18 +366,18 @@ public:
     //!
     //! @param[in] linear_memory:
     //! `LinearMemory` that provided the memory for the opject that should be deleted
-    explicit LinearDeleter(LinearMemory<T_Lock>& linear_memory) noexcept;
+    explicit LinearDeleter(T_MemoryType& linear_memory) noexcept;
 
     //! @brief
     //! Destroy the object at the passed memory address and deallocate the memory.
     //!
     //! @param[in] pointer:
     //! Pointer to the object that should be destroyed and the memory that should be deallocated.
-    void operator()(T_Type* pointer) noexcept;
+    void operator()(std::remove_extent_t<T_Type>* pointer) noexcept;
 
 
 private:
-    LinearMemory<T_Lock>& m_memory;
+    T_MemoryType& m_memory;
 };
 
 
@@ -356,19 +390,16 @@ private:
 
 namespace mjolnir
 {
-// --------------------------------------------------------------------------------------------------------------------
-
-template <typename T_Lock>
-LinearMemory<T_Lock>::LinearMemory(UST size_in_bytes) : m_memory_size{size_in_bytes}
+template <typename T_Lock, typename T_Deleter>
+LinearMemory<T_Lock, T_Deleter>::LinearMemory(T_Deleter deleter) : m_memory{nullptr, deleter}
 {
-    THROW_EXCEPTION_IF(m_memory_size < 1, Exception, "Memory size can't be 0.");
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-auto LinearMemory<T_Lock>::allocate(UST size, UST alignment) -> void*
+template <typename T_Lock, typename T_Deleter>
+auto LinearMemory<T_Lock, T_Deleter>::allocate(UST size, UST alignment) -> void*
 {
     return allocate_internal(size, alignment);
 }
@@ -376,9 +407,9 @@ auto LinearMemory<T_Lock>::allocate(UST size, UST alignment) -> void*
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
+template <typename T_Lock, typename T_Deleter>
 template <typename T_Type, typename... T_Args>
-auto LinearMemory<T_Lock>::create(T_Args&&... args) -> T_Type*
+auto LinearMemory<T_Lock, T_Deleter>::create(T_Args&&... args) -> T_Type*
 {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return new (allocate(sizeof(T_Type), alignof(T_Type))) T_Type(std::forward<T_Args>(args)...);
@@ -387,10 +418,10 @@ auto LinearMemory<T_Lock>::create(T_Args&&... args) -> T_Type*
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-void LinearMemory<T_Lock>::deallocate([[maybe_unused]] void* ptr,
-                                      [[maybe_unused]] UST   size,
-                                      [[maybe_unused]] UST   alignment) const noexcept
+template <typename T_Lock, typename T_Deleter>
+void LinearMemory<T_Lock, T_Deleter>::deallocate([[maybe_unused]] void* ptr,
+                                                 [[maybe_unused]] UST   size,
+                                                 [[maybe_unused]] UST   alignment) const noexcept
 {
 #ifndef NDEBUG
     UPT addr         = pointer_to_integer(ptr);
@@ -398,6 +429,7 @@ void LinearMemory<T_Lock>::deallocate([[maybe_unused]] void* ptr,
 
     // NOLINTNEXTLINE
     assert(addr >= memory_start && addr < memory_start + m_memory_size && "Pointer doesn't belong to this memory.");
+    assert(m_num_allocations > 0 && "Deallocation was called to often"); // NOLINT
 
     --m_num_allocations;
 #endif
@@ -405,19 +437,22 @@ void LinearMemory<T_Lock>::deallocate([[maybe_unused]] void* ptr,
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
+template <typename T_Lock, typename T_Deleter>
 template <typename T_Type>
-void LinearMemory<T_Lock>::destroy(T_Type* pointer) const noexcept
+void LinearMemory<T_Lock, T_Deleter>::destroy(T_Type* pointer) const noexcept
 {
-    pointer->~T_Type();
-    deallocate(pointer, sizeof(T_Type), alignof(T_Type));
+    if (pointer)
+    {
+        pointer->~T_Type();
+        deallocate(pointer, sizeof(T_Type), alignof(T_Type));
+    }
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-void LinearMemory<T_Lock>::deinitialize()
+template <typename T_Lock, typename T_Deleter>
+void LinearMemory<T_Lock, T_Deleter>::deinitialize()
 {
     deinitialize_internal();
 }
@@ -425,8 +460,8 @@ void LinearMemory<T_Lock>::deinitialize()
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-auto LinearMemory<T_Lock>::get_free_memory_size() const noexcept -> UST
+template <typename T_Lock, typename T_Deleter>
+auto LinearMemory<T_Lock, T_Deleter>::get_free_memory_size() const noexcept -> UST
 {
     if (! m_memory)
         return 0;
@@ -438,8 +473,8 @@ auto LinearMemory<T_Lock>::get_free_memory_size() const noexcept -> UST
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-[[nodiscard]] auto LinearMemory<T_Lock>::get_memory_size() const noexcept -> UST
+template <typename T_Lock, typename T_Deleter>
+[[nodiscard]] auto LinearMemory<T_Lock, T_Deleter>::get_memory_size() const noexcept -> UST
 {
     if (m_memory)
         return m_memory_size;
@@ -449,17 +484,32 @@ template <typename T_Lock>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-void LinearMemory<T_Lock>::initialize()
+template <typename T_Lock, typename T_Deleter>
+void LinearMemory<T_Lock, T_Deleter>::initialize(UST size)
 {
-    initialize_internal();
+    initialize_internal(size);
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-[[nodiscard]] auto LinearMemory<T_Lock>::is_initialized() const noexcept -> bool
+template <typename T_Lock, typename T_Deleter>
+void LinearMemory<T_Lock, T_Deleter>::initialize(UST size, std::byte* memory_ptr)
+{
+    THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
+
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+    m_memory_size = size;
+    // auto deleter = m_memory.get_deleter();
+    m_memory.reset(memory_ptr);
+    m_current_addr = get_start_address();
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Lock, typename T_Deleter>
+[[nodiscard]] auto LinearMemory<T_Lock, T_Deleter>::is_initialized() const noexcept -> bool
 {
     return m_memory != nullptr;
 }
@@ -467,8 +517,8 @@ template <typename T_Lock>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-void LinearMemory<T_Lock>::reset() noexcept
+template <typename T_Lock, typename T_Deleter>
+void LinearMemory<T_Lock, T_Deleter>::reset() noexcept
 {
     assert(m_num_allocations == 0 && "Memory still in use."); // NOLINT
 
@@ -478,8 +528,8 @@ void LinearMemory<T_Lock>::reset() noexcept
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-auto LinearMemory<T_Lock>::allocate_internal(UST size, UST alignment) -> void*
+template <typename T_Lock, typename T_Deleter>
+auto LinearMemory<T_Lock, T_Deleter>::allocate_internal(UST size, UST alignment) -> void*
 {
     assert(size != 0 && "Allocated memory size is 0.");             // NOLINT
     assert(is_initialized() && "Stack memory is not initialized."); // NOLINT
@@ -501,12 +551,13 @@ auto LinearMemory<T_Lock>::allocate_internal(UST size, UST alignment) -> void*
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-void LinearMemory<T_Lock>::deinitialize_internal()
+template <typename T_Lock, typename T_Deleter>
+void LinearMemory<T_Lock, T_Deleter>::deinitialize_internal()
 {
     THROW_EXCEPTION_IF(! is_initialized(), Exception, "Memory already deinitialized.");
     assert(m_num_allocations == 0 && "Memory still in use."); // NOLINT
 
+    m_memory_size  = 0;
     m_memory       = nullptr;
     m_current_addr = 0;
 }
@@ -514,21 +565,31 @@ void LinearMemory<T_Lock>::deinitialize_internal()
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-void LinearMemory<T_Lock>::initialize_internal()
+template <typename T_Lock, typename T_Deleter>
+void LinearMemory<T_Lock, T_Deleter>::initialize_internal(UST size)
 {
-    THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
+    if constexpr (std::is_same_v<T_Deleter, DefaultMemoryDeleter>)
+    {
+        THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
+        THROW_EXCEPTION_IF(size == 0, Exception, "Memory size must be larger than 0.");
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-    m_memory       = std::make_unique<std::byte[]>(m_memory_size);
-    m_current_addr = get_start_address();
+        m_memory_size = size;
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+        m_memory       = std::make_unique<std::byte[]>(m_memory_size);
+        m_current_addr = get_start_address();
+    }
+    else
+    {
+        // todo: Add meaningful message
+        THROW_EXCEPTION(Exception, "");
+    }
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Lock>
-auto LinearMemory<T_Lock>::get_start_address() const noexcept -> UPT
+template <typename T_Lock, typename T_Deleter>
+auto LinearMemory<T_Lock, T_Deleter>::get_start_address() const noexcept -> UPT
 {
     return pointer_to_integer(m_memory.get());
 }
@@ -572,16 +633,16 @@ void LinearAllocator<T_Type, T_Lock>::deallocate(T_Type* pointer, UST num_instan
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_Lock>
-LinearDeleter<T_Type, T_Lock>::LinearDeleter(LinearMemory<T_Lock>& linear_memory) noexcept : m_memory(linear_memory)
+template <typename T_Type, typename T_MemoryType>
+LinearDeleter<T_Type, T_MemoryType>::LinearDeleter(T_MemoryType& linear_memory) noexcept : m_memory(linear_memory)
 {
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_Lock>
-void LinearDeleter<T_Type, T_Lock>::operator()(T_Type* pointer) noexcept
+template <typename T_Type, typename T_MemoryType>
+void LinearDeleter<T_Type, T_MemoryType>::operator()(std::remove_extent_t<T_Type>* pointer) noexcept
 {
     m_memory.destroy(pointer);
 }

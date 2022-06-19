@@ -8,6 +8,7 @@
 #include "mjolnir/testing/new_delete_counter.h"
 #include <gtest/gtest.h>
 
+#include <array>
 #include <memory>
 
 
@@ -57,24 +58,14 @@ private:
 
 TEST(test_linear_memory, construction) // NOLINT
 {
-    constexpr UST num_bytes = 1024;
-
     COUNT_NEW_AND_DELETE;
 
-    auto mem = LinearMemory(num_bytes);
+    auto mem = LinearMemory();
 
     EXPECT_EQ(mem.get_memory_size(), 0);
     EXPECT_EQ(mem.get_free_memory_size(), 0);
     EXPECT_FALSE(mem.is_initialized());
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
-}
-
-
-// --- test construction exceptions -----------------------------------------------------------------------------------
-
-TEST(test_linear_memory, construction_exceptions) // NOLINT
-{
-    EXPECT_THROW(LinearMemory(0), Exception); // NOLINT
 }
 
 
@@ -86,8 +77,8 @@ TEST(test_linear_memory, initialization) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     EXPECT_EQ(mem.get_memory_size(), num_bytes);
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
@@ -102,14 +93,78 @@ TEST(test_linear_memory, initialization_exceptions) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
 
-    EXPECT_THROW(mem.initialize(), Exception); // NOLINT
+    EXPECT_THROW(mem.initialize(0), Exception); // NOLINT
+
+    EXPECT_EQ(mem.get_memory_size(), 0);
+    EXPECT_EQ(mem.get_free_memory_size(), 0);
+    EXPECT_FALSE(mem.is_initialized());
+
+    mem.initialize(num_bytes);
+
+    EXPECT_THROW(mem.initialize(num_bytes), Exception); // NOLINT
 
     EXPECT_EQ(mem.get_memory_size(), num_bytes);
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
     EXPECT_TRUE(mem.is_initialized());
+}
+
+
+// --- test initialize with buffer ------------------------------------------------------------------------------------
+
+TEST(test_linear_memory, initialize_with_buffer) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+
+    constexpr UST                    num_bytes = 1024;
+    std::array<std::byte, num_bytes> buffer    = {};
+
+    auto deleter = []([[maybe_unused]] std::byte* unused)
+    {
+    };
+
+    auto mem = LinearMemory<void, decltype(deleter)>(deleter);
+
+    mem.initialize(num_bytes, buffer.data());
+
+    EXPECT_EQ(mem.get_memory_size(), num_bytes);
+    EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
+    EXPECT_TRUE(mem.is_initialized());
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// --- test initialize other memory system ----------------------------------------------------------------------------
+
+TEST(test_linear_memory, initialize_with_other_memory_system) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+
+    constexpr UST num_bytes   = 1024;
+    constexpr UST num_bytes_2 = num_bytes / 2;
+
+
+    auto mem_1 = LinearMemory();
+    mem_1.initialize(num_bytes);
+
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+    auto deleter = LinearMemory<>::DeleterType<std::byte[]>(mem_1);
+
+    //[[maybe_unused]] auto deleter_1 = LinearDeleter<std::byte, decltype(mem_1)>();
+    //[[maybe_unused]] auto deleter_2 = LinearDeleter<std::byte[], decltype(mem_1)>();
+    //[[maybe_unused]] auto deleter_3 = LinearDeleter<std::byte*, decltype(mem_1)>();
+
+    auto mem_2 = LinearMemory<void, decltype(deleter)>(deleter);
+
+    mem_2.initialize(num_bytes_2, static_cast<std::byte*>(mem_1.allocate(num_bytes_2)));
+
+    // EXPECT_EQ(mem.get_memory_size(), num_bytes);
+    // EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
+    // EXPECT_TRUE(mem.is_initialized());
+
+    // ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
 }
 
 
@@ -119,11 +174,11 @@ TEST(test_linear_memory, allocation) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
+    auto mem = LinearMemory();
 
     COUNT_NEW_AND_DELETE;
 
-    mem.initialize();
+    mem.initialize(num_bytes);
 
     // cppcheck-suppress unreadVariable
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
@@ -156,11 +211,11 @@ TEST(test_linear_memory, aligned_allocation) // NOLINT
     constexpr UST num_bytes  = 1024;
     constexpr UST alloc_size = 8;
 
-    auto mem = LinearMemory(num_bytes);
+    auto mem = LinearMemory();
 
     COUNT_NEW_AND_DELETE;
 
-    mem.initialize();
+    mem.initialize(num_bytes);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     void* a = mem.allocate(alloc_size, 64);
@@ -199,9 +254,9 @@ TEST(test_linear_memory, allocation_exceptions) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
+    auto mem = LinearMemory();
 
-    mem.initialize();
+    mem.initialize(num_bytes);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto,hicpp-avoid-goto)
     EXPECT_THROW([[maybe_unused]] auto m = mem.allocate(num_bytes + 1), Exception);
@@ -223,11 +278,11 @@ TEST(test_linear_memory, create) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
+    auto mem = LinearMemory();
 
     COUNT_NEW_AND_DELETE;
 
-    mem.initialize();
+    mem.initialize(num_bytes);
 
 
     auto* a = mem.create<UST>(num_bytes);
@@ -255,11 +310,11 @@ TEST(test_linear_memory, create_aligned) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
+    auto mem = LinearMemory();
 
     COUNT_NEW_AND_DELETE;
 
-    mem.initialize();
+    mem.initialize(num_bytes);
 
     auto* a = mem.create<AlignedStruct>();
 
@@ -279,11 +334,11 @@ TEST(test_linear_memory, deallocation) // NOLINT
     constexpr UST num_bytes  = 1024;
     constexpr UST alloc_size = 36;
 
-    auto mem = LinearMemory(num_bytes);
+    auto mem = LinearMemory();
 
     COUNT_NEW_AND_DELETE;
 
-    mem.initialize();
+    mem.initialize(num_bytes);
 
 
     void* a = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
@@ -312,8 +367,8 @@ TEST(test_linear_memory, destroy) // NOLINT
     constexpr UST num_bytes     = 1024;
     UST           num_destroyed = 0;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
@@ -341,8 +396,8 @@ TEST(test_linear_memory, deinitialization) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     void* a = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     void* b = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
@@ -364,8 +419,8 @@ TEST(test_linear_memory, deinitialization_exceptions) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
     mem.deinitialize();
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto,hicpp-avoid-goto)
@@ -383,11 +438,11 @@ TEST(test_linear_memory, reset) // NOLINT
     constexpr UST num_bytes  = 1024;
     constexpr UST alloc_size = 64;
 
-    auto mem = LinearMemory(num_bytes);
+    auto mem = LinearMemory();
 
     COUNT_NEW_AND_DELETE;
 
-    mem.initialize();
+    mem.initialize(num_bytes);
 
 
     void* a = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
@@ -417,8 +472,8 @@ TEST(test_linear_allocator, constructor) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
@@ -435,8 +490,8 @@ TEST(test_linear_allocator, constructor_allocator_other_value_type) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
@@ -455,8 +510,8 @@ TEST(test_linear_allocator, allocate) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
@@ -483,8 +538,8 @@ TEST(test_linear_allocator, deallocate) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
@@ -508,8 +563,8 @@ TEST(test_linear_allocator, std_vector) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
@@ -552,8 +607,8 @@ TEST(test_linear_allocator, std_vector_aligned_object) // NOLINT
     constexpr UST num_bytes    = 1024;
     constexpr UST num_elements = 5;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
@@ -579,8 +634,8 @@ TEST(test_linear_allocator, std_map) // NOLINT
     constexpr UST num_bytes    = 1024;
     constexpr UST num_elements = 5;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
@@ -615,8 +670,8 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
     constexpr UST num_bytes    = 1024;
     constexpr UST num_elements = 5;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
@@ -644,13 +699,13 @@ TEST(test_linear_deleter, constructor) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
     // cppcheck-suppress unreadVariable
-    [[maybe_unused]] auto allocator = LinearDeleter<F32>(mem);
+    [[maybe_unused]] auto allocator = LinearDeleter<F32, decltype(mem)>(mem);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
@@ -664,12 +719,12 @@ TEST(test_linear_deleter, call_deleter) // NOLINT
     UST           num_destroyed = 0;
 
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
-    auto deleter = LinearDeleter<DestructionTester>(mem);
+    auto deleter = LinearDeleter<DestructionTester, decltype(mem)>(mem);
 
     auto* ptr = mem.create<DestructionTester>(num_destroyed);
 
@@ -693,15 +748,15 @@ TEST(test_linear_deleter, std_unique_ptr) // NOLINT
     constexpr UST num_bytes     = 1024;
     UST           num_destroyed = 0;
 
-    auto mem = LinearMemory(num_bytes);
-    mem.initialize();
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
 
     COUNT_NEW_AND_DELETE;
 
-    auto deleter = LinearDeleter<DestructionTester>(mem);
+    auto deleter = LinearDeleter<DestructionTester, decltype(mem)>(mem);
 
     auto* ptr   = mem.create<DestructionTester>(num_destroyed);
-    auto  u_ptr = std::unique_ptr<DestructionTester, LinearDeleter<DestructionTester>>(ptr, deleter);
+    auto  u_ptr = std::unique_ptr<DestructionTester, decltype(deleter)>(ptr, deleter);
     ptr         = nullptr;
 
     EXPECT_EQ(num_destroyed, 0);
