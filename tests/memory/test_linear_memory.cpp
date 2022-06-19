@@ -141,8 +141,10 @@ TEST(test_linear_memory, initialization_with_external_memory_exceptions) // NOLI
 {
     constexpr UST num_bytes = 1024;
 
-    [[maybe_unused]] I32 exp_num_new = 0; // cppcheck-suppress unreadVariable
-    [[maybe_unused]] I32 exp_num_del = 0; // cppcheck-suppress unreadVariable
+    // cppcheck-suppress unreadVariable
+    [[maybe_unused]] I32 exp_num_new = 0;
+    // cppcheck-suppress unreadVariable
+    [[maybe_unused]] I32 exp_num_del = 0;
 
     COUNT_NEW_AND_DELETE;
     {
