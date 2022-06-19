@@ -166,8 +166,8 @@ TEST(test_linear_memory, initialization_with_external_memory_exceptions) // NOLI
         EXPECT_TRUE(mem.is_initialized());
 
 #ifndef DISABLE_NEW_DELETE_COUNTER
-        exp_num_new = new_delete_counter.get_num_new_calls();
-        exp_num_del = new_delete_counter.get_num_delete_calls() + 1;
+        exp_num_new = new_delete_counter.get_num_new_calls();        // cppcheck-suppress unreadVariable
+        exp_num_del = new_delete_counter.get_num_delete_calls() + 1; // cppcheck-suppress unreadVariable
 #endif
     }
     ASSERT_NUM_NEW_AND_DELETE_EQ(exp_num_new, exp_num_del);
