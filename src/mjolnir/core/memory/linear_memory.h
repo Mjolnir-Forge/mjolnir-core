@@ -22,6 +22,8 @@
 
 namespace mjolnir
 {
+//! @brief
+//! The default deleter type for all memory systems
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
 using DefaultMemoryDeleter = std::default_delete<std::byte[]>;
 
@@ -498,9 +500,7 @@ void LinearMemory<T_Lock, T_Deleter>::initialize(UST size, std::byte* memory_ptr
 {
     THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
     m_memory_size = size;
-    // auto deleter = m_memory.get_deleter();
     m_memory.reset(memory_ptr);
     m_current_addr = get_start_address();
 }
@@ -634,6 +634,7 @@ void LinearAllocator<T_Type, T_Lock>::deallocate(T_Type* pointer, UST num_instan
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_Type, typename T_MemoryType>
+// cppcheck-suppress constParameter
 LinearDeleter<T_Type, T_MemoryType>::LinearDeleter(T_MemoryType& linear_memory) noexcept : m_memory(linear_memory)
 {
 }

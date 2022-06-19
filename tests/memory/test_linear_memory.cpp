@@ -142,29 +142,29 @@ TEST(test_linear_memory, initialize_with_other_memory_system) // NOLINT
 {
     COUNT_NEW_AND_DELETE;
 
-    constexpr UST num_bytes   = 1024;
-    constexpr UST num_bytes_2 = num_bytes / 2;
+    constexpr UST num_bytes_1 = 1024;
+    constexpr UST num_bytes_2 = num_bytes_1 / 2;
 
 
     auto mem_1 = LinearMemory();
-    mem_1.initialize(num_bytes);
+    mem_1.initialize(num_bytes_1);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
     auto deleter = LinearMemory<>::DeleterType<std::byte[]>(mem_1);
-
-    //[[maybe_unused]] auto deleter_1 = LinearDeleter<std::byte, decltype(mem_1)>();
-    //[[maybe_unused]] auto deleter_2 = LinearDeleter<std::byte[], decltype(mem_1)>();
-    //[[maybe_unused]] auto deleter_3 = LinearDeleter<std::byte*, decltype(mem_1)>();
-
-    auto mem_2 = LinearMemory<void, decltype(deleter)>(deleter);
+    auto mem_2   = LinearMemory<void, decltype(deleter)>(deleter);
 
     mem_2.initialize(num_bytes_2, static_cast<std::byte*>(mem_1.allocate(num_bytes_2)));
 
-    // EXPECT_EQ(mem.get_memory_size(), num_bytes);
-    // EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
-    // EXPECT_TRUE(mem.is_initialized());
+    EXPECT_EQ(mem_1.get_free_memory_size(), num_bytes_1 - num_bytes_2);
+    EXPECT_EQ(mem_2.get_memory_size(), num_bytes_2);
+    EXPECT_EQ(mem_2.get_free_memory_size(), num_bytes_2);
+    EXPECT_TRUE(mem_2.is_initialized());
 
-    // ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
+    ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
+
+    mem_2.deinitialize();
+    // Next line would fail in debug mode if `mem_2` doesn't release the occupied memory correctly.
+    mem_1.deinitialize();
 }
 
 
