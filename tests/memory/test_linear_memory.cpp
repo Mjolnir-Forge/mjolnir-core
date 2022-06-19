@@ -88,6 +88,29 @@ TEST(test_linear_memory, initialization) // NOLINT
 }
 
 
+// --- test initialization_with_external_memory -----------------------------------------------------------------------
+
+TEST(test_linear_memory, initialization_with_external_memory) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    COUNT_NEW_AND_DELETE;
+    {
+        auto* mem_ptr = new std::byte[num_bytes]; // NOLINT(cppcoreguidelines-owning-memory)
+        EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
+
+        auto mem = LinearMemory();
+        mem.initialize(num_bytes, mem_ptr);
+
+        EXPECT_EQ(mem.get_memory_size(), num_bytes);
+        EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
+        EXPECT_TRUE(mem.is_initialized());
+        EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
+    }
+    ASSERT_NUM_NEW_AND_DELETE_EQ(1, 1);
+}
+
+
 // --- test initialization exceptions ---------------------------------------------------------------------------------
 
 TEST(test_linear_memory, initialization_exceptions) // NOLINT
@@ -111,6 +134,8 @@ TEST(test_linear_memory, initialization_exceptions) // NOLINT
     EXPECT_TRUE(mem.is_initialized());
 }
 
+
+// todo test exceptions other init
 
 // --- test allocation ------------------------------------------------------------------------------------------------
 

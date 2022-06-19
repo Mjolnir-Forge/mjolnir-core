@@ -499,6 +499,7 @@ template <typename T_Lock, typename T_Deleter>
 void LinearMemory<T_Lock, T_Deleter>::initialize(UST size, std::byte* memory_ptr)
 {
     THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
+    THROW_EXCEPTION_IF(size == 0, Exception, "Memory size must be larger than 0.");
 
     m_memory_size = size;
     m_memory.reset(memory_ptr);
