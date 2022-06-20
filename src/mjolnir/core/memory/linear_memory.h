@@ -27,6 +27,7 @@ namespace mjolnir
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
 using DefaultMemoryDeleter = std::default_delete<std::byte[]>;
 
+
 template <typename, typename>
 class LinearAllocator;
 template <typename, typename>
@@ -569,21 +570,16 @@ void LinearMemory<T_Lock, T_Deleter>::deinitialize_internal()
 template <typename T_Lock, typename T_Deleter>
 void LinearMemory<T_Lock, T_Deleter>::initialize_internal(UST size)
 {
-    if constexpr (std::is_same_v<T_Deleter, DefaultMemoryDeleter>)
-    {
-        THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
-        THROW_EXCEPTION_IF(size == 0, Exception, "Memory size must be larger than 0.");
+    static_assert(std::is_same_v<T_Deleter, DefaultMemoryDeleter>,
+                  "Function can only be used if the classes deleter type is the default deleter.");
 
-        m_memory_size = size;
-        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-        m_memory       = std::make_unique<std::byte[]>(m_memory_size);
-        m_current_addr = get_start_address();
-    }
-    else
-    {
-        // todo: Add meaningful message
-        THROW_EXCEPTION(Exception, "");
-    }
+    THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
+    THROW_EXCEPTION_IF(size == 0, Exception, "Memory size must be larger than 0.");
+
+    m_memory_size = size;
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+    m_memory       = std::make_unique<std::byte[]>(m_memory_size);
+    m_current_addr = get_start_address();
 }
 
 
