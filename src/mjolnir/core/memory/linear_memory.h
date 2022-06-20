@@ -538,7 +538,7 @@ auto LinearMemory<T_Lock, T_Deleter>::allocate_internal(UST size, UST alignment)
     UPT allocated_addr = align_address(m_current_addr, alignment);
     UPT next_addr      = allocated_addr + size;
 
-    THROW_EXCEPTION_IF(get_start_address() + m_memory_size < next_addr, Exception, "No more memory available.");
+    THROW_EXCEPTION_IF(get_start_address() + m_memory_size < next_addr, AllocationError, "No more memory available.");
 
     m_current_addr = next_addr;
 

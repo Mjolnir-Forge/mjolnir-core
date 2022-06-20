@@ -60,56 +60,37 @@ namespace mjolnir
 //! @{
 
 //! @brief
-//! Stores origin and message of an exception
+//! Base exception class that stores origin and message of an exception
 class Exception : public std::runtime_error
 {
 public:
-    Exception()           = delete;
-    ~Exception() override = default;
+    //! \cond DO_NOT_DOCUMENT
 
-    //! @brief
-    //! Copy contstructor
-    //!
-    //! @param[in] other:
-    //! Other instance that should be copied
+    Exception()                       = delete;
     Exception(const Exception& other) = default;
-
-    //! @brief
-    //! Move constructor
-    //!
-    //! @param[in, out] other:
-    //! Other instance that should be moved
-    Exception(Exception&& other) = default;
-
-    //! @brief
-    //! Copy assignment operator
-    //!
-    //! @param[in] other:
-    //! Other instance that should be copied
-    //!
-    //! @return Reference to class instance
+    Exception(Exception&& other)      = default;
+    ~Exception() override             = default;
     auto operator=(const Exception& other) -> Exception& = default;
-
-    //! @brief
-    //! Move assignment operator
-    //!
-    //! @param[in, out] other:
-    //! Other instance that should be moved
-    //!
-    //! @return
-    //! Reference to class instance
     auto operator=(Exception&& other) -> Exception& = default;
 
+    //! \endcond
 
     //! @brief
     //! Constructor
     //!
     //! @param[in] origin:
     //! Name of the function that caused the exception
-    //!
     //! @param[in] message:
     //! Exception message
     Exception(const std::string& origin, const std::string& message);
+};
+
+
+//! @brief
+//! Exception class for failed memory allocations.
+class AllocationError : public Exception
+{
+    using Exception::Exception;
 };
 
 

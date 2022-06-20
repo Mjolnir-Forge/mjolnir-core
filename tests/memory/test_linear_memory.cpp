@@ -266,7 +266,7 @@ TEST(test_linear_memory, allocation_exceptions) // NOLINT
     mem.initialize(num_bytes);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto,hicpp-avoid-goto)
-    EXPECT_THROW([[maybe_unused]] auto m = mem.allocate(num_bytes + 1), Exception);
+    EXPECT_THROW([[maybe_unused]] auto m = mem.allocate(num_bytes + 1), AllocationError);
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
 
     // cppcheck-suppress unreadVariable
@@ -274,7 +274,7 @@ TEST(test_linear_memory, allocation_exceptions) // NOLINT
     EXPECT_EQ(mem.get_free_memory_size(), 0);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto,hicpp-avoid-goto)
-    EXPECT_THROW([[maybe_unused]] auto m = mem.allocate(1), Exception);
+    EXPECT_THROW([[maybe_unused]] auto m = mem.allocate(1), AllocationError);
     EXPECT_EQ(mem.get_free_memory_size(), 0);
 }
 
