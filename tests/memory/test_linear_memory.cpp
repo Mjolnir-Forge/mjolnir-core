@@ -292,7 +292,7 @@ TEST(test_linear_memory, create) // NOLINT
     mem.initialize(num_bytes);
 
 
-    auto* a = mem.create<UST>(num_bytes);
+    auto* a = mem.allocate_construct<UST>(num_bytes);
 
     UST exp_free_mem = num_bytes - sizeof(UST);
 
@@ -300,7 +300,7 @@ TEST(test_linear_memory, create) // NOLINT
     EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    auto* b = mem.create<F32>(3.14F);
+    auto* b = mem.allocate_construct<F32>(3.14F);
 
     exp_free_mem -= sizeof(F32);
 
@@ -323,7 +323,7 @@ TEST(test_linear_memory, create_aligned) // NOLINT
 
     mem.initialize(num_bytes);
 
-    auto* a = mem.create<AlignedStruct>();
+    auto* a = mem.allocate_construct<AlignedStruct>();
 
     UST exp_free_mem = num_bytes - sizeof(AlignedStruct);
 
@@ -379,11 +379,11 @@ TEST(test_linear_memory, destroy) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto* a = mem.create<DestructionTester>(num_destroyed);
+    auto* a = mem.allocate_construct<DestructionTester>(num_destroyed);
 
     EXPECT_EQ(num_destroyed, 0);
 
-    mem.destroy(a);
+    mem.destroy_deallocate(a);
     a = nullptr;
 
     EXPECT_EQ(num_destroyed, 1);
@@ -733,7 +733,7 @@ TEST(test_linear_deleter, call_deleter) // NOLINT
 
     auto deleter = LinearDeleter<DestructionTester, decltype(mem)>(mem);
 
-    auto* ptr = mem.create<DestructionTester>(num_destroyed);
+    auto* ptr = mem.allocate_construct<DestructionTester>(num_destroyed);
 
     EXPECT_EQ(num_destroyed, 0);
 
@@ -762,7 +762,7 @@ TEST(test_linear_deleter, std_unique_ptr) // NOLINT
 
     auto deleter = LinearDeleter<DestructionTester, decltype(mem)>(mem);
 
-    auto* ptr   = mem.create<DestructionTester>(num_destroyed);
+    auto* ptr   = mem.allocate_construct<DestructionTester>(num_destroyed);
     auto  u_ptr = std::unique_ptr<DestructionTester, decltype(deleter)>(ptr, deleter);
     ptr         = nullptr;
 
@@ -801,12 +801,12 @@ TEST(test_linear_memory, memory_from_buffer) // NOLINT
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
     EXPECT_TRUE(mem.is_initialized());
 
-    F32* a = mem.create<F32>(std::numbers::pi_v<F32>);
+    F32* a = mem.allocate_construct<F32>(std::numbers::pi_v<F32>);
 
     EXPECT_EQ(*a, std::numbers::pi_v<F32>);
     EXPECT_EQ(pointer_to_integer(a), pointer_to_integer(buffer.data()));
 
-    mem.destroy(a);
+    mem.destroy_deallocate(a);
 
     mem.deinitialize();
 
@@ -843,12 +843,12 @@ TEST(test_linear_memory, memory_from_other_memory_system) // NOLINT
     EXPECT_EQ(mem_2.get_free_memory_size(), num_bytes_2);
     EXPECT_TRUE(mem_2.is_initialized());
 
-    F32* a = mem_2.create<F32>(std::numbers::pi_v<F32>);
+    F32* a = mem_2.allocate_construct<F32>(std::numbers::pi_v<F32>);
 
     EXPECT_EQ(*a, std::numbers::pi_v<F32>);
     EXPECT_EQ(pointer_to_integer(a), pointer_to_integer(mem_ptr));
 
-    mem_2.destroy(a);
+    mem_2.destroy_deallocate(a);
 
     mem_2.deinitialize();
 

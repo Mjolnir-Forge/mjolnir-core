@@ -106,19 +106,8 @@ public:
     //! @return
     //! Pointer to the created instance of `T_Type`
     template <typename T_Type, typename... T_Args>
-    [[nodiscard]] auto create(T_Args&&... args) -> T_Type*;
+    [[nodiscard]] auto allocate_construct(T_Args&&... args) -> T_Type*;
 
-
-    //! @brief
-    //! Destroy the passed object and release its memory.
-    //!
-    //! @tparam T_Type
-    //! Type of the passed object
-    //!
-    //! @param[in] pointer:
-    //! Pointer to the object that should be destroyed
-    template <typename T_Type>
-    void destroy(T_Type* pointer) const noexcept;
 
     //! @brief
     //! Deallocate memory.
@@ -148,6 +137,19 @@ public:
     //! @exception Exception
     //! Memory is still in use (number of allocations != number of deallocations)
     void deinitialize();
+
+
+    //! @brief
+    //! Destroy the passed object and release its memory.
+    //!
+    //! @tparam T_Type
+    //! Type of the passed object
+    //!
+    //! @param[in] pointer:
+    //! Pointer to the object that should be destroyed
+    template <typename T_Type>
+    void destroy_deallocate(T_Type* pointer) const noexcept;
+
 
     //! @brief
     //! Get the size of the free memory.
@@ -412,7 +414,7 @@ auto LinearMemory<T_Lock, T_Deleter>::allocate(UST size, UST alignment) -> void*
 
 template <typename T_Lock, typename T_Deleter>
 template <typename T_Type, typename... T_Args>
-auto LinearMemory<T_Lock, T_Deleter>::create(T_Args&&... args) -> T_Type*
+auto LinearMemory<T_Lock, T_Deleter>::allocate_construct(T_Args&&... args) -> T_Type*
 {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return new (allocate(sizeof(T_Type), alignof(T_Type))) T_Type(std::forward<T_Args>(args)...);
@@ -438,19 +440,6 @@ void LinearMemory<T_Lock, T_Deleter>::deallocate([[maybe_unused]] void* ptr,
 #endif
 }
 
-// --------------------------------------------------------------------------------------------------------------------
-
-template <typename T_Lock, typename T_Deleter>
-template <typename T_Type>
-void LinearMemory<T_Lock, T_Deleter>::destroy(T_Type* pointer) const noexcept
-{
-    if (pointer)
-    {
-        pointer->~T_Type();
-        deallocate(pointer, sizeof(T_Type), alignof(T_Type));
-    }
-}
-
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -458,6 +447,20 @@ template <typename T_Lock, typename T_Deleter>
 void LinearMemory<T_Lock, T_Deleter>::deinitialize()
 {
     deinitialize_internal();
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Lock, typename T_Deleter>
+template <typename T_Type>
+void LinearMemory<T_Lock, T_Deleter>::destroy_deallocate(T_Type* pointer) const noexcept
+{
+    if (pointer)
+    {
+        pointer->~T_Type();
+        deallocate(pointer, sizeof(T_Type), alignof(T_Type));
+    }
 }
 
 
@@ -642,7 +645,7 @@ LinearDeleter<T_Type, T_MemoryType>::LinearDeleter(T_MemoryType& linear_memory) 
 template <typename T_Type, typename T_MemoryType>
 void LinearDeleter<T_Type, T_MemoryType>::operator()(std::remove_extent_t<T_Type>* pointer) noexcept
 {
-    m_memory.destroy(pointer);
+    m_memory.destroy_deallocate(pointer);
 }
 
 
