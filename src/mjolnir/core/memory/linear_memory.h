@@ -424,12 +424,9 @@ void LinearMemory<T_Lock, T_Deleter>::deallocate([[maybe_unused]] void* ptr,
                                                  [[maybe_unused]] UST   alignment) const noexcept
 {
 #ifndef NDEBUG
-    UPT addr         = pointer_to_integer(ptr);
-    UPT memory_start = get_start_address();
-
-    // NOLINTNEXTLINE
-    assert(addr >= memory_start && addr < memory_start + m_memory_size && "Pointer doesn't belong to this memory.");
-    assert(m_num_allocations > 0 && "Deallocation was called to often"); // NOLINT
+    assert(ptr != nullptr && "Pointer is the `nullptr`.");                                                   // NOLINT
+    assert(is_pointer_in_memory(ptr, m_memory.get(), m_memory_size) && "Pointer doesn't belong to memory."); // NOLINT
+    assert(m_num_allocations > 0 && "Deallocation was called to often");                                     // NOLINT
 
     --m_num_allocations;
 #endif
@@ -451,11 +448,8 @@ template <typename T_Lock, typename T_Deleter>
 template <typename T_Type>
 void LinearMemory<T_Lock, T_Deleter>::destroy_deallocate(T_Type* pointer) const noexcept
 {
-    if (pointer)
-    {
-        pointer->~T_Type();
-        deallocate(pointer, sizeof(T_Type), alignof(T_Type));
-    }
+    mjolnir::destroy(pointer);
+    deallocate(pointer, sizeof(T_Type), alignof(T_Type));
 }
 
 
