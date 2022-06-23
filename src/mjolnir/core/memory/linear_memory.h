@@ -12,6 +12,7 @@
 
 #include "mjolnir/core/exception.h"
 #include "mjolnir/core/fundamental_types.h"
+#include "mjolnir/core/memory/definitions.h"
 #include "mjolnir/core/memory/utility.h"
 #include "mjolnir/core/utility/pointer_operations.h"
 
@@ -22,15 +23,9 @@
 
 namespace mjolnir
 {
-//! @brief
-//! The default deleter type for all memory systems
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-using DefaultMemoryDeleter = std::default_delete<std::byte[]>;
-
-
 template <typename, typename>
 class LinearAllocator;
-template <typename, typename>
+template <typename T_Type, MemorySystem>
 class LinearDeleter;
 
 // --- LinearMemory ---------------------------------------------------------------------------------------------------
@@ -349,7 +344,7 @@ private:
 //! Type of the allocated object
 //! @tparam T_Lock:
 //! Set to `true` if the used linear memory is thread safe.
-template <typename T_Type, typename T_MemoryType = void>
+template <typename T_Type, MemorySystem T_MemoryType>
 class LinearDeleter
 {
     // todo: generalize -> DefaultDeleter
@@ -633,7 +628,7 @@ void LinearAllocator<T_Type, T_Lock>::deallocate(T_Type* pointer, UST num_instan
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_MemoryType>
+template <typename T_Type, MemorySystem T_MemoryType>
 // cppcheck-suppress constParameter
 LinearDeleter<T_Type, T_MemoryType>::LinearDeleter(T_MemoryType& linear_memory) noexcept : m_memory(linear_memory)
 {
@@ -642,7 +637,7 @@ LinearDeleter<T_Type, T_MemoryType>::LinearDeleter(T_MemoryType& linear_memory) 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_MemoryType>
+template <typename T_Type, MemorySystem T_MemoryType>
 void LinearDeleter<T_Type, T_MemoryType>::operator()(std::remove_extent_t<T_Type>* pointer) noexcept
 {
     m_memory.destroy_deallocate(pointer);
