@@ -25,7 +25,7 @@ namespace mjolnir
 {
 template <typename, typename>
 class LinearAllocator;
-template <typename T_Type, MemorySystem>
+template <typename, MemorySystem>
 class LinearDeleter;
 
 // --- LinearMemory ---------------------------------------------------------------------------------------------------
