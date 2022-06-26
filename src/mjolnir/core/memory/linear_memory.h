@@ -370,6 +370,7 @@ public:
     //! Memory system that provided the memory for the object that should be deleted
     explicit MemorySystemDeleter(T_MemorySystem& memory_system) noexcept;
 
+
     //! @brief
     //! Destroy the object at the passed memory address and deallocate the memory.
     //!
@@ -378,8 +379,17 @@ public:
     void operator()(std::remove_extent_t<T_Type>* pointer) noexcept;
 
 
+    //! @brief
+    //! Get a deleter for another type that uses the same memory system.
+    //!
+    //! @tparam T_OtherType:
+    //! Type of the objects that should be deleted by the new deleter
+    //!
+    //! @return
+    //! New deleter that uses the same memory system
     template <typename T_OtherType>
     [[nodiscard]] auto as_type() const noexcept -> MemorySystemDeleter<T_OtherType, T_MemorySystem>;
+
 
     //! @brief
     //! Get a reference to the memory system that is used by the deleter
