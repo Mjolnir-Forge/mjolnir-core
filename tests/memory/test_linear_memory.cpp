@@ -504,8 +504,56 @@ TEST(test_linear_allocator, constructor_allocator_other_value_type) // NOLINT
 
     auto allocator = MemorySystemAllocator<F32, LinearMemory<>>(mem);
 
-    // cppcheck-suppress unreadVariable
-    [[maybe_unused]] auto allocator_other_type = MemorySystemAllocator<UST, LinearMemory<>>(allocator);
+    auto allocator_other_type = MemorySystemAllocator<UST, LinearMemory<>>(allocator);
+
+    EXPECT_EQ(&allocator_other_type.get_memory_system(), &allocator.get_memory_system());
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// --- test get_memory_system -----------------------------------------------------------------------------------------
+
+TEST(test_linear_allocator, get_memory_system) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
+
+    COUNT_NEW_AND_DELETE;
+
+    auto allocator = MemorySystemAllocator<F32, LinearMemory<>>(mem);
+
+    auto& mem_ref = allocator.get_memory_system();
+
+    EXPECT_TRUE((std::is_same_v<decltype(mem_ref), decltype(mem)&>) );
+
+    UST original_addr  = pointer_to_integer(&mem);
+    UST reference_addr = pointer_to_integer(&mem_ref);
+
+    EXPECT_EQ(reference_addr, original_addr);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
+// --- test as_type ---------------------------------------------------------------------------------------------------
+
+TEST(test_linear_allocator, as_type) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
+
+    COUNT_NEW_AND_DELETE;
+
+    auto allocator            = MemorySystemAllocator<F32, LinearMemory<>>(mem);
+    auto allocator_other_type = allocator.as_type<UST>();
+
+    EXPECT_TRUE((std::is_same_v<decltype(allocator_other_type), MemorySystemAllocator<UST, LinearMemory<>>>) );
+    EXPECT_EQ(&allocator_other_type.get_memory_system(), &allocator.get_memory_system());
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
@@ -718,6 +766,32 @@ TEST(test_linear_deleter, constructor) // NOLINT
 }
 
 
+// --- test get_memory_system -----------------------------------------------------------------------------------------
+
+TEST(test_linear_deleter, get_memory_sytem) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem = LinearMemory();
+    mem.initialize(num_bytes);
+
+    COUNT_NEW_AND_DELETE;
+
+    auto deleter = MemorySystemDeleter<F32, decltype(mem)>(mem);
+
+    auto& mem_ref = deleter.get_memory_system();
+
+    EXPECT_TRUE((std::is_same_v<decltype(mem_ref), decltype(mem)&>) );
+
+    UST original_addr  = pointer_to_integer(&mem);
+    UST reference_addr = pointer_to_integer(&mem_ref);
+
+    EXPECT_EQ(reference_addr, original_addr);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
 // --- test as_type ---------------------------------------------------------------------------------------------------
 
 TEST(test_linear_deleter, as_type) // NOLINT
@@ -735,32 +809,6 @@ TEST(test_linear_deleter, as_type) // NOLINT
 
     EXPECT_TRUE((std::is_same_v<decltype(deleter_other), MemorySystemDeleter<UST, decltype(mem)>>) );
     EXPECT_EQ(&deleter.get_memory_system(), &deleter_other.get_memory_system());
-
-    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
-}
-
-
-// --- test get_memory_system -----------------------------------------------------------------------------------------
-
-TEST(test_linear_deleter, get_memory_sytem) // NOLINT
-{
-    constexpr UST num_bytes = 1024;
-
-    auto mem = LinearMemory();
-    mem.initialize(num_bytes);
-
-    COUNT_NEW_AND_DELETE;
-
-    auto deleter = MemorySystemDeleter<F32, decltype(mem)>(mem);
-
-    auto& mem_ref = deleter.get_memory_system();
-
-    EXPECT_TRUE((std::is_same_v<decltype(mem)&, decltype(mem_ref)>) );
-
-    UST original_addr  = pointer_to_integer(&mem);
-    UST reference_addr = pointer_to_integer(&mem_ref);
-
-    EXPECT_EQ(original_addr, reference_addr);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }

@@ -251,8 +251,7 @@ private:
 };
 
 
-// --- MemorySystemAllocator
-// ------------------------------------------------------------------------------------------------
+// --- MemorySystemAllocator ------------------------------------------------------------------------------------------
 
 //! @brief
 //! STL compatible allocator for memory systems.
@@ -265,6 +264,11 @@ template <typename T_Type, MemorySystem T_MemorySystem>
 class MemorySystemAllocator
 {
 public:
+    //! @brief
+    //! The Type of the objects that are allocated by the allocator.
+    using ValueType = T_Type;
+
+
     //! \cond DO_NOT_DOCUMENT
 
     //! Required class members for allocators
@@ -318,6 +322,18 @@ public:
 
 
     //! @brief
+    //! Get an allocator with different value type that uses the same memory system.
+    //!
+    //! @tparam T_OtherType:
+    //! Type of the objects that should be allocated by the new allocator
+    //!
+    //! @return
+    //! New allocator that uses the same memory system
+    template <typename T_OtherType>
+    [[nodiscard]] auto as_type() const noexcept -> MemorySystemAllocator<T_OtherType, T_MemorySystem>;
+
+
+    //! @brief
     //! Deallocates the memory of the passed pointer.
     //!
     //! @details
@@ -330,6 +346,14 @@ public:
     void deallocate([[maybe_unused]] T_Type* pointer, UST num_instances);
 
 
+    //! @brief
+    //! Get a reference to the memory system that is used by the allocator.
+    //!
+    //! @return
+    //! Memory system that is used by the allocator
+    [[nodiscard]] auto get_memory_system() const noexcept -> T_MemorySystem&;
+
+
 private:
     T_MemorySystem& m_memory;
 
@@ -337,6 +361,8 @@ private:
     friend class MemorySystemAllocator;
 };
 
+
+// --- MemorySystemDeleter --------------------------------------------------------------------------------------------
 
 //! @brief
 //! STL compatible deleter for memory systems.
@@ -639,9 +665,29 @@ template <typename T_Type, MemorySystem T_MemorySystem>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_Type, MemorySystem T_MemorySystem>
+template <typename T_OtherType>
+[[nodiscard]] auto MemorySystemAllocator<T_Type, T_MemorySystem>::as_type() const noexcept
+        -> MemorySystemAllocator<T_OtherType, T_MemorySystem>
+{
+    return MemorySystemAllocator<T_OtherType, T_MemorySystem>(m_memory);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, MemorySystem T_MemorySystem>
 void MemorySystemAllocator<T_Type, T_MemorySystem>::deallocate(T_Type* pointer, UST num_instances)
 {
     m_memory.deallocate(pointer, num_instances * sizeof(T_Type), alignof(T_Type));
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, MemorySystem T_MemorySystem>
+[[nodiscard]] auto MemorySystemAllocator<T_Type, T_MemorySystem>::get_memory_system() const noexcept -> T_MemorySystem&
+{
+    return m_memory;
 }
 
 
