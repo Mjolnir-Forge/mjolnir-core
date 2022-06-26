@@ -79,6 +79,7 @@ public:
     //! A deleter that is used to free the internal memory.
     explicit LinearMemory(T_Deleter deleter = DefaultMemoryDeleter());
 
+
     //! @brief
     //! Allocate a new memory block and return a pointer that points to it.
     //!
@@ -238,6 +239,7 @@ public:
     //! @return
     //! `true` or `false`
     [[nodiscard]] auto is_initialized() const noexcept -> bool;
+
 
     //! @brief
     //! Reset the internal memory
