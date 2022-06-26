@@ -471,6 +471,23 @@ TEST(test_linear_memory, reset) // NOLINT
 }
 
 
+// --- test get_deleter -----------------------------------------------------------------------------------------------
+
+TEST(test_linear_memory, get_deleter) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+
+    auto mem = LinearMemory();
+
+    auto deleter = mem.get_deleter<F32>();
+
+    EXPECT_TRUE((std::is_same_v<decltype(deleter), MemorySystemDeleter<F32, decltype(mem)>>) );
+    EXPECT_EQ(&deleter.get_memory_system(), &mem);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
 // ~~~ MemorySystemAllocator ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // --- test constructor -----------------------------------------------------------------------------------------------
@@ -768,7 +785,7 @@ TEST(test_linear_deleter, constructor) // NOLINT
 
 // --- test get_memory_system -----------------------------------------------------------------------------------------
 
-TEST(test_linear_deleter, get_memory_sytem) // NOLINT
+TEST(test_linear_deleter, get_memory_system) // NOLINT
 {
     constexpr UST num_bytes = 1024;
 
@@ -925,7 +942,7 @@ TEST(test_linear_memory, memory_from_other_memory_system) // NOLINT
     mem_1.initialize(num_bytes_1);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-    using DeleterType = LinearMemory<>::DeleterType<std::byte[]>;
+    using DeleterType = LinearMemory<>::MemoryDeleterType<std::byte[]>;
 
     auto deleter = DeleterType(mem_1);
     auto mem_2   = LinearMemory<void, DeleterType>(deleter);

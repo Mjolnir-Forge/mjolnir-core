@@ -58,7 +58,7 @@ public:
     //! @tparam T_Type:
     //! Type of the object that should be deleted.
     template <typename T_Type>
-    using DeleterType = MemorySystemDeleter<T_Type, LinearMemory<T_Lock, T_Deleter>>;
+    using MemoryDeleterType = MemorySystemDeleter<T_Type, LinearMemory<T_Lock, T_Deleter>>;
 
     LinearMemory(const LinearMemory&)     = delete;
     LinearMemory(LinearMemory&&) noexcept = delete;
@@ -144,6 +144,18 @@ public:
     //! Pointer to the object that should be destroyed
     template <typename T_Type>
     void destroy_deallocate(T_Type* pointer) const noexcept;
+
+
+    //! @brief
+    //! Get a deleter that deletes the specified type from this memory
+    //!
+    //! @tparam T_Type
+    //! Type that should be deleted
+    //!
+    //! @return
+    //! Deleter of the specified type
+    template <typename T_Type>
+    [[nodiscard]] auto get_deleter() noexcept -> MemoryDeleterType<T_Type>;
 
 
     //! @brief
@@ -505,7 +517,17 @@ void LinearMemory<T_Lock, T_Deleter>::destroy_deallocate(T_Type* pointer) const 
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_Lock, typename T_Deleter>
-auto LinearMemory<T_Lock, T_Deleter>::get_free_memory_size() const noexcept -> UST
+template <typename T_Type>
+[[nodiscard]] auto LinearMemory<T_Lock, T_Deleter>::get_deleter() noexcept -> MemoryDeleterType<T_Type>
+{
+    return MemoryDeleterType<T_Type>(*this);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Lock, typename T_Deleter>
+[[nodiscard]] auto LinearMemory<T_Lock, T_Deleter>::get_free_memory_size() const noexcept -> UST
 {
     if (! m_memory)
         return 0;
