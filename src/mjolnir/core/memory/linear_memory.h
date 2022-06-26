@@ -49,8 +49,13 @@ class LinearMemory
     static_assert(std::is_same_v<T_Lock, void>, "Not implemented yet");
 
 public:
-    // template <typename T_Type>
-    // using AllocatorType = MemorySystemAllocator<T_Type, T_Lock>;
+    //! @brief
+    //! Compatible allocator type that can be used with STL containers.
+    //!
+    //! @tparam T_Type:
+    //! Type of the object that should be allocated.
+    template <typename T_Type>
+    using MemoryAllocatorType = MemorySystemAllocator<T_Type, LinearMemory<T_Lock, T_Deleter>>;
 
     //! @brief
     //! Compatible deleter type that can be used with `std::unique_ptr` etc.
@@ -147,7 +152,27 @@ public:
 
 
     //! @brief
-    //! Get a deleter that deletes the specified type from this memory
+    //! Get an allocator that allocates and deallocates memory for the specified type from this memory system
+    //!
+    //! @details
+    //! Note that it is not necessary to initialize the memory system before calling this function. However, using the
+    //! returned allocator before the memory is initialized is undefined behavior.
+    //!
+    //! @tparam T_Type
+    //! Type that should be allocated
+    //!
+    //! @return
+    //! Allocator of the specified type
+    template <typename T_Type>
+    [[nodiscard]] auto get_allocator() noexcept -> MemoryAllocatorType<T_Type>;
+
+
+    //! @brief
+    //! Get a deleter that deletes the specified type from this memory system
+    //!
+    //! @details
+    //! Note that it is not necessary to initialize the memory system before calling this function. However, using the
+    //! returned deleter before the memory is initialized is undefined behavior.
     //!
     //! @tparam T_Type
     //! Type that should be deleted
@@ -511,6 +536,16 @@ void LinearMemory<T_Lock, T_Deleter>::destroy_deallocate(T_Type* pointer) const 
 {
     mjolnir::destroy(pointer);
     deallocate(pointer, sizeof(T_Type), alignof(T_Type));
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Lock, typename T_Deleter>
+template <typename T_Type>
+[[nodiscard]] auto LinearMemory<T_Lock, T_Deleter>::get_allocator() noexcept -> MemoryAllocatorType<T_Type>
+{
+    return MemoryAllocatorType<T_Type>(*this);
 }
 
 

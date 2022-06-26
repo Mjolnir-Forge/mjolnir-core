@@ -471,6 +471,23 @@ TEST(test_linear_memory, reset) // NOLINT
 }
 
 
+// --- test get_allocator ---------------------------------------------------------------------------------------------
+
+TEST(test_linear_memory, get_allocator) // NOLINT
+{
+    COUNT_NEW_AND_DELETE;
+
+    auto mem = LinearMemory();
+
+    auto allocator = mem.get_allocator<F32>();
+
+    EXPECT_TRUE((std::is_same_v<decltype(allocator), MemorySystemAllocator<F32, decltype(mem)>>) );
+    EXPECT_EQ(&allocator.get_memory_system(), &mem);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
+
+
 // --- test get_deleter -----------------------------------------------------------------------------------------------
 
 TEST(test_linear_memory, get_deleter) // NOLINT
