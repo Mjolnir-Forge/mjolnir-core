@@ -1,5 +1,2 @@
-add_subdirectory(math)
-add_subdirectory(memory)
+add_subdirectory(core)
 add_subdirectory(testing)
-add_subdirectory(utility)
-add_subdirectory(x86)
