@@ -1,8 +1,8 @@
 //! @file
-//! memory/linear_memory.h
+//! memory/memory_system_allocator.h
 //!
 //! @brief
-//! Defines classes that deal with linear memory management
+//! Defines an STL compatible allocator class for the memory systems of this library
 
 
 #pragma once
@@ -10,23 +10,14 @@
 
 // === DECLARATIONS ===================================================================================================
 
-#include "mjolnir/core/exception.h"
 #include "mjolnir/core/fundamental_types.h"
 #include "mjolnir/core/memory/definitions.h"
-#include "mjolnir/core/memory/memory_system_deleter.h"
-#include "mjolnir/core/memory/utility.h"
-#include "mjolnir/core/utility/pointer_operations.h"
-
-#include <cassert>
-#include <cstddef>
-#include <memory>
 
 
 namespace mjolnir
 {
-
-
-
+//! \addtogroup core_memory
+//! @{
 
 
 //! @brief
@@ -147,7 +138,6 @@ private:
 
 namespace mjolnir
 {
-
 // --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_Type, MemorySystem T_MemorySystem>

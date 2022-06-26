@@ -2,7 +2,7 @@
 //! memory/linear_memory.h
 //!
 //! @brief
-//! Defines classes that deal with linear memory management
+//! Defines a class that manages memory in a linear fashion
 
 
 #pragma once

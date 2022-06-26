@@ -53,6 +53,22 @@ inline void destroy(T_Type* pointer) noexcept;
 
 
 //! @brief
+//! Destroy the object that the passed pointer points to and deallocate its memory from the passed memory system.
+//!
+//! @tparam T_Type:
+//! Type of the object
+//! @tparam T_MemorySystem:
+//! Type of the memory system
+//!
+//! @param[in] pointer:
+//! Pointer pointing to the object that should be destroyed and the memory that should be freed
+//! @param[in] memory_system:
+//! Memory system that manages the memory of the passed pointer
+template <typename T_Type, MemorySystem T_MemorySystem>
+inline void destroy_deallocate(T_Type* pointer, T_MemorySystem& memory_system) noexcept;
+
+
+//! @brief
 //! Return `true` if `pointer` is part of the memory starting at `memory_start_ptr`.
 //!
 //! @tparam T_Type:
@@ -106,6 +122,16 @@ inline void destroy(T_Type* pointer) noexcept
 {
     assert(pointer != nullptr && "The passed pointer is the `nullptr`."); // NOLINT
     pointer->~T_Type();
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, MemorySystem T_MemorySystem>
+inline void destroy_deallocate(T_Type* pointer, T_MemorySystem& memory_system) noexcept
+{
+    destroy(pointer);
+    memory_system.deallocate(pointer, sizeof(T_Type), alignof(T_Type));
 }
 
 
