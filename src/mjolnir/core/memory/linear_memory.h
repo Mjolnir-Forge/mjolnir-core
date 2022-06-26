@@ -23,7 +23,7 @@
 
 namespace mjolnir
 {
-template <typename, typename>
+template <typename, MemorySystem>
 class MemorySystemAllocator;
 template <typename, MemorySystem>
 class MemorySystemDeleter;
@@ -261,7 +261,7 @@ private:
 //! Type of the allocated object
 //! @tparam T_MemorySystem:
 //! The memory system type.
-template <typename T_Type, typename T_MemorySystem>
+template <typename T_Type, MemorySystem T_MemorySystem>
 class MemorySystemAllocator
 {
 public:
@@ -333,7 +333,7 @@ public:
 private:
     T_MemorySystem& m_memory;
 
-    template <typename T_OtherType, typename T_OtherLock>
+    template <typename, MemorySystem>
     friend class MemorySystemAllocator;
 };
 
@@ -342,17 +342,18 @@ private:
 //! STL compatible deleter for memory systems.
 //!
 //! @tparam T_Type:
-//! Type of the allocated object
+//! Type of the objects that are deleted by this class
 //! @tparam T_MemorySystem:
 //! The memory system type.
 template <typename T_Type, MemorySystem T_MemorySystem>
 class MemorySystemDeleter
 {
-    // todo: generalize -> DefaultDeleter
-
 public:
-    //! \cond DO_NOT_DOCUMENT
+    //! @brief
+    //! The Type of the objects that are deleted by the deleter.
+    using ValueType = T_Type;
 
+    //! \cond DO_NOT_DOCUMENT
     MemorySystemDeleter()                               = delete;
     MemorySystemDeleter(const MemorySystemDeleter&)     = default;
     MemorySystemDeleter(MemorySystemDeleter&&) noexcept = default;
@@ -365,9 +366,9 @@ public:
     //! @brief
     //! Construct a new deleter with the passes `LinearMemory` instance.
     //!
-    //! @param[in] linear_memory:
-    //! `LinearMemory` that provided the memory for the opject that should be deleted
-    explicit MemorySystemDeleter(T_MemorySystem& linear_memory) noexcept;
+    //! @param[in] memory_system:
+    //! Memory system that provided the memory for the object that should be deleted
+    explicit MemorySystemDeleter(T_MemorySystem& memory_system) noexcept;
 
     //! @brief
     //! Destroy the object at the passed memory address and deallocate the memory.
@@ -375,6 +376,17 @@ public:
     //! @param[in] pointer:
     //! Pointer to the object that should be destroyed and the memory that should be deallocated.
     void operator()(std::remove_extent_t<T_Type>* pointer) noexcept;
+
+
+    template <typename T_OtherType>
+    [[nodiscard]] auto as_type() const noexcept -> MemorySystemDeleter<T_OtherType, T_MemorySystem>;
+
+    //! @brief
+    //! Get a reference to the memory system that is used by the deleter
+    //!
+    //! @return
+    //! Memory system that is used by the deleter
+    [[nodiscard]] auto get_memory_system() const noexcept -> T_MemorySystem&;
 
 
 private:
@@ -587,7 +599,7 @@ auto LinearMemory<T_Lock, T_Deleter>::get_start_address() const noexcept -> UPT
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_MemorySystem>
+template <typename T_Type, MemorySystem T_MemorySystem>
 MemorySystemAllocator<T_Type, T_MemorySystem>::MemorySystemAllocator(T_MemorySystem& linear_memory) noexcept
     : m_memory{linear_memory}
 {
@@ -596,7 +608,7 @@ MemorySystemAllocator<T_Type, T_MemorySystem>::MemorySystemAllocator(T_MemorySys
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_MemorySystem>
+template <typename T_Type, MemorySystem T_MemorySystem>
 template <class T_OtherType>
 MemorySystemAllocator<T_Type, T_MemorySystem>::MemorySystemAllocator(
         const MemorySystemAllocator<T_OtherType, T_MemorySystem>& other) noexcept
@@ -607,7 +619,7 @@ MemorySystemAllocator<T_Type, T_MemorySystem>::MemorySystemAllocator(
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_MemorySystem>
+template <typename T_Type, MemorySystem T_MemorySystem>
 [[nodiscard]] auto MemorySystemAllocator<T_Type, T_MemorySystem>::allocate(UST num_instances) -> T_Type*
 {
     return static_cast<T_Type*>(m_memory.allocate(num_instances * sizeof(T_Type), alignof(T_Type)));
@@ -616,7 +628,7 @@ template <typename T_Type, typename T_MemorySystem>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_MemorySystem>
+template <typename T_Type, MemorySystem T_MemorySystem>
 void MemorySystemAllocator<T_Type, T_MemorySystem>::deallocate(T_Type* pointer, UST num_instances)
 {
     m_memory.deallocate(pointer, num_instances * sizeof(T_Type), alignof(T_Type));
@@ -627,8 +639,8 @@ void MemorySystemAllocator<T_Type, T_MemorySystem>::deallocate(T_Type* pointer, 
 
 template <typename T_Type, MemorySystem T_MemorySystem>
 // cppcheck-suppress constParameter
-MemorySystemDeleter<T_Type, T_MemorySystem>::MemorySystemDeleter(T_MemorySystem& linear_memory) noexcept
-    : m_memory(linear_memory)
+MemorySystemDeleter<T_Type, T_MemorySystem>::MemorySystemDeleter(T_MemorySystem& memory_system) noexcept
+    : m_memory(memory_system)
 {
 }
 
@@ -639,6 +651,26 @@ template <typename T_Type, MemorySystem T_MemorySystem>
 void MemorySystemDeleter<T_Type, T_MemorySystem>::operator()(std::remove_extent_t<T_Type>* pointer) noexcept
 {
     m_memory.destroy_deallocate(pointer);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, MemorySystem T_MemorySystem>
+template <typename T_OtherType>
+[[nodiscard]] auto MemorySystemDeleter<T_Type, T_MemorySystem>::as_type() const noexcept
+        -> MemorySystemDeleter<T_OtherType, T_MemorySystem>
+{
+    return MemorySystemDeleter<T_OtherType, T_MemorySystem>(m_memory);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, MemorySystem T_MemorySystem>
+[[nodiscard]] auto MemorySystemDeleter<T_Type, T_MemorySystem>::get_memory_system() const noexcept -> T_MemorySystem&
+{
+    return m_memory;
 }
 
 
