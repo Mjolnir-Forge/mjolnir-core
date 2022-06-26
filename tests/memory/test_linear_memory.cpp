@@ -471,7 +471,7 @@ TEST(test_linear_memory, reset) // NOLINT
 }
 
 
-// ~~~ LinearAllocator ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ~~~ MemorySystemAllocator ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // --- test constructor -----------------------------------------------------------------------------------------------
 
@@ -485,7 +485,7 @@ TEST(test_linear_allocator, constructor) // NOLINT
     COUNT_NEW_AND_DELETE;
 
     // cppcheck-suppress unreadVariable
-    [[maybe_unused]] auto allocator = LinearAllocator<F32>(mem);
+    [[maybe_unused]] auto allocator = MemorySystemAllocator<F32, LinearMemory<>>(mem);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
@@ -502,10 +502,10 @@ TEST(test_linear_allocator, constructor_allocator_other_value_type) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto allocator = LinearAllocator<F32>(mem);
+    auto allocator = MemorySystemAllocator<F32, LinearMemory<>>(mem);
 
     // cppcheck-suppress unreadVariable
-    [[maybe_unused]] auto allocator_other_type = LinearAllocator<UST>(allocator);
+    [[maybe_unused]] auto allocator_other_type = MemorySystemAllocator<UST, LinearMemory<>>(allocator);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
@@ -522,7 +522,7 @@ TEST(test_linear_allocator, allocate) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto allocator = LinearAllocator<F32>(mem);
+    auto allocator = MemorySystemAllocator<F32, LinearMemory<>>(mem);
 
     auto* a = allocator.allocate(1);
     *a      = static_cast<F32>(num_bytes);
@@ -550,7 +550,7 @@ TEST(test_linear_allocator, deallocate) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto allocator = LinearAllocator<F32>(mem);
+    auto allocator = MemorySystemAllocator<F32, LinearMemory<>>(mem);
 
     auto* a = allocator.allocate(1);
     auto* b = allocator.allocate(3);
@@ -575,8 +575,8 @@ TEST(test_linear_allocator, std_vector) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto allocator = LinearAllocator<F32>(mem);
-    auto vec       = std::vector<F32, LinearAllocator<F32>>(0, allocator);
+    auto allocator = MemorySystemAllocator<F32, LinearMemory<>>(mem);
+    auto vec       = std::vector<F32, MemorySystemAllocator<F32, LinearMemory<>>>(0, allocator);
 
     UST exp_memory_size = mem.get_free_memory_size();
 
@@ -619,8 +619,8 @@ TEST(test_linear_allocator, std_vector_aligned_object) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto allocator = LinearAllocator<AlignedStruct>(mem);
-    auto vec       = std::vector<AlignedStruct, LinearAllocator<AlignedStruct>>(0, allocator);
+    auto allocator = MemorySystemAllocator<AlignedStruct, LinearMemory<>>(mem);
+    auto vec       = std::vector<AlignedStruct, MemorySystemAllocator<AlignedStruct, LinearMemory<>>>(0, allocator);
 
     for (UST i = 0; i < num_elements; ++i)
         vec.emplace_back();
@@ -636,7 +636,7 @@ TEST(test_linear_allocator, std_vector_aligned_object) // NOLINT
 
 TEST(test_linear_allocator, std_map) // NOLINT
 {
-    using AllocatorType = LinearAllocator<std::pair<const UST, F32>>;
+    using AllocatorType = MemorySystemAllocator<std::pair<const UST, F32>, LinearMemory<>>;
 
     constexpr UST num_bytes    = 1024;
     constexpr UST num_elements = 5;
@@ -672,7 +672,7 @@ TEST(test_linear_allocator, std_map) // NOLINT
 
 TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
 {
-    using AllocatorType = LinearAllocator<std::pair<const UST, AlignedStruct>>;
+    using AllocatorType = MemorySystemAllocator<std::pair<const UST, AlignedStruct>, LinearMemory<>>;
 
     constexpr UST num_bytes    = 1024;
     constexpr UST num_elements = 5;
@@ -698,7 +698,7 @@ TEST(test_linear_allocator, std_map_aligned_object) // NOLINT
 }
 
 
-// ~~~ LinearDeleter $$~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ~~~ MemorySystemDeleter ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // --- test constructor -----------------------------------------------------------------------------------------------
 
@@ -712,7 +712,7 @@ TEST(test_linear_deleter, constructor) // NOLINT
     COUNT_NEW_AND_DELETE;
 
     // cppcheck-suppress unreadVariable
-    [[maybe_unused]] auto allocator = LinearDeleter<F32, decltype(mem)>(mem);
+    [[maybe_unused]] auto allocator = MemorySystemDeleter<F32, decltype(mem)>(mem);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
@@ -731,7 +731,7 @@ TEST(test_linear_deleter, call_deleter) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto deleter = LinearDeleter<DestructionTester, decltype(mem)>(mem);
+    auto deleter = MemorySystemDeleter<DestructionTester, decltype(mem)>(mem);
 
     auto* ptr = mem.allocate_construct<DestructionTester>(num_destroyed);
 
@@ -760,7 +760,7 @@ TEST(test_linear_deleter, std_unique_ptr) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto deleter = LinearDeleter<DestructionTester, decltype(mem)>(mem);
+    auto deleter = MemorySystemDeleter<DestructionTester, decltype(mem)>(mem);
 
     auto* ptr   = mem.allocate_construct<DestructionTester>(num_destroyed);
     auto  u_ptr = std::unique_ptr<DestructionTester, decltype(deleter)>(ptr, deleter);

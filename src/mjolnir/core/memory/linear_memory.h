@@ -24,9 +24,9 @@
 namespace mjolnir
 {
 template <typename, typename>
-class LinearAllocator;
+class MemorySystemAllocator;
 template <typename, MemorySystem>
-class LinearDeleter;
+class MemorySystemDeleter;
 
 // --- LinearMemory ---------------------------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ class LinearMemory
 
 public:
     // template <typename T_Type>
-    // using AllocatorType = LinearAllocator<T_Type, T_Lock>;
+    // using AllocatorType = MemorySystemAllocator<T_Type, T_Lock>;
 
     //! @brief
     //! Compatible deleter type that can be used with `std::unique_ptr` etc.
@@ -58,7 +58,7 @@ public:
     //! @tparam T_Type:
     //! Type of the object that should be deleted.
     template <typename T_Type>
-    using DeleterType = LinearDeleter<T_Type, LinearMemory<T_Lock, T_Deleter>>;
+    using DeleterType = MemorySystemDeleter<T_Type, LinearMemory<T_Lock, T_Deleter>>;
 
     LinearMemory(const LinearMemory&)     = delete;
     LinearMemory(LinearMemory&&) noexcept = delete;
@@ -251,17 +251,18 @@ private:
 };
 
 
-// --- LinearAllocator ------------------------------------------------------------------------------------------------
+// --- MemorySystemAllocator
+// ------------------------------------------------------------------------------------------------
 
 //! @brief
-//! STL compatible allocator that uses linear memory.
+//! STL compatible allocator for memory systems.
 //!
 //! @tparam T_Type:
 //! Type of the allocated object
-//! @tparam T_Lock:
-//! Set to `true` if the used linear memory is thread safe.
-template <typename T_Type, typename T_Lock = void>
-class LinearAllocator
+//! @tparam T_MemorySystem:
+//! The memory system type.
+template <typename T_Type, typename T_MemorySystem>
+class MemorySystemAllocator
 {
 public:
     //! \cond DO_NOT_DOCUMENT
@@ -272,16 +273,16 @@ public:
     template <typename T_OtherType>
     struct rebind // NOLINT(readability-identifier-naming)
     {
-        using other = LinearAllocator<T_OtherType, T_Lock>; // NOLINT(readability-identifier-naming)
+        using other = MemorySystemAllocator<T_OtherType, T_MemorySystem>; // NOLINT(readability-identifier-naming)
     };
 
 
-    LinearAllocator()                           = delete;
-    LinearAllocator(const LinearAllocator&)     = default;
-    LinearAllocator(LinearAllocator&&) noexcept = default;
-    ~LinearAllocator()                          = default;
-    auto operator=(const LinearAllocator&) -> LinearAllocator& = default;
-    auto operator=(LinearAllocator&&) noexcept -> LinearAllocator& = default;
+    MemorySystemAllocator()                                 = delete;
+    MemorySystemAllocator(const MemorySystemAllocator&)     = default;
+    MemorySystemAllocator(MemorySystemAllocator&&) noexcept = default;
+    ~MemorySystemAllocator()                                = default;
+    auto operator=(const MemorySystemAllocator&) -> MemorySystemAllocator& = default;
+    auto operator=(MemorySystemAllocator&&) noexcept -> MemorySystemAllocator& = default;
     //! \endcond
 
 
@@ -290,7 +291,7 @@ public:
     //!
     //! @param[in] linear_memory:
     //! `LinearMemory` instance that provides the memory for the allocations
-    explicit LinearAllocator(LinearMemory<T_Lock>& linear_memory) noexcept;
+    explicit MemorySystemAllocator(T_MemorySystem& linear_memory) noexcept;
 
 
     //! @brief
@@ -302,7 +303,7 @@ public:
     //! @param[in] other:
     //! Other allocator that provides a reference to the `LinearMemory` instance that should be used
     template <class T_OtherType>
-    explicit LinearAllocator(const LinearAllocator<T_OtherType, T_Lock>& other) noexcept;
+    explicit MemorySystemAllocator(const MemorySystemAllocator<T_OtherType, T_MemorySystem>& other) noexcept;
 
 
     //! @brief
@@ -330,34 +331,34 @@ public:
 
 
 private:
-    LinearMemory<T_Lock>& m_memory;
+    T_MemorySystem& m_memory;
 
     template <typename T_OtherType, typename T_OtherLock>
-    friend class LinearAllocator;
+    friend class MemorySystemAllocator;
 };
 
 
 //! @brief
-//! STL compatible deleter that uses linear memory.
+//! STL compatible deleter for memory systems.
 //!
 //! @tparam T_Type:
 //! Type of the allocated object
-//! @tparam T_Lock:
-//! Set to `true` if the used linear memory is thread safe.
-template <typename T_Type, MemorySystem T_MemoryType>
-class LinearDeleter
+//! @tparam T_MemorySystem:
+//! The memory system type.
+template <typename T_Type, MemorySystem T_MemorySystem>
+class MemorySystemDeleter
 {
     // todo: generalize -> DefaultDeleter
 
 public:
     //! \cond DO_NOT_DOCUMENT
 
-    LinearDeleter()                         = delete;
-    LinearDeleter(const LinearDeleter&)     = default;
-    LinearDeleter(LinearDeleter&&) noexcept = default;
-    ~LinearDeleter()                        = default;
-    auto operator=(const LinearDeleter&) -> LinearDeleter& = default;
-    auto operator=(LinearDeleter&&) noexcept -> LinearDeleter& = default;
+    MemorySystemDeleter()                               = delete;
+    MemorySystemDeleter(const MemorySystemDeleter&)     = default;
+    MemorySystemDeleter(MemorySystemDeleter&&) noexcept = default;
+    ~MemorySystemDeleter()                              = default;
+    auto operator=(const MemorySystemDeleter&) -> MemorySystemDeleter& = default;
+    auto operator=(MemorySystemDeleter&&) noexcept -> MemorySystemDeleter& = default;
     //! \endcond
 
 
@@ -366,7 +367,7 @@ public:
     //!
     //! @param[in] linear_memory:
     //! `LinearMemory` that provided the memory for the opject that should be deleted
-    explicit LinearDeleter(T_MemoryType& linear_memory) noexcept;
+    explicit MemorySystemDeleter(T_MemorySystem& linear_memory) noexcept;
 
     //! @brief
     //! Destroy the object at the passed memory address and deallocate the memory.
@@ -377,7 +378,7 @@ public:
 
 
 private:
-    T_MemoryType& m_memory;
+    T_MemorySystem& m_memory;
 };
 
 
@@ -586,17 +587,19 @@ auto LinearMemory<T_Lock, T_Deleter>::get_start_address() const noexcept -> UPT
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_Lock>
-LinearAllocator<T_Type, T_Lock>::LinearAllocator(LinearMemory<T_Lock>& linear_memory) noexcept : m_memory{linear_memory}
+template <typename T_Type, typename T_MemorySystem>
+MemorySystemAllocator<T_Type, T_MemorySystem>::MemorySystemAllocator(T_MemorySystem& linear_memory) noexcept
+    : m_memory{linear_memory}
 {
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_Lock>
+template <typename T_Type, typename T_MemorySystem>
 template <class T_OtherType>
-LinearAllocator<T_Type, T_Lock>::LinearAllocator(const LinearAllocator<T_OtherType, T_Lock>& other) noexcept
+MemorySystemAllocator<T_Type, T_MemorySystem>::MemorySystemAllocator(
+        const MemorySystemAllocator<T_OtherType, T_MemorySystem>& other) noexcept
     : m_memory{other.m_memory}
 {
 }
@@ -604,8 +607,8 @@ LinearAllocator<T_Type, T_Lock>::LinearAllocator(const LinearAllocator<T_OtherTy
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_Lock>
-[[nodiscard]] auto LinearAllocator<T_Type, T_Lock>::allocate(UST num_instances) -> T_Type*
+template <typename T_Type, typename T_MemorySystem>
+[[nodiscard]] auto MemorySystemAllocator<T_Type, T_MemorySystem>::allocate(UST num_instances) -> T_Type*
 {
     return static_cast<T_Type*>(m_memory.allocate(num_instances * sizeof(T_Type), alignof(T_Type)));
 }
@@ -613,8 +616,8 @@ template <typename T_Type, typename T_Lock>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, typename T_Lock>
-void LinearAllocator<T_Type, T_Lock>::deallocate(T_Type* pointer, UST num_instances)
+template <typename T_Type, typename T_MemorySystem>
+void MemorySystemAllocator<T_Type, T_MemorySystem>::deallocate(T_Type* pointer, UST num_instances)
 {
     m_memory.deallocate(pointer, num_instances * sizeof(T_Type), alignof(T_Type));
 }
@@ -622,17 +625,18 @@ void LinearAllocator<T_Type, T_Lock>::deallocate(T_Type* pointer, UST num_instan
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, MemorySystem T_MemoryType>
+template <typename T_Type, MemorySystem T_MemorySystem>
 // cppcheck-suppress constParameter
-LinearDeleter<T_Type, T_MemoryType>::LinearDeleter(T_MemoryType& linear_memory) noexcept : m_memory(linear_memory)
+MemorySystemDeleter<T_Type, T_MemorySystem>::MemorySystemDeleter(T_MemorySystem& linear_memory) noexcept
+    : m_memory(linear_memory)
 {
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type, MemorySystem T_MemoryType>
-void LinearDeleter<T_Type, T_MemoryType>::operator()(std::remove_extent_t<T_Type>* pointer) noexcept
+template <typename T_Type, MemorySystem T_MemorySystem>
+void MemorySystemDeleter<T_Type, T_MemorySystem>::operator()(std::remove_extent_t<T_Type>* pointer) noexcept
 {
     m_memory.destroy_deallocate(pointer);
 }
