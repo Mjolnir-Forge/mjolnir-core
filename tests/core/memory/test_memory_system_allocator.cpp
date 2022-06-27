@@ -51,7 +51,6 @@ TYPED_TEST(AllocatorTestSuite, constructor) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    // cppcheck-suppress unreadVariable
     [[maybe_unused]] auto allocator = MemorySystemAllocator<F32, TypeParam>(mem);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
@@ -146,7 +145,6 @@ TYPED_TEST(AllocatorTestSuite, allocate) // NOLINT
     EXPECT_EQ(*a, static_cast<F32>(num_bytes));
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes - sizeof(F32));
 
-    // cppcheck-suppress unreadVariable
     [[maybe_unused]] auto* b = allocator.allocate(3);
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes - 4 * sizeof(F32));
 
