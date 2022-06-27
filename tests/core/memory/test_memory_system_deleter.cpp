@@ -64,6 +64,11 @@ private:
 // === TESTS ==========================================================================================================
 
 
+// todo:
+// - alignment test
+// - std::shared_ptr test
+
+
 // --- test constructor -----------------------------------------------------------------------------------------------
 
 TYPED_TEST(DeleterTestSuite, constructor) // NOLINT
@@ -75,7 +80,6 @@ TYPED_TEST(DeleterTestSuite, constructor) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    // cppcheck-suppress unreadVariable
     [[maybe_unused]] auto deleter = MemorySystemDeleter<F32, decltype(mem)>(mem);
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
