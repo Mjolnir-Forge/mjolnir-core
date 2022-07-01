@@ -41,6 +41,7 @@ for file in files:
     sys.stdout.flush()
     if r.returncode != 0:
         error = True
+        print(f"THE BAD RETURN CODE IS {r.returncode}")
 
 if error:
     sys.exit(1)
