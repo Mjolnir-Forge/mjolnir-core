@@ -581,3 +581,9 @@ TEST(test_linear_memory, memory_from_other_memory_system) // NOLINT
     // Next line would fail in debug mode if `mem_2` doesn't release the occupied memory correctly.
     mem_1.deinitialize();
 }
+
+
+TEST(should, fail)
+{
+    int* fail = new int(4);
+}
