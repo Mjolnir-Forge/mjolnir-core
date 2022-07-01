@@ -100,8 +100,8 @@ jobs:
       run:
         cmake
         -DCMAKE_BUILD_TYPE=DEBUG
-        -DCMAKE_C_COMPILER=clang-12
-        -DCMAKE_CXX_COMPILER=clang++-12
+        -DCMAKE_C_COMPILER=gcc-10
+        -DCMAKE_CXX_COMPILER=g++-10
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_DEFINITIONS="DISABLE_NEW_DELETE_COUNTER"
         -S . -B build
     - name: Build
