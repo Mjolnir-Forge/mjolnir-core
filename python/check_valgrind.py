@@ -29,9 +29,10 @@ for file in files:
             "valgrind",
             "--tool=memcheck",
             "--leak-check=full",
+            "--error-exitcode=1",
+            "--show-leak-kinds=all",
+            "--track-origins=yes",
             "--show-reachable=yes",
-            "--num-callers=20",
-            "--track-fds=yes",
             file,
         ],
     )
