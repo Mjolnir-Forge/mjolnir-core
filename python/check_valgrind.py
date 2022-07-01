@@ -32,7 +32,7 @@ for file in files:
             "--error-exitcode=1",
             "--show-leak-kinds=all",
             "--track-origins=yes",
-            "--show-reachable=yes",
+            # "--show-reachable=yes",
             file,
         ],
     )
