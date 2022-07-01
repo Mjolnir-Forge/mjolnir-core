@@ -104,6 +104,9 @@ jobs:
         -DCMAKE_CXX_COMPILER=clang++-12
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_DEFINITIONS="DISABLE_NEW_DELETE_COUNTER"
         -S . -B build
+    - name: Build
+      run:
+        cmake --build build -j 2
     - name: Run valgrind
       run:
         python python/check_valgrind.py
