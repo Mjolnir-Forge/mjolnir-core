@@ -39,7 +39,7 @@ for file in files:
     print(f"Elapsed time: {round(time.time()-start_time, 2)}s")
     print("\n")
     sys.stdout.flush()
-    if r.returncode != 0:
+    if r.returncode > 0:
         error = True
         print(f"THE BAD RETURN CODE IS {r.returncode}")
 
