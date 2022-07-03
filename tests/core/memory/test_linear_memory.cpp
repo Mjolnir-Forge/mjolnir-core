@@ -85,7 +85,7 @@ TEST(test_linear_memory, initialization_exceptions) // NOLINT
 
     auto mem = LinearMemory();
 
-    EXPECT_THROW(mem.initialize(0), Exception); // NOLINT
+    EXPECT_THROW(mem.initialize(0), ValueError); // NOLINT
 
     EXPECT_EQ(mem.get_memory_size(), 0);
     EXPECT_EQ(mem.get_free_memory_size(), 0);
@@ -118,7 +118,7 @@ TEST(test_linear_memory, initialization_with_external_memory_exceptions) // NOLI
         EXPECT_NUM_NEW_AND_DELETE_EQ(1, 0);
 
         auto mem = LinearMemory();
-        EXPECT_THROW(mem.initialize(0, mem_ptr), Exception); // NOLINT
+        EXPECT_THROW(mem.initialize(0, mem_ptr), ValueError); // NOLINT
 
         EXPECT_EQ(mem.get_memory_size(), 0);
         EXPECT_EQ(mem.get_free_memory_size(), 0);

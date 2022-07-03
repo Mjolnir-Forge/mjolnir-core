@@ -94,6 +94,14 @@ class AllocationError : public Exception
 };
 
 
+//! @brief
+//! Exception class if an invalid value is detected.
+class ValueError : public Exception
+{
+    using Exception::Exception;
+};
+
+
 //! @}
 } // namespace mjolnir
 

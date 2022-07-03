@@ -74,7 +74,7 @@ public:
     //!
     //! @param[in] deleter:
     //! A deleter that is used to free the internal memory.
-    explicit LinearMemory(T_Deleter deleter = DefaultMemoryDeleter());
+    explicit LinearMemory(T_Deleter deleter = DefaultMemoryDeleter()) noexcept;
 
 
     //! @brief
@@ -87,6 +87,9 @@ public:
     //!
     //! @return
     //! Pointer to the newly allocated memory
+    //!
+    //! @exception AllocationError
+    //! There is not enough memory available
     [[nodiscard]] auto allocate(UST size, UST alignment = 1) -> void*;
 
 
@@ -103,6 +106,9 @@ public:
     //!
     //! @return
     //! Pointer to the created instance of `T_Type`
+    //!
+    //! @exception AllocationError
+    //! There is not enough memory available
     template <typename T_Type, typename... T_Args>
     [[nodiscard]] auto allocate_construct(T_Args&&... args) -> T_Type*;
 
@@ -132,8 +138,6 @@ public:
     //!
     //! @exception Exception
     //! Memory is already deinitialized
-    //! @exception Exception
-    //! Memory is still in use (number of allocations != number of deallocations)
     void deinitialize();
 
 
@@ -214,6 +218,10 @@ public:
     //!
     //! @exception Exception
     //! Memory is already initialized
+    //! @exception ValueError
+    //! `size` must be larger than `0`
+    //! @exception std::bad_alloc
+    //! Heap allocation failed
     void initialize(UST size);
 
 
@@ -227,6 +235,11 @@ public:
     //! Size of the passed memory.
     //! @param[in] memory_ptr:
     //! Pointer to the memory that the class should use internally
+    //!
+    //! @exception Exception
+    //! Memory is already initialized
+    //! @exception ValueError
+    //! `size` must be larger than `0`
     void initialize(UST size, std::byte* memory_ptr);
 
 
@@ -259,16 +272,33 @@ private:
     //!
     //! @return
     //! Pointer to the newly allocated memory
+    //!
+    //! @exception Exception
+    //! Memory is already initialized
+    //! @exception ValueError
+    //! `size` must be larger than `0`
+    //! @exception std::bad_alloc
+    //! Heap allocation failed
     [[nodiscard]] auto allocate_internal(UST size, UST alignment) -> void*;
 
 
     //! @brief
-    //! Initialize the memory.
+    //! Deinitialize the memory.
+    //!
+    //! @exception Exception
+    //! Memory is already deinitialized
     void deinitialize_internal();
 
 
     //! @brief
     //! Initialize the memory.
+    //!
+    //! @exception Exception
+    //! Memory is already initialized
+    //! @exception ValueError
+    //! `size` must be larger than `0`
+    //! @exception std::bad_alloc
+    //! Heap allocation failed
     void initialize_internal(UST size);
 
     //! @brief
@@ -297,7 +327,7 @@ private:
 namespace mjolnir
 {
 template <typename T_Lock, typename T_Deleter>
-LinearMemory<T_Lock, T_Deleter>::LinearMemory(T_Deleter deleter) : m_memory{nullptr, deleter}
+LinearMemory<T_Lock, T_Deleter>::LinearMemory(T_Deleter deleter) noexcept : m_memory{nullptr, deleter}
 {
 }
 
@@ -418,7 +448,7 @@ template <typename T_Lock, typename T_Deleter>
 void LinearMemory<T_Lock, T_Deleter>::initialize(UST size, std::byte* memory_ptr)
 {
     THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
-    THROW_EXCEPTION_IF(size == 0, Exception, "Memory size must be larger than 0.");
+    THROW_EXCEPTION_IF(size == 0, ValueError, "Memory size must be larger than 0.");
 
     m_memory_size = size;
     m_memory.reset(memory_ptr);
@@ -492,7 +522,7 @@ void LinearMemory<T_Lock, T_Deleter>::initialize_internal(UST size)
                   "Function can only be used if the classes deleter type is the default deleter.");
 
     THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
-    THROW_EXCEPTION_IF(size == 0, Exception, "Memory size must be larger than 0.");
+    THROW_EXCEPTION_IF(size == 0, ValueError, "Memory size must be larger than 0.");
 
     m_memory_size = size;
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
