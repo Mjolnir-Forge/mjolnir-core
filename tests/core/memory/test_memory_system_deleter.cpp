@@ -6,6 +6,7 @@
 #include "mjolnir/core/memory/linear_memory.h"
 #include "mjolnir/core/memory/memory_system_deleter.h"
 #include "mjolnir/core/utility/pointer_operations.h"
+#include "mjolnir/testing/memory/memory_test_classes.h"
 #include "mjolnir/testing/new_delete_counter.h"
 #include <gtest/gtest.h>
 
@@ -26,39 +27,6 @@ class DeleterTestSuite : public ::testing::Test
 using DeleterTestTypes = ::testing::Types<LinearMemory<>>;
 // cppcheck-suppress syntaxError
 TYPED_TEST_SUITE(DeleterTestSuite, DeleterTestTypes, ); // NOLINT
-
-
-// --- test structs ---------------------------------------------------------------------------------------------------
-
-constexpr UST struct_alignment = 32;
-struct alignas(struct_alignment) AlignedStruct
-{
-    I64 m_member_a = 0;
-    I64 m_member_b = 0;
-};
-
-
-//! This class is used to test if a custom deleter calls the destructor during deletion. It takes a reference to an
-//! integer during construction and increases it by 1 if the class gets destroyed.
-class DestructionTester
-{
-public:
-    DestructionTester()                             = delete;
-    DestructionTester(const DestructionTester&)     = default;
-    DestructionTester(DestructionTester&&) noexcept = default;
-    auto operator=(const DestructionTester&) -> DestructionTester& = delete;
-    auto operator=(DestructionTester&&) noexcept -> DestructionTester& = delete;
-    ~DestructionTester()
-    {
-        ++m_destruction_count;
-    }
-
-    explicit DestructionTester(UST& destruction_count) : m_destruction_count{destruction_count} {};
-
-
-private:
-    UST& m_destruction_count;
-};
 
 
 // === TESTS ==========================================================================================================

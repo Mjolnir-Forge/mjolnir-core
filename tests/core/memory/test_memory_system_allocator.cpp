@@ -6,6 +6,7 @@
 #include "mjolnir/core/memory/linear_memory.h"
 #include "mjolnir/core/memory/memory_system_allocator.h"
 #include "mjolnir/core/utility/pointer_operations.h"
+#include "mjolnir/testing/memory/memory_test_classes.h"
 #include "mjolnir/testing/new_delete_counter.h"
 #include <gtest/gtest.h>
 
@@ -24,17 +25,6 @@ class AllocatorTestSuite : public ::testing::Test
 using AllocatorTestTypes = ::testing::Types<LinearMemory<>>;
 // cppcheck-suppress syntaxError
 TYPED_TEST_SUITE(AllocatorTestSuite, AllocatorTestTypes, ); // NOLINT
-
-
-// --- test structs ---------------------------------------------------------------------------------------------------
-
-
-constexpr UST struct_alignment = 32;
-struct alignas(struct_alignment) AlignedStruct
-{
-    I64 m_member_a = 0;
-    I64 m_member_b = 0;
-};
 
 
 // === TESTS ==========================================================================================================
