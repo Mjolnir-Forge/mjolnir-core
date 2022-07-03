@@ -84,14 +84,14 @@ namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-DestructionTester::DestructionTester(UST& destruction_count) : m_destruction_count{destruction_count}
+inline DestructionTester::DestructionTester(UST& destruction_count) : m_destruction_count{destruction_count}
 {
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-DestructionTester::~DestructionTester()
+inline DestructionTester::~DestructionTester()
 {
     ++m_destruction_count;
 };
