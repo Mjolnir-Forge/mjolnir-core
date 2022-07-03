@@ -40,16 +40,6 @@ concept MemorySystem = requires(T_Type t, void* ptr, UST size, UST alignment)
 };
 // clang-format on
 
-// template <typename T_Type, typename T_Object_Type>
-// concept TypedMemorySystem = MemorySystem<T_Type> && requires(T_Type t, T_Object_Type* ptr)
-//{
-//    {t.destroy_deallocate(ptr)};
-//};
-
-
-// template <typename T_Type>
-// concept
-
 
 //! @}
 } // namespace mjolnir

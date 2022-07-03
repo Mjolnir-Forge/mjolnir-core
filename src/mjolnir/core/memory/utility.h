@@ -11,10 +11,12 @@
 // === DECLARATIONS ===================================================================================================
 
 #include "mjolnir/core/fundamental_types.h"
+#include "mjolnir/core/math/math.h"
 #include "mjolnir/core/memory/definitions.h"
 #include "mjolnir/core/utility/pointer_operations.h"
 
-#include "memory"
+#include <cassert>
+#include <memory>
 
 namespace mjolnir
 {
@@ -34,7 +36,7 @@ namespace mjolnir
 //!
 //! @return
 //! Aligned pointer address
-[[nodiscard]] inline constexpr auto align_address(UPT address, UST alignment) noexcept -> UPT;
+[[nodiscard]] constexpr auto align_address(UPT address, UST alignment) noexcept -> UPT;
 
 
 //! @brief
@@ -85,7 +87,7 @@ inline void destroy_deallocate(T_Type* pointer, T_MemorySystem& memory_system) n
 //! `true` or `false`
 template <typename T_Type>
 [[nodiscard]] constexpr auto
-is_pointer_in_memory(T_Type* pointer, std::byte* memory_start_ptr, UST memory_size) noexcept -> bool;
+is_pointer_in_memory(const T_Type* pointer, const std::byte* memory_start_ptr, UST memory_size) noexcept -> bool;
 
 
 //! @}
@@ -95,15 +97,11 @@ is_pointer_in_memory(T_Type* pointer, std::byte* memory_start_ptr, UST memory_si
 // === DEFINITIONS ====================================================================================================
 
 
-#include "mjolnir/core/math/math.h"
-
-#include <cassert>
-
 namespace mjolnir
 {
 // --------------------------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline constexpr auto align_address(UPT address, UST alignment) noexcept -> UPT
+[[nodiscard]] constexpr auto align_address(UPT address, UST alignment) noexcept -> UPT
 {
     assert(is_power_of_2(alignment) && "Alignment must be a power of 2."); // NOLINT
 
@@ -139,7 +137,7 @@ inline void destroy_deallocate(T_Type* pointer, T_MemorySystem& memory_system) n
 
 template <typename T_Type>
 [[nodiscard]] constexpr auto
-is_pointer_in_memory(T_Type* pointer, std::byte* memory_start_ptr, UST memory_size) noexcept -> bool
+is_pointer_in_memory(const T_Type* pointer, const std::byte* memory_start_ptr, UST memory_size) noexcept -> bool
 {
     UPT addr         = pointer_to_integer(pointer);
     UPT memory_start = pointer_to_integer(memory_start_ptr);
