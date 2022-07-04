@@ -2,7 +2,6 @@
 #    pragma warning(disable : 4324) // Some objects trigger this warning more or less on purpose during alignment tests
 #endif
 
-#include "mjolnir/core/exception.h"
 #include "mjolnir/core/memory/linear_memory.h"
 #include "mjolnir/core/memory/memory_system_deleter.h"
 #include "mjolnir/core/utility/pointer_operations.h"
