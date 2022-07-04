@@ -93,7 +93,7 @@ TEST(test_linear_memory, initialization_exceptions) // NOLINT
 
     mem.initialize(num_bytes);
 
-    EXPECT_THROW(mem.initialize(num_bytes), Exception); // NOLINT
+    EXPECT_THROW(mem.initialize(num_bytes), RuntimeError); // NOLINT
 
     EXPECT_EQ(mem.get_memory_size(), num_bytes);
     EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
@@ -127,7 +127,7 @@ TEST(test_linear_memory, initialization_with_external_memory_exceptions) // NOLI
         mem.initialize(num_bytes, mem_ptr);
 
 
-        EXPECT_THROW(mem.initialize(num_bytes, mem_ptr), Exception); // NOLINT
+        EXPECT_THROW(mem.initialize(num_bytes, mem_ptr), RuntimeError); // NOLINT
 
         EXPECT_EQ(mem.get_memory_size(), num_bytes);
         EXPECT_EQ(mem.get_free_memory_size(), num_bytes);
@@ -397,7 +397,7 @@ TEST(test_linear_memory, deinitialization_exceptions) // NOLINT
     mem.deinitialize();
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-goto,hicpp-avoid-goto)
-    EXPECT_THROW(mem.deinitialize(), Exception);
+    EXPECT_THROW(mem.deinitialize(), RuntimeError);
 
     EXPECT_EQ(mem.get_memory_size(), 0);
     EXPECT_FALSE(mem.is_initialized());

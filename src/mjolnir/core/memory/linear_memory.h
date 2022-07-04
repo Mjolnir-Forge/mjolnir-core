@@ -136,7 +136,7 @@ public:
     //! @details
     //! Resets the internal variables and frees the memory.
     //!
-    //! @exception Exception
+    //! @exception RuntimeError
     //! Memory is already deinitialized
     void deinitialize();
 
@@ -216,7 +216,7 @@ public:
     //! @param[in] size:
     //! Desired size of the internal memory.
     //!
-    //! @exception Exception
+    //! @exception RuntimeError
     //! Memory is already initialized
     //! @exception ValueError
     //! `size` must be larger than `0`
@@ -236,7 +236,7 @@ public:
     //! @param[in] memory_ptr:
     //! Pointer to the memory that the class should use internally
     //!
-    //! @exception Exception
+    //! @exception RuntimeError
     //! Memory is already initialized
     //! @exception ValueError
     //! `size` must be larger than `0`
@@ -273,19 +273,15 @@ private:
     //! @return
     //! Pointer to the newly allocated memory
     //!
-    //! @exception Exception
-    //! Memory is already initialized
-    //! @exception ValueError
-    //! `size` must be larger than `0`
-    //! @exception std::bad_alloc
-    //! Heap allocation failed
+    //! @exception AllocationError
+    //! There is not enough memory available
     [[nodiscard]] auto allocate_internal(UST size, UST alignment) -> void*;
 
 
     //! @brief
     //! Deinitialize the memory.
     //!
-    //! @exception Exception
+    //! @exception RuntimeError
     //! Memory is already deinitialized
     void deinitialize_internal();
 
@@ -293,7 +289,7 @@ private:
     //! @brief
     //! Initialize the memory.
     //!
-    //! @exception Exception
+    //! @exception RuntimeError
     //! Memory is already initialized
     //! @exception ValueError
     //! `size` must be larger than `0`
@@ -447,7 +443,7 @@ void LinearMemory<T_Lock, T_Deleter>::initialize(UST size)
 template <typename T_Lock, typename T_Deleter>
 void LinearMemory<T_Lock, T_Deleter>::initialize(UST size, std::byte* memory_ptr)
 {
-    THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
+    THROW_EXCEPTION_IF(is_initialized(), RuntimeError, "Memory is already initialized");
     THROW_EXCEPTION_IF(size == 0, ValueError, "Memory size must be larger than 0.");
 
     m_memory_size = size;
@@ -504,7 +500,7 @@ auto LinearMemory<T_Lock, T_Deleter>::allocate_internal(UST size, UST alignment)
 template <typename T_Lock, typename T_Deleter>
 void LinearMemory<T_Lock, T_Deleter>::deinitialize_internal()
 {
-    THROW_EXCEPTION_IF(! is_initialized(), Exception, "Memory already deinitialized.");
+    THROW_EXCEPTION_IF(! is_initialized(), RuntimeError, "Memory already deinitialized.");
     assert(m_num_allocations == 0 && "Memory still in use."); // NOLINT
 
     m_memory_size  = 0;
@@ -521,7 +517,7 @@ void LinearMemory<T_Lock, T_Deleter>::initialize_internal(UST size)
     static_assert(std::is_same_v<T_Deleter, DefaultMemoryDeleter>,
                   "Function can only be used if the classes deleter type is the default deleter.");
 
-    THROW_EXCEPTION_IF(is_initialized(), Exception, "Memory is already initialized");
+    THROW_EXCEPTION_IF(is_initialized(), RuntimeError, "Memory is already initialized");
     THROW_EXCEPTION_IF(size == 0, ValueError, "Memory size must be larger than 0.");
 
     m_memory_size = size;

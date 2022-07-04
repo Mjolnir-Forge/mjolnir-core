@@ -95,7 +95,15 @@ class AllocationError : public Exception
 
 
 //! @brief
-//! Exception class if an invalid value is detected.
+//! Exception class for errors that do not fit into any other category.
+class RuntimeError : public Exception
+{
+    using Exception::Exception;
+};
+
+
+//! @brief
+//! Exception class that should be throwm if an invalid value is detected.
 class ValueError : public Exception
 {
     using Exception::Exception;
