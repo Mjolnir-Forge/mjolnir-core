@@ -30,12 +30,6 @@ TYPED_TEST_SUITE(DeleterTestSuite, DeleterTestTypes, ); // NOLINT
 
 // === TESTS ==========================================================================================================
 
-
-// todo:
-// - alignment test
-// - std::shared_ptr test
-
-
 // --- test constructor -----------------------------------------------------------------------------------------------
 
 TYPED_TEST(DeleterTestSuite, constructor) // NOLINT

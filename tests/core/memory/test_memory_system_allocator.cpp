@@ -298,3 +298,35 @@ TYPED_TEST(AllocatorTestSuite, std_map_aligned_object) // NOLINT
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
+
+
+// --- test std::shared_ptr -------------------------------------------------------------------------------------------
+
+TYPED_TEST(AllocatorTestSuite, std_shared_ptr) // NOLINT
+{
+    using AllocatorType = MemorySystemAllocator<DestructionTester, TypeParam>;
+
+    constexpr UST num_bytes     = 1024;
+    UST           num_destroyed = 0;
+
+
+    auto mem = TypeParam();
+    mem.initialize(num_bytes);
+
+    COUNT_NEW_AND_DELETE;
+
+    auto allocator = AllocatorType(mem);
+
+    {
+        std::shared_ptr<DestructionTester> s_ptr_1;
+        {
+            auto s_ptr_2 = std::allocate_shared<DestructionTester, AllocatorType>(allocator, num_destroyed);
+
+            s_ptr_1 = s_ptr_2;
+        }
+        EXPECT_EQ(num_destroyed, 0);
+    }
+    EXPECT_EQ(num_destroyed, 1);
+
+    ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
+}
