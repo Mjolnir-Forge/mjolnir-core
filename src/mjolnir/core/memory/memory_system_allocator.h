@@ -58,7 +58,7 @@ public:
 
 
     //! @brief
-    //! Construct a new allocator with the passes `LinearMemory` instance
+    //! Construct a new allocator with the passed `LinearMemory` instance
     //!
     //! @param[in] linear_memory:
     //! `LinearMemory` instance that provides the memory for the allocations
@@ -102,9 +102,6 @@ public:
 
     //! @brief
     //! Deallocates the memory of the passed pointer.
-    //!
-    //! @details
-    //! Due to the mechanics of the internally used `LinearMemory` this function does nothing.
     //!
     //! @param[in] pointer:
     //! Pointer to the memory that should be freed

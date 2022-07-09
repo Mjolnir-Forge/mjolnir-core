@@ -1,5 +1,5 @@
 //! @file
-//! heap_allocation_counter.h
+//! new_delete_counter.h
 //!
 //! @brief
 //! Contains a class that keeps track of the number of new and delete calls.

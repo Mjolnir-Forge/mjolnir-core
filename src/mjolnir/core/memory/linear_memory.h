@@ -358,7 +358,7 @@ void LinearMemory<T_Lock, T_Deleter>::deallocate([[maybe_unused]] void* ptr,
 #ifndef NDEBUG
     assert(ptr != nullptr && "Pointer is the `nullptr`.");                                                   // NOLINT
     assert(is_pointer_in_memory(ptr, m_memory.get(), m_memory_size) && "Pointer doesn't belong to memory."); // NOLINT
-    assert(m_num_allocations > 0 && "Deallocation was called to often");                                     // NOLINT
+    assert(m_num_allocations > 0 && "Deallocation was called too often");                                     // NOLINT
 
     --m_num_allocations;
 #endif

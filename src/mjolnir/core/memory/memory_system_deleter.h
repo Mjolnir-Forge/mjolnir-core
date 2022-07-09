@@ -47,7 +47,7 @@ public:
 
 
     //! @brief
-    //! Construct a new deleter with the passes `LinearMemory` instance.
+    //! Construct a new deleter with the passed `LinearMemory` instance.
     //!
     //! @param[in] memory_system:
     //! Memory system that provided the memory for the object that should be deleted

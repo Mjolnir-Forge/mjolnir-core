@@ -265,7 +265,6 @@ TEST(test_linear_memory, create) // NOLINT
     EXPECT_EQ(*a, num_bytes);
     EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     const auto* b = mem.allocate_construct<F32>(std::numbers::pi_v<F32>);
 
     exp_free_mem -= sizeof(F32);
@@ -314,10 +313,10 @@ TEST(test_linear_memory, deallocation) // NOLINT
     mem.initialize(num_bytes);
 
 
-    void* a = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    void* b = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    void* c = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    void* d = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    void* a = mem.allocate(alloc_size);
+    void* b = mem.allocate(alloc_size);
+    void* c = mem.allocate(alloc_size);
+    void* d = mem.allocate(alloc_size);
 
     constexpr UST exp_free_mem = num_bytes - 4 * alloc_size;
     EXPECT_EQ(mem.get_free_memory_size(), exp_free_mem);
@@ -372,8 +371,8 @@ TEST(test_linear_memory, deinitialization) // NOLINT
     auto mem = LinearMemory();
     mem.initialize(num_bytes);
 
-    void* a = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    void* b = mem.allocate(alloc_size); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    void* a = mem.allocate(alloc_size);
+    void* b = mem.allocate(alloc_size);
     mem.deallocate(a, alloc_size);
     mem.deallocate(b, alloc_size);
 
