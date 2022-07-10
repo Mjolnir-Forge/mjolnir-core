@@ -14,6 +14,7 @@ jobs:
         -DCMAKE_C_COMPILER=clang-12
         -DCMAKE_CXX_COMPILER=clang++-12
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=address;-fno-omit-frame-pointer"
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_DEFINITIONS="DISABLE_NEW_DELETE_COUNTER"
         -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=address"
         -S . -B build
     - name: Build
@@ -35,6 +36,7 @@ jobs:
         -DCMAKE_C_COMPILER=clang-12
         -DCMAKE_CXX_COMPILER=clang++-12
         -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=thread"
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_DEFINITIONS="DISABLE_NEW_DELETE_COUNTER"
         -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=thread"
         -S . -B build
     - name: Build
@@ -85,6 +87,29 @@ jobs:
       run: |
         cd build
         scan-build-11 --status-bugs make -j2
+
+
+  valgrind:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install valgrind
+      run:
+        sudo apt-get install valgrind
+    - name: Run CMake to fetch googletest
+      run:
+        cmake
+        -DCMAKE_BUILD_TYPE=DEBUG
+        -DCMAKE_C_COMPILER=gcc-10
+        -DCMAKE_CXX_COMPILER=g++-10
+        -DMJOLNIR_CORE_ADDITIONAL_COMPILE_DEFINITIONS="DISABLE_NEW_DELETE_COUNTER"
+        -S . -B build
+    - name: Build
+      run:
+        cmake --build build -j 2
+    - name: Run valgrind
+      run:
+        python python/check_valgrind.py
 
 
 # cmake -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMJOLNIR_CORE_ADDITIONAL_COMPILE_OPTIONS="-fsanitize=memory;-fPIE;-pie;-fsanitize-memory-track-origins=2;-fno-omit-frame-pointer" -DMJOLNIR_CORE_ADDITIONAL_LINK_OPTIONS="-fsanitize=memory;-fPIE;-pie"  ../../code/

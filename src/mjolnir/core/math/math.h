@@ -7,16 +7,34 @@
 
 #pragma once
 
-#include "mjolnir/core/concepts.h"
+#include "mjolnir/core/definitions.h"
 #include "mjolnir/core/fundamental_types.h"
+#include "mjolnir/core/utility/type.h"
 
 #include <concepts>
 
+
+// === DECLARATIONS ===================================================================================================
 
 namespace mjolnir
 {
 //! \addtogroup core_math
 //! @{
+
+
+//! @brief
+//! Return `true` if the passed value is a power of 2.
+//!
+//! @tparam T_Type:
+//! Type of the passed value
+//!
+//! @param[in] value:
+//! The value that should be checked
+//!
+//! @return
+//! `true` or `false`
+template <std::integral T_Type>
+[[nodiscard]] constexpr auto is_power_of_2(T_Type value) noexcept -> bool;
 
 
 //! @brief
@@ -73,7 +91,7 @@ template <Number T_Type = UST>
 } // namespace mjolnir
 
 
-// ====================================================================================================================
+// === DEFINITIONS ====================================================================================================
 
 
 #include <cassert>
@@ -81,6 +99,14 @@ template <Number T_Type = UST>
 
 namespace mjolnir
 {
+template <std::integral T_Type>
+[[nodiscard]] constexpr auto is_power_of_2(T_Type value) noexcept -> bool
+{
+    auto u_value = signed_to_unsigned(value);
+    return (value > 0) && ! (u_value & (u_value - 1));
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 
 template <std::integral T_Type>

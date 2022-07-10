@@ -17,17 +17,19 @@
 
 namespace mjolnir
 {
-using I8  = std::int8_t;   //!< 8 bit signed integer type
-using I16 = std::int16_t;  //!< 16 bit signed integer type
-using I32 = std::int32_t;  //!< 32 bit signed integer type
-using I64 = std::int64_t;  //!< 64 bit signed integer type
-using U8  = std::uint8_t;  //!< 8 bit unsigned integer type
-using U16 = std::uint16_t; //!< 16 bit unsigned integer type
-using U32 = std::uint32_t; //!< 32 bit unsigned integer type
-using U64 = std::uint64_t; //!< 64 bit unsigned integer type
-using UST = std::size_t;   //!< Unsigned integer type that is returned by `sizeof` operations
-using F32 = float;         //!< 32 bit floating point type
-using F64 = double;        //!< 64 bit floating point type
+using I8  = std::int8_t;    //!< 8 bit signed integer type
+using I16 = std::int16_t;   //!< 16 bit signed integer type
+using I32 = std::int32_t;   //!< 32 bit signed integer type
+using I64 = std::int64_t;   //!< 64 bit signed integer type
+using IPT = std::intptr_t;  //!< Signed integer type that has the same size as a pointer
+using U8  = std::uint8_t;   //!< 8 bit unsigned integer type
+using U16 = std::uint16_t;  //!< 16 bit unsigned integer type
+using U32 = std::uint32_t;  //!< 32 bit unsigned integer type
+using U64 = std::uint64_t;  //!< 64 bit unsigned integer type
+using UST = std::size_t;    //!< Unsigned integer type that is returned by `sizeof` operations
+using UPT = std::uintptr_t; //!< Unsigned integer type that has the same size as a pointer
+using F32 = float;          //!< 32 bit floating point type
+using F64 = double;         //!< 64 bit floating point type
 
 
 constexpr UST float_bit_size  = 32; //!< Required size of a `float` in bits
