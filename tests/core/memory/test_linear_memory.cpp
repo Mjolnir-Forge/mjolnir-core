@@ -153,25 +153,40 @@ TEST(test_linear_memory, allocation) // NOLINT
 
     mem.initialize(num_bytes);
 
-    // cppcheck-suppress unreadVariable
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    [[maybe_unused]] const void* a = mem.allocate(24);
-    EXPECT_EQ(mem.get_free_memory_size(), 1000);
 
-    // cppcheck-suppress unreadVariable
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    [[maybe_unused]] const void* b = mem.allocate(16);
-    EXPECT_EQ(mem.get_free_memory_size(), 984);
+    UST         allocation_size = 24; // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    UST         exp_free_memory = num_bytes - allocation_size;
+    const void* a               = mem.allocate(allocation_size);
 
-    // cppcheck-suppress unreadVariable
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    [[maybe_unused]] const void* c = mem.allocate(64);
-    EXPECT_EQ(mem.get_free_memory_size(), 920);
+    EXPECT_EQ(mem.get_free_memory_size(), exp_free_memory);
 
-    // cppcheck-suppress unreadVariable
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    [[maybe_unused]] const void* d = mem.allocate(920);
-    EXPECT_EQ(mem.get_free_memory_size(), 0);
+
+    UST exp_addr    = pointer_to_integer(a) + allocation_size;
+    allocation_size = 16; // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    exp_free_memory -= allocation_size;
+    const void* b = mem.allocate(allocation_size);
+
+    EXPECT_EQ(mem.get_free_memory_size(), exp_free_memory);
+    EXPECT_EQ(pointer_to_integer(b), exp_addr);
+
+
+    exp_addr += allocation_size;
+    allocation_size = 64; // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+    exp_free_memory -= allocation_size;
+    [[maybe_unused]] const void* c = mem.allocate(allocation_size);
+
+    EXPECT_EQ(mem.get_free_memory_size(), exp_free_memory);
+    EXPECT_EQ(pointer_to_integer(c), exp_addr);
+
+
+    exp_addr += allocation_size;
+    allocation_size = mem.get_free_memory_size();
+    exp_free_memory = 0;
+    const void* d   = mem.allocate(allocation_size);
+
+    EXPECT_EQ(mem.get_free_memory_size(), exp_free_memory);
+    EXPECT_EQ(pointer_to_integer(d), exp_addr);
+
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(1, 0);
 }
