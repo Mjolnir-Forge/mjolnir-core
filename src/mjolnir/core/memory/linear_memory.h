@@ -40,6 +40,12 @@ namespace mjolnir
 //!
 //! @tparam T_Lock:
 //! The type of lock that should be used for thread safety. If the type is set to `void`, the memory is not protected.
+//! @tparam T_Deleter
+//! The Type of the deleter that is used to delete the internal memory. The memory system uses a
+//! `std::unique_ptr<std::byte[], T_Deleter>` for the memory that it manages. By default, this class allocates its
+//! memory from the heap and there is no need to specify a deleter type. But you can also pass a pointer to a memory
+//! location that should be managed by this class. In this case the memory system takes ownership of the memory and you
+//! need to define the correct deleter type that should be used to deallocate the memory once it is no longer needed.
 template <typename T_Lock = void, typename T_Deleter = DefaultMemoryDeleter>
 class LinearMemory
 {
@@ -73,8 +79,10 @@ public:
     //! Construct a new instance
     //!
     //! @param[in] deleter:
-    //! A deleter that is used to free the internal memory.
-    explicit LinearMemory(T_Deleter deleter = DefaultMemoryDeleter()) noexcept;
+    //! A deleter instance that is used to free the internal memory (see documentation of `T_Deleter` in the class
+    //! documentation). This parameter is optional if you did not explicitly set the template parameter `T_Deleter` or
+    //! if the utilized deleter type is default constructable.
+    explicit LinearMemory(T_Deleter deleter = T_Deleter()) noexcept;
 
 
     //! @brief
@@ -229,7 +237,11 @@ public:
     //! Initialize the class.
     //!
     //! @details
-    //! This function passes the given memory to the class so that it can be used internally.
+    //! This function passes a pointer to a memory block that the class should use as internal memory. The memory system
+    //! takes ownership of the memory and will take care of its deallocation once the memory is not needed anymore.
+    //!
+    //! Note that you usually need to specify the `T_Deleter` template parameter if you use this function overload
+    //! unless the memory was allocated from the heap by using `new` or the `std::allocator`.
     //!
     //! @param[in] size:
     //! Size of the passed memory.
@@ -358,7 +370,7 @@ void LinearMemory<T_Lock, T_Deleter>::deallocate([[maybe_unused]] void* ptr,
 #ifndef NDEBUG
     assert(ptr != nullptr && "Pointer is the `nullptr`.");                                                   // NOLINT
     assert(is_pointer_in_memory(ptr, m_memory.get(), m_memory_size) && "Pointer doesn't belong to memory."); // NOLINT
-    assert(m_num_allocations > 0 && "Deallocation was called too often");                                     // NOLINT
+    assert(m_num_allocations > 0 && "Deallocation was called too often");                                    // NOLINT
 
     --m_num_allocations;
 #endif
