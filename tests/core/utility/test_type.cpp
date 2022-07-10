@@ -2,7 +2,6 @@
 #include "mjolnir/core/utility/type.h"
 #include <gtest/gtest.h>
 
-//! Inspired by: https://stackoverflow.com/a/22272614/6700329
 
 using namespace mjolnir;
 
@@ -45,9 +44,6 @@ TYPED_TEST_SUITE(UnsignedTestSuite, UnsignedTestTypes, );
 
 
 // test_is_any_of -----------------------------------------------------------------------------------------------------
-
-// define support class for expected results
-
 
 TYPED_TEST(IsAnyOfTestSuite, testcase) // NOLINT
 {
