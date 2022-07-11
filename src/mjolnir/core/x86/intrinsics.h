@@ -301,6 +301,23 @@ template <IntegerVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Perform an element-wise multiplication of `lhs` and `rhs` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! Results of the element-wise multiplication.
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_mul(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Compute the bitwise OR of `a` and `b`.
 //!
 //! @tparam T_RegisterType:
@@ -432,6 +449,23 @@ template <UST t_mask, FloatVectorRegister T_RegisterType>
 //! The register that should be stored
 template <FloatVectorRegister T_RegisterType>
 inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexcept;
+
+
+//! @brief
+//! Subtract `rhs` element-wise from `rhs` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! Results of the element-wise subtraction.
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_sub(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
 
 //! @brief
@@ -710,6 +744,22 @@ template <IntegerVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_mul(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_mul_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_mul_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_mul_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else
+        return _mm256_mul_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_or(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
 {
     if constexpr (is_m128<T_RegisterType>)
@@ -832,6 +882,22 @@ inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexc
         _mm256_store_ps(ptr, reg);
     else
         _mm256_store_pd(ptr, reg);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_sub(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_sub_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_sub_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_sub_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else
+        return _mm256_sub_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
 }
 
 
