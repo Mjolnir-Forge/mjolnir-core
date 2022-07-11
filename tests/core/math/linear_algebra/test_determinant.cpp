@@ -34,7 +34,7 @@ template <FloatVectorRegister T_RegisterType, UST t_size, typename... T_Args>
 
     static_assert(n_values % t_size == 0, "Values can't be distributed equally.");
 
-    std::array<ElementType<T_RegisterType>, n_values> data = {static_cast<ElementType<T_RegisterType>>(args)...};
+    std::array<ElementType<T_RegisterType>, n_values> data = {{static_cast<ElementType<T_RegisterType>>(args)...}};
 
     std::array<T_RegisterType, t_size> a = {{{0}}};
     for (UST i = 0; i < t_size; ++i)
@@ -54,19 +54,19 @@ template <FloatVectorRegister T_RegisterType, UST t_size, typename... T_Args>
 
 TYPED_TEST(FloatingPointTypeTestSuite, determinant_2x2) // NOLINT
 {
-    std::array<TypeParam, 4> a = {1., 0., 0., 1.};
+    std::array<TypeParam, 4> a = {{1., 0., 0., 1.}};
     EXPECT_DOUBLE_EQ(determinant_2x2(a), 1.);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    std::array<TypeParam, 4> b = {4., 2., -3., 5.};
+    std::array<TypeParam, 4> b = {{4., 2., -3., 5.}};
     EXPECT_DOUBLE_EQ(determinant_2x2(b), 26.);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    std::array<TypeParam, 4> c = {-1., 2., 4., 3.};
+    std::array<TypeParam, 4> c = {{-1., 2., 4., 3.}};
     EXPECT_DOUBLE_EQ(determinant_2x2(c), -11.);
 
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    std::array<TypeParam, 4> d = {4., 2., 6., 3.};
+    std::array<TypeParam, 4> d = {{4., 2., 6., 3.}};
     EXPECT_DOUBLE_EQ(determinant_2x2(d), 0.);
 }
 
