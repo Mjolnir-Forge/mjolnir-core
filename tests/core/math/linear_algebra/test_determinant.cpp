@@ -21,7 +21,6 @@ class FloatingPointTypeTestSuite : public ::testing::Test
 
 using FloatingPointTestTypes = ::testing::Types<F32, F64>; // NOLINT
 
-// cppcheck-suppress syntaxError
 TYPED_TEST_SUITE(FloatingPointTypeTestSuite, FloatingPointTestTypes, );
 
 
