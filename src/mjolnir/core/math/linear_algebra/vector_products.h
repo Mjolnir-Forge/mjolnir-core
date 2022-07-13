@@ -44,6 +44,21 @@ template <UST t_size, Number T_Type>
         -> T_Type;
 
 
+//! @brief
+//! Calculate the dot product of 2 vectors
+//!
+//! @tparam t_size:
+//! Size of the vector. Note that this number should not exceed the number of register elements.
+//! @tparam T_RegisterType:
+//! Register type that stores the vector data.
+//!
+//! @param[in] lhs:
+//! Data of the vector on the left-hand side of the operator
+//! @param[in] rhs:
+//! Data of the vector on the right-hand side of the operator
+//!
+//! @return
+//! Dot product
 template <UST t_size, x86::FloatVectorRegister T_RegisterType>
 [[nodiscard]] auto dot_product(T_RegisterType lhs, T_RegisterType rhs) -> x86::ElementType<T_RegisterType>;
 
@@ -64,7 +79,7 @@ template <UST t_size, Number T_Type>
 {
     T_Type result = 0;
     for (UST i = 0; i < t_size; ++i)
-        result += lhs[i] * rhs[i];
+        result += lhs[i] * rhs[i]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
     return result;
 }

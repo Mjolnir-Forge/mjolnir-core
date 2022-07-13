@@ -57,16 +57,13 @@ TYPED_TEST(FloatingPointTypeTestSuite, determinant_2x2) // NOLINT
     std::array<TypeParam, 4> a = {{1., 0., 0., 1.}};
     EXPECT_DOUBLE_EQ(determinant_2x2(a), 1.);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    std::array<TypeParam, 4> b = {{4., 2., -3., 5.}};
+    std::array<TypeParam, 4> b = {{4., 2., -3., 5.}}; // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(determinant_2x2(b), 26.);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    std::array<TypeParam, 4> c = {{-1., 2., 4., 3.}};
+    std::array<TypeParam, 4> c = {{-1., 2., 4., 3.}}; // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(determinant_2x2(c), -11.);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    std::array<TypeParam, 4> d = {{4., 2., 6., 3.}};
+    std::array<TypeParam, 4> d = {{4., 2., 6., 3.}}; // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(determinant_2x2(d), 0.);
 }
 
@@ -78,15 +75,12 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, determinant_2x2) // NOLINT
     auto a = create_register_array<TypeParam, 2>(1., 0., 0., 1.);
     EXPECT_DOUBLE_EQ(determinant_2x2(a), 1.);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    auto b = create_register_array<TypeParam, 2>(4., 2., -3., 5.);
+    auto b = create_register_array<TypeParam, 2>(4., 2., -3., 5.); // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(determinant_2x2(b), 26.);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    auto c = create_register_array<TypeParam, 2>(-1., 2., 4., 3.);
+    auto c = create_register_array<TypeParam, 2>(-1., 2., 4., 3.); // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(determinant_2x2(c), -11.);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    auto d = create_register_array<TypeParam, 2>(4., 2., 6., 3.);
+    auto d = create_register_array<TypeParam, 2>(4., 2., 6., 3.); // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(determinant_2x2(d), 0.);
 }

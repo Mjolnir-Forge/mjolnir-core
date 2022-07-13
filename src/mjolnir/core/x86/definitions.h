@@ -58,6 +58,24 @@ concept FloatAVXRegister = is_any_of<T_Type, __m256, __m256d>();
 
 
 //! @brief
+//! Concept for a x86 vector register that has single precision elements.
+//!
+//! @tparam T_Type
+//! Type
+template <typename T_Type>
+concept SinglePrecisionVectorRegister = is_any_of<T_Type, __m128, __m256>();
+
+
+//! @brief
+//! Concept for a x86 vector register that has double precision elements.
+//!
+//! @tparam T_Type
+//! Type
+template <typename T_Type>
+concept DoublePrecisionVectorRegister = is_any_of<T_Type, __m128d, __m256d>();
+
+
+//! @brief
 //! Concept for a x86 vector register that has integer elements.
 //!
 //! @tparam T_Type

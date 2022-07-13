@@ -13,15 +13,41 @@ using namespace mjolnir::x86;
 
 // --- test suite -----------------------------------------------------------------------------------------------------
 
-template <mjolnir::Number T_RegisterType>
+template <typename T_RegisterType>
 class VectorProductTestSuite : public ::testing::Test
 {
 };
 
 
-using VectorProductTestTypes = ::testing::Types<F32, F64>; // NOLINT
+using VectorProductTestTypes = ::testing::Types<F32, F64, __m128, __m128d, __m256, __m256d>; // NOLINT
 
 TYPED_TEST_SUITE(VectorProductTestSuite, VectorProductTestTypes, );
+
+
+// --- helper functions -----------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType, Number... T_Args>
+[[nodiscard]] auto set_vector(T_Args... args) -> T_RegisterType
+{
+    using EType        = ElementType<T_RegisterType>;
+    constexpr UST size = sizeof...(args);
+
+    std::array<EType, size> data = {{static_cast<EType>(args)...}};
+
+    auto reg = mm_setzero<T_RegisterType>();
+    for (UST i = 0; i < size; ++i)
+        set(reg, i, data.at(i));
+
+    return reg;
+}
+
+
+template <Number T_Type, Number... T_Args>
+[[nodiscard]] auto set_vector(T_Args... args) -> std::array<T_Type, sizeof...(T_Args)>
+{
+    std::array<T_Type, sizeof...(T_Args)> data = {{static_cast<T_Type>(args)...}};
+    return data;
+}
 
 
 // ====================================================================================================================
@@ -29,51 +55,67 @@ TYPED_TEST_SUITE(VectorProductTestSuite, VectorProductTestTypes, );
 // ====================================================================================================================
 
 
-// --- test dot_product (serial version) --------------------------------------------------------------------------
+// --- test dot_product with vector size 2 ----------------------------------------------------------------------------
 
-TYPED_TEST(VectorProductTestSuite, dot_product) // NOLINT
+TYPED_TEST(VectorProductTestSuite, dot_product_vec_2) // NOLINT
 {
-    EXPECT_DOUBLE_EQ((dot_product<2, TypeParam>({{0., 0.}}, {{2., 5.}})), 0.);
-    EXPECT_DOUBLE_EQ((dot_product<2, TypeParam>({{2., 3.}}, {{4., 4.}})), 20.);
-    EXPECT_DOUBLE_EQ((dot_product<2, TypeParam>({{-4., 3.}}, {{6., 2.}})), -18.);
-
-    EXPECT_DOUBLE_EQ((dot_product<3, TypeParam>({{0., 0., 0.}}, {{2., 5., -2.}})), 0.);
-    EXPECT_DOUBLE_EQ((dot_product<3, TypeParam>({{2., 3., 1.}}, {{4., 4., 2.}})), 22.);
-    EXPECT_DOUBLE_EQ((dot_product<3, TypeParam>({{-4., 3., 4.}}, {{6., 2., -3.}})), -30.);
-
-    EXPECT_DOUBLE_EQ((dot_product<4, TypeParam>({{0., 0., 0., 0.}}, {{2., 5., -2., 7.}})), 0.);
-    EXPECT_DOUBLE_EQ((dot_product<4, TypeParam>({{2., 3., 1., 5.}}, {{4., 4., 2., 2.}})), 32.);
-    EXPECT_DOUBLE_EQ((dot_product<4, TypeParam>({{-4., 3., 4., -5.}}, {{6., 2., -3., -2.}})), -20.);
-}
-
-
-// --- test dot_product with vector size 2(vectorized) ----------------------------------------------------------------
-
-TYPED_TEST(FloatingPointVectorRegisterTestSuite, dot_product_size_2) // NOLINT
-{
-    auto a = mm_setzero<TypeParam>();
-    auto b = mm_setzero<TypeParam>();
-
-    set<0>(a, 0.);
-    set<1>(a, 0.);
-    set<0>(b, 2.);
-    set<1>(b, 5.);
-
+    auto a = set_vector<TypeParam>(0., 0.);
+    auto b = set_vector<TypeParam>(2., 5.); // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(dot_product<2>(a, b), 0.);
 
 
-    set<0>(a, 2.);
-    set<1>(a, 3.);
-    set<0>(b, 4.);
-    set<1>(b, 4.);
-
-    EXPECT_DOUBLE_EQ(dot_product<2>(a, b), 22.);
+    a = set_vector<TypeParam>(2., 3.); // NOLINT(readability-magic-numbers)
+    b = set_vector<TypeParam>(4., 4.); // NOLINT(readability-magic-numbers)
+    EXPECT_DOUBLE_EQ(dot_product<2>(a, b), 20.);
 
 
-    set<0>(a, -4.);
-    set<1>(a, 3.);
-    set<0>(b, 6.);
-    set<1>(b, 2.);
-
+    a = set_vector<TypeParam>(-4., 3.); // NOLINT(readability-magic-numbers)
+    b = set_vector<TypeParam>(6., 2.);  // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(dot_product<2>(a, b), -18.);
+}
+
+
+// --- test dot_product with vector size 3 ----------------------------------------------------------------------------
+
+TYPED_TEST(VectorProductTestSuite, dot_product_vec_3) // NOLINT
+{
+    if constexpr (! is_m128d<TypeParam>)
+    {
+        auto a = set_vector<TypeParam>(0., 0., 0.);
+        auto b = set_vector<TypeParam>(2., 5., -2.); // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(dot_product<3>(a, b), 0.);
+
+
+        a = set_vector<TypeParam>(2., 3., 1.); // NOLINT(readability-magic-numbers)
+        b = set_vector<TypeParam>(4., 4., 2.); // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(dot_product<3>(a, b), 22.);
+
+
+        a = set_vector<TypeParam>(-4., 3., 4.); // NOLINT(readability-magic-numbers)
+        b = set_vector<TypeParam>(6., 2., -3.); // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(dot_product<3>(a, b), -30.);
+    }
+}
+
+
+// --- test dot_product with vector size 4 ----------------------------------------------------------------------------
+
+TYPED_TEST(VectorProductTestSuite, dot_product_vec_4) // NOLINT
+{
+    if constexpr (! is_m128d<TypeParam>)
+    {
+        auto a = set_vector<TypeParam>(0., 0., 0., 0.);
+        auto b = set_vector<TypeParam>(2., 5., -2., 7.); // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(dot_product<4>(a, b), 0.);
+
+
+        a = set_vector<TypeParam>(2., 3., 1., 5.); // NOLINT(readability-magic-numbers)
+        b = set_vector<TypeParam>(4., 4., 2., 2.); // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(dot_product<4>(a, b), 32.);
+
+
+        a = set_vector<TypeParam>(-4., 3., 4., -5.); // NOLINT(readability-magic-numbers)
+        b = set_vector<TypeParam>(6., 2., -3., -2.); // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(dot_product<4>(a, b), -20.);
+    }
 }
