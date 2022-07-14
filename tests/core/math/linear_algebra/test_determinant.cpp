@@ -17,7 +17,7 @@ class DeterminantTestSuite : public ::testing::Test
 {
 };
 
-
+// cppcheck-suppress syntaxError
 using DeterminantTestTypes = ::testing::Types<F32, F64, __m128, __m128d, __m256, __m256d>; // NOLINT
 
 TYPED_TEST_SUITE(DeterminantTestSuite, DeterminantTestTypes, );
