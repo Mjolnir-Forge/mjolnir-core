@@ -164,3 +164,34 @@ TYPED_TEST(VectorProductTestSuite, dot_product_vec_4) // NOLINT
         EXPECT_DOUBLE_EQ(dot_product<4>(a, b), -20.);
     }
 }
+
+
+// --- test scalar triple product ----------------------------------------------------------------------------
+
+TYPED_TEST(VectorProductTestSuite, scalar_triple_product) // NOLINT
+{
+    if constexpr (! is_m128d<TypeParam>)
+    {
+        auto a = set_vector<TypeParam>(1., 0., 0.);
+        auto b = set_vector<TypeParam>(0., 1., 0.); // NOLINT(readability-magic-numbers)
+        auto c = set_vector<TypeParam>(0., 0., 1.);
+        EXPECT_DOUBLE_EQ(scalar_triple_product(a, b, c), 1.);
+
+
+        a = set_vector<TypeParam>(1., 2., 3.); // NOLINT(readability-magic-numbers)
+        b = set_vector<TypeParam>(4., 5., 6.); // NOLINT(readability-magic-numbers)
+        c = set_vector<TypeParam>(7., 8., 9.); // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(scalar_triple_product(a, b, c), 0.);
+
+
+        a = set_vector<TypeParam>(-2., 4., 1.); // NOLINT(readability-magic-numbers)
+        b = set_vector<TypeParam>(3., -5., 2.); // NOLINT(readability-magic-numbers)
+        c = set_vector<TypeParam>(5., 1., 3.);  // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(scalar_triple_product(a, b, c), 66.);
+
+        a = set_vector<TypeParam>(-2., 3., 5.); // NOLINT(readability-magic-numbers)
+        b = set_vector<TypeParam>(4., -5., 1.); // NOLINT(readability-magic-numbers)
+        c = set_vector<TypeParam>(1., 2., 3.);  // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(scalar_triple_product(a, b, c), 66.);
+    }
+}

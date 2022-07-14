@@ -79,7 +79,7 @@ template <x86::FloatVectorRegister T_RegisterType>
 {
     using namespace x86;
 
-    if constexpr (num_lane_elements<T_RegisterType> == 2)
+    if constexpr (is_double_precision<T_RegisterType>)
     {
         auto products = mm_mul(mat[0], permute<1, 0>(mat[1]));
         auto result   = mm_sub(products, permute<1, 0>(products));
