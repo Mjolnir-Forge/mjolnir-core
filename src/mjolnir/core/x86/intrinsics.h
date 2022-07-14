@@ -268,6 +268,44 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Perform an element-wise multiplication of `a` and `b`, add `c` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] a:
+//! The register left of the multiplication operator
+//! @param[in] b:
+//! The register right of the multiplication operator
+//! @param[in] c:
+//! The register that will be added after the multiplication
+//!
+//! @return
+//! Results of the element-wise multiplication with subsequent addition
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_fmadd(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Perform an element-wise multiplication of `a` and `b`, subtract `c` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] a:
+//! The register left of the multiplication operator
+//! @param[in] b:
+//! The register right of the multiplication operator
+//! @param[in] c:
+//! The register that will be subtracted after the multiplication
+//!
+//! @return
+//! Results of the element-wise multiplication with subsequent subtraction
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_fmsub(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Load data from an aligned memory location into a new register.
 //!
 //! @tparam T_RegisterType:
@@ -708,6 +746,38 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_cvtss_f32(src);
     else
         return _mm256_cvtsd_f64(src);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_fmadd(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_fmadd_ps(a, b, c);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_fmadd_pd(a, b, c);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_fmadd_ps(a, b, c);
+    else
+        return _mm256_fmadd_pd(a, b, c);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_fmsub(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_fmsub_ps(a, b, c);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_fmsub_pd(a, b, c);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_fmsub_ps(a, b, c);
+    else
+        return _mm256_fmsub_pd(a, b, c);
 }
 
 

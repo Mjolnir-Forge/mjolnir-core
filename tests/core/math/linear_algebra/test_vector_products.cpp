@@ -50,9 +50,54 @@ template <Number T_Type, Number... T_Args>
 }
 
 
+template <UST t_size, Number T_Type>
+void compare_vectors_equal(const std::array<T_Type, t_size>& lhs, const std::array<T_Type, t_size>& rhs) noexcept
+{
+    for (UST i = 0; i < t_size; ++i)
+        EXPECT_DOUBLE_EQ(lhs.at(i), rhs.at(i));
+}
+
+
+template <UST t_size, FloatVectorRegister T_RegisterType>
+void compare_vectors_equal(T_RegisterType lhs, T_RegisterType rhs) noexcept
+{
+    for (UST i = 0; i < t_size; ++i)
+        EXPECT_DOUBLE_EQ(get(lhs, i), get(rhs, i));
+}
+
+
 // ====================================================================================================================
 // Tests
 // ====================================================================================================================
+
+
+// --- test cross_product  --------------------------------------------------------------------------------------------
+
+TYPED_TEST(VectorProductTestSuite, cross_product) // NOLINT
+{
+    if constexpr (! is_m128d<TypeParam>)
+    {
+        auto a   = set_vector<TypeParam>(1., 0., 0.);
+        auto b   = set_vector<TypeParam>(0., 1., 0.); // NOLINT(readability-magic-numbers)
+        auto exp = set_vector<TypeParam>(0., 0., 1.);
+
+        compare_vectors_equal<3>(cross_product(a, b), exp);
+
+
+        a   = set_vector<TypeParam>(3., 2., 1.);  // NOLINT(readability-magic-numbers)
+        b   = set_vector<TypeParam>(1., 2., 3.);  // NOLINT(readability-magic-numbers)
+        exp = set_vector<TypeParam>(4., -8., 4.); // NOLINT(readability-magic-numbers)
+
+        compare_vectors_equal<3>(cross_product(a, b), exp);
+
+
+        a   = set_vector<TypeParam>(-2., 4., 3.);  // NOLINT(readability-magic-numbers)
+        b   = set_vector<TypeParam>(-1., -3., 2.); // NOLINT(readability-magic-numbers)
+        exp = set_vector<TypeParam>(17., 1., 10.); // NOLINT(readability-magic-numbers)
+
+        compare_vectors_equal<3>(cross_product(a, b), exp);
+    }
+}
 
 
 // --- test dot_product with vector size 2 ----------------------------------------------------------------------------
