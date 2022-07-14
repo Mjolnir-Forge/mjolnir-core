@@ -197,7 +197,7 @@ template <UST t_num_elements, SinglePrecisionVectorRegister T_RegisterType>
                 sum = mm_add(sum, swap_lanes(src));
         }
 
-        if constexpr (t_num_elements == 6) // NOLINT(readability-magic-numbers)
+        if constexpr (t_num_elements == 6) // NOLINT(readability-magic-numbers, readability-misleading-indentation)
         {
             __m256 tmp = sum;
             sum        = mm_add(sum, permute<2, 3, 0, 1>(sum));
