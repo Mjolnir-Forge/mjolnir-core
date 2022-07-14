@@ -59,7 +59,7 @@ template <Number T_Type>
 //! @return
 //! Cross product
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] auto cross_product(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
+[[nodiscard]] inline auto cross_product(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
 
 //! @brief
@@ -101,7 +101,8 @@ template <UST t_size, Number T_Type>
 //! @return
 //! Dot product
 template <UST t_size, x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] auto dot_product(T_RegisterType lhs, T_RegisterType rhs) noexcept -> x86::ElementType<T_RegisterType>;
+[[nodiscard]] inline auto dot_product(T_RegisterType lhs, T_RegisterType rhs) noexcept
+        -> x86::ElementType<T_RegisterType>;
 
 //! @}
 } // namespace mjolnir
@@ -125,7 +126,7 @@ template <Number T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] auto cross_product(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+[[nodiscard]] inline auto cross_product(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
 {
     using namespace x86;
 
@@ -174,7 +175,8 @@ template <UST t_size, Number T_Type>
 
 
 template <UST t_size, x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] auto dot_product(T_RegisterType lhs, T_RegisterType rhs) noexcept -> x86::ElementType<T_RegisterType>
+[[nodiscard]] inline auto dot_product(T_RegisterType lhs, T_RegisterType rhs) noexcept
+        -> x86::ElementType<T_RegisterType>
 {
     using namespace x86;
 
