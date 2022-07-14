@@ -1,6 +1,5 @@
 #include "mjolnir/core/math/linear_algebra/determinant.h"
 #include "mjolnir/core/x86/direct_access.h"
-#include "mjolnir/testing/x86/floating_point_vector_register_test_suite.h"
 #include <gtest/gtest.h>
 
 // ====================================================================================================================
@@ -13,21 +12,21 @@ using namespace mjolnir::x86;
 
 // --- test suite -----------------------------------------------------------------------------------------------------
 
-template <mjolnir::Number T_RegisterType>
-class FloatingPointTypeTestSuite : public ::testing::Test
+template <typename T_RegisterType>
+class DeterminantTestSuite : public ::testing::Test
 {
 };
 
 
-using FloatingPointTestTypes = ::testing::Types<F32, F64>; // NOLINT
+using DeterminantTestTypes = ::testing::Types<F32, F64, __m128, __m128d, __m256, __m256d>; // NOLINT
 
-TYPED_TEST_SUITE(FloatingPointTypeTestSuite, FloatingPointTestTypes, );
+TYPED_TEST_SUITE(DeterminantTestSuite, DeterminantTestTypes, );
 
 
 // --- helper functions -----------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType, UST t_size, typename... T_Args>
-[[nodiscard]] constexpr auto create_register_array(T_Args... args) -> std::array<T_RegisterType, t_size>
+[[nodiscard]] constexpr auto create_matrix_data(T_Args... args) -> std::array<T_RegisterType, t_size>
 {
     constexpr UST n_values      = sizeof...(args);
     constexpr UST n_val_per_reg = n_values / t_size;
@@ -45,42 +44,57 @@ template <FloatVectorRegister T_RegisterType, UST t_size, typename... T_Args>
 }
 
 
+template <Number T_Type, UST t_size, typename... T_Args>
+[[nodiscard]] constexpr auto create_matrix_data(T_Args... args) -> std::array<T_Type, sizeof...(T_Args)>
+{
+    std::array<T_Type, sizeof...(T_Args)> mat = {{static_cast<T_Type>(args)...}};
+
+    return mat;
+}
+
+
 // ====================================================================================================================
 // Tests
 // ====================================================================================================================
 
 
-// --- test determinant_2x2 (serial version) --------------------------------------------------------------------------
+// --- test determinant_2x2 -------------------------------------------------------------------------------------------
 
-TYPED_TEST(FloatingPointTypeTestSuite, determinant_2x2) // NOLINT
+TYPED_TEST(DeterminantTestSuite, determinant_2x2) // NOLINT
 {
-    std::array<TypeParam, 4> a = {{1., 0., 0., 1.}};
+    auto a = create_matrix_data<TypeParam, 2>(1., 0., 0., 1.);
     EXPECT_DOUBLE_EQ(determinant_2x2(a), 1.);
 
-    std::array<TypeParam, 4> b = {{4., 2., -3., 5.}}; // NOLINT(readability-magic-numbers)
+    auto b = create_matrix_data<TypeParam, 2>(4., 2., -3., 5.); // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(determinant_2x2(b), 26.);
 
-    std::array<TypeParam, 4> c = {{-1., 2., 4., 3.}}; // NOLINT(readability-magic-numbers)
+    auto c = create_matrix_data<TypeParam, 2>(-1., 2., 4., 3.); // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(determinant_2x2(c), -11.);
 
-    std::array<TypeParam, 4> d = {{4., 2., 6., 3.}}; // NOLINT(readability-magic-numbers)
+    auto d = create_matrix_data<TypeParam, 2>(4., 2., 6., 3.); // NOLINT(readability-magic-numbers)
     EXPECT_DOUBLE_EQ(determinant_2x2(d), 0.);
 }
 
 
-// --- test determinant_2x2 (x86 version) --------------------------------------------------------------------------
+// --- test determinant_3x3 -------------------------------------------------------------------------------------------
 
-TYPED_TEST(FloatingPointVectorRegisterTestSuite, determinant_2x2) // NOLINT
+TYPED_TEST(DeterminantTestSuite, determinant_3x3) // NOLINT
 {
-    auto a = create_register_array<TypeParam, 2>(1., 0., 0., 1.);
-    EXPECT_DOUBLE_EQ(determinant_2x2(a), 1.);
+    if constexpr (! is_m128d<TypeParam>)
+    {
+        auto a = create_matrix_data<TypeParam, 3>(1., 0., 0., 0., 1., 0., 0., 0., 1.);
+        EXPECT_DOUBLE_EQ(determinant_3x3(a), 1.);
 
-    auto b = create_register_array<TypeParam, 2>(4., 2., -3., 5.); // NOLINT(readability-magic-numbers)
-    EXPECT_DOUBLE_EQ(determinant_2x2(b), 26.);
+        // NOLINTNEXTLINE(readability-magic-numbers)
+        auto b = create_matrix_data<TypeParam, 3>(1., 2., 3., 4., 5., 6., 7., 8., 9.);
+        EXPECT_DOUBLE_EQ(determinant_3x3(b), 0.);
 
-    auto c = create_register_array<TypeParam, 2>(-1., 2., 4., 3.); // NOLINT(readability-magic-numbers)
-    EXPECT_DOUBLE_EQ(determinant_2x2(c), -11.);
+        // NOLINTNEXTLINE(readability-magic-numbers)
+        auto c = create_matrix_data<TypeParam, 3>(-2., 4., 1., 3., -5., 2., 5., 1., 3.);
+        EXPECT_DOUBLE_EQ(determinant_3x3(c), 66.);
 
-    auto d = create_register_array<TypeParam, 2>(4., 2., 6., 3.); // NOLINT(readability-magic-numbers)
-    EXPECT_DOUBLE_EQ(determinant_2x2(d), 0.);
+        // NOLINTNEXTLINE(readability-magic-numbers)
+        auto d = create_matrix_data<TypeParam, 3>(-2., 3., 5., 4., -5., 1., 1., 2., 3.);
+        EXPECT_DOUBLE_EQ(determinant_3x3(d), 66.);
+    }
 }
