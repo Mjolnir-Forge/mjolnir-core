@@ -85,16 +85,37 @@ TYPED_TEST(DeterminantTestSuite, determinant_3x3) // NOLINT
         auto a = create_matrix_data<TypeParam, 3>(1., 0., 0., 0., 1., 0., 0., 0., 1.);
         EXPECT_DOUBLE_EQ(determinant_3x3(a), 1.);
 
-        // NOLINTNEXTLINE(readability-magic-numbers)
-        auto b = create_matrix_data<TypeParam, 3>(1., 2., 3., 4., 5., 6., 7., 8., 9.);
-        EXPECT_DOUBLE_EQ(determinant_3x3(b), 0.);
+        a = create_matrix_data<TypeParam, 3>(1., 2., 3., 4., 5., 6., 7., 8., 9.); // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(determinant_3x3(a), 0.);
+
+        a = create_matrix_data<TypeParam, 3>(-2., 4., 1., 3., -5., 2., 5., 1., 3.); // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(determinant_3x3(a), 66.);
+
+        a = create_matrix_data<TypeParam, 3>(-2., 3., 5., 4., -5., 1., 1., 2., 3.); // NOLINT(readability-magic-numbers)
+        EXPECT_DOUBLE_EQ(determinant_3x3(a), 66.);
+    }
+}
+
+
+// --- test determinant_4x4 -------------------------------------------------------------------------------------------
+
+TYPED_TEST(DeterminantTestSuite, determinant_4x4) // NOLINT
+{
+    if constexpr (! is_vector_register<TypeParam>)
+    {
+        auto a = create_matrix_data<TypeParam, 4>(1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.);
+        EXPECT_DOUBLE_EQ(determinant_4x4(a), 1.);
 
         // NOLINTNEXTLINE(readability-magic-numbers)
-        auto c = create_matrix_data<TypeParam, 3>(-2., 4., 1., 3., -5., 2., 5., 1., 3.);
-        EXPECT_DOUBLE_EQ(determinant_3x3(c), 66.);
+        a = create_matrix_data<TypeParam, 4>(1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.);
+        EXPECT_DOUBLE_EQ(determinant_4x4(a), 0.);
 
         // NOLINTNEXTLINE(readability-magic-numbers)
-        auto d = create_matrix_data<TypeParam, 3>(-2., 3., 5., 4., -5., 1., 1., 2., 3.);
-        EXPECT_DOUBLE_EQ(determinant_3x3(d), 66.);
+        a = create_matrix_data<TypeParam, 4>(4., -2., 7., 3., 1., 3., -6., 2., 5., -1., 6., 5., 2., 4., 9., -2.);
+        EXPECT_DOUBLE_EQ(determinant_4x4(a), -208.);
+
+        // NOLINTNEXTLINE(readability-magic-numbers)
+        a = create_matrix_data<TypeParam, 4>(4., 1., 5., 2., -2., 3., -1., 4., 7., -6., 6., 9., 3., 2., 5., -2.);
+        EXPECT_DOUBLE_EQ(determinant_4x4(a), -208.);
     }
 }
