@@ -236,13 +236,18 @@ template <x86::FloatVectorRegister T_RegisterType>
         auto d_1230        = permute<1, 2, 3, 0>(mat[3]);
 
         // calculate all twelve 2x2 determinants
-        auto abcd_45 = mm_fmsub(ac_b0011, bd_b1100_2301, mm_mul(ac_b1100_2301, bd_b0011)); // for last 2 terms
-        auto ab_03   = mm_fmsub(mat[0], b_1230, mm_mul(a_1230, mat[1]));                   // for first 4 terms
-        auto cd_03   = mm_fmsub(mat[2], d_1230, mm_mul(c_1230, mat[3]));
+        auto prod_abcd_45 = mm_mul(ac_b1100_2301, bd_b0011); // for last 2 terms
+        auto prod_ab_03   = mm_mul(a_1230, mat[1]);          // for first 4 terms
+        auto prod_cd_03   = mm_mul(c_1230, mat[3]);
+
+        auto abcd_45 = mm_fmsub(ac_b0011, bd_b1100_2301, prod_abcd_45); // for last 2 terms
+        auto ab_03   = mm_fmsub(mat[0], b_1230, prod_ab_03);            // for first 4 terms
+        auto cd_03   = mm_fmsub(mat[2], d_1230, prod_cd_03);
 
         // reorder to multiply correct terms
-        auto abcd_45_3210   = permute<3, 2, 1, 0>(abcd_45); // for last 2 terms
-        auto cd_03_2301     = permute<2, 3, 0, 1>(cd_03);   // for first 4 terms
+        auto abcd_45_3210 = permute<3, 2, 1, 0>(abcd_45); // for last 2 terms
+        auto cd_03_2301   = permute<2, 3, 0, 1>(cd_03);   // for first 4 terms
+
         auto cd_03_2301_neg = negate_selected<0, 1, 0, 1>(cd_03_2301);
 
         // multiply the 2x2 determinants
@@ -250,7 +255,8 @@ template <x86::FloatVectorRegister T_RegisterType>
         auto products_03 = mm_mul(ab_03, cd_03_2301_neg);
 
         // set redundant elements to zero and and add both products
-        products_45  = blend<0, 0, 1, 1>(products_45, mm_setzero<T_RegisterType>());
+        products_45 = blend<0, 0, 1, 1>(products_45, mm_setzero<T_RegisterType>());
+
         auto tmp_sum = mm_add(products_03, products_45);
 
         // sum up all elements to get the determinant
