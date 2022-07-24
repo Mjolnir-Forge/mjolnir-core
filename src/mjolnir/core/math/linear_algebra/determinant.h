@@ -262,6 +262,27 @@ template <x86::FloatVectorRegister T_RegisterType>
         // sum up all elements to get the determinant
         return element_sum(tmp_sum);
     }
+    if constexpr (is_m256<T_RegisterType>)
+    {
+        auto a_0 = permute_across_lanes<0, 1, 2, 3, 0, 1, 0, 0>(mat[0]);
+        auto a_1 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(mat[0]);
+        auto b_0 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(mat[1]);
+        auto b_1 = permute_across_lanes<0, 1, 2, 3, 0, 1, 0, 0>(mat[1]);
+        auto c_0 = permute_across_lanes<2, 0, 0, 2, 3, 2, 0, 0>(mat[2]);
+        auto c_1 = permute_across_lanes<3, 3, 1, 1, 1, 0, 0, 0>(mat[2]);
+        auto d_0 = permute_across_lanes<3, 3, 1, 1, 1, 0, 0, 0>(mat[3]);
+        auto d_1 = permute_across_lanes<2, 0, 0, 2, 3, 2, 0, 0>(mat[3]);
+
+        auto prod_ab_0 = mm_mul(a_0, b_0);
+        auto prod_cd_0 = mm_mul(c_0, d_0);
+
+        auto prod_ab = mm_fmsub(a_1, b_1, prod_ab_0);
+        auto prod_cd = mm_fmsub(c_1, d_1, prod_cd_0);
+
+        auto products = mm_mul(prod_ab, prod_cd);
+
+        return element_sum_first_n<6>(products);
+    }
 }
 
 } // namespace mjolnir
