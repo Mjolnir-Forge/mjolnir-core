@@ -262,9 +262,9 @@ template <x86::FloatVectorRegister T_RegisterType>
         // sum up all elements to get the determinant
         return element_sum(tmp_sum);
     }
-    if constexpr (is_m256<T_RegisterType>)
+    else if constexpr (is_m256<T_RegisterType>) // NOLINT(readability-misleading-indentation)
     {
-        // necessary permutations
+        // necessary permutations (last 2 elements are unused)
         auto a_0 = permute_across_lanes<0, 1, 2, 3, 0, 1, 0, 0>(mat[0]);
         auto a_1 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(mat[0]);
         auto b_0 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(mat[1]);
@@ -285,7 +285,7 @@ template <x86::FloatVectorRegister T_RegisterType>
         auto products = mm_mul(prod_ab, prod_cd);
 
         // sum up all elements to get the determinant
-        return element_sum_first_n<6>(products);
+        return element_sum_first_n<6>(products); // NOLINT(readability-magic-numbers)
     }
 }
 
