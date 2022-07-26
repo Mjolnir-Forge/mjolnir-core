@@ -101,7 +101,7 @@ TYPED_TEST(DeterminantTestSuite, determinant_3x3) // NOLINT
 
 TYPED_TEST(DeterminantTestSuite, determinant_4x4) // NOLINT
 {
-    if constexpr (! is_m128d<TypeParam> && ! is_m256d<TypeParam>)
+    if constexpr (! is_m128d<TypeParam>)
     {
         auto a = create_matrix_data<TypeParam, 4>(1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.);
         EXPECT_DOUBLE_EQ(determinant_4x4(a), 1.);

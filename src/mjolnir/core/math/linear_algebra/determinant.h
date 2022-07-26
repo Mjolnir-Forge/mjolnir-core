@@ -217,76 +217,88 @@ template <x86::FloatVectorRegister T_RegisterType>
         -> x86::ElementType<T_RegisterType>
 {
     using namespace x86;
-    if constexpr (is_m128<T_RegisterType>)
-    {
-        // The implementation is based on the formula that expresses the 4x4 determinant by a combination of twelve 2x2
-        // determinants
 
-        // reorder values as needed
-        auto ac_b0011 = blend<0, 0, 1, 1>(mat[0], mat[2]); // for last 2 terms
-        auto ac_b1100 = blend<1, 1, 0, 0>(mat[0], mat[2]);
-        auto bd_b0011 = blend<0, 0, 1, 1>(mat[1], mat[3]);
-        auto bd_b1100 = blend<1, 1, 0, 0>(mat[1], mat[3]);
+    static_assert(num_elements<T_RegisterType> >= 4, "Register size too small.");
 
-        auto ac_b1100_2301 = permute<2, 3, 0, 1>(ac_b1100); // for last 2 terms
-        auto bd_b1100_2301 = permute<2, 3, 0, 1>(bd_b1100);
-        auto a_1230        = permute<1, 2, 3, 0>(mat[0]); // for first 4 terms
-        auto b_1230        = permute<1, 2, 3, 0>(mat[1]);
-        auto c_1230        = permute<1, 2, 3, 0>(mat[2]);
-        auto d_1230        = permute<1, 2, 3, 0>(mat[3]);
+    // The implementation is based on the formula that expresses the 4x4 determinant by a combination of twelve 2x2
+    // determinants
+    // Note that there is a specialization for __m256 registers below
 
-        // calculate all twelve 2x2 determinants
-        auto prod_abcd_45 = mm_mul(ac_b1100_2301, bd_b0011); // for last 2 terms
-        auto prod_ab_03   = mm_mul(a_1230, mat[1]);          // for first 4 terms
-        auto prod_cd_03   = mm_mul(c_1230, mat[3]);
+    // reorder values as needed
+    auto ac_b0011 = blend<0, 0, 1, 1>(mat[0], mat[2]); // for last 2 terms
+    auto ac_b1100 = blend<1, 1, 0, 0>(mat[0], mat[2]);
+    auto bd_b0011 = blend<0, 0, 1, 1>(mat[1], mat[3]);
+    auto bd_b1100 = blend<1, 1, 0, 0>(mat[1], mat[3]);
 
-        auto abcd_45 = mm_fmsub(ac_b0011, bd_b1100_2301, prod_abcd_45); // for last 2 terms
-        auto ab_03   = mm_fmsub(mat[0], b_1230, prod_ab_03);            // for first 4 terms
-        auto cd_03   = mm_fmsub(mat[2], d_1230, prod_cd_03);
+    auto ac_b1100_2301 = permute_across_lanes<2, 3, 0, 1>(ac_b1100); // for last 2 terms
+    auto bd_b1100_2301 = permute_across_lanes<2, 3, 0, 1>(bd_b1100);
+    auto a_1230        = permute_across_lanes<1, 2, 3, 0>(mat[0]); // for first 4 terms
+    auto b_1230        = permute_across_lanes<1, 2, 3, 0>(mat[1]);
+    auto c_1230        = permute_across_lanes<1, 2, 3, 0>(mat[2]);
+    auto d_1230        = permute_across_lanes<1, 2, 3, 0>(mat[3]);
 
-        // reorder to multiply correct terms
-        auto abcd_45_3210 = permute<3, 2, 1, 0>(abcd_45); // for last 2 terms
-        auto cd_03_2301   = permute<2, 3, 0, 1>(cd_03);   // for first 4 terms
+    // calculate all twelve 2x2 determinants
+    auto prod_abcd_45 = mm_mul(ac_b1100_2301, bd_b0011); // for last 2 terms
+    auto prod_ab_03   = mm_mul(a_1230, mat[1]);          // for first 4 terms
+    auto prod_cd_03   = mm_mul(c_1230, mat[3]);
 
-        auto cd_03_2301_neg = negate_selected<0, 1, 0, 1>(cd_03_2301);
+    auto abcd_45 = mm_fmsub(ac_b0011, bd_b1100_2301, prod_abcd_45); // for last 2 terms
+    auto ab_03   = mm_fmsub(mat[0], b_1230, prod_ab_03);            // for first 4 terms
+    auto cd_03   = mm_fmsub(mat[2], d_1230, prod_cd_03);
 
-        // multiply the 2x2 determinants
-        auto products_45 = mm_mul(abcd_45, abcd_45_3210);
-        auto products_03 = mm_mul(ab_03, cd_03_2301_neg);
+    // reorder to multiply correct terms
+    auto abcd_45_3210 = permute_across_lanes<3, 2, 1, 0>(abcd_45); // for last 2 terms
+    auto cd_03_2301   = permute_across_lanes<2, 3, 0, 1>(cd_03);   // for first 4 terms
 
-        // set redundant elements to zero and and add both products
-        products_45 = blend<0, 0, 1, 1>(products_45, mm_setzero<T_RegisterType>());
+    auto cd_03_2301_neg = negate_selected<0, 1, 0, 1>(cd_03_2301);
 
-        auto tmp_sum = mm_add(products_03, products_45);
+    // multiply the 2x2 determinants
+    auto products_45 = mm_mul(abcd_45, abcd_45_3210);
+    auto products_03 = mm_mul(ab_03, cd_03_2301_neg);
 
-        // sum up all elements to get the determinant
-        return element_sum(tmp_sum);
-    }
-    else if constexpr (is_m256<T_RegisterType>) // NOLINT(readability-misleading-indentation)
-    {
-        // necessary permutations (last 2 elements are unused)
-        auto a_0 = permute_across_lanes<0, 1, 2, 3, 0, 1, 0, 0>(mat[0]);
-        auto a_1 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(mat[0]);
-        auto b_0 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(mat[1]);
-        auto b_1 = permute_across_lanes<0, 1, 2, 3, 0, 1, 0, 0>(mat[1]);
-        auto c_0 = permute_across_lanes<2, 0, 0, 2, 3, 2, 0, 0>(mat[2]);
-        auto c_1 = permute_across_lanes<3, 3, 1, 1, 1, 0, 0, 0>(mat[2]);
-        auto d_0 = permute_across_lanes<3, 3, 1, 1, 1, 0, 0, 0>(mat[3]);
-        auto d_1 = permute_across_lanes<2, 0, 0, 2, 3, 2, 0, 0>(mat[3]);
+    // set redundant elements to zero and and add both products
+    products_45 = blend<0, 0, 1, 1>(products_45, mm_setzero<T_RegisterType>());
 
-        // calculate all twelve 2x2 determinants
-        auto prod_ab_0 = mm_mul(a_0, b_0);
-        auto prod_cd_0 = mm_mul(c_0, d_0);
+    auto tmp_sum = mm_add(products_03, products_45);
 
-        auto prod_ab = mm_fmsub(a_1, b_1, prod_ab_0);
-        auto prod_cd = mm_fmsub(c_1, d_1, prod_cd_0);
-
-        // multiply the 2x2 determinants
-        auto products = mm_mul(prod_ab, prod_cd);
-
-        // sum up all elements to get the determinant
-        return element_sum_first_n<6>(products); // NOLINT(readability-magic-numbers)
-    }
+    // sum up all elements to get the determinant
+    return element_sum(tmp_sum);
 }
+
+
+// --- specializations
+
+//! \cond DO_NOT_DOCUMENT
+
+template <>
+[[nodiscard]] inline auto determinant_4x4(const std::array<__m256, 4>& mat) noexcept -> x86::ElementType<__m256>
+{
+    using namespace x86;
+
+    // necessary permutations (last 2 elements are unused)
+    auto a_0 = permute_across_lanes<0, 1, 2, 3, 0, 1, 0, 0>(mat[0]);
+    auto a_1 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(mat[0]);
+    auto b_0 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(mat[1]);
+    auto b_1 = permute_across_lanes<0, 1, 2, 3, 0, 1, 0, 0>(mat[1]);
+    auto c_0 = permute_across_lanes<2, 0, 0, 2, 3, 2, 0, 0>(mat[2]);
+    auto c_1 = permute_across_lanes<3, 3, 1, 1, 1, 0, 0, 0>(mat[2]);
+    auto d_0 = permute_across_lanes<3, 3, 1, 1, 1, 0, 0, 0>(mat[3]);
+    auto d_1 = permute_across_lanes<2, 0, 0, 2, 3, 2, 0, 0>(mat[3]);
+
+    // calculate all twelve 2x2 determinants
+    auto prod_ab_0 = mm_mul(a_0, b_0);
+    auto prod_cd_0 = mm_mul(c_0, d_0);
+
+    auto prod_ab = mm_fmsub(a_1, b_1, prod_ab_0);
+    auto prod_cd = mm_fmsub(c_1, d_1, prod_cd_0);
+
+    // multiply the 2x2 determinants
+    auto products = mm_mul(prod_ab, prod_cd);
+
+    // sum up all elements to get the determinant
+    return element_sum_first_n<6>(products); // NOLINT(readability-magic-numbers)
+}
+
+//! \endcond
 
 } // namespace mjolnir
