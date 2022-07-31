@@ -1,8 +1,8 @@
 //! @file
-//! math/linear_algebra/vector_products.h
+//! math/linear_algebra/vector_operations.h
 //!
 //! @brief
-//! Functions to calculate various vector products.
+//! Functions to calculate various vector products and properties.
 
 
 #pragma once

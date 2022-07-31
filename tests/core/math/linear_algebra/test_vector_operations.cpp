@@ -1,4 +1,4 @@
-#include "mjolnir/core/math/linear_algebra/vector_products.h"
+#include "mjolnir/core/math/linear_algebra/vector_operations.h"
 #include "mjolnir/core/x86/direct_access.h"
 #include "mjolnir/testing/x86/floating_point_vector_register_test_suite.h"
 #include <gtest/gtest.h>

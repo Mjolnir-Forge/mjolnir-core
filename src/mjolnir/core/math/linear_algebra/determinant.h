@@ -9,7 +9,7 @@
 
 #include "mjolnir/core/definitions.h"
 #include "mjolnir/core/fundamental_types.h"
-#include "mjolnir/core/math/linear_algebra/vector_products.h"
+#include "mjolnir/core/math/linear_algebra/vector_operations.h"
 #include "mjolnir/core/x86/definitions.h"
 #include "mjolnir/core/x86/intrinsics.h"
 #include "mjolnir/core/x86/permutation.h"
