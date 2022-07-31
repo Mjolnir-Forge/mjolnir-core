@@ -26,7 +26,7 @@ A good tutorial about determinants can be found
 \f]
 \f[
 \mathrm{det} \left( \mathbf{AB} \right)
-= 
+=
 \mathrm{det} \left( \mathbf{A} \right) \cdot
 \mathrm{det} \left( \mathbf{B} \right)
 \f]
