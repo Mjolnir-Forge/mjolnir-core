@@ -2,15 +2,20 @@
 
 ## Introduction
 
-The determinant of a square matrix \f$\mathbf{A}\f$, denoted as \f$\mathrm{det} \left( \mathbf{A} \right)\f$ is a 
-number associated with \f$\mathbf{A}\f$. It has several use-cases like determining the solvability of linear system of
-equations. Its magnitude is the scaling factor of the transformation represented by the matrix. If the edges of an 
-arbitrary volume are multiplied by a matrix with a determinant of value 4, the new volume will be 4 times larger than
-the original one. If the determinant is negative, it indicates that the transformation switches the orientation of all
-transformed points. If three points originally had a clockwise orientation, then the new ones will have a 
-counter-clockwise orientation. Positive determinants preserve the original orientation.
+The determinant of a square matrix \f$\mathbf{A}\f$, denoted as
+\f$\mathrm{det} \left( \mathbf{A} \right)\f$ is a number associated with
+\f$\mathbf{A}\f$. It has several use-cases like determining the solvability of 
+linear system of equations. Its magnitude is the scaling factor of the
+transformation represented by the matrix. If the edges of an arbitrary volume
+are multiplied by a matrix with a determinant of value 4, the new volume will be
+4 times larger than the original one. If the determinant is negative, it
+indicates that the transformation switches the orientation of all transformed
+points. If three points originally had a clockwise orientation, then the new
+ones will have a counter-clockwise orientation. Positive determinants preserve
+the original orientation.
 
-A good tutorial about determinants can be found [here](https://www.youtube.com/watch?v=Ip3X9LOh2dk&t=13s)
+A good tutorial about determinants can be found
+[here](https://www.youtube.com/watch?v=Ip3X9LOh2dk&t=13s)
 
 
 ## Properties
@@ -23,7 +28,8 @@ A good tutorial about determinants can be found [here](https://www.youtube.com/w
 \f[
 \mathrm{det} \left( \mathbf{AB} \right)
 = 
-\mathrm{det} \left( \mathbf{A} \right) \cdot \mathrm{det} \left( \mathbf{B} \right)
+\mathrm{det} \left( \mathbf{A} \right) \cdot 
+\mathrm{det} \left( \mathbf{B} \right)
 \f]
 
 ## Equations
@@ -69,8 +75,8 @@ a_2&b_2&c_2
 \end{matrix}
 \f]
 
-With the column of \f$\mathbf{A}\f$ being the vectors \f$\mathbf{a}\f$, \f$\mathbf{b}\f$, and \f$\mathbf{c}\f$, this can 
-be written as:
+With the column of \f$\mathbf{A}\f$ being the vectors \f$\mathbf{a}\f$,
+\f$\mathbf{b}\f$, and \f$\mathbf{c}\f$, this can be written as:
 
 \f[
 \mathrm{det} \left( \mathbf{A} \right)
@@ -78,7 +84,8 @@ be written as:
 \mathbf{a} \cdot \left( \mathbf{b} \times \mathbf{c} \right)
 \f]
 
-The right-hand side of the equation above is also known as the scalar triple product.
+The right-hand side of the equation above is also known as the scalar triple
+product.
 
 
 ### 4x4 Determinant
