@@ -4,11 +4,11 @@
 
 ### Added
 
-- `core/math/linear_algebra/determinant.h` - contains functions to 
+- `core/math/linear_algebra/determinant.h` - contains functions to
   calculate the determinant of a matrix
   [[PR #55](https://github.com/Mjolnir-Forge/mjolnir-core/pull/55)]
 
-- `core/math/linear_algebra/vector_operations.h` - contains functions to 
+- `core/math/linear_algebra/vector_operations.h` - contains functions to
   calculate several vector products and properties
   [[PR #55](https://github.com/Mjolnir-Forge/mjolnir-core/pull/55)]
 
