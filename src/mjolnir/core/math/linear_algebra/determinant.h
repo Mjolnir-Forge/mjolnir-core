@@ -190,7 +190,8 @@ template <Number T_Type>
 // NOLINTNEXTLINE(readability-magic-numbers)
 [[nodiscard]] constexpr auto determinant_4x4(const std::array<T_Type, 16>& mat) noexcept -> T_Type
 {
-    // todo copy documentation from old repo
+    // The implementation is based on the formula that expresses the 4x4 determinant by a combination of twelve 2x2
+    // determinants. You can find it in the corresponding section about determinants in the developers documentation.
 
     T_Type ab_01 = (mat[0] * mat[5] - mat[1] * mat[4]); // NOLINT(readability-magic-numbers)
     T_Type ab_12 = (mat[1] * mat[6] - mat[2] * mat[5]); // NOLINT(readability-magic-numbers)
@@ -221,7 +222,8 @@ template <x86::FloatVectorRegister T_RegisterType>
     static_assert(num_elements<T_RegisterType> >= 4, "Register size too small.");
 
     // The implementation is based on the formula that expresses the 4x4 determinant by a combination of twelve 2x2
-    // determinants
+    // determinants. You can find it in the corresponding section about determinants in the developers documentation.
+
     // Note that there is a specialization for __m256 registers below
 
     // reorder values as needed
