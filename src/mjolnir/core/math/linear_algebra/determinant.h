@@ -268,7 +268,7 @@ template <x86::FloatVectorRegister T_RegisterType>
 }
 
 
-// --- specializations
+// --- specialization -------------------------------------
 
 //! \cond DO_NOT_DOCUMENT
 
