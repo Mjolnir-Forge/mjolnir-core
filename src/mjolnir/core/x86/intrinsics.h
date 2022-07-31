@@ -268,6 +268,44 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Perform an element-wise multiplication of `a` and `b`, add `c` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] a:
+//! The register left of the multiplication operator
+//! @param[in] b:
+//! The register right of the multiplication operator
+//! @param[in] c:
+//! The register that will be added after the multiplication
+//!
+//! @return
+//! Results of the element-wise multiplication with subsequent addition
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_fmadd(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Perform an element-wise multiplication of `a` and `b`, subtract `c` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] a:
+//! The register left of the multiplication operator
+//! @param[in] b:
+//! The register right of the multiplication operator
+//! @param[in] c:
+//! The register that will be subtracted after the multiplication
+//!
+//! @return
+//! Results of the element-wise multiplication with subsequent subtraction
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_fmsub(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Load data from an aligned memory location into a new register.
 //!
 //! @tparam T_RegisterType:
@@ -298,6 +336,23 @@ template <FloatVectorRegister T_RegisterType>
 //! The created mask
 template <IntegerVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_movemask_epi8(T_RegisterType src) noexcept;
+
+
+//! @brief
+//! Perform an element-wise multiplication of `lhs` and `rhs` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! Results of the element-wise multiplication.
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_mul(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
 
 //! @brief
@@ -432,6 +487,23 @@ template <UST t_mask, FloatVectorRegister T_RegisterType>
 //! The register that should be stored
 template <FloatVectorRegister T_RegisterType>
 inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexcept;
+
+
+//! @brief
+//! Subtract `rhs` element-wise from `rhs` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! Results of the element-wise subtraction.
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_sub(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
 
 //! @brief
@@ -680,6 +752,38 @@ template <FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_fmadd(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_fmadd_ps(a, b, c);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_fmadd_pd(a, b, c);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_fmadd_ps(a, b, c);
+    else
+        return _mm256_fmadd_pd(a, b, c);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_fmsub(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_fmsub_ps(a, b, c);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_fmsub_pd(a, b, c);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_fmsub_ps(a, b, c);
+    else
+        return _mm256_fmsub_pd(a, b, c);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_load(ElementType<T_RegisterType>* ptr) noexcept -> T_RegisterType
 {
     assert(is_aligned<alignment_bytes<T_RegisterType>>(ptr)); // NOLINT
@@ -704,6 +808,22 @@ template <IntegerVectorRegister T_RegisterType>
         return static_cast<U16>(_mm_movemask_epi8(src));
     else
         return static_cast<U32>(_mm256_movemask_epi8(src));
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_mul(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_mul_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_mul_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_mul_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else
+        return _mm256_mul_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
 }
 
 
@@ -832,6 +952,22 @@ inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexc
         _mm256_store_ps(ptr, reg);
     else
         _mm256_store_pd(ptr, reg);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_sub(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_sub_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_sub_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_sub_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else
+        return _mm256_sub_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
 }
 
 

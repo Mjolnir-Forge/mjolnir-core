@@ -1,5 +1,6 @@
 # portability is probably going to be removed or disabled since it would trigger a lot of warnings for all x86
-# implementations
+# implementations.
+# cppcoreguidelines-avoid-magic-numbers is removed since magic numbers are already covered by readability-magic-numbers
 Checks: >
   bugprone-*,
   cert-*,
@@ -14,6 +15,7 @@ Checks: >
   readability-*,
   -hicpp-braces-around-statements,
   -readability-braces-around-statements,
+  -cppcoreguidelines-avoid-magic-numbers,
   -llvm-header-guard
 
 WarningsAsErrors: '*, -readability-identifier-naming'

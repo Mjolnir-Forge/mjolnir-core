@@ -1,1 +1,2 @@
+add_subdirectory(linear_algebra)
 add_mjolnir_core_test(math)
