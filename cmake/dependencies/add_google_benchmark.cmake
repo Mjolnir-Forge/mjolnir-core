@@ -8,12 +8,11 @@ as external project. In this case the minimal required version will be used.
 
 if(MJOLNIR_CORE_ENABLE_BENCHMARKS)
     find_package(benchmark ${BENCHMARK_MINIMAL_VERSION} QUIET)
-    if (NOT ${benchmark_FOUND})
+    if(NOT ${benchmark_FOUND})
         message(
-            STATUS
-                "Google benchmark ${BENCHMARK_MINIMAL_VERSION} (or higher)"
-                "installation could not be located. It will be fetched from "
-                "the GitHub repository")
+            STATUS "Google benchmark ${BENCHMARK_MINIMAL_VERSION} (or higher)"
+                   "installation could not be located. It will be fetched from "
+                   "the GitHub repository")
 
         FetchContent_Declare(
             benchmark
@@ -33,6 +32,7 @@ if(MJOLNIR_CORE_ENABLE_BENCHMARKS)
             message(STATUS "Google benchmark already populated.")
         endif()
     else()
-        message(STATUS "Google benchmark ${benchmark_VERSION} installation found.")
+        message(
+            STATUS "Google benchmark ${benchmark_VERSION} installation found.")
     endif()
 endif()
