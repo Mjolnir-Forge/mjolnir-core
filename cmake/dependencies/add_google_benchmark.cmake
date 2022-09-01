@@ -7,18 +7,18 @@ as external project. In this case the minimal required version will be used.
 #]==]
 
 if(MJOLNIR_CORE_ENABLE_BENCHMARKS)
-    find_package(benchmark ${benchmark_MINIMAL_VERSION} QUIET)
+    find_package(benchmark ${BENCHMARK_MINIMAL_VERSION} QUIET)
     if (NOT ${benchmark_FOUND})
         message(
             STATUS
-                "Google benchmark ${benchmark_MINIMAL_VERSION} (or higher)"
+                "Google benchmark ${BENCHMARK_MINIMAL_VERSION} (or higher)"
                 "installation could not be located. It will be fetched from "
                 "the GitHub repository")
 
         FetchContent_Declare(
             benchmark
             GIT_REPOSITORY https://github.com/google/benchmark.git
-            GIT_TAG v${benchmark_MINIMAL_VERSION})
+            GIT_TAG v${BENCHMARK_MINIMAL_VERSION})
 
         FetchContent_MakeAvailable(benchmark)
 
