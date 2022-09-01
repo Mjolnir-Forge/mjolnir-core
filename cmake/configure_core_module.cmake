@@ -7,6 +7,7 @@ Configure the module.
 # ------------------------------------------------------------------------------
 
 option(MJOLNIR_CORE_ENABLE_TESTS "Enable the tests" TRUE)
+option(MJOLNIR_CORE_ENABLE_BENCHMARKS "Enable the benchmarks" TRUE)
 option(MJOLNIR_CORE_ENABLE_COMPILER_EXTENSIONS "Enables compiler extensions"
        FALSE)
 option(MJOLNIR_CORE_ENABLE_LTO "Enables link time optimizations" FALSE)
@@ -32,6 +33,7 @@ endif()
 # ------------------------------------------------------------------------------
 
 set(GTEST_MINIMAL_VERSION 1.10.0)
+set(benchmark_MINIMAL_VERSION 1.7.0)
 
 # ------------------------------------------------------------------------------
 # Compiler
