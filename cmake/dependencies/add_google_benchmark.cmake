@@ -14,6 +14,8 @@ if(MJOLNIR_CORE_ENABLE_BENCHMARKS)
                    "installation could not be located. It will be fetched from "
                    "the GitHub repository")
 
+        set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "Enable testing of the benchmark library.")
+
         FetchContent_Declare(
             benchmark
             GIT_REPOSITORY https://github.com/google/benchmark.git
