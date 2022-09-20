@@ -46,3 +46,4 @@ include(resolve_dependencies)
 
 add_subdirectory(src/mjolnir/core)
 add_subdirectory(tests)
+add_subdirectory(benchmarks)
