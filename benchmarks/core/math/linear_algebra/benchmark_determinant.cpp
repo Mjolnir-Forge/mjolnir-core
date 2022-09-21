@@ -9,8 +9,8 @@ using namespace mjolnir;
 using namespace mjolnir::x86;
 
 
-template <Number T_Type, U32 t_size>
-void benchmark_determinant(benchmark::State& state)
+template <Number T_Type, UST t_size>
+static void bm_determinant(benchmark::State& state)
 {
     std::array<T_Type, t_size* t_size> data = {{0}};
     benchmark::DoNotOptimize(data);
@@ -31,8 +31,8 @@ void benchmark_determinant(benchmark::State& state)
 }
 
 
-template <FloatVectorRegister T_RegisterType, U32 t_size>
-void benchmark_determinant(benchmark::State& state)
+template <FloatVectorRegister T_RegisterType, UST t_size>
+static void bm_determinant(benchmark::State& state)
 {
     using Type = ElementType<T_RegisterType>;
 
@@ -55,122 +55,29 @@ void benchmark_determinant(benchmark::State& state)
 }
 
 
-// --- determinant 2x2 ------------------------------------------------------------------------------------------------
+// --- benchmarks -----------------------------------------------------------------------------------------------------
 
-static void determinant_2x2_f32(benchmark::State& state)
-{
-    benchmark_determinant<F32, 2>(state);
-}
-BENCHMARK(determinant_2x2_f32); // NOLINT
+BENCHMARK(bm_determinant<F32, 2>)->Name("F32 - 2x2"); // NOLINT
+BENCHMARK(bm_determinant<F32, 3>)->Name("F32 - 3x3"); // NOLINT
+BENCHMARK(bm_determinant<F32, 4>)->Name("F32 - 4x4"); // NOLINT
 
+BENCHMARK(bm_determinant<F64, 2>)->Name("F64 - 2x2"); // NOLINT
+BENCHMARK(bm_determinant<F64, 3>)->Name("F64 - 3x3"); // NOLINT
+BENCHMARK(bm_determinant<F64, 4>)->Name("F64 - 4x4"); // NOLINT
 
-static void determinant_2x2_f64(benchmark::State& state)
-{
-    benchmark_determinant<F64, 2>(state);
-}
-BENCHMARK(determinant_2x2_f64); // NOLINT
+BENCHMARK(bm_determinant<__m128d, 2>)->Name("m128d - 2x2"); // NOLINT
 
+BENCHMARK(bm_determinant<__m128, 2>)->Name("m128 - 2x2"); // NOLINT
+BENCHMARK(bm_determinant<__m128, 3>)->Name("m128 - 3x3"); // NOLINT
+BENCHMARK(bm_determinant<__m128, 4>)->Name("m128 - 4x4"); // NOLINT
 
-static void determinant_2x2_m128(benchmark::State& state)
-{
-    benchmark_determinant<__m128, 2>(state);
-}
-BENCHMARK(determinant_2x2_m128); // NOLINT
+BENCHMARK(bm_determinant<__m256d, 2>)->Name("m256d - 2x2"); // NOLINT
+BENCHMARK(bm_determinant<__m256d, 3>)->Name("m256d - 3x3"); // NOLINT
+BENCHMARK(bm_determinant<__m256d, 4>)->Name("m256d - 4x4"); // NOLINT
 
-
-static void determinant_2x2_m128d(benchmark::State& state)
-{
-    benchmark_determinant<__m128d, 2>(state);
-}
-BENCHMARK(determinant_2x2_m128d); // NOLINT
-
-
-static void determinant_2x2_m256(benchmark::State& state)
-{
-    benchmark_determinant<__m256, 2>(state);
-}
-BENCHMARK(determinant_2x2_m256); // NOLINT
-
-
-static void determinant_2x2_m256d(benchmark::State& state)
-{
-    benchmark_determinant<__m256d, 2>(state);
-}
-BENCHMARK(determinant_2x2_m256d); // NOLINT
-
-
-// --- determinant 3x3 ------------------------------------------------------------------------------------------------
-
-static void determinant_3x3_f32(benchmark::State& state)
-{
-    benchmark_determinant<F32, 3>(state);
-}
-BENCHMARK(determinant_3x3_f32); // NOLINT
-
-
-static void determinant_3x3_f64(benchmark::State& state)
-{
-    benchmark_determinant<F64, 3>(state);
-}
-BENCHMARK(determinant_3x3_f64); // NOLINT
-
-
-static void determinant_3x3_m128(benchmark::State& state)
-{
-    benchmark_determinant<__m128, 3>(state);
-}
-BENCHMARK(determinant_3x3_m128); // NOLINT
-
-
-static void determinant_3x3_m256(benchmark::State& state)
-{
-    benchmark_determinant<__m256, 3>(state);
-}
-BENCHMARK(determinant_3x3_m256); // NOLINT
-
-
-static void determinant_3x3_m256d(benchmark::State& state)
-{
-    benchmark_determinant<__m256d, 3>(state);
-}
-BENCHMARK(determinant_3x3_m256d); // NOLINT
-
-
-// --- determinant 4x4 ------------------------------------------------------------------------------------------------
-
-static void determinant_4x4_f32(benchmark::State& state)
-{
-    benchmark_determinant<F32, 4>(state);
-}
-BENCHMARK(determinant_4x4_f32); // NOLINT
-
-
-static void determinant_4x4_f64(benchmark::State& state)
-{
-    benchmark_determinant<F64, 4>(state);
-}
-BENCHMARK(determinant_4x4_f64); // NOLINT
-
-
-static void determinant_4x4_m128(benchmark::State& state)
-{
-    benchmark_determinant<__m128, 4>(state);
-}
-BENCHMARK(determinant_4x4_m128); // NOLINT
-
-
-static void determinant_4x4_m256(benchmark::State& state)
-{
-    benchmark_determinant<__m256, 4>(state);
-}
-BENCHMARK(determinant_4x4_m256); // NOLINT
-
-
-static void determinant_4x4_m256d(benchmark::State& state)
-{
-    benchmark_determinant<__m256d, 4>(state);
-}
-BENCHMARK(determinant_4x4_m256d); // NOLINT
+BENCHMARK(bm_determinant<__m256, 2>)->Name("m256 - 2x2"); // NOLINT
+BENCHMARK(bm_determinant<__m256, 3>)->Name("m256 - 3x3"); // NOLINT
+BENCHMARK(bm_determinant<__m256, 4>)->Name("m256 - 4x4"); // NOLINT
 
 
 BENCHMARK_MAIN(); // NOLINT
