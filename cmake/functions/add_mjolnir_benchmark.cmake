@@ -60,8 +60,8 @@ function(add_mjolnir_benchmark target module)
     if(${MJOLNIR_${module}_ENABLE_TESTS})
         set(target "benchmark_${target}")
 
-        string(REPLACE "${MJOLNIR_${module}_ROOT_DIR}/benchmarks/" "" relative_path
-                       ${CMAKE_CURRENT_SOURCE_DIR})
+        string(REPLACE "${MJOLNIR_${module}_ROOT_DIR}/benchmarks/" ""
+                       relative_path ${CMAKE_CURRENT_SOURCE_DIR})
 
         set(benchmark_source "/benchmarks/${relative_path}/${target}.cpp")
 
