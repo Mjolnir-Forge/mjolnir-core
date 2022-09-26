@@ -66,7 +66,7 @@ function(add_mjolnir_benchmark target module)
         set(benchmark_source "/benchmarks/${relative_path}/${target}.cpp")
 
         add_to_list_after_keyword("${ARGN}" arguments LINK_LIBRARIES PRIVATE
-                                  benchmark)
+                                  benchmark::benchmark)
 
         if(NOT "${MJOLNIR_${module}_COMPILE_DEFINITIONS}" STREQUAL "")
             add_to_list_after_keyword(
@@ -91,10 +91,10 @@ function(add_mjolnir_benchmark target module)
         add_to_list_after_keyword("${arguments}" arguments PROPERTIES
                                   ${MJOLNIR_${module}_TARGET_PROPERTIES})
 
-        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-            add_to_list_after_keyword("${arguments}" arguments LINK_OPTIONS
-                                      -lshlwapi)
-        endif()
+        #if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        #    add_to_list_after_keyword("${arguments}" arguments LINK_OPTIONS
+        #                              -lshlwapi)
+        #endif()
 
         add_generic_executable(
             ${target} ${benchmark_source}
