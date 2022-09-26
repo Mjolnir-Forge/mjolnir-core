@@ -91,6 +91,11 @@ function(add_mjolnir_benchmark target module)
         add_to_list_after_keyword("${arguments}" arguments PROPERTIES
                                   ${MJOLNIR_${module}_TARGET_PROPERTIES})
 
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+            add_to_list_after_keyword("${arguments}" arguments LINK_LIBRARIES
+                                      shlwapi)
+        endif()
+
         add_generic_executable(
             ${target} ${benchmark_source}
             SOURCE_DIRECTORY ${MJOLNIR_${module}_ROOT_DIR} ${arguments})
