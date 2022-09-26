@@ -91,10 +91,11 @@ function(add_mjolnir_benchmark target module)
         add_to_list_after_keyword("${arguments}" arguments PROPERTIES
                                   ${MJOLNIR_${module}_TARGET_PROPERTIES})
 
-        #if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+            set(gtest_force_shared_crt on)
         #    add_to_list_after_keyword("${arguments}" arguments LINK_OPTIONS
         #                              -lshlwapi)
-        #endif()
+        endif()
 
         add_generic_executable(
             ${target} ${benchmark_source}
