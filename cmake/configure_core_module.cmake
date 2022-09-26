@@ -33,6 +33,10 @@ endif()
 # ------------------------------------------------------------------------------
 
 set(GTEST_MINIMAL_VERSION 1.10.0)
+# The latest google benchmark version (1.7.0) has a bug that causes linker
+# errors when using MSVC.
+# Link to the bug report:
+# https://github.com/google/benchmark/issues/1441
 set(BENCHMARK_MINIMAL_VERSION 1.6.2)
 
 # ------------------------------------------------------------------------------
