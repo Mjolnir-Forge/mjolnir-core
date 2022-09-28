@@ -18,3 +18,6 @@ coverage:
         enabled: yes
         target: 95%
         threshold: 5%
+
+ignore:
+  - "benchmarks"

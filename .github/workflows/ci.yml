@@ -52,10 +52,6 @@ jobs:
       run: |
         ls
         lcov --directory . --capture --output-file ./coverage.info
-        ls
-        lcov --remove ./coverage.info 'usr/*' --output-file ./coverage.info
-        ls
-        lcov --remove ./coverage.info '*benchmarks/*' --output-file ./coverage.info
         bash <(curl -s https://codecov.io/bash)
 
 
