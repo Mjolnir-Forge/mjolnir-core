@@ -24,6 +24,12 @@ parser.add_argument(
     default=None,
 )
 parser.add_argument(
+    "--benchmark_build_dir",
+    help="Directory containing the google benchmark build. This might be needed to add missing includes if benchmark is fetched from the repository.",
+    type=str,
+    default=None,
+)
+parser.add_argument(
     "--build_dir",
     help="The build directory (Can be used to automatically find dependencies fetched "
     "by CMake)",
@@ -43,6 +49,9 @@ if args.gtest_dir is None:
 
 if args.benchmark_dir is None:
     args.benchmark_dir = f"{args.build_dir}/_deps/benchmark-src/include"
+
+if args.benchmark_build_dir is None:
+    args.benchmark_build_dir = f"{args.build_dir}/_deps/benchmark-build/include"
 
 
 cmd = f"clang-tidy-{args.version}"
@@ -73,7 +82,10 @@ for file in files:
             "src",
             "-isystem",
             args.gtest_dir,
+            "-isystem",
             args.benchmark_dir,
+            "-isystem",
+            args.benchmark_build_dir,
         ],
     )
     print(f"Elapsed time: {round(time.time()-start_time, 2)}s")
