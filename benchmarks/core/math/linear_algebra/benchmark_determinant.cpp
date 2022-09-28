@@ -57,27 +57,24 @@ static void bm_determinant(benchmark::State& state)
 
 // --- benchmarks -----------------------------------------------------------------------------------------------------
 
-BENCHMARK(bm_determinant<F32, 2>)->Name("F32 - 2x2"); // NOLINT
-BENCHMARK(bm_determinant<F32, 3>)->Name("F32 - 3x3"); // NOLINT
-BENCHMARK(bm_determinant<F32, 4>)->Name("F32 - 4x4"); // NOLINT
+BENCHMARK(bm_determinant<F32, 2>)->Name("2x2 - F32");       // NOLINT
+BENCHMARK(bm_determinant<F64, 2>)->Name("2x2 - F64");       // NOLINT
+BENCHMARK(bm_determinant<__m128, 2>)->Name("2x2 - m128");   // NOLINT
+BENCHMARK(bm_determinant<__m128d, 2>)->Name("2x2 - m128d"); // NOLINT
+BENCHMARK(bm_determinant<__m256, 2>)->Name("2x2 - m256");   // NOLINT
+BENCHMARK(bm_determinant<__m256d, 2>)->Name("2x2 - m256d"); // NOLINT
 
-BENCHMARK(bm_determinant<F64, 2>)->Name("F64 - 2x2"); // NOLINT
-BENCHMARK(bm_determinant<F64, 3>)->Name("F64 - 3x3"); // NOLINT
-BENCHMARK(bm_determinant<F64, 4>)->Name("F64 - 4x4"); // NOLINT
+BENCHMARK(bm_determinant<F32, 3>)->Name("3x3 - F32");       // NOLINT
+BENCHMARK(bm_determinant<F64, 3>)->Name("3x3 - F64");       // NOLINT
+BENCHMARK(bm_determinant<__m128, 3>)->Name("3x3 - m128");   // NOLINT
+BENCHMARK(bm_determinant<__m256d, 3>)->Name("3x3 - m256d"); // NOLINT
+BENCHMARK(bm_determinant<__m256, 3>)->Name("3x3 - m256");   // NOLINT
 
-BENCHMARK(bm_determinant<__m128d, 2>)->Name("m128d - 2x2"); // NOLINT
-
-BENCHMARK(bm_determinant<__m128, 2>)->Name("m128 - 2x2"); // NOLINT
-BENCHMARK(bm_determinant<__m128, 3>)->Name("m128 - 3x3"); // NOLINT
-BENCHMARK(bm_determinant<__m128, 4>)->Name("m128 - 4x4"); // NOLINT
-
-BENCHMARK(bm_determinant<__m256d, 2>)->Name("m256d - 2x2"); // NOLINT
-BENCHMARK(bm_determinant<__m256d, 3>)->Name("m256d - 3x3"); // NOLINT
-BENCHMARK(bm_determinant<__m256d, 4>)->Name("m256d - 4x4"); // NOLINT
-
-BENCHMARK(bm_determinant<__m256, 2>)->Name("m256 - 2x2"); // NOLINT
-BENCHMARK(bm_determinant<__m256, 3>)->Name("m256 - 3x3"); // NOLINT
-BENCHMARK(bm_determinant<__m256, 4>)->Name("m256 - 4x4"); // NOLINT
+BENCHMARK(bm_determinant<F32, 4>)->Name("4x4 - F32");       // NOLINT
+BENCHMARK(bm_determinant<F64, 4>)->Name("4x4 - F64");       // NOLINT
+BENCHMARK(bm_determinant<__m128, 4>)->Name("4x4 - m128");   // NOLINT
+BENCHMARK(bm_determinant<__m256d, 4>)->Name("4x4 - m256d"); // NOLINT
+BENCHMARK(bm_determinant<__m256, 4>)->Name("4x4 - m256");   // NOLINT
 
 
 BENCHMARK_MAIN(); // NOLINT
