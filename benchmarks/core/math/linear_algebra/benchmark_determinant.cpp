@@ -26,7 +26,7 @@ static void bm_determinant(benchmark::State& state)
         else
             res = determinant_4x4(data);
 
-        std::fill(std::begin(data), std::end(data), res);
+        std::ranges::fill(data, res);
     }
 }
 
