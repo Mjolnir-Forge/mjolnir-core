@@ -2,7 +2,7 @@
 //! permutation.h
 //!
 //! @brief
-//! Contains functions to permute and blend the elements of verctor registers.
+//! Contains functions to permute and blend the elements of vector registers.
 
 
 #pragma once

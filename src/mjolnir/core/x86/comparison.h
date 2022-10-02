@@ -2,7 +2,7 @@
 //! comparison.h
 //!
 //! @brief
-//! Contains functions to compare verctor registers.
+//! Contains functions to compare vector registers.
 
 
 #pragma once

@@ -1,0 +1,1 @@
+add_mjolnir_core_benchmark(memory_systems)
