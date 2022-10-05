@@ -21,6 +21,20 @@ namespace mjolnir
 //! \addtogroup core_math
 //! @{
 
+
+//! @brief
+//! Solve a linear system of equations of size 2 using Cramer's Rule.
+//!
+//! @tparam T_Type:
+//! The basic type of a matrix/vector element
+//!
+//! @param mat:
+//! The matrix of the system of equations. The data has to be provided in column major format
+//! @param rhs:
+//! The right-hand side vector of the system
+//!
+//! @return
+//! Solution vector
 template <Number T_Type>
 [[nodiscard]] constexpr auto cramer(const std::array<T_Type, 4>& mat, const std::array<T_Type, 2>& rhs) noexcept
         -> std::array<T_Type, 2>;
@@ -35,7 +49,7 @@ template <Number T_Type>
 namespace mjolnir
 {
 template <Number T_Type>
-[[nodiscard]] constexpr auto cramer(const std::array<T_Type, 4>& mat, const std::array<T_Type, 2>& rhs) noexcept
+[[nodiscard]] inline constexpr auto cramer(const std::array<T_Type, 4>& mat, const std::array<T_Type, 2>& rhs) noexcept
         -> std::array<T_Type, 2>
 {
     T_Type det_mat = determinant_2x2(mat);
