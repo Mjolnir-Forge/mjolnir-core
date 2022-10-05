@@ -12,6 +12,8 @@
 
 
 #include "mjolnir/core/definitions.h"
+#include "mjolnir/core/x86/definitions.h"
+#include "mjolnir/core/x86/direct_access.h"
 #include <gtest/gtest.h>
 
 #include <array>
@@ -24,7 +26,7 @@ namespace mjolnir
 
 
 //! @brief
-//! Class that defines a single testcase for linear solvers that use scalar types as fundamental data type.
+//! Class that defines a single testcase for linear solvers.
 //!
 //! @details
 //! A testcase consists of the matrix, the right-hand side and the expected solution of a linear system of equations.
@@ -33,12 +35,15 @@ namespace mjolnir
 //! Basic data type used by the solver
 //! @tparam t_size:
 //! Size of the system
-template <Number T_Type, UST t_size>
+template <typename T_Type, UST t_size>
 class SolverTestcase
 {
-    const std::array<T_Type, t_size * t_size> m_mat;
-    const std::array<T_Type, t_size>          m_exp;
-    const std::array<T_Type, t_size>          m_rhs;
+    using ScalarType = typename std::conditional_t<x86::is_float_register<T_Type>, F64, T_Type>;
+    using VectorType = typename std::conditional_t<x86::is_float_register<T_Type>, T_Type, std::array<T_Type, t_size>>;
+    using MatrixType = typename std::conditional_t<x86::is_float_register<T_Type>,
+                                                   std::array<T_Type, t_size>,
+                                                   std::array<T_Type, t_size * t_size>>;
+
 
 public:
     //! @brief
@@ -54,9 +59,9 @@ public:
     //! @note
     //! The order of those parameters is chosen to match the order as they appear in the linear equation
     //! `mat * exp = rhs`.
-    SolverTestcase(const std::array<T_Type, t_size * t_size>& mat,
-                   const std::array<T_Type, t_size>&          exp,
-                   const std::array<T_Type, t_size>&          rhs);
+    SolverTestcase(const std::array<ScalarType, t_size * t_size>& mat,
+                   const std::array<ScalarType, t_size>&          exp,
+                   const std::array<ScalarType, t_size>&          rhs);
 
 
     //! @brief
@@ -64,7 +69,7 @@ public:
     //!
     //! @return
     //! Expected solution vector
-    [[nodiscard]] auto exp() const noexcept -> const std::array<T_Type, t_size>&;
+    [[nodiscard]] auto exp() const noexcept -> const VectorType&;
 
 
     //! @brief
@@ -72,14 +77,14 @@ public:
     //!
     //! @return
     //! Matrix of the system
-    [[nodiscard]] auto mat() const noexcept -> const std::array<T_Type, t_size * t_size>&;
+    [[nodiscard]] auto mat() const noexcept -> const MatrixType&;
 
     //! @brief
     //! Get the right-hand side vector.
     //!
     //! @return
     //! Right-hand side vector
-    [[nodiscard]] auto rhs() const noexcept -> const std::array<T_Type, t_size>&;
+    [[nodiscard]] auto rhs() const noexcept -> const VectorType&;
 
 
     //! @brief
@@ -93,7 +98,7 @@ public:
     //! The calculated result vector.
     //! @param message_prefix:
     //! An optional string that is added in front of the message that prints the index of the failed comparison.
-    void check_result(const std::array<T_Type, t_size>& result, const std::string& message_prefix = "") const noexcept;
+    void check_result(const VectorType& result, const std::string& message_prefix = "") const noexcept;
 
 
     //! @brief
@@ -107,7 +112,16 @@ public:
     //! The calculated result vector.
     //! @param testcase_index:
     //! The number of the testcase.
-    void check_result_testcase(const std::array<T_Type, t_size>& result, UST testcase_index) const noexcept;
+    void check_result_testcase(const VectorType& result, UST testcase_index) const noexcept;
+
+private:
+    [[nodiscard]] static auto format_matrix(const std::array<ScalarType, t_size * t_size>& mat) noexcept -> MatrixType;
+
+    [[nodiscard]] static auto format_vector(const std::array<ScalarType, t_size>& vec) noexcept -> VectorType;
+
+    const MatrixType m_mat;
+    const VectorType m_exp;
+    const VectorType m_rhs;
 };
 
 
@@ -118,7 +132,7 @@ public:
 //!
 //! @return
 //! Vector of testcases for 2x2 solvers
-template <Number T_Type>
+template <typename T_Type>
 [[nodiscard]] auto get_solver_testcases_2x2() -> std::vector<SolverTestcase<T_Type, 2>>;
 
 
@@ -131,30 +145,29 @@ template <Number T_Type>
 
 namespace mjolnir
 {
-template <Number T_Type, UST t_size>
-SolverTestcase<T_Type, t_size>::SolverTestcase(const std::array<T_Type, t_size * t_size>& mat,
-                                               const std::array<T_Type, t_size>&          exp,
-                                               const std::array<T_Type, t_size>&          rhs)
-    : m_mat(mat)
-    , m_exp(exp)
-    , m_rhs(rhs)
+template <typename T_Type, UST t_size>
+SolverTestcase<T_Type, t_size>::SolverTestcase(const std::array<ScalarType, t_size * t_size>& mat,
+                                               const std::array<ScalarType, t_size>&          exp,
+                                               const std::array<ScalarType, t_size>&          rhs)
+    : m_mat(format_matrix(mat))
+    , m_exp(format_vector(exp))
+    , m_rhs(format_vector(rhs))
 {
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <Number T_Type, UST t_size>
-[[nodiscard]] inline auto SolverTestcase<T_Type, t_size>::mat() const noexcept
-        -> const std::array<T_Type, t_size * t_size>&
+template <typename T_Type, UST t_size>
+[[nodiscard]] inline auto SolverTestcase<T_Type, t_size>::mat() const noexcept -> const MatrixType&
 {
     return m_mat;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <Number T_Type, UST t_size>
-[[nodiscard]] inline auto SolverTestcase<T_Type, t_size>::rhs() const noexcept -> const std::array<T_Type, t_size>&
+template <typename T_Type, UST t_size>
+[[nodiscard]] inline auto SolverTestcase<T_Type, t_size>::rhs() const noexcept -> const VectorType&
 {
     return m_rhs;
 }
@@ -162,8 +175,8 @@ template <Number T_Type, UST t_size>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <Number T_Type, UST t_size>
-[[nodiscard]] inline auto SolverTestcase<T_Type, t_size>::exp() const noexcept -> const std::array<T_Type, t_size>&
+template <typename T_Type, UST t_size>
+[[nodiscard]] inline auto SolverTestcase<T_Type, t_size>::exp() const noexcept -> const VectorType&
 {
     return m_exp;
 }
@@ -171,29 +184,80 @@ template <Number T_Type, UST t_size>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <Number T_Type, UST t_size>
-inline void SolverTestcase<T_Type, t_size>::check_result(const std::array<T_Type, t_size>& result,
+template <typename T_Type, UST t_size>
+inline void SolverTestcase<T_Type, t_size>::check_result(const VectorType&  result,
                                                          const std::string& message_prefix) const noexcept
 {
-    for (UST i = 0; i < 2; ++i)
-        EXPECT_DOUBLE_EQ(result.at(i), m_exp.at(i)) << message_prefix << "value index: " << i << "\n";
+    using namespace x86;
+    if constexpr (is_float_register<T_Type>)
+    {
+        for (UST i = 0; i < 2; ++i)
+            EXPECT_DOUBLE_EQ(get(result, i), get(m_exp, i)) << message_prefix << "value index: " << i << "\n";
+    }
+    else
+    {
+        for (UST i = 0; i < 2; ++i)
+            EXPECT_DOUBLE_EQ(result.at(i), m_exp.at(i)) << message_prefix << "value index: " << i << "\n";
+    }
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <Number T_Type, UST t_size>
-inline void SolverTestcase<T_Type, t_size>::check_result_testcase(const std::array<T_Type, t_size>& result,
-                                                                  UST testcase_index) const noexcept
+template <typename T_Type, UST t_size>
+inline void SolverTestcase<T_Type, t_size>::check_result_testcase(const VectorType& result,
+                                                                  UST               testcase_index) const noexcept
 {
     const std::string prefix = "testcase index: " + std::to_string(testcase_index) + " --- ";
     check_result(result, prefix);
 }
 
 
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, UST t_size>
+inline auto SolverTestcase<T_Type, t_size>::format_matrix(const std::array<ScalarType, t_size * t_size>& mat) noexcept
+        -> MatrixType
+{
+    using namespace x86;
+    if constexpr (is_float_register<T_Type>)
+    {
+        MatrixType mat_reg = {{0}};
+        for (UST i = 0; i < t_size; ++i)
+            for (UST j = 0; j < t_size; ++j)
+            {
+                UST arr_idx = i * t_size + j;
+                set(mat_reg.at(i), j, mat.at(arr_idx));
+            }
+        return mat_reg;
+    }
+    else
+        return mat;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, UST t_size>
+inline auto SolverTestcase<T_Type, t_size>::format_vector(const std::array<ScalarType, t_size>& vec) noexcept
+        -> VectorType
+{
+    using namespace x86;
+    if constexpr (is_float_register<T_Type>)
+    {
+        VectorType vec_reg = {0};
+        for (UST i = 0; i < t_size; ++i)
+            set(vec_reg, i, vec.at(i));
+        return vec_reg;
+    }
+    else
+        return vec;
+}
+
+
 // --- Free functions -------------------------------------------------------------------------------------------------
 
-template <Number T_Type>
+template <typename T_Type>
 [[nodiscard]] inline auto get_solver_testcases_2x2() -> std::vector<SolverTestcase<T_Type, 2>>
 {
     using STC = SolverTestcase<T_Type, 2>;

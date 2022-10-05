@@ -20,7 +20,7 @@ class SolverTestSuite : public ::testing::Test
 {
 };
 
-using SolverTestTypes = ::testing::Types<F32, F64>; // NOLINT
+using SolverTestTypes = ::testing::Types<F32, F64, __m128, __m128d, __m256, __m256d>; // NOLINT
 
 // cppcheck-suppress syntaxError
 TYPED_TEST_SUITE(SolverTestSuite, SolverTestTypes, );

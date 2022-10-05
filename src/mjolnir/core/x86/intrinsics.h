@@ -268,6 +268,23 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Perform an element-wise division of `lhs` by `rhs` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! Results of the element-wise division.
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_div(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Perform an element-wise multiplication of `a` and `b`, add `c` and return the result.
 //!
 //! @tparam T_RegisterType:
@@ -746,6 +763,22 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_cvtss_f32(src);
     else
         return _mm256_cvtsd_f64(src);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_div(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_div_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_div_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_div_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else
+        return _mm256_div_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
 }
 
 
