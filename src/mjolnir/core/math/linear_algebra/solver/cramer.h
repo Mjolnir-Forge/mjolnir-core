@@ -58,8 +58,7 @@ template <Number T_Type>
 //! @return
 //! Solution vector
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] auto cramer(const std::array<T_RegisterType, 2>& mat, const T_RegisterType rhs) noexcept
-        -> T_RegisterType;
+[[nodiscard]] auto cramer(const std::array<T_RegisterType, 2>& mat, T_RegisterType rhs) noexcept -> T_RegisterType;
 
 //! @}
 } // namespace mjolnir
@@ -86,7 +85,7 @@ template <Number T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] auto cramer(const std::array<T_RegisterType, 2>& mat, const T_RegisterType rhs) noexcept -> T_RegisterType
+[[nodiscard]] auto cramer(const std::array<T_RegisterType, 2>& mat, T_RegisterType rhs) noexcept -> T_RegisterType
 {
     using namespace x86;
 
