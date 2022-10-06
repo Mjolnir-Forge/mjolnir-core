@@ -522,11 +522,12 @@ inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexc
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_sub(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
+
 //! @brief
 //! Store the lower elements of `a` and `b` alternately in a new register and return it.
 //!
 //! @details
-//! The first elemet is taken from `a`
+//! The first element is taken from `a`
 //!
 //! @tparam T_RegisterType:
 //! The register type
