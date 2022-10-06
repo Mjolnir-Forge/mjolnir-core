@@ -15,7 +15,7 @@ using namespace mjolnir::x86;
 // --- helper functions -----------------------------------------------------------------------------------------------
 
 template <Number T_Type, UST t_size>
-[[nodiscard]] inline constexpr auto get_matrix() noexcept -> std::array<T_Type, t_size * t_size>
+[[nodiscard]] constexpr auto get_matrix() noexcept -> std::array<T_Type, t_size * t_size>
 {
     return std::array<T_Type, 4>{{3., 2., 1., 6.}}; // NOLINT(readability-magic-numbers)
 }
@@ -37,7 +37,7 @@ template <FloatVectorRegister T_RegisterType, UST t_size>
 
 
 template <Number T_Type, UST t_size>
-[[nodiscard]] inline constexpr auto get_rhs() noexcept -> std::array<T_Type, t_size>
+[[nodiscard]] constexpr auto get_rhs() noexcept -> std::array<T_Type, t_size>
 {
     return std::array<T_Type, 2>{{4., 3.}}; // NOLINT(readability-magic-numbers)
 }
