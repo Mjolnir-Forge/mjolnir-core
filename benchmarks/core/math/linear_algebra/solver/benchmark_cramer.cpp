@@ -4,56 +4,83 @@
 
 #include <algorithm>
 
+
+// ====================================================================================================================
+// Setup
+// ====================================================================================================================
+
 using namespace mjolnir;
 using namespace mjolnir::x86;
 
+// --- helper functions -----------------------------------------------------------------------------------------------
+
 template <Number T_Type, UST t_size>
-static void bm_solver(benchmark::State& state)
+[[nodiscard]] inline constexpr auto get_matrix() noexcept -> std::array<T_Type, t_size * t_size>
 {
-    std::array<T_Type, t_size* t_size> mat = {{3., 2., 1., 6.}};
-    std::array<T_Type, t_size>         rhs = {{4., 3.}};
-    benchmark::DoNotOptimize(mat);
-
-    for ([[maybe_unused]] auto s : state)
-        rhs = cramer(mat, rhs);
-
-
-    benchmark::DoNotOptimize(rhs);
+    return std::array<T_Type, 4>{{3., 2., 1., 6.}}; // NOLINT(readability-magic-numbers)
 }
 
 
 template <FloatVectorRegister T_RegisterType, UST t_size>
-static void bm_solver(benchmark::State& state)
+[[nodiscard]] inline auto get_matrix() noexcept -> std::array<T_RegisterType, t_size>
 {
-    std::array<ElementType<T_RegisterType>, t_size* t_size> mat_vals = {{3., 2., 1., 6.}};
-    std::array<ElementType<T_RegisterType>, t_size>         rhs_vals = {{4., 3.}};
+    auto mat_vals = get_matrix<ElementType<T_RegisterType>, t_size>();
 
     std::array<T_RegisterType, t_size> mat = {{{0}}};
-    T_RegisterType                     rhs = mm_setzero<T_RegisterType>();
 
     for (UST i = 0; i < t_size; ++i)
-    {
-        set(rhs, i, rhs_vals.at(i));
         for (UST j = 0; j < t_size; ++j)
-        {
-            UST idx_arr = i * t_size + j;
-            set(mat.at(i), j, mat_vals.at(idx_arr));
-        }
-    }
+            set(mat.at(i), j, mat_vals.at(i * t_size + j));
+
+    return mat;
+}
+
+
+template <Number T_Type, UST t_size>
+[[nodiscard]] inline constexpr auto get_rhs() noexcept -> std::array<T_Type, t_size>
+{
+    return std::array<T_Type, 2>{{4., 3.}}; // NOLINT(readability-magic-numbers)
+}
+
+
+template <FloatVectorRegister T_RegisterType, UST t_size>
+[[nodiscard]] inline auto get_rhs() noexcept -> T_RegisterType
+{
+    auto rhs_vals = get_rhs<ElementType<T_RegisterType>, t_size>();
+    auto rhs      = mm_setzero<T_RegisterType>();
+
+    for (UST i = 0; i < t_size; ++i)
+        set(rhs, i, rhs_vals.at(i));
+
+    return rhs;
+}
+
+
+// ====================================================================================================================
+// Benchmarks
+// ====================================================================================================================
+
+template <typename T_Type, UST t_size>
+static void bm_solver(benchmark::State& state)
+{
+    auto mat = get_matrix<T_Type, t_size>();
+    auto rhs = get_rhs<T_Type, t_size>();
+
     benchmark::DoNotOptimize(mat);
 
     for ([[maybe_unused]] auto s : state)
-        rhs = cramer(mat, rhs);
+        rhs = Cramer::solve(mat, rhs);
+
 
     benchmark::DoNotOptimize(rhs);
 }
 
 
 BENCHMARK(bm_solver<F32, 2>)->Name("2x2 - F32");       // NOLINT
-BENCHMARK(bm_solver<F64, 2>)->Name("2x2 - F64");       // NOLINT
 BENCHMARK(bm_solver<__m128, 2>)->Name("2x2 - m128");   // NOLINT
-BENCHMARK(bm_solver<__m128d, 2>)->Name("2x2 - m128d"); // NOLINT
 BENCHMARK(bm_solver<__m256, 2>)->Name("2x2 - m256");   // NOLINT
+BENCHMARK(bm_solver<F64, 2>)->Name("2x2 - F64");       // NOLINT
+BENCHMARK(bm_solver<__m128d, 2>)->Name("2x2 - m128d"); // NOLINT
 BENCHMARK(bm_solver<__m256d, 2>)->Name("2x2 - m256d"); // NOLINT
 
 BENCHMARK_MAIN(); // NOLINT

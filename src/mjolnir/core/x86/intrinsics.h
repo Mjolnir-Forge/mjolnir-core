@@ -522,6 +522,25 @@ inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexc
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_sub(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
 
+//! @brief
+//! Store the lower elements of `a` and `b` alternately in a new register and return it.
+//!
+//! @details
+//! The first elemet is taken from `a`
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] a:
+//! First register
+//! @param [in] b:
+//! Second register
+//!
+//! @return
+//! Lower elements of `a` and `b` in alternating order
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_unpacklo(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
+
 
 //! @brief
 //! Compute the bitwise XOR of `a` and `b`.
@@ -1007,6 +1026,22 @@ template <FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_unpacklo(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_unpacklo_ps(a, b);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_unpacklo_pd(a, b);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_unpacklo_ps(a, b);
+    else
+        return _mm256_unpacklo_pd(a, b);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_xor(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
 {
     if constexpr (is_m128<T_RegisterType>)
@@ -1017,22 +1052,6 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_xor_ps(a, b);
     else
         return _mm256_xor_pd(a, b);
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto mm_unpacklo(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
-{
-    if constexpr (is_m128<T_RegisterType>)
-        return _mm_unpacklo_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
-    else if constexpr (is_m128d<T_RegisterType>)
-        return _mm_unpacklo_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
-    else if constexpr (is_m256<T_RegisterType>)
-        return _mm256_unpacklo_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
-    else
-        return _mm256_unpacklo_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
 }
 
 

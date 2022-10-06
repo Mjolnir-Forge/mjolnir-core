@@ -823,11 +823,11 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
         for (UST i = 0; i < n_e; ++i)
         {
             if (t_idx_0 == i)
-                a[i] = t_idx_1 % n_le;
+                a[i] = t_idx_1 % n_le; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             else if (t_idx_1 == i)
-                a[i] = t_idx_0 % n_le;
+                a[i] = t_idx_0 % n_le; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             else
-                a[i] = i % n_le;
+                a[i] = i % n_le; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         }
         return a;
     };
