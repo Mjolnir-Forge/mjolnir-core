@@ -1020,4 +1020,20 @@ template <FloatVectorRegister T_RegisterType>
 }
 
 
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_unpacklo(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_unpacklo_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_unpacklo_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_unpacklo_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else
+        return _mm256_unpacklo_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+}
+
+
 } // namespace mjolnir::x86

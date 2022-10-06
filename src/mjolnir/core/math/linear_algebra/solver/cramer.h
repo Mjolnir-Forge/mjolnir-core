@@ -87,46 +87,25 @@ template <Number T_Type>
 template <x86::FloatVectorRegister T_RegisterType>
 [[nodiscard]] auto cramer(const std::array<T_RegisterType, 2>& mat, T_RegisterType rhs) noexcept -> T_RegisterType
 {
+    // Several implementations have been tested and benchmarked. This one was the fastest. Note that the throughput of
+    // `mm_mul` and `mm_fmsub` is 0.5. Therefore, reducing those instructions to 1 instead of 2 doesn't yield any
+    // performance boost. The required permutations for this actually cause the code to be slower.
+
     using namespace x86;
 
-    if constexpr (is_double_precision<T_RegisterType>)
-    {
-        auto p_mat_c1 = permute<1, 0>(mat[1]);
-        auto p_rhs    = permute<1, 0>(rhs);
+    auto b0a1  = blend_at<0>(mat[0], mat[1]);
+    auto a0b1  = blend_at<1>(mat[0], mat[1]);
+    auto b1a0  = swap<1, 0>(a0b1);
+    auto a1b0  = swap<1, 0>(b0a1);
+    auto p_rhs = swap<1, 0>(rhs);
 
-        auto products_mat = mm_mul(mat[0], p_mat_c1);
-        auto products_x0  = mm_mul(rhs, p_mat_c1);
-        auto products_x1  = mm_mul(mat[0], p_rhs);
+    auto prod_mat = mm_mul(a1b0, b0a1);
+    auto prod_rhs = mm_mul(p_rhs, b0a1);
 
-        auto p_products_mat = permute<1, 0>(products_mat);
-        auto p_products_x0  = permute<1, 0>(products_x0);
-        auto p_products_x1  = permute<1, 0>(products_x1);
+    auto det_mat = mm_fmsub(a0b1, b1a0, prod_mat);
+    auto det_rhs = mm_fmsub(rhs, b1a0, prod_rhs);
 
-        auto det_mat = mm_sub(products_mat, p_products_mat);
-        auto det_x0  = mm_sub(products_x0, p_products_x0);
-        auto det_x1  = mm_sub(products_x1, p_products_x1);
-
-        T_RegisterType det_x = blend_at<1>(det_x0, det_x1);
-
-        return mm_div(det_x, det_mat);
-    }
-    else
-    {
-        auto shf_mat = shuffle<1, 0, 0, 1>(mat[1], mat[0]);
-        auto p_rhs_2 = permute<0, 1, 1, 0>(rhs);
-
-        auto products_mat = mm_mul(mat[0], shf_mat);
-        auto products_x   = mm_mul(p_rhs_2, shf_mat);
-
-        auto shf_prod_0 = shuffle<0, 2, 0, 0>(products_x, products_mat);
-        auto shf_prod_1 = shuffle<1, 3, 1, 1>(products_x, products_mat);
-
-        auto dets = mm_sub(shf_prod_0, shf_prod_1);
-
-        auto det_mat_2 = permute<2, 3, 2, 3>(dets);
-
-        return mm_div(dets, det_mat_2);
-    }
+    return mm_div(det_rhs, det_mat);
 }
 
 
