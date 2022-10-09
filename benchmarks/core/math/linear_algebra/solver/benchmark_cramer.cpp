@@ -17,7 +17,10 @@ using namespace mjolnir::x86;
 template <Number T_Type, UST t_size>
 [[nodiscard]] constexpr auto get_matrix() noexcept -> std::array<T_Type, t_size * t_size>
 {
-    return std::array<T_Type, 4>{{3., 2., 1., 6.}}; // NOLINT(readability-magic-numbers)
+    if constexpr (t_size == 2)
+        return std::array<T_Type, 4>{{3., 2., 1., 6.}}; // NOLINT(readability-magic-numbers)
+    else
+        return std::array<T_Type, 9>{{3., 2., 1., 6., 2., 1., 4., 1., 1.}}; // NOLINT(readability-magic-numbers)
 }
 
 
@@ -39,7 +42,10 @@ template <FloatVectorRegister T_RegisterType, UST t_size>
 template <Number T_Type, UST t_size>
 [[nodiscard]] constexpr auto get_rhs() noexcept -> std::array<T_Type, t_size>
 {
-    return std::array<T_Type, 2>{{4., 3.}}; // NOLINT(readability-magic-numbers)
+    if constexpr (t_size == 2)
+        return std::array<T_Type, 2>{{4., 3.}}; // NOLINT(readability-magic-numbers)
+    else
+        return std::array<T_Type, 3>{{1., 2., 3.}}; // NOLINT(readability-magic-numbers)
 }
 
 
@@ -69,8 +75,10 @@ static void bm_solver(benchmark::State& state)
     benchmark::DoNotOptimize(mat);
 
     for ([[maybe_unused]] auto s : state)
+    {
         rhs = Cramer::solve(mat, rhs);
-
+        benchmark::ClobberMemory();
+    }
 
     benchmark::DoNotOptimize(rhs);
 }
@@ -82,5 +90,8 @@ BENCHMARK(bm_solver<__m256, 2>)->Name("2x2 - m256");   // NOLINT
 BENCHMARK(bm_solver<F64, 2>)->Name("2x2 - F64");       // NOLINT
 BENCHMARK(bm_solver<__m128d, 2>)->Name("2x2 - m128d"); // NOLINT
 BENCHMARK(bm_solver<__m256d, 2>)->Name("2x2 - m256d"); // NOLINT
-
+BENCHMARK(bm_solver<F32, 3>)->Name("3x3 - F32");       // NOLINT
+BENCHMARK(bm_solver<__m128, 3>)->Name("3x3 - m128");   // NOLINT
+BENCHMARK(bm_solver<F64, 3>)->Name("3x3 - F64");       // NOLINT
+// BENCHMARK(bm_solver<__m256d, 3>)->Name("3x3 - m256d"); // NOLINT
 BENCHMARK_MAIN(); // NOLINT

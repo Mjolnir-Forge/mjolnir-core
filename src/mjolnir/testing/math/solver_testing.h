@@ -136,6 +136,15 @@ template <typename T_Type>
 [[nodiscard]] auto get_solver_testcases_2x2() -> std::vector<SolverTestcase<T_Type, 2>>;
 
 
+//! @brief
+//! Get a vector of testcases for 3x3 solvers.
+//!
+//! @return
+//! Vector of testcases for 3x3 solvers
+template <typename T_Type>
+[[nodiscard]] auto get_solver_testcases_3x3() -> std::vector<SolverTestcase<T_Type, 3>>;
+
+
 //! @}
 } // namespace mjolnir
 
@@ -191,12 +200,12 @@ inline void SolverTestcase<T_Type, t_size>::check_result(const VectorType&  resu
     using namespace x86;
     if constexpr (is_float_register<T_Type>)
     {
-        for (UST i = 0; i < 2; ++i)
+        for (UST i = 0; i < t_size; ++i)
             EXPECT_DOUBLE_EQ(get(result, i), get(m_exp, i)) << message_prefix << "value index: " << i << "\n";
     }
     else
     {
-        for (UST i = 0; i < 2; ++i)
+        for (UST i = 0; i < t_size; ++i)
             EXPECT_DOUBLE_EQ(result.at(i), m_exp.at(i)) << message_prefix << "value index: " << i << "\n";
     }
 }
@@ -260,15 +269,38 @@ inline auto SolverTestcase<T_Type, t_size>::format_vector(const std::array<Scala
 template <typename T_Type>
 [[nodiscard]] inline auto get_solver_testcases_2x2() -> std::vector<SolverTestcase<T_Type, 2>>
 {
-    using STC = SolverTestcase<T_Type, 2>;
+    using ST = SolverTestcase<T_Type, 2>;
 
-    std::vector<STC> testcases = {};
+    std::vector<ST> testcases = {};
 
-    // https://elsenaju.eu/Calculator/system-of-equations-2x2.htm
-    testcases.emplace_back(STC({{1., 0., 0., 1.}}, {{2., 3.}}, {{2., 3.}}));   // NOLINT(readability-magic-numbers)
-    testcases.emplace_back(STC({{3., 5., 2., 4.}}, {{1., -0.5}}, {{2., 3.}})); // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{1., 0., 0., 1.}}, {{2., 3.}}, {{2., 3.}}));         // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{3., 5., 2., 4.}}, {{1., -0.5}}, {{2., 3.}}));       // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{4., 1., 6., 3.}}, {{2., 1.}}, {{14., 5.}}));        // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{3., -2., 1., 4.}}, {{2., 4.}}, {{10., 12.}}));      // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{-5., -7., 2., -1.}}, {{5., -3.}}, {{-31., -32.}})); // NOLINT(readability-magic-numbers)
 
     return testcases;
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type>
+[[nodiscard]] inline auto get_solver_testcases_3x3() -> std::vector<SolverTestcase<T_Type, 3>>
+{
+    using ST = SolverTestcase<T_Type, 3>;
+
+    std::vector<ST> testcases = {};
+
+    testcases.emplace_back(ST({{1., 0., 0., 0., 1., 0., 0., 0., 1.}}, // NOLINT(readability-magic-numbers)
+                              {{1., 2., 3.}},                         // NOLINT(readability-magic-numbers)
+                              {{1., 2., 3.}}));                       // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{2., 3., 1., 5., 2., 1., 1., 4., 1.}}, // NOLINT(readability-magic-numbers)
+                              {{2., -3., 1.}},                        // NOLINT(readability-magic-numbers)
+                              {{-10., 4., 0.}}));                     // NOLINT(readability-magic-numbers)
+
+    return testcases;
+}
+
 
 } // namespace mjolnir

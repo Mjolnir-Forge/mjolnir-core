@@ -1027,6 +1027,22 @@ template <FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_unpackhi(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_unpackhi_ps(a, b);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_unpackhi_pd(a, b);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_unpackhi_ps(a, b);
+    else
+        return _mm256_unpackhi_pd(a, b);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_unpacklo(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
 {
     if constexpr (is_m128<T_RegisterType>)
