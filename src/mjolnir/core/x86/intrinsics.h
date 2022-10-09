@@ -524,6 +524,26 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Store the higher elements of `a` and `b` alternately in a new register and return it.
+//!
+//! @details
+//! The first element is taken from `a`
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] a:
+//! First register
+//! @param [in] b:
+//! Second register
+//!
+//! @return
+//! Higher elements of `a` and `b` in alternating order
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_unpackhi(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Store the lower elements of `a` and `b` alternately in a new register and return it.
 //!
 //! @details
