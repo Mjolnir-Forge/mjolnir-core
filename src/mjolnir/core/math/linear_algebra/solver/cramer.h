@@ -181,11 +181,11 @@ template <x86::FloatVectorRegister T_RegisterType>
 [[nodiscard]] auto Cramer::solve(const std::array<T_RegisterType, 3>& mat, T_RegisterType rhs) noexcept
         -> T_RegisterType
 {
-#ifdef test
     using namespace x86;
     static_assert(num_elements<T_RegisterType> > 2, "Registers with 2 elements are not supported.");
 
-    // calculate all cross products
+
+    // create all necessary permutations
     auto r_yzx = permute<1, 2, 0, 3>(rhs);
     auto c_yzx = permute<1, 2, 0, 3>(mat[2]);
     auto b_yzx = permute<1, 2, 0, 3>(mat[1]);
@@ -198,79 +198,38 @@ template <x86::FloatVectorRegister T_RegisterType>
     auto a_rzx = blend_at<0>(a_yzx, r_yzx);
     auto a_rxy = blend_at<0>(a_zxy, r_zxy);
 
+
+    // calculate all necessary cross product components
     auto prod_bc = mm_mul(b_yzx, mat[2]);
     auto prod_rc = mm_mul(r_yzx, mat[2]);
     auto prod_br = mm_mul(b_yzx, rhs);
 
-    auto tmp_bc = mm_fmsub(mat[1], c_yzx, prod_bc);
-    auto tmp_rc = mm_fmsub(rhs, c_yzx, prod_rc);
-    auto tmp_br = mm_fmsub(mat[1], r_yzx, prod_br);
+    auto cross_bc = mm_fmsub(mat[1], c_yzx, prod_bc);
+    auto cross_rc = mm_fmsub(rhs, c_yzx, prod_rc);
+    auto cross_br = mm_fmsub(mat[1], r_yzx, prod_br);
 
 
-    auto t_0 = shuffle<1, 2, 2, 0>(tmp_bc, tmp_rc);
-    auto t_1 = shuffle<0, 0, 1, 0>(tmp_bc, tmp_rc);
+    // shuffle all cross product terms as needed
+    auto tmp_shf_cross_0 = shuffle<1, 2, 2, 0>(cross_bc, cross_rc);
+    auto tmp_shf_cross_1 = shuffle<0, 0, 1, 0>(cross_bc, cross_rc);
 
-    auto g0 = shuffle<0, 2, 0, 0>(t_0, tmp_br);
-    auto g1 = shuffle<1, 3, 1, 0>(t_0, tmp_br);
-    auto g2 = shuffle<0, 2, 2, 0>(t_1, tmp_br);
-
-    auto tt0    = mm_mul(mat[0], g0);
-    auto uu0    = mm_mul(a_ryz, g0);
-    auto tt1    = mm_fmadd(a_yzx, g1, tt0);
-    auto uu1    = mm_fmadd(a_rzx, g1, uu0);
-    auto dets_u = mm_fmadd(a_zxy, g2, tt1);
-    auto dets   = mm_fmadd(a_rxy, g2, uu1);
+    auto shf_cross_0 = shuffle<0, 2, 0, 0>(tmp_shf_cross_0, cross_br);
+    auto shf_cross_1 = shuffle<1, 3, 1, 0>(tmp_shf_cross_0, cross_br);
+    auto shf_cross_2 = shuffle<0, 2, 2, 0>(tmp_shf_cross_1, cross_br);
 
 
-    auto det_mat = broadcast<0>(dets_u);
-    return mm_div(dets, det_mat);
-#else
-    using namespace x86;
-    static_assert(num_elements<T_RegisterType> > 2, "Registers with 2 elements are not supported.");
-
-    // calculate all cross products
-
-    auto r_yzx = permute<1, 2, 0, 3>(rhs);
-    auto a_yzx = permute<1, 2, 0, 3>(mat[0]);
-    auto b_yzx = permute<1, 2, 0, 3>(mat[1]);
-    auto c_yzx = permute<1, 2, 0, 3>(mat[2]);
-
-    auto a0 = broadcast<0>(mat[0]);
-    auto a1 = broadcast<1>(mat[0]);
-    auto a2 = broadcast<2>(mat[0]);
-    auto r2 = broadcast<2>(rhs);
+    // calculate all necessary determinants
+    auto sum_0_m = mm_mul(mat[0], shf_cross_0);
+    auto sum_0_r = mm_mul(a_ryz, shf_cross_0);
+    auto sum_1_m = mm_fmadd(a_yzx, shf_cross_1, sum_0_m);
+    auto sum_1_r = mm_fmadd(a_rzx, shf_cross_1, sum_0_r);
+    auto dets_m  = mm_fmadd(a_zxy, shf_cross_2, sum_1_m);
+    auto dets_r  = mm_fmadd(a_rxy, shf_cross_2, sum_1_r);
 
 
-    auto prod_bc = mm_mul(b_yzx, mat[2]);
-    auto prod_rc = mm_mul(r_yzx, mat[2]);
-    auto prod_br = mm_mul(b_yzx, rhs);
-
-    auto tmp_bc = mm_fmsub(mat[1], c_yzx, prod_bc);
-    auto tmp_rc = mm_fmsub(rhs, c_yzx, prod_rc);
-    auto tmp_br = mm_fmsub(mat[1], r_yzx, prod_br);
-
-    auto l0 = blend_at<0>(a0, rhs);
-    auto l1 = blend_at<0>(a1, r_yzx);
-    auto l2 = blend_at<0>(a2, r2);
-
-    auto tmp_0 = shuffle<1, 2, 1, 2>(tmp_bc, tmp_rc);
-    auto tmp_1 = shuffle<0, 0, 0, 0>(tmp_bc, tmp_rc);
-
-    auto h0 = shuffle<0, 2, 1, 0>(tmp_0, tmp_br);
-    auto h1 = shuffle<1, 3, 2, 0>(tmp_0, tmp_br);
-    auto h2 = shuffle<0, 2, 0, 0>(tmp_1, tmp_br);
-
-    auto t0     = mm_mul(l0, h0);
-    auto u0     = mm_mul(a0, h0);
-    auto t1     = mm_fmadd(l1, h1, t0);
-    auto u1     = mm_fmadd(a1, h1, u0);
-    auto dets   = mm_fmadd(l2, h2, t1);
-    auto dets_u = mm_fmadd(a2, h2, u1);
-
-
-    auto det_mat = broadcast<0>(dets_u);
-    return mm_div(dets, det_mat);
-#endif
+    // calculate solution of the system
+    auto det_mat = broadcast<0>(dets_m);
+    return mm_div(dets_r, det_mat);
 }
 
 
