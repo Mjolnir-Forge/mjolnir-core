@@ -81,6 +81,7 @@ public:
     //! @return
     //! Solution vector
     template <Number T_Type>
+    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
     [[nodiscard]] static constexpr auto solve(const std::array<T_Type, 9>& mat,
                                               const std::array<T_Type, 3>& rhs) noexcept -> std::array<T_Type, 3>;
 
@@ -158,13 +159,17 @@ template <x86::FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <Number T_Type>
+// NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
 [[nodiscard]] constexpr auto Cramer::solve(const std::array<T_Type, 9>& mat, const std::array<T_Type, 3>& rhs) noexcept
         -> std::array<T_Type, 3>
 {
     T_Type det_mat = determinant_3x3(mat);
 
+    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
     auto r_0 = std::array<T_Type, 9>{rhs[0], rhs[1], rhs[2], mat[3], mat[4], mat[5], mat[6], mat[7], mat[8]};
+    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
     auto r_1 = std::array<T_Type, 9>{mat[0], mat[1], mat[2], rhs[0], rhs[1], rhs[2], mat[6], mat[7], mat[8]};
+    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
     auto r_2 = std::array<T_Type, 9>{mat[0], mat[1], mat[2], mat[3], mat[4], mat[5], rhs[0], rhs[1], rhs[2]};
 
     T_Type x_0 = determinant_3x3(r_0) / det_mat;
