@@ -32,75 +32,69 @@ class Cramer
 {
 public:
     //! @brief
-    //! Solve a linear system of equations of size 2.
+    //! Solve a linear system of equations.
     //!
     //! @tparam T_Type:
     //! The basic type of a matrix/vector element
+    //! @tparam t_size:
+    //! Size of the system
     //!
-    //! @param mat:
+    //! @param[in] mat:
     //! The matrix of the system of equations. The data has to be provided in column major format
-    //! @param rhs:
+    //! @param[in] rhs:
     //! The right-hand side vector of the system
     //!
     //! @return
     //! Solution vector
-    template <Number T_Type>
-    [[nodiscard]] static constexpr auto solve(const std::array<T_Type, 4>& mat,
-                                              const std::array<T_Type, 2>& rhs) noexcept -> std::array<T_Type, 2>;
+    template <Number T_Type, UST t_size>
+    [[nodiscard]] static constexpr auto solve(const std::array<T_Type, t_size * t_size>& mat,
+                                              const std::array<T_Type, t_size>&          rhs) noexcept
+            -> std::array<T_Type, t_size>;
 
 
     //! @brief
-    //! Solve a linear system of equations of size 2.
+    //! Solve a linear system of equations.
     //!
     //! @tparam T_RegisterType:
     //! The register type that stores the columns of a matrix/vector
+    //! @tparam t_size
+    //! Size of the system
     //!
-    //! @param mat:
+    //! @param[in] mat:
     //! The matrix of the system of equations. The data has to be provided in column major format
-    //! @param rhs:
+    //! @param[in] rhs:
     //! The right-hand side vector of the system
     //!
     //! @return
     //! Solution vector
-    template <x86::FloatVectorRegister T_RegisterType>
-    [[nodiscard]] static auto solve(const std::array<T_RegisterType, 2>& mat, T_RegisterType rhs) noexcept
+    template <x86::FloatVectorRegister T_RegisterType, UST t_size>
+    [[nodiscard]] static auto solve(const std::array<T_RegisterType, t_size>& mat, T_RegisterType rhs) noexcept
             -> T_RegisterType;
 
 
-    //! @brief
-    //! Solve a linear system of equations of size 3.
-    //!
-    //! @tparam T_Type:
-    //! The basic type of a matrix/vector element
-    //!
-    //! @param mat:
-    //! The matrix of the system of equations. The data has to be provided in column major format
-    //! @param rhs:
-    //! The right-hand side vector of the system
-    //!
-    //! @return
-    //! Solution vector
+private:
+    //! Solver implementation for 2x2 systems (not vectorized).
+    template <Number T_Type>
+    [[nodiscard]] static constexpr auto solve_2x2(const std::array<T_Type, 4>& mat,
+                                                  const std::array<T_Type, 2>& rhs) noexcept -> std::array<T_Type, 2>;
+
+
+    //! Solver implementation for 2x2 systems (vectorized).
+    template <x86::FloatVectorRegister T_RegisterType>
+    [[nodiscard]] static auto solve_2x2(const std::array<T_RegisterType, 2>& mat, T_RegisterType rhs) noexcept
+            -> T_RegisterType;
+
+
+    //! Solver implementation for 3x3 systems (not vectorized).
     template <Number T_Type>
     // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
-    [[nodiscard]] static constexpr auto solve(const std::array<T_Type, 9>& mat,
-                                              const std::array<T_Type, 3>& rhs) noexcept -> std::array<T_Type, 3>;
+    [[nodiscard]] static constexpr auto solve_3x3(const std::array<T_Type, 9>& mat,
+                                                  const std::array<T_Type, 3>& rhs) noexcept -> std::array<T_Type, 3>;
 
 
-    //! @brief
-    //! Solve a linear system of equations of size 3.
-    //!
-    //! @tparam T_RegisterType:
-    //! The register type that stores the columns of a matrix/vector
-    //!
-    //! @param mat:
-    //! The matrix of the system of equations. The data has to be provided in column major format
-    //! @param rhs:
-    //! The right-hand side vector of the system
-    //!
-    //! @return
-    //! Solution vector
+    //! Solver implementation for 3x3 systems (vectorized).
     template <x86::FloatVectorRegister T_RegisterType>
-    [[nodiscard]] static auto solve(const std::array<T_RegisterType, 3>& mat, T_RegisterType rhs) noexcept
+    [[nodiscard]] static auto solve_3x3(const std::array<T_RegisterType, 3>& mat, T_RegisterType rhs) noexcept
             -> T_RegisterType;
 };
 
@@ -112,9 +106,35 @@ public:
 
 namespace mjolnir
 {
+template <Number T_Type, UST t_size>
+[[nodiscard]] constexpr auto Cramer::solve(const std::array<T_Type, t_size * t_size>& mat,
+                                           const std::array<T_Type, t_size>& rhs) noexcept -> std::array<T_Type, t_size>
+{
+    if constexpr (t_size == 2)
+        return solve_2x2(mat, rhs);
+    else if constexpr (t_size == 3)
+        return solve_3x3(mat, rhs);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <x86::FloatVectorRegister T_RegisterType, UST t_size>
+[[nodiscard]] auto Cramer::solve(const std::array<T_RegisterType, t_size>& mat, T_RegisterType rhs) noexcept
+        -> T_RegisterType
+{
+    if constexpr (t_size == 2)
+        return solve_2x2(mat, rhs);
+    else if constexpr (t_size == 3)
+        return solve_3x3(mat, rhs);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <Number T_Type>
-[[nodiscard]] constexpr auto Cramer::solve(const std::array<T_Type, 4>& mat, const std::array<T_Type, 2>& rhs) noexcept
-        -> std::array<T_Type, 2>
+[[nodiscard]] constexpr auto Cramer::solve_2x2(const std::array<T_Type, 4>& mat,
+                                               const std::array<T_Type, 2>& rhs) noexcept -> std::array<T_Type, 2>
 {
     T_Type det_mat = determinant_2x2(mat);
 
@@ -131,7 +151,7 @@ template <Number T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] auto Cramer::solve(const std::array<T_RegisterType, 2>& mat, T_RegisterType rhs) noexcept
+[[nodiscard]] auto Cramer::solve_2x2(const std::array<T_RegisterType, 2>& mat, T_RegisterType rhs) noexcept
         -> T_RegisterType
 {
     // Several implementations have been tested and benchmarked. This one was the fastest. Note that the throughput of
@@ -160,8 +180,8 @@ template <x86::FloatVectorRegister T_RegisterType>
 
 template <Number T_Type>
 // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
-[[nodiscard]] constexpr auto Cramer::solve(const std::array<T_Type, 9>& mat, const std::array<T_Type, 3>& rhs) noexcept
-        -> std::array<T_Type, 3>
+[[nodiscard]] constexpr auto Cramer::solve_3x3(const std::array<T_Type, 9>& mat,
+                                               const std::array<T_Type, 3>& rhs) noexcept -> std::array<T_Type, 3>
 {
     T_Type det_mat = determinant_3x3(mat);
 
@@ -183,7 +203,7 @@ template <Number T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] auto Cramer::solve(const std::array<T_RegisterType, 3>& mat, T_RegisterType rhs) noexcept
+[[nodiscard]] auto Cramer::solve_3x3(const std::array<T_RegisterType, 3>& mat, T_RegisterType rhs) noexcept
         -> T_RegisterType
 {
     using namespace x86;

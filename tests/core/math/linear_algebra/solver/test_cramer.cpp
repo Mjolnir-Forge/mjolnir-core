@@ -34,7 +34,7 @@ TYPED_TEST(SolverTestSuite, cramer_2x2) // NOLINT
     UST tc_idx = 0;
     for (const auto& tc : get_solver_testcases_2x2<TypeParam>())
     {
-        auto x = Cramer::solve<TypeParam>(tc.mat(), tc.rhs());
+        auto x = Cramer::solve(tc.mat(), tc.rhs());
         tc.check_result_testcase(x, tc_idx);
         ++tc_idx;
     }
@@ -50,7 +50,7 @@ TYPED_TEST(SolverTestSuite, cramer_3x3) // NOLINT
         UST tc_idx = 0;
         for (const auto& tc : get_solver_testcases_3x3<TypeParam>())
         {
-            auto x = Cramer::solve<TypeParam>(tc.mat(), tc.rhs());
+            auto x = Cramer::solve(tc.mat(), tc.rhs());
             tc.check_result_testcase(x, tc_idx);
             ++tc_idx;
         }
