@@ -258,6 +258,64 @@ template <x86::FloatVectorRegister T_RegisterType>
 }
 
 
+// --- specialization -------------------------------------
+
+template <>
+[[nodiscard]] auto Cramer::solve_3x3(const std::array<__m256d, 3>& mat, __m256d rhs) noexcept -> __m256d
+{
+    using namespace x86;
+
+    // create all necessary permutations
+    auto r_yzx = permute_across_lanes<1, 2, 0, 3>(rhs);
+    auto c_yzx = permute_across_lanes<1, 2, 0, 3>(mat[2]);
+    auto b_yzx = permute_across_lanes<1, 2, 0, 3>(mat[1]);
+    auto a_yzx = permute_across_lanes<1, 2, 0, 3>(mat[0]);
+
+    auto r_zxy = permute_across_lanes<2, 0, 1, 3>(rhs);
+    auto a_zxy = permute_across_lanes<2, 0, 1, 3>(mat[0]);
+
+    auto a_ryz = blend_at<0>(mat[0], rhs);
+    auto a_rzx = blend_at<0>(a_yzx, r_yzx);
+    auto a_rxy = blend_at<0>(a_zxy, r_zxy);
+
+
+    // calculate all necessary cross product components
+    auto prod_bc = mm_mul(b_yzx, mat[2]);
+    auto prod_rc = mm_mul(r_yzx, mat[2]);
+    auto prod_br = mm_mul(b_yzx, rhs);
+
+    auto cross_bc = mm_fmsub(mat[1], c_yzx, prod_bc);
+    auto cross_rc = mm_fmsub(rhs, c_yzx, prod_rc);
+    auto cross_br = mm_fmsub(mat[1], r_yzx, prod_br);
+
+
+    // shuffle all cross product terms as needed
+
+    auto tmp_blend_cross_0 = blend_at<1>(cross_bc, cross_rc);
+    auto tmp_blend_cross_1 = blend_at<1>(cross_rc, cross_br);
+    auto tmp_blend_cross_2 = blend_at<1>(cross_br, cross_bc);
+
+    auto perm_cross_0     = blend_at<2>(tmp_blend_cross_0, cross_br);
+    auto tmp_perm_cross_1 = blend_at<2>(tmp_blend_cross_1, cross_bc);
+    auto tmp_perm_cross_2 = blend_at<2>(tmp_blend_cross_2, cross_rc);
+
+
+    // calculate all necessary determinants
+    auto sum_0_m      = mm_mul(a_zxy, perm_cross_0);
+    auto sum_0_r      = mm_mul(a_rxy, perm_cross_0);
+    auto perm_cross_1 = permute_across_lanes<2, 0, 1, 0>(tmp_perm_cross_1);
+    auto sum_1_m      = mm_fmadd(a_yzx, perm_cross_1, sum_0_m);
+    auto sum_1_r      = mm_fmadd(a_rzx, perm_cross_1, sum_0_r);
+    auto perm_cross_2 = permute_across_lanes<1, 2, 0, 0>(tmp_perm_cross_2);
+    auto dets_m       = mm_fmadd(mat[0], perm_cross_2, sum_1_m);
+    auto dets_r       = mm_fmadd(a_ryz, perm_cross_2, sum_1_r);
+
+
+    // calculate solution of the system
+    auto det_mat = broadcast_across_lanes<0>(dets_m);
+    return mm_div(dets_r, det_mat);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 
 } // namespace mjolnir
