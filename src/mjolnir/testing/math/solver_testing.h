@@ -145,6 +145,15 @@ template <typename T_Type>
 [[nodiscard]] auto get_solver_testcases_3x3() -> std::vector<SolverTestcase<T_Type, 3>>;
 
 
+//! @brief
+//! Get a vector of testcases for 4x4 solvers.
+//!
+//! @return
+//! Vector of testcases for 4x4 solvers
+template <typename T_Type>
+[[nodiscard]] auto get_solver_testcases_4x4() -> std::vector<SolverTestcase<T_Type, 4>>;
+
+
 //! @}
 } // namespace mjolnir
 
@@ -292,13 +301,43 @@ template <typename T_Type>
 
     std::vector<ST> testcases = {};
 
-    testcases.emplace_back(ST({{1., 0., 0., 0., 1., 0., 0., 0., 1.}}, // NOLINT(readability-magic-numbers)
-                              {{1., 2., 3.}},                         // NOLINT(readability-magic-numbers)
-                              {{1., 2., 3.}}));                       // NOLINT(readability-magic-numbers)
-    testcases.emplace_back(ST({{2., 3., 1., 5., 2., 1., 1., 4., 1.}}, // NOLINT(readability-magic-numbers)
-                              {{2., -3., 1.}},                        // NOLINT(readability-magic-numbers)
-                              {{-10., 4., 0.}}));                     // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{1., 0., 0., 0., 1., 0., 0., 0., 1.}},      // NOLINT(readability-magic-numbers)
+                              {{1., 2., 3.}},                              // NOLINT(readability-magic-numbers)
+                              {{1., 2., 3.}}));                            // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{2., 3., 1., 5., 2., 1., 1., 4., 1.}},      // NOLINT(readability-magic-numbers)
+                              {{2., -3., 1.}},                             // NOLINT(readability-magic-numbers)
+                              {{-10., 4., 0.}}));                          // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{7., 1., -4., -2., -8., -6., 2., -3., 5.}}, // NOLINT(readability-magic-numbers)
+                              {{3., 5., -2.}},                             // NOLINT(readability-magic-numbers)
+                              {{7., -31., -52.}}));                        // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{4., 8., 9., 3., 4., 7., 2., 1., 4.}},      // NOLINT(readability-magic-numbers)
+                              {{4., -7., 9.}},                             // NOLINT(readability-magic-numbers)
+                              {{13., 13., 23.}}));                         // NOLINT(readability-magic-numbers)
+    testcases.emplace_back(ST({{-9., 2., 5., 3., 6., 8., 8., -4., 1.}},    // NOLINT(readability-magic-numbers)
+                              {{6., -5., 7.}},                             // NOLINT(readability-magic-numbers)
+                              {{-13., -46., -3.}}));                       // NOLINT(readability-magic-numbers)
 
+    return testcases;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type>
+[[nodiscard]] auto get_solver_testcases_4x4() -> std::vector<SolverTestcase<T_Type, 4>>
+{
+    using ST = SolverTestcase<T_Type, 4>;
+
+    std::vector<ST> testcases = {};
+
+    // NOLINTNEXTLINE(readability-magic-numbers)
+    testcases.emplace_back(ST({{1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.}},
+                              {{1., 2., 3., 4.}},   // NOLINT(readability-magic-numbers)
+                              {{1., 2., 3., 4.}})); // NOLINT(readability-magic-numbers)
+    // NOLINTNEXTLINE(readability-magic-numbers)
+    testcases.emplace_back(ST({{3., -5., 4., -6., 2., -3., 7., -5., 8., -6., 1., -1., 5., -2., 3., -9.}},
+                              {{5., 2., 1., 7.}},          // NOLINT(readability-magic-numbers)
+                              {{62., -51., 56., -104.}})); // NOLINT(readability-magic-numbers)
     return testcases;
 }
 

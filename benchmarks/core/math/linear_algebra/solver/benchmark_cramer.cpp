@@ -19,8 +19,11 @@ template <Number T_Type, UST t_size>
 {
     if constexpr (t_size == 2)
         return std::array<T_Type, 4>{{3., 2., 1., 6.}}; // NOLINT(readability-magic-numbers)
-    else
+    else if constexpr (t_size == 3)
         return std::array<T_Type, 9>{{3., 2., 1., 6., 2., 1., 4., 1., 1.}}; // NOLINT(readability-magic-numbers)
+    else
+        // NOLINTNEXTLINE(readability-magic-numbers)
+        return std::array<T_Type, 16>{{3., 2., 1., 6., 2., 1., 4., 1., 1., 5., 2., 4., 5., 3., 9., 7.}};
 }
 
 
@@ -44,8 +47,10 @@ template <Number T_Type, UST t_size>
 {
     if constexpr (t_size == 2)
         return std::array<T_Type, 2>{{4., 3.}}; // NOLINT(readability-magic-numbers)
-    else
+    else if constexpr (t_size == 3)
         return std::array<T_Type, 3>{{1., 2., 3.}}; // NOLINT(readability-magic-numbers)
+    else
+        return std::array<T_Type, 4>{{1., 2., 3., 4.}}; // NOLINT(readability-magic-numbers)
 }
 
 
@@ -95,4 +100,6 @@ BENCHMARK(bm_solver<__m128, 3>)->Name("3x3 - m128");   // NOLINT
 BENCHMARK(bm_solver<__m256, 3>)->Name("3x3 - m256");   // NOLINT
 BENCHMARK(bm_solver<F64, 3>)->Name("3x3 - F64");       // NOLINT
 BENCHMARK(bm_solver<__m256d, 3>)->Name("3x3 - m256d"); // NOLINT
+BENCHMARK(bm_solver<F32, 4>)->Name("4x4 - F32");       // NOLINT
+BENCHMARK(bm_solver<F64, 4>)->Name("4x4 - F64");       // NOLINT
 BENCHMARK_MAIN();                                      // NOLINT

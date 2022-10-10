@@ -96,6 +96,13 @@ private:
     template <x86::FloatVectorRegister T_RegisterType>
     [[nodiscard]] static auto solve_3x3(const std::array<T_RegisterType, 3>& mat, T_RegisterType rhs) noexcept
             -> T_RegisterType;
+
+
+    //! Solver implementation for 4x4 systems (not vectorized).
+    template <Number T_Type>
+    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
+    [[nodiscard]] static constexpr auto solve_4x4(const std::array<T_Type, 16>& mat,
+                                                  const std::array<T_Type, 4>&  rhs) noexcept -> std::array<T_Type, 4>;
 };
 
 //! @}
@@ -110,10 +117,14 @@ template <Number T_Type, UST t_size>
 [[nodiscard]] constexpr auto Cramer::solve(const std::array<T_Type, t_size * t_size>& mat,
                                            const std::array<T_Type, t_size>& rhs) noexcept -> std::array<T_Type, t_size>
 {
+    static_assert(4 >= t_size && 1 < t_size, "Only sizes 2-4 are supported.");
+
     if constexpr (t_size == 2)
         return solve_2x2(mat, rhs);
     else if constexpr (t_size == 3)
         return solve_3x3(mat, rhs);
+    else
+        return solve_4x4(mat, rhs);
 }
 
 
@@ -124,6 +135,7 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_size>
         -> T_RegisterType
 {
     using namespace x86;
+    static_assert(4 >= t_size && 1 < t_size, "Only sizes 2-4 are supported.");
     static_assert(num_elements<T_RegisterType> >= t_size, "Registers size must be equal or larger than system size.");
 
     if constexpr (t_size == 2)
@@ -320,6 +332,48 @@ template <>
 }
 
 //! \endcond
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <Number T_Type>
+// NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
+[[nodiscard]] constexpr auto Cramer::solve_4x4(const std::array<T_Type, 16>& mat,
+                                               const std::array<T_Type, 4>&  rhs) noexcept -> std::array<T_Type, 4>
+{
+    T_Type det_mat = determinant_4x4(mat);
+
+    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
+    // clang-format off
+    auto r_0 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                rhs[0],  rhs[1],  rhs[2],  rhs[3],
+                mat[4],  mat[5],  mat[6],  mat[7],      // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[8],  mat[9],  mat[10], mat[11],     // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[12], mat[13], mat[14], mat[15]};    // NOLINT(readability-magic-numbers,-warnings-as-errors)
+    auto r_1 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[0],  mat[1],  mat[2],  mat[3],
+                rhs[0],  rhs[1],  rhs[2],  rhs[3],
+                mat[8],  mat[9],  mat[10], mat[11],     // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[12], mat[13], mat[14], mat[15]};    // NOLINT(readability-magic-numbers,-warnings-as-errors)
+    auto r_2 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[0],  mat[1],  mat[2],  mat[3],
+                mat[4],  mat[5],  mat[6],  mat[7],      // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                rhs[0],  rhs[1],  rhs[2],  rhs[3],
+                mat[12], mat[13], mat[14], mat[15]};    // NOLINT(readability-magic-numbers,-warnings-as-errors)
+    auto r_3 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[0],  mat[1],  mat[2],  mat[3],
+                mat[4],  mat[5],  mat[6],  mat[7],      // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[8],  mat[9],  mat[10], mat[11],     // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                rhs[0],  rhs[1],  rhs[2],  rhs[3]};
+    // clang-format on
+
+    T_Type x_0 = determinant_4x4(r_0) / det_mat;
+    T_Type x_1 = determinant_4x4(r_1) / det_mat;
+    T_Type x_2 = determinant_4x4(r_2) / det_mat;
+    T_Type x_3 = determinant_4x4(r_3) / det_mat;
+
+    return std::array<T_Type, 4>{x_0, x_1, x_2, x_3};
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
