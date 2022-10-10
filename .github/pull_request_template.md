@@ -13,9 +13,13 @@ Closes # (add issue numbers)
 - [ ] update changelog
 - [ ] update documentation
 - [ ] update tests
-- [ ] updaet benchmarks
+- [ ] update benchmarks
 
 ### Cpp
 
 - [ ] add the following keywords and attributes to functions if it makes sense: 
       `[[nodiscard]]`, `inline`, `constexpr`, `const`, `noexcept`
+
+### Doxygen
+
+- [ ] use `[in]`,  `[out]`, and `[in,out]` with every `@param`
