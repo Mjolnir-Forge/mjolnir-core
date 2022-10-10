@@ -123,6 +123,9 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_size>
 [[nodiscard]] auto Cramer::solve(const std::array<T_RegisterType, t_size>& mat, T_RegisterType rhs) noexcept
         -> T_RegisterType
 {
+    using namespace x86;
+    static_assert(num_elements<T_RegisterType> >= t_size, "Registers size must be equal or larger than system size.");
+
     if constexpr (t_size == 2)
         return solve_2x2(mat, rhs);
     else if constexpr (t_size == 3)
@@ -207,8 +210,6 @@ template <x86::FloatVectorRegister T_RegisterType>
         -> T_RegisterType
 {
     using namespace x86;
-    static_assert(num_elements<T_RegisterType> > 2, "Registers with 2 elements are not supported.");
-
 
     // create all necessary permutations
     auto r_yzx = permute<1, 2, 0, 3>(rhs);
@@ -259,6 +260,8 @@ template <x86::FloatVectorRegister T_RegisterType>
 
 
 // --- specialization -------------------------------------
+
+//! \cond DO_NOT_DOCUMENT
 
 template <>
 [[nodiscard]] auto Cramer::solve_3x3(const std::array<__m256d, 3>& mat, __m256d rhs) noexcept -> __m256d
@@ -315,6 +318,9 @@ template <>
     auto det_mat = broadcast_across_lanes<0>(dets_m);
     return mm_div(dets_r, det_mat);
 }
+
+//! \endcond
+
 
 // --------------------------------------------------------------------------------------------------------------------
 
