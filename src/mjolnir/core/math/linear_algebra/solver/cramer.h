@@ -264,7 +264,7 @@ template <x86::FloatVectorRegister T_RegisterType>
 //! \cond DO_NOT_DOCUMENT
 
 template <>
-[[nodiscard]] auto Cramer::solve_3x3(const std::array<__m256d, 3>& mat, __m256d rhs) noexcept -> __m256d
+[[nodiscard]] inline auto Cramer::solve_3x3(const std::array<__m256d, 3>& mat, __m256d rhs) noexcept -> __m256d
 {
     using namespace x86;
 
