@@ -290,7 +290,6 @@ template <>
 
 
     // shuffle all cross product terms as needed
-
     auto tmp_blend_cross_0 = blend_at<1>(cross_bc, cross_rc);
     auto tmp_blend_cross_1 = blend_at<1>(cross_rc, cross_br);
     auto tmp_blend_cross_2 = blend_at<1>(cross_br, cross_bc);
@@ -299,16 +298,17 @@ template <>
     auto tmp_perm_cross_1 = blend_at<2>(tmp_blend_cross_1, cross_bc);
     auto tmp_perm_cross_2 = blend_at<2>(tmp_blend_cross_2, cross_rc);
 
+    auto perm_cross_1 = permute_across_lanes<2, 0, 1, 0>(tmp_perm_cross_1);
+    auto perm_cross_2 = permute_across_lanes<1, 2, 0, 0>(tmp_perm_cross_2);
+
 
     // calculate all necessary determinants
-    auto sum_0_m      = mm_mul(a_zxy, perm_cross_0);
-    auto sum_0_r      = mm_mul(a_rxy, perm_cross_0);
-    auto perm_cross_1 = permute_across_lanes<2, 0, 1, 0>(tmp_perm_cross_1);
-    auto sum_1_m      = mm_fmadd(a_yzx, perm_cross_1, sum_0_m);
-    auto sum_1_r      = mm_fmadd(a_rzx, perm_cross_1, sum_0_r);
-    auto perm_cross_2 = permute_across_lanes<1, 2, 0, 0>(tmp_perm_cross_2);
-    auto dets_m       = mm_fmadd(mat[0], perm_cross_2, sum_1_m);
-    auto dets_r       = mm_fmadd(a_ryz, perm_cross_2, sum_1_r);
+    auto sum_0_m = mm_mul(a_zxy, perm_cross_0);
+    auto sum_0_r = mm_mul(a_rxy, perm_cross_0);
+    auto sum_1_m = mm_fmadd(a_yzx, perm_cross_1, sum_0_m);
+    auto sum_1_r = mm_fmadd(a_rzx, perm_cross_1, sum_0_r);
+    auto dets_m  = mm_fmadd(mat[0], perm_cross_2, sum_1_m);
+    auto dets_r  = mm_fmadd(a_ryz, perm_cross_2, sum_1_r);
 
 
     // calculate solution of the system
