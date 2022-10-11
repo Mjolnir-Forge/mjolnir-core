@@ -87,7 +87,7 @@ private:
 
     //! Solver implementation for 3x3 systems (not vectorized).
     template <Number T_Type>
-    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
+    // NOLINTNEXTLINE(readability-magic-numbers)
     [[nodiscard]] static constexpr auto solve_3x3(const std::array<T_Type, 9>& mat,
                                                   const std::array<T_Type, 3>& rhs) noexcept -> std::array<T_Type, 3>;
 
@@ -100,7 +100,7 @@ private:
 
     //! Solver implementation for 4x4 systems (not vectorized).
     template <Number T_Type>
-    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
+    // NOLINTNEXTLINE(readability-magic-numbers)
     [[nodiscard]] static constexpr auto solve_4x4(const std::array<T_Type, 16>& mat,
                                                   const std::array<T_Type, 4>&  rhs) noexcept -> std::array<T_Type, 4>;
 };
@@ -194,17 +194,17 @@ template <x86::FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <Number T_Type>
-// NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
+// NOLINTNEXTLINE(readability-magic-numbers)
 [[nodiscard]] constexpr auto Cramer::solve_3x3(const std::array<T_Type, 9>& mat,
                                                const std::array<T_Type, 3>& rhs) noexcept -> std::array<T_Type, 3>
 {
     T_Type det_mat = determinant_3x3(mat);
 
-    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
+    // NOLINTNEXTLINE(readability-magic-numbers)
     auto r_0 = std::array<T_Type, 9>{rhs[0], rhs[1], rhs[2], mat[3], mat[4], mat[5], mat[6], mat[7], mat[8]};
-    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
+    // NOLINTNEXTLINE(readability-magic-numbers)
     auto r_1 = std::array<T_Type, 9>{mat[0], mat[1], mat[2], rhs[0], rhs[1], rhs[2], mat[6], mat[7], mat[8]};
-    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
+    // NOLINTNEXTLINE(readability-magic-numbers)
     auto r_2 = std::array<T_Type, 9>{mat[0], mat[1], mat[2], mat[3], mat[4], mat[5], rhs[0], rhs[1], rhs[2]};
 
     T_Type x_0 = determinant_3x3(r_0) / det_mat;
@@ -337,33 +337,36 @@ template <>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <Number T_Type>
-// NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
+// NOLINTNEXTLINE(readability-magic-numbers)
 [[nodiscard]] constexpr auto Cramer::solve_4x4(const std::array<T_Type, 16>& mat,
                                                const std::array<T_Type, 4>&  rhs) noexcept -> std::array<T_Type, 4>
 {
+    // This implementation is extremely slow if `T_Type` is `F64`. Writing out all equations instead of using the
+    // determinant functions didn't improve the performance. The time consumption factor of approximately 100 (when
+    // compared to the F32 version) is probably caused by cache misses.
+
     T_Type det_mat = determinant_4x4(mat);
 
-    // NOLINTNEXTLINE(readability-magic-numbers,-warnings-as-errors)
     // clang-format off
-    auto r_0 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers,-warnings-as-errors)
+    auto r_0 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers)
                 rhs[0],  rhs[1],  rhs[2],  rhs[3],
-                mat[4],  mat[5],  mat[6],  mat[7],      // NOLINT(readability-magic-numbers,-warnings-as-errors)
-                mat[8],  mat[9],  mat[10], mat[11],     // NOLINT(readability-magic-numbers,-warnings-as-errors)
-                mat[12], mat[13], mat[14], mat[15]};    // NOLINT(readability-magic-numbers,-warnings-as-errors)
-    auto r_1 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[4],  mat[5],  mat[6],  mat[7],      // NOLINT(readability-magic-numbers)
+                mat[8],  mat[9],  mat[10], mat[11],     // NOLINT(readability-magic-numbers)
+                mat[12], mat[13], mat[14], mat[15]};    // NOLINT(readability-magic-numbers)
+    auto r_1 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers)
                 mat[0],  mat[1],  mat[2],  mat[3],
                 rhs[0],  rhs[1],  rhs[2],  rhs[3],
-                mat[8],  mat[9],  mat[10], mat[11],     // NOLINT(readability-magic-numbers,-warnings-as-errors)
-                mat[12], mat[13], mat[14], mat[15]};    // NOLINT(readability-magic-numbers,-warnings-as-errors)
-    auto r_2 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[8],  mat[9],  mat[10], mat[11],     // NOLINT(readability-magic-numbers)
+                mat[12], mat[13], mat[14], mat[15]};    // NOLINT(readability-magic-numbers)
+    auto r_2 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers)
                 mat[0],  mat[1],  mat[2],  mat[3],
-                mat[4],  mat[5],  mat[6],  mat[7],      // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[4],  mat[5],  mat[6],  mat[7],      // NOLINT(readability-magic-numbers)
                 rhs[0],  rhs[1],  rhs[2],  rhs[3],
-                mat[12], mat[13], mat[14], mat[15]};    // NOLINT(readability-magic-numbers,-warnings-as-errors)
-    auto r_3 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[12], mat[13], mat[14], mat[15]};    // NOLINT(readability-magic-numbers)
+    auto r_3 = std::array<T_Type, 16>{                  // NOLINT(readability-magic-numbers)
                 mat[0],  mat[1],  mat[2],  mat[3],
-                mat[4],  mat[5],  mat[6],  mat[7],      // NOLINT(readability-magic-numbers,-warnings-as-errors)
-                mat[8],  mat[9],  mat[10], mat[11],     // NOLINT(readability-magic-numbers,-warnings-as-errors)
+                mat[4],  mat[5],  mat[6],  mat[7],      // NOLINT(readability-magic-numbers)
+                mat[8],  mat[9],  mat[10], mat[11],     // NOLINT(readability-magic-numbers)
                 rhs[0],  rhs[1],  rhs[2],  rhs[3]};
     // clang-format on
 
