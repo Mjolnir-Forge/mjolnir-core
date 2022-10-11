@@ -103,6 +103,12 @@ private:
     // NOLINTNEXTLINE(readability-magic-numbers)
     [[nodiscard]] static constexpr auto solve_4x4(const std::array<T_Type, 16>& mat,
                                                   const std::array<T_Type, 4>&  rhs) noexcept -> std::array<T_Type, 4>;
+
+
+    //! Solver implementation for 3x3 systems (vectorized).
+    template <x86::FloatVectorRegister T_RegisterType>
+    [[nodiscard]] static auto solve_4x4(const std::array<T_RegisterType, 4>& mat, T_RegisterType rhs) noexcept
+            -> T_RegisterType;
 };
 
 //! @}
@@ -142,6 +148,8 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_size>
         return solve_2x2(mat, rhs);
     else if constexpr (t_size == 3)
         return solve_3x3(mat, rhs);
+    else
+        return solve_4x4(mat, rhs);
 }
 
 
@@ -376,6 +384,154 @@ template <Number T_Type>
     T_Type x_3 = determinant_4x4(r_3) / det_mat;
 
     return std::array<T_Type, 4>{x_0, x_1, x_2, x_3};
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <x86::FloatVectorRegister T_RegisterType>
+[[nodiscard]] auto Cramer::solve_4x4(const std::array<T_RegisterType, 4>& mat, T_RegisterType rhs) noexcept
+        -> T_RegisterType
+{
+    using namespace x86;
+
+    // todo: check if last 2 terms of 2 determinants can be merged
+
+    // reorder values as needed
+    auto ac_b0011 = blend<0, 0, 1, 1>(mat[0], mat[2]); // for last 2 terms
+    auto ac_b1100 = blend<1, 1, 0, 0>(mat[0], mat[2]);
+    auto rc_b0011 = blend<0, 0, 1, 1>(rhs, mat[2]);
+    auto rc_b1100 = blend<1, 1, 0, 0>(rhs, mat[2]);
+    auto ar_b0011 = blend<0, 0, 1, 1>(mat[0], rhs);
+    auto ar_b1100 = blend<1, 1, 0, 0>(mat[0], rhs);
+    auto bd_b0011 = blend<0, 0, 1, 1>(mat[1], mat[3]);
+    auto bd_b1100 = blend<1, 1, 0, 0>(mat[1], mat[3]);
+    auto rd_b0011 = blend<0, 0, 1, 1>(rhs, mat[3]);
+    auto rd_b1100 = blend<1, 1, 0, 0>(rhs, mat[3]);
+    auto br_b0011 = blend<0, 0, 1, 1>(mat[1], rhs);
+    auto br_b1100 = blend<1, 1, 0, 0>(mat[1], rhs);
+
+    auto ac_b1100_2301 = permute_across_lanes<2, 3, 0, 1>(ac_b1100); // for last 2 terms
+    auto rc_b1100_2301 = permute_across_lanes<2, 3, 0, 1>(rc_b1100);
+    auto ar_b1100_2301 = permute_across_lanes<2, 3, 0, 1>(ar_b1100);
+    auto bd_b1100_2301 = permute_across_lanes<2, 3, 0, 1>(bd_b1100);
+    auto rd_b1100_2301 = permute_across_lanes<2, 3, 0, 1>(rd_b1100);
+    auto br_b1100_2301 = permute_across_lanes<2, 3, 0, 1>(br_b1100);
+    auto a_1230        = permute_across_lanes<1, 2, 3, 0>(mat[0]); // for first 4 terms
+    auto b_1230        = permute_across_lanes<1, 2, 3, 0>(mat[1]);
+    auto c_1230        = permute_across_lanes<1, 2, 3, 0>(mat[2]);
+    auto d_1230        = permute_across_lanes<1, 2, 3, 0>(mat[3]);
+    auto r_1230        = permute_across_lanes<1, 2, 3, 0>(rhs);
+
+    // calculate all twelve 2x2 determinants
+    auto prod_abcd_45 = mm_mul(ac_b1100_2301, bd_b0011); // for last 2 terms
+    auto prod_rbcd_45 = mm_mul(rc_b1100_2301, bd_b0011);
+    auto prod_arcd_45 = mm_mul(ac_b1100_2301, rd_b0011);
+    auto prod_abrd_45 = mm_mul(ar_b1100_2301, bd_b0011);
+    auto prod_abcr_45 = mm_mul(ac_b1100_2301, br_b0011);
+    auto prod_ab_03   = mm_mul(a_1230, mat[1]); // for first 4 terms
+    auto prod_rb_03   = mm_mul(r_1230, mat[1]);
+    auto prod_ar_03   = mm_mul(a_1230, rhs);
+    auto prod_cd_03   = mm_mul(c_1230, mat[3]);
+    auto prod_rd_03   = mm_mul(r_1230, mat[3]);
+    auto prod_cr_03   = mm_mul(c_1230, rhs);
+
+    auto abcd_45 = mm_fmsub(ac_b0011, bd_b1100_2301, prod_abcd_45); // for last 2 terms
+    auto rbcd_45 = mm_fmsub(rc_b0011, bd_b1100_2301, prod_rbcd_45);
+    auto arcd_45 = mm_fmsub(ac_b0011, rd_b1100_2301, prod_arcd_45);
+    auto abrd_45 = mm_fmsub(ar_b0011, bd_b1100_2301, prod_abrd_45);
+    auto abcr_45 = mm_fmsub(ac_b0011, br_b1100_2301, prod_abcr_45);
+    auto ab_03   = mm_fmsub(mat[0], b_1230, prod_ab_03); // for first 4 terms
+    auto rb_03   = mm_fmsub(rhs, b_1230, prod_rb_03);
+    auto ar_03   = mm_fmsub(mat[0], r_1230, prod_ar_03);
+    auto cd_03   = mm_fmsub(mat[2], d_1230, prod_cd_03);
+    auto rd_03   = mm_fmsub(rhs, d_1230, prod_rd_03);
+    auto cr_03   = mm_fmsub(mat[2], r_1230, prod_cr_03);
+
+    // reorder to multiply correct terms
+    auto abcd_45_3210 = permute_across_lanes<3, 2, 1, 0>(abcd_45); // for last 2 terms
+    auto rbcd_45_3210 = permute_across_lanes<3, 2, 1, 0>(rbcd_45);
+    auto arcd_45_3210 = permute_across_lanes<3, 2, 1, 0>(arcd_45);
+    auto abrd_45_3210 = permute_across_lanes<3, 2, 1, 0>(abrd_45);
+    auto abcr_45_3210 = permute_across_lanes<3, 2, 1, 0>(abcr_45);
+    auto cd_03_2301   = permute_across_lanes<2, 3, 0, 1>(cd_03); // for first 4 terms
+    auto rd_03_2301   = permute_across_lanes<2, 3, 0, 1>(rd_03);
+    auto cr_03_2301   = permute_across_lanes<2, 3, 0, 1>(cr_03);
+
+    auto cd_03_2301_neg = negate_selected<0, 1, 0, 1>(cd_03_2301);
+    auto rd_03_2301_neg = negate_selected<0, 1, 0, 1>(rd_03_2301);
+    auto cr_03_2301_neg = negate_selected<0, 1, 0, 1>(cr_03_2301);
+
+    // multiply the 2x2 determinants
+    auto products_45_abcd = mm_mul(abcd_45, abcd_45_3210);
+    auto products_45_rbcd = mm_mul(rbcd_45, rbcd_45_3210);
+    auto products_45_arcd = mm_mul(arcd_45, arcd_45_3210);
+    auto products_45_abrd = mm_mul(abrd_45, abrd_45_3210);
+    auto products_45_abcr = mm_mul(abcr_45, abcr_45_3210);
+    auto products_03_abcd = mm_mul(ab_03, cd_03_2301_neg);
+    auto products_03_rbcd = mm_mul(rb_03, cd_03_2301_neg);
+    auto products_03_arcd = mm_mul(ar_03, cd_03_2301_neg);
+    auto products_03_abrd = mm_mul(ab_03, rd_03_2301_neg);
+    auto products_03_abcr = mm_mul(ab_03, cr_03_2301_neg);
+
+    // set redundant elements to zero and and add both products
+    products_45_abcd = blend<0, 0, 1, 1>(products_45_abcd, mm_setzero<T_RegisterType>());
+    products_45_rbcd = blend<0, 0, 1, 1>(products_45_rbcd, mm_setzero<T_RegisterType>());
+    products_45_arcd = blend<0, 0, 1, 1>(products_45_arcd, mm_setzero<T_RegisterType>());
+    products_45_abrd = blend<0, 0, 1, 1>(products_45_abrd, mm_setzero<T_RegisterType>());
+    products_45_abcr = blend<0, 0, 1, 1>(products_45_abcr, mm_setzero<T_RegisterType>());
+
+
+    auto tmp_sum_abcd = mm_add(products_03_abcd, products_45_abcd);
+    auto tmp_sum_rbcd = mm_add(products_03_rbcd, products_45_rbcd);
+    auto tmp_sum_arcd = mm_add(products_03_arcd, products_45_arcd);
+    auto tmp_sum_abrd = mm_add(products_03_abrd, products_45_abrd);
+    auto tmp_sum_abcr = mm_add(products_03_abcr, products_45_abcr);
+
+
+    // sum up all elements to get the determinant
+    auto det_mat = broadcast_element_sum(tmp_sum_abcd);
+
+    T_RegisterType out_0 = {0};
+    T_RegisterType out_1 = {0};
+    T_RegisterType out_2 = {0};
+    T_RegisterType out_3 = {0};
+
+    // todo: Replace this branch with 4x4 matrix transpositon once it is implemented
+    if constexpr (is_m128<T_RegisterType>)
+    {
+        auto tmp_0 = shuffle<0, 1, 0, 1>(tmp_sum_rbcd, tmp_sum_arcd);
+        auto tmp_1 = shuffle<2, 3, 2, 3>(tmp_sum_rbcd, tmp_sum_arcd);
+        auto tmp_2 = shuffle<0, 1, 0, 1>(tmp_sum_abrd, tmp_sum_abcr);
+        auto tmp_3 = shuffle<2, 3, 2, 3>(tmp_sum_abrd, tmp_sum_abcr);
+
+        out_0 = shuffle<0, 2, 0, 2>(tmp_0, tmp_2);
+        out_1 = shuffle<1, 3, 1, 3>(tmp_0, tmp_2);
+        out_2 = shuffle<0, 2, 0, 2>(tmp_1, tmp_3);
+        out_3 = shuffle<1, 3, 1, 3>(tmp_1, tmp_3);
+    }
+    else
+    {
+        auto tmp_0 = shuffle_lanes<0, 1, 1, 0>(tmp_sum_rbcd, tmp_sum_abrd);
+        auto tmp_1 = shuffle_lanes<0, 1, 1, 0>(tmp_sum_arcd, tmp_sum_abcr);
+
+        auto tmp_2 = blend_above<1>(tmp_sum_rbcd, tmp_0);
+        auto tmp_3 = blend_above<1>(tmp_sum_arcd, tmp_1);
+        auto tmp_4 = blend_above<1>(tmp_0, tmp_sum_abrd);
+        auto tmp_5 = blend_above<1>(tmp_1, tmp_sum_abcr);
+
+        out_0 = mm_unpacklo(tmp_2, tmp_3);
+        out_1 = mm_unpackhi(tmp_2, tmp_3);
+        out_2 = mm_unpacklo(tmp_4, tmp_5);
+        out_3 = mm_unpackhi(tmp_4, tmp_5);
+    }
+
+    auto sum_0 = mm_add(out_0, out_1);
+    auto sum_1 = mm_add(out_2, out_3);
+
+    auto dets = mm_add(sum_0, sum_1);
+
+    return mm_div(dets, det_mat);
 }
 
 

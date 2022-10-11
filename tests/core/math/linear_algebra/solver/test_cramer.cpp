@@ -62,7 +62,7 @@ TYPED_TEST(SolverTestSuite, cramer_3x3) // NOLINT
 
 TYPED_TEST(SolverTestSuite, cramer_4x4) // NOLINT
 {
-    if constexpr (! x86::is_m128d<TypeParam> && ! x86::is_vector_register<TypeParam>)
+    if constexpr (! x86::is_m128d<TypeParam> && ! x86::is_m256<TypeParam>)
     {
         UST tc_idx = 0;
         for (const auto& tc : get_solver_testcases_4x4<TypeParam>())
