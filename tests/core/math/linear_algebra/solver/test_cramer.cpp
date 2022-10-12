@@ -73,3 +73,22 @@ TYPED_TEST(SolverTestSuite, cramer_4x4) // NOLINT
         }
     }
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+TYPED_TEST(SolverTestSuite, cramer_multiple_rhs_4x4) // NOLINT
+{
+    if constexpr (! x86::is_vector_register<TypeParam>)
+    {
+        std::array<TypeParam, 4>                mat = {{1., 3., -2., 5.}};
+        std::array<std::array<TypeParam, 2>, 3> exp = {{{1., 2.}, {4., -5.}, {3., 1.}}};
+        std::array<std::array<TypeParam, 2>, 3> rhs = {{{-3., 13.}, {14., -13.}, {1., 14.}}};
+
+        auto results = Cramer::solve_multiple_rhs(mat, rhs);
+
+        for (UST i = 0; i < 3; ++i)
+            for (UST j = 0; j < 2; ++j)
+                EXPECT_DOUBLE_EQ(results[i][j], exp[i][j]);
+    }
+}

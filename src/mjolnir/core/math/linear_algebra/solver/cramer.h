@@ -72,6 +72,13 @@ public:
             -> T_RegisterType;
 
 
+    template <Number T_Type, UST t_size, UST t_num_rhs>
+    [[nodiscard]] static constexpr auto
+    solve_multiple_rhs(const std::array<T_Type, t_size * t_size>&               mat,
+                       const std::array<std::array<T_Type, t_size>, t_num_rhs>& rhs) noexcept
+            -> std::array<std::array<T_Type, t_size>, t_num_rhs>;
+
+
 private:
     //! Solver implementation for 2x2 systems (not vectorized).
     template <Number T_Type>
@@ -83,6 +90,13 @@ private:
     template <x86::FloatVectorRegister T_RegisterType>
     [[nodiscard]] static auto solve_2x2(const std::array<T_RegisterType, 2>& mat, T_RegisterType rhs) noexcept
             -> T_RegisterType;
+
+    //! Solver implementation for 2x2 systems with multiple right-hand sides (not vectorized).
+    template <Number T_Type, UST t_num_rhs>
+    [[nodiscard]] static constexpr auto
+    solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                        mat,
+                           const std::array<std::array<T_Type, 2>, t_num_rhs>& rhs) noexcept
+            -> std::array<std::array<T_Type, 2>, t_num_rhs>;
 
 
     //! Solver implementation for 3x3 systems (not vectorized).
@@ -105,7 +119,7 @@ private:
                                                   const std::array<T_Type, 4>&  rhs) noexcept -> std::array<T_Type, 4>;
 
 
-    //! Solver implementation for 3x3 systems (vectorized).
+    //! Solver implementation for 4x4 systems (vectorized).
     template <x86::FloatVectorRegister T_RegisterType>
     [[nodiscard]] static auto solve_4x4(const std::array<T_RegisterType, 4>& mat, T_RegisterType rhs) noexcept
             -> T_RegisterType;
@@ -155,6 +169,21 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_size>
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <Number T_Type, UST t_size, UST t_num_rhs>
+[[nodiscard]] constexpr auto
+Cramer::solve_multiple_rhs(const std::array<T_Type, t_size * t_size>&               mat,
+                           const std::array<std::array<T_Type, t_size>, t_num_rhs>& rhs) noexcept
+        -> std::array<std::array<T_Type, t_size>, t_num_rhs>
+{
+    static_assert(4 >= t_size && 1 < t_size, "Only sizes 2-4 are supported.");
+
+    if constexpr (t_size == 2)
+        return solve_multiple_rhs_2x2(mat, rhs);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <Number T_Type>
 [[nodiscard]] constexpr auto Cramer::solve_2x2(const std::array<T_Type, 4>& mat,
                                                const std::array<T_Type, 2>& rhs) noexcept -> std::array<T_Type, 2>
@@ -196,6 +225,31 @@ template <x86::FloatVectorRegister T_RegisterType>
     auto det_rhs = mm_fmsub(rhs, b1a0, prod_rhs);
 
     return mm_div(det_rhs, det_mat);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <Number T_Type, UST t_num_rhs>
+[[nodiscard]] constexpr auto
+Cramer::solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                        mat,
+                               const std::array<std::array<T_Type, 2>, t_num_rhs>& rhs) noexcept
+        -> std::array<std::array<T_Type, 2>, t_num_rhs>
+{
+    T_Type det_mat = determinant_2x2(mat);
+
+    std::array<std::array<T_Type, 2>, t_num_rhs> result = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        auto r_0 = std::array<T_Type, 4>{rhs[i][0], rhs[i][1], mat[2], mat[3]};
+        auto r_1 = std::array<T_Type, 4>{mat[0], mat[1], rhs[i][0], rhs[i][1]};
+
+        result[i][0] = determinant_2x2(r_0) / det_mat;
+        result[i][1] = determinant_2x2(r_1) / det_mat;
+    }
+
+    return result;
 }
 
 
@@ -540,7 +594,7 @@ template <x86::FloatVectorRegister T_RegisterType>
 //! \cond DO_NOT_DOCUMENT
 
 template <>
-[[nodiscard]] auto Cramer::solve_4x4(const std::array<__m256, 4>& mat, __m256 rhs) noexcept -> __m256
+[[nodiscard]] inline auto Cramer::solve_4x4(const std::array<__m256, 4>& mat, __m256 rhs) noexcept -> __m256
 {
     using namespace x86;
 
@@ -617,9 +671,9 @@ template <>
     return mm_div(dets, det_mat);
 }
 
+//! \endcond
 
 // --------------------------------------------------------------------------------------------------------------------
 
-//! \endcond
 
 } // namespace mjolnir
