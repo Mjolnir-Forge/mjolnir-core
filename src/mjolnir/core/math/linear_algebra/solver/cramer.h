@@ -232,45 +232,45 @@ template <x86::FloatVectorRegister T_RegisterType>
     using namespace x86;
 
     // create all necessary permutations
-    auto r_yzx = permute<1, 2, 0, 3>(rhs);
-    auto c_yzx = permute<1, 2, 0, 3>(mat[2]);
-    auto b_yzx = permute<1, 2, 0, 3>(mat[1]);
-    auto a_yzx = permute<1, 2, 0, 3>(mat[0]);
+    auto r_120 = permute<1, 2, 0, 3>(rhs);
+    auto c_120 = permute<1, 2, 0, 3>(mat[2]);
+    auto b_120 = permute<1, 2, 0, 3>(mat[1]);
+    auto a_120 = permute<1, 2, 0, 3>(mat[0]);
 
-    auto r_zxy = permute<2, 0, 1, 3>(rhs);
-    auto a_zxy = permute<2, 0, 1, 3>(mat[0]);
+    auto r_201 = permute<2, 0, 1, 3>(rhs);
+    auto a_201 = permute<2, 0, 1, 3>(mat[0]);
 
-    auto a_ryz = blend_at<0>(mat[0], rhs);
-    auto a_rzx = blend_at<0>(a_yzx, r_yzx);
-    auto a_rxy = blend_at<0>(a_zxy, r_zxy);
+    auto a_r12 = blend_at<0>(mat[0], rhs);
+    auto a_r20 = blend_at<0>(a_120, r_120);
+    auto a_r01 = blend_at<0>(a_201, r_201);
 
 
     // calculate all necessary cross product components
-    auto prod_bc = mm_mul(b_yzx, mat[2]);
-    auto prod_rc = mm_mul(r_yzx, mat[2]);
-    auto prod_br = mm_mul(b_yzx, rhs);
+    auto prod_bc = mm_mul(b_120, mat[2]);
+    auto prod_rc = mm_mul(r_120, mat[2]);
+    auto prod_br = mm_mul(b_120, rhs);
 
-    auto cross_bc = mm_fmsub(mat[1], c_yzx, prod_bc);
-    auto cross_rc = mm_fmsub(rhs, c_yzx, prod_rc);
-    auto cross_br = mm_fmsub(mat[1], r_yzx, prod_br);
+    auto cross_bc_201 = mm_fmsub(mat[1], c_120, prod_bc);
+    auto cross_rc_201 = mm_fmsub(rhs, c_120, prod_rc);
+    auto cross_br_201 = mm_fmsub(mat[1], r_120, prod_br);
 
 
     // shuffle all cross product terms as needed
-    auto tmp_shf_cross_0 = shuffle<1, 2, 2, 0>(cross_bc, cross_rc);
-    auto tmp_shf_cross_1 = shuffle<0, 0, 1, 0>(cross_bc, cross_rc);
+    auto tmp_shf_cross_0 = shuffle<1, 2, 2, 0>(cross_bc_201, cross_rc_201);
+    auto tmp_shf_cross_1 = shuffle<0, 0, 1, 0>(cross_bc_201, cross_rc_201);
 
-    auto shf_cross_0 = shuffle<0, 2, 0, 0>(tmp_shf_cross_0, cross_br);
-    auto shf_cross_1 = shuffle<1, 3, 1, 0>(tmp_shf_cross_0, cross_br);
-    auto shf_cross_2 = shuffle<0, 2, 2, 0>(tmp_shf_cross_1, cross_br);
+    auto terms_012 = shuffle<0, 2, 0, 0>(tmp_shf_cross_0, cross_br_201);
+    auto terms_120 = shuffle<1, 3, 1, 0>(tmp_shf_cross_0, cross_br_201);
+    auto terms_201 = shuffle<0, 2, 2, 0>(tmp_shf_cross_1, cross_br_201);
 
 
     // calculate all necessary determinants
-    auto sum_0_m = mm_mul(mat[0], shf_cross_0);
-    auto sum_0_r = mm_mul(a_ryz, shf_cross_0);
-    auto sum_1_m = mm_fmadd(a_yzx, shf_cross_1, sum_0_m);
-    auto sum_1_r = mm_fmadd(a_rzx, shf_cross_1, sum_0_r);
-    auto dets_m  = mm_fmadd(a_zxy, shf_cross_2, sum_1_m);
-    auto dets_r  = mm_fmadd(a_rxy, shf_cross_2, sum_1_r);
+    auto sum_0_m = mm_mul(mat[0], terms_012);
+    auto sum_0_r = mm_mul(a_r12, terms_012);
+    auto sum_1_m = mm_fmadd(a_120, terms_120, sum_0_m);
+    auto sum_1_r = mm_fmadd(a_r20, terms_120, sum_0_r);
+    auto dets_m  = mm_fmadd(a_201, terms_201, sum_1_m);
+    auto dets_r  = mm_fmadd(a_r01, terms_201, sum_1_r);
 
 
     // calculate solution of the system
@@ -289,49 +289,49 @@ template <>
     using namespace x86;
 
     // create all necessary permutations
-    auto r_yzx = permute_across_lanes<1, 2, 0, 3>(rhs);
-    auto c_yzx = permute_across_lanes<1, 2, 0, 3>(mat[2]);
-    auto b_yzx = permute_across_lanes<1, 2, 0, 3>(mat[1]);
-    auto a_yzx = permute_across_lanes<1, 2, 0, 3>(mat[0]);
+    auto r_120 = permute_across_lanes<1, 2, 0, 3>(rhs);
+    auto c_120 = permute_across_lanes<1, 2, 0, 3>(mat[2]);
+    auto b_120 = permute_across_lanes<1, 2, 0, 3>(mat[1]);
+    auto a_120 = permute_across_lanes<1, 2, 0, 3>(mat[0]);
 
-    auto r_zxy = permute_across_lanes<2, 0, 1, 3>(rhs);
-    auto a_zxy = permute_across_lanes<2, 0, 1, 3>(mat[0]);
+    auto r_201 = permute_across_lanes<2, 0, 1, 3>(rhs);
+    auto a_201 = permute_across_lanes<2, 0, 1, 3>(mat[0]);
 
-    auto a_ryz = blend_at<0>(mat[0], rhs);
-    auto a_rzx = blend_at<0>(a_yzx, r_yzx);
-    auto a_rxy = blend_at<0>(a_zxy, r_zxy);
+    auto a_r12 = blend_at<0>(mat[0], rhs);
+    auto a_r20 = blend_at<0>(a_120, r_120);
+    auto a_r01 = blend_at<0>(a_201, r_201);
 
 
     // calculate all necessary cross product components
-    auto prod_bc = mm_mul(b_yzx, mat[2]);
-    auto prod_rc = mm_mul(r_yzx, mat[2]);
-    auto prod_br = mm_mul(b_yzx, rhs);
+    auto prod_bc = mm_mul(b_120, mat[2]);
+    auto prod_rc = mm_mul(r_120, mat[2]);
+    auto prod_br = mm_mul(b_120, rhs);
 
-    auto cross_bc = mm_fmsub(mat[1], c_yzx, prod_bc);
-    auto cross_rc = mm_fmsub(rhs, c_yzx, prod_rc);
-    auto cross_br = mm_fmsub(mat[1], r_yzx, prod_br);
+    auto cross_bc_201 = mm_fmsub(mat[1], c_120, prod_bc);
+    auto cross_rc_201 = mm_fmsub(rhs, c_120, prod_rc);
+    auto cross_br_201 = mm_fmsub(mat[1], r_120, prod_br);
 
 
     // shuffle all cross product terms as needed
-    auto tmp_blend_cross_0 = blend_at<1>(cross_bc, cross_rc);
-    auto tmp_blend_cross_1 = blend_at<1>(cross_rc, cross_br);
-    auto tmp_blend_cross_2 = blend_at<1>(cross_br, cross_bc);
+    auto tmp_blend_cross_0 = blend_at<1>(cross_bc_201, cross_rc_201);
+    auto tmp_blend_cross_1 = blend_at<1>(cross_rc_201, cross_br_201);
+    auto tmp_blend_cross_2 = blend_at<1>(cross_br_201, cross_bc_201);
 
-    auto perm_cross_0     = blend_at<2>(tmp_blend_cross_0, cross_br);
-    auto tmp_perm_cross_1 = blend_at<2>(tmp_blend_cross_1, cross_bc);
-    auto tmp_perm_cross_2 = blend_at<2>(tmp_blend_cross_2, cross_rc);
+    auto terms_201        = blend_at<2>(tmp_blend_cross_0, cross_br_201);
+    auto tmp_perm_cross_1 = blend_at<2>(tmp_blend_cross_1, cross_bc_201);
+    auto tmp_perm_cross_2 = blend_at<2>(tmp_blend_cross_2, cross_rc_201);
 
-    auto perm_cross_1 = permute_across_lanes<2, 0, 1, 0>(tmp_perm_cross_1);
-    auto perm_cross_2 = permute_across_lanes<1, 2, 0, 0>(tmp_perm_cross_2);
+    auto terms_120 = permute_across_lanes<2, 0, 1, 0>(tmp_perm_cross_1);
+    auto terms_012 = permute_across_lanes<1, 2, 0, 0>(tmp_perm_cross_2);
 
 
     // calculate all necessary determinants
-    auto sum_0_m = mm_mul(a_zxy, perm_cross_0);
-    auto sum_0_r = mm_mul(a_rxy, perm_cross_0);
-    auto sum_1_m = mm_fmadd(a_yzx, perm_cross_1, sum_0_m);
-    auto sum_1_r = mm_fmadd(a_rzx, perm_cross_1, sum_0_r);
-    auto dets_m  = mm_fmadd(mat[0], perm_cross_2, sum_1_m);
-    auto dets_r  = mm_fmadd(a_ryz, perm_cross_2, sum_1_r);
+    auto sum_0_m = mm_mul(a_201, terms_201);
+    auto sum_0_r = mm_mul(a_r01, terms_201);
+    auto sum_1_m = mm_fmadd(a_120, terms_120, sum_0_m);
+    auto sum_1_r = mm_fmadd(a_r20, terms_120, sum_0_r);
+    auto dets_m  = mm_fmadd(mat[0], terms_012, sum_1_m);
+    auto dets_r  = mm_fmadd(a_r12, terms_012, sum_1_r);
 
 
     // calculate solution of the system
@@ -558,6 +558,7 @@ template <>
     auto r_10 = permute_across_lanes<3, 3, 1, 1, 1, 0, 0, 0>(rhs);
     auto r_11 = permute_across_lanes<2, 0, 0, 2, 3, 2, 0, 0>(rhs);
 
+
     // calculate all twelve 2x2 determinants
     auto prod_ab_0 = mm_mul(a_0, b_0);
     auto prod_cd_0 = mm_mul(c_0, d_0);
@@ -573,12 +574,14 @@ template <>
     auto prod_rd = mm_fmsub(r_10, d_1, prod_rd_0);
     auto prod_cr = mm_fmsub(c_1, r_11, prod_cr_0);
 
+
     // multiply the 2x2 determinants
     auto products_abcd = mm_mul(prod_ab, prod_cd);
     auto products_rbcd = mm_mul(prod_rb, prod_cd);
     auto products_arcd = mm_mul(prod_ar, prod_cd);
     auto products_abrd = mm_mul(prod_ab, prod_rd);
     auto products_abcr = mm_mul(prod_ab, prod_cr);
+
 
     // sum up all elements to get the determinant of the unmodified matrix
     products_abcd = blend_above<5>(products_abcd, mm_setzero<__m256>());
@@ -599,6 +602,7 @@ template <>
     auto term_4 = swap_lanes(term_0);
     auto term_5 = swap_lanes(term_1);
 
+
     // calculate determinants
     auto sum_01 = mm_add(term_0, term_1);
     auto sum_23 = mm_add(term_2, term_3);
@@ -607,6 +611,7 @@ template <>
     auto sum_0123 = mm_add(sum_01, sum_23);
 
     auto dets = mm_add(sum_0123, sum_45);
+
 
     // return result
     return mm_div(dets, det_mat);
