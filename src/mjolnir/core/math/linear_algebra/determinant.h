@@ -258,12 +258,11 @@ template <x86::FloatVectorRegister T_RegisterType>
     auto products_45 = mm_mul(abcd_45, abcd_45_3210);
     auto products_03 = mm_mul(ab_03, cd_03_2301_neg);
 
-    // set redundant elements to zero and and add both products
+    // set redundant elements to zero
     products_45 = blend<0, 0, 1, 1>(products_45, mm_setzero<T_RegisterType>());
 
-    auto tmp_sum = mm_add(products_03, products_45);
-
     // sum up all elements to get the determinant
+    auto tmp_sum = mm_add(products_03, products_45);
     return element_sum(tmp_sum);
 }
 

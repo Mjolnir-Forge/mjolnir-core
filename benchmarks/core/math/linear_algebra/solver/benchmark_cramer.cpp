@@ -102,6 +102,7 @@ BENCHMARK(bm_solver<F64, 3>)->Name("3x3 - F64");       // NOLINT
 BENCHMARK(bm_solver<__m256d, 3>)->Name("3x3 - m256d"); // NOLINT
 BENCHMARK(bm_solver<F32, 4>)->Name("4x4 - F32");       // NOLINT
 BENCHMARK(bm_solver<__m128, 4>)->Name("4x4 - m128");   // NOLINT
+BENCHMARK(bm_solver<__m256, 4>)->Name("4x4 - m256");   // NOLINT
 BENCHMARK(bm_solver<F64, 4>)->Name("4x4 - F64");       // NOLINT
 BENCHMARK(bm_solver<__m256d, 4>)->Name("4x4 - m256d"); // NOLINT
 BENCHMARK_MAIN();                                      // NOLINT
