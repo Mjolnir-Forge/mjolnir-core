@@ -67,6 +67,39 @@ template <FloatVectorRegister T_RegisterType, UST t_size>
 }
 
 
+template <Number T_Type, UST t_size>
+// NOLINTNEXTLINE(readability-magic-numbers)
+[[nodiscard]] constexpr auto get_multiple_rhs() noexcept -> std::array<std::array<T_Type, t_size>, 20>
+{
+    if constexpr (t_size == 2)
+        return std::array<std::array<T_Type, 2>, 20>{{{{4., 3.}},  {{2., 5.}},  {{7., -3.}},
+                                                      {{1., 1.}},  {{-1., 2.}}, {{4., 3.}},
+                                                      {{2., 5.}},  {{7., -3.}}, {{1., 1.}},
+                                                      {{-1., 2.}}, {{4., 3.}},  {{2., 5.}},
+                                                      {{7., -3.}}, {{1., 1.}},  {{-1., 2.}},
+                                                      {{4., 3.}},  {{2., 5.}},  {{7., -3.}},
+                                                      {{1., 1.}},  {{-1., 2.}}}}; // NOLINT(readability-magic-numbers)
+    // else if constexpr (t_size == 3)
+    //    return std::array<T_Type, 3>{{1., 2., 3.}}; // NOLINT(readability-magic-numbers)
+    // else
+    //    return std::array<T_Type, 4>{{1., 2., 3., 4.}}; // NOLINT(readability-magic-numbers)
+}
+
+
+template <FloatVectorRegister T_RegisterType, UST t_size>
+[[nodiscard]] inline auto get_multiple_rhs() noexcept -> std::array<T_RegisterType, 20>
+{
+    auto rhs_vals = get_multiple_rhs<ElementType<T_RegisterType>, t_size>();
+    auto rhs      = std::array<T_RegisterType, 20>{{{0}}};
+
+    for (UST i = 0; i < 20; ++i)
+        for (UST j = 0; j < t_size; ++j)
+            set(rhs[i], j, rhs_vals.at(i).at(j));
+
+    return rhs;
+}
+
+
 // ====================================================================================================================
 // Benchmarks
 // ====================================================================================================================
@@ -88,21 +121,48 @@ static void bm_solver(benchmark::State& state)
     benchmark::DoNotOptimize(rhs);
 }
 
-
+/*
 BENCHMARK(bm_solver<F32, 2>)->Name("2x2 - F32");       // NOLINT
 BENCHMARK(bm_solver<__m128, 2>)->Name("2x2 - m128");   // NOLINT
 BENCHMARK(bm_solver<__m256, 2>)->Name("2x2 - m256");   // NOLINT
-BENCHMARK(bm_solver<F64, 2>)->Name("2x2 - F64");       // NOLINT
-BENCHMARK(bm_solver<__m128d, 2>)->Name("2x2 - m128d"); // NOLINT
-BENCHMARK(bm_solver<__m256d, 2>)->Name("2x2 - m256d"); // NOLINT
 BENCHMARK(bm_solver<F32, 3>)->Name("3x3 - F32");       // NOLINT
 BENCHMARK(bm_solver<__m128, 3>)->Name("3x3 - m128");   // NOLINT
 BENCHMARK(bm_solver<__m256, 3>)->Name("3x3 - m256");   // NOLINT
-BENCHMARK(bm_solver<F64, 3>)->Name("3x3 - F64");       // NOLINT
-BENCHMARK(bm_solver<__m256d, 3>)->Name("3x3 - m256d"); // NOLINT
 BENCHMARK(bm_solver<F32, 4>)->Name("4x4 - F32");       // NOLINT
 BENCHMARK(bm_solver<__m128, 4>)->Name("4x4 - m128");   // NOLINT
 BENCHMARK(bm_solver<__m256, 4>)->Name("4x4 - m256");   // NOLINT
+BENCHMARK(bm_solver<F64, 2>)->Name("2x2 - F64");       // NOLINT
+BENCHMARK(bm_solver<__m128d, 2>)->Name("2x2 - m128d"); // NOLINT
+BENCHMARK(bm_solver<__m256d, 2>)->Name("2x2 - m256d"); // NOLINT
+BENCHMARK(bm_solver<F64, 3>)->Name("3x3 - F64");       // NOLINT
+BENCHMARK(bm_solver<__m256d, 3>)->Name("3x3 - m256d"); // NOLINT
 BENCHMARK(bm_solver<F64, 4>)->Name("4x4 - F64");       // NOLINT
 BENCHMARK(bm_solver<__m256d, 4>)->Name("4x4 - m256d"); // NOLINT
-BENCHMARK_MAIN();                                      // NOLINT
+*/
+
+template <typename T_Type, UST t_size>
+static void bm_solver_multiple_rhs(benchmark::State& state)
+{
+    auto mat = get_matrix<T_Type, t_size>();
+    auto rhs = get_multiple_rhs<T_Type, t_size>();
+
+    benchmark::DoNotOptimize(mat);
+
+
+    for ([[maybe_unused]] auto s : state)
+    {
+        rhs = Cramer::solve_multiple_rhs(mat, rhs);
+        benchmark::ClobberMemory();
+    }
+
+    benchmark::DoNotOptimize(rhs);
+}
+
+BENCHMARK(bm_solver_multiple_rhs<F32, 2>)->Name("2x2 - 5x RHS - F32");       // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m128, 2>)->Name("2x2 - 5x RHS - m128");   // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m256, 2>)->Name("2x2 - 5x RHS - m256");   // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<F64, 2>)->Name("2x2 - 5x RHS - F64");       // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m128d, 2>)->Name("2x2 - 5x RHS - m128d"); // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m256d, 2>)->Name("2x2 - 5x RHS - m256d"); // NOLINT
+
+BENCHMARK_MAIN(); // NOLINT

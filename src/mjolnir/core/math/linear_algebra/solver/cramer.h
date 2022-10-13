@@ -79,6 +79,12 @@ public:
             -> std::array<std::array<T_Type, t_size>, t_num_rhs>;
 
 
+    template <x86::FloatVectorRegister T_RegisterType, UST t_size, UST t_num_rhs>
+    [[nodiscard]] static auto solve_multiple_rhs(const std::array<T_RegisterType, t_size>&    mat,
+                                                 const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
+            -> std::array<T_RegisterType, t_num_rhs>;
+
+
 private:
     //! Solver implementation for 2x2 systems (not vectorized).
     template <Number T_Type>
@@ -90,13 +96,6 @@ private:
     template <x86::FloatVectorRegister T_RegisterType>
     [[nodiscard]] static auto solve_2x2(const std::array<T_RegisterType, 2>& mat, T_RegisterType rhs) noexcept
             -> T_RegisterType;
-
-    //! Solver implementation for 2x2 systems with multiple right-hand sides (not vectorized).
-    template <Number T_Type, UST t_num_rhs>
-    [[nodiscard]] static constexpr auto
-    solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                        mat,
-                           const std::array<std::array<T_Type, 2>, t_num_rhs>& rhs) noexcept
-            -> std::array<std::array<T_Type, 2>, t_num_rhs>;
 
 
     //! Solver implementation for 3x3 systems (not vectorized).
@@ -123,6 +122,21 @@ private:
     template <x86::FloatVectorRegister T_RegisterType>
     [[nodiscard]] static auto solve_4x4(const std::array<T_RegisterType, 4>& mat, T_RegisterType rhs) noexcept
             -> T_RegisterType;
+
+
+    //! Solver implementation for 2x2 systems with multiple right-hand sides (not vectorized).
+    template <Number T_Type, UST t_num_rhs>
+    [[nodiscard]] static constexpr auto
+    solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                        mat,
+                           const std::array<std::array<T_Type, 2>, t_num_rhs>& rhs) noexcept
+            -> std::array<std::array<T_Type, 2>, t_num_rhs>;
+
+
+    //! Solver implementation for 2x2 systems with multiple right-hand sides (not vectorized).
+    template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
+    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
+                                                     const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
+            -> std::array<T_RegisterType, t_num_rhs>;
 };
 
 //! @}
@@ -184,6 +198,22 @@ Cramer::solve_multiple_rhs(const std::array<T_Type, t_size * t_size>&           
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <x86::FloatVectorRegister T_RegisterType, UST t_size, UST t_num_rhs>
+[[nodiscard]] auto Cramer::solve_multiple_rhs(const std::array<T_RegisterType, t_size>&    mat,
+                                              const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
+        -> std::array<T_RegisterType, t_num_rhs>
+{
+    using namespace x86;
+    static_assert(4 >= t_size && 1 < t_size, "Only sizes 2-4 are supported.");
+    static_assert(num_elements<T_RegisterType> >= t_size, "Registers size must be equal or larger than system size.");
+
+    if constexpr (t_size == 2)
+        return solve_multiple_rhs_2x2(mat, rhs);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <Number T_Type>
 [[nodiscard]] constexpr auto Cramer::solve_2x2(const std::array<T_Type, 4>& mat,
                                                const std::array<T_Type, 2>& rhs) noexcept -> std::array<T_Type, 2>
@@ -225,31 +255,6 @@ template <x86::FloatVectorRegister T_RegisterType>
     auto det_rhs = mm_fmsub(rhs, b1a0, prod_rhs);
 
     return mm_div(det_rhs, det_mat);
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <Number T_Type, UST t_num_rhs>
-[[nodiscard]] constexpr auto
-Cramer::solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                        mat,
-                               const std::array<std::array<T_Type, 2>, t_num_rhs>& rhs) noexcept
-        -> std::array<std::array<T_Type, 2>, t_num_rhs>
-{
-    T_Type det_mat = determinant_2x2(mat);
-
-    std::array<std::array<T_Type, 2>, t_num_rhs> result = {{{0}}};
-
-    for (UST i = 0; i < t_num_rhs; ++i)
-    {
-        auto r_0 = std::array<T_Type, 4>{rhs[i][0], rhs[i][1], mat[2], mat[3]};
-        auto r_1 = std::array<T_Type, 4>{mat[0], mat[1], rhs[i][0], rhs[i][1]};
-
-        result[i][0] = determinant_2x2(r_0) / det_mat;
-        result[i][1] = determinant_2x2(r_1) / det_mat;
-    }
-
-    return result;
 }
 
 
@@ -673,7 +678,105 @@ template <>
 
 //! \endcond
 
+
 // --------------------------------------------------------------------------------------------------------------------
+
+template <Number T_Type, UST t_num_rhs>
+[[nodiscard]] constexpr auto
+Cramer::solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                        mat,
+                               const std::array<std::array<T_Type, 2>, t_num_rhs>& rhs) noexcept
+        -> std::array<std::array<T_Type, 2>, t_num_rhs>
+{
+    T_Type det_mat = determinant_2x2(mat);
+
+    std::array<std::array<T_Type, 2>, t_num_rhs> result = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        auto r_0 = std::array<T_Type, 4>{rhs[i][0], rhs[i][1], mat[2], mat[3]};
+        auto r_1 = std::array<T_Type, 4>{mat[0], mat[1], rhs[i][0], rhs[i][1]};
+
+        result[i][0] = determinant_2x2(r_0) / det_mat;
+        result[i][1] = determinant_2x2(r_1) / det_mat;
+    }
+
+    return result;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+
+template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
+[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
+                                                         const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
+        -> std::array<T_RegisterType, t_num_rhs>
+{
+    using namespace x86;
+    using ArrayType = std::array<T_RegisterType, t_num_rhs>;
+
+    if constexpr (! is_m128<T_RegisterType>)
+    {
+        const UST num_rhs = rhs.size();
+
+        auto b0a1 = blend_at<0>(mat[0], mat[1]);
+        auto a0b1 = blend_at<1>(mat[0], mat[1]);
+        auto b1a0 = swap<1, 0>(a0b1);
+        auto a1b0 = swap<1, 0>(b0a1);
+
+
+        auto prod_mat = mm_mul(a1b0, b0a1);
+        auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
+
+        ArrayType result = {{{0}}};
+        for (UST i = 0; i < num_rhs; ++i)
+        {
+            result[i] = swap<1, 0>(rhs[i]);
+            result[i] = mm_mul(result[i], b0a1);
+            result[i] = mm_fmsub(rhs[i], b1a0, result[i]);
+            result[i] = mm_div(result[i], det_mat);
+        }
+        return result;
+    }
+    else
+    {
+        auto mat_data = shuffle<0, 1, 0, 1>(mat[0], mat[1]);
+
+        auto b0a1 = permute<2, 1, 2, 1>(mat_data);
+        auto a0b1 = permute<0, 3, 0, 3>(mat_data);
+        auto b1a0 = permute<3, 0, 3, 0>(mat_data);
+        auto a1b0 = permute<1, 2, 1, 2>(mat_data);
+
+        auto prod_mat = mm_mul(a1b0, b0a1);
+        auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
+
+        constexpr UST num_loops = t_num_rhs / 2;
+        constexpr UST rest      = t_num_rhs % 2;
+
+        ArrayType result = {{{0}}};
+        for (UST i = 0; i < num_loops; ++i)
+        {
+            auto idx = 2 * i;
+            auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
+            auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
+
+            result[idx]     = mm_mul(r10, b0a1);
+            result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
+            result[idx]     = mm_div(result[idx], det_mat);
+            result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
+        }
+        if constexpr (rest > 0)
+        {
+            constexpr UST idx = t_num_rhs - 1;
+            auto          r10 = permute<1, 0, 1, 0>(rhs[idx]);
+
+            result[idx] = mm_mul(r10, b0a1);
+            result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]);
+            result[idx] = mm_div(result[idx], det_mat);
+        }
+        return result;
+    }
+}
 
 
 } // namespace mjolnir
