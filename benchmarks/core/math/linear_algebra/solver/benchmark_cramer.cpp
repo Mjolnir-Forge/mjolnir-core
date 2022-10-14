@@ -69,16 +69,28 @@ template <FloatVectorRegister T_RegisterType, UST t_size>
 
 template <Number T_Type, UST t_size>
 // NOLINTNEXTLINE(readability-magic-numbers)
-[[nodiscard]] constexpr auto get_multiple_rhs() noexcept -> std::array<std::array<T_Type, t_size>, 20>
+[[nodiscard]] constexpr auto get_multiple_rhs() noexcept -> std::array<std::array<T_Type, t_size>, 19>
 {
     if constexpr (t_size == 2)
-        return std::array<std::array<T_Type, 2>, 20>{{{{4., 3.}},  {{2., 5.}},  {{7., -3.}},
-                                                      {{1., 1.}},  {{-1., 2.}}, {{4., 3.}},
-                                                      {{2., 5.}},  {{7., -3.}}, {{1., 1.}},
-                                                      {{-1., 2.}}, {{4., 3.}},  {{2., 5.}},
-                                                      {{7., -3.}}, {{1., 1.}},  {{-1., 2.}},
-                                                      {{4., 3.}},  {{2., 5.}},  {{7., -3.}},
-                                                      {{1., 1.}},  {{-1., 2.}}}}; // NOLINT(readability-magic-numbers)
+        return std::array<std::array<T_Type, 2>, 19>{{{{4., 3.}},
+                                                      {{2., 5.}},
+                                                      {{7., -3.}},
+                                                      {{1., 1.}},
+                                                      {{-1., 2.}},
+                                                      {{4., 3.}},
+                                                      {{2., 5.}},
+                                                      {{7., -3.}},
+                                                      {{1., 1.}},
+                                                      {{-1., 2.}},
+                                                      {{4., 3.}},
+                                                      {{2., 5.}},
+                                                      {{7., -3.}},
+                                                      {{1., 1.}},
+                                                      {{-1., 2.}},
+                                                      {{4., 3.}},
+                                                      {{2., 5.}},
+                                                      {{7., -3.}},
+                                                      {{1., 1.}}}}; // NOLINT(readability-magic-numbers)
     // else if constexpr (t_size == 3)
     //    return std::array<T_Type, 3>{{1., 2., 3.}}; // NOLINT(readability-magic-numbers)
     // else
@@ -87,12 +99,12 @@ template <Number T_Type, UST t_size>
 
 
 template <FloatVectorRegister T_RegisterType, UST t_size>
-[[nodiscard]] inline auto get_multiple_rhs() noexcept -> std::array<T_RegisterType, 20>
+[[nodiscard]] inline auto get_multiple_rhs() noexcept -> std::array<T_RegisterType, 19>
 {
     auto rhs_vals = get_multiple_rhs<ElementType<T_RegisterType>, t_size>();
-    auto rhs      = std::array<T_RegisterType, 20>{{{0}}};
+    auto rhs      = std::array<T_RegisterType, 19>{{{0}}};
 
-    for (UST i = 0; i < 20; ++i)
+    for (UST i = 0; i < 19; ++i)
         for (UST j = 0; j < t_size; ++j)
             set(rhs[i], j, rhs_vals.at(i).at(j));
 
