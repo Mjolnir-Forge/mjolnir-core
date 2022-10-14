@@ -599,17 +599,34 @@ template <typename T_Type>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <typename T_Type>
+template <typename T_Type, UST t_num_rhs>
 [[nodiscard]] inline auto get_solver_testcases_multiple_rhs_2x2()
-        -> std::vector<SolverTestcaseMultipleRHS<T_Type, 2, 5>>
+        -> std::vector<SolverTestcaseMultipleRHS<T_Type, 2, t_num_rhs>>
 {
-    using ST = SolverTestcaseMultipleRHS<T_Type, 2, 5>;
+    using ST         = SolverTestcaseMultipleRHS<T_Type, 2, t_num_rhs>;
+    using ScalarType = typename std::conditional_t<x86::is_float_register<T_Type>, F64, T_Type>;
+    using VectorType = std::array<ScalarType, 2>;
 
     std::vector<ST> testcases = {};
 
-    testcases.emplace_back(ST({{1., 3., -2., 5.}},
-                              {{{{1., 2.}}, {{4., -5.}}, {{3., 1.}}, {{6., 6.}}, {{2., -3.}}}},
-                              {{{{-3., 13.}}, {{14., -13.}}, {{1., 14.}}, {{-6., 48.}}, {{8., -9.}}}}));
+    std::array<VectorType, 5> exp_data = {{{{1., 2.}}, {{4., -5.}}, {{3., 1.}}, {{6., 6.}}, {{2., -3.}}}};
+    std::array<VectorType, 5> rhs_data = {{{{-3., 13.}}, {{14., -13.}}, {{1., 14.}}, {{-6., 48.}}, {{8., -9.}}}};
+
+    std::array<VectorType, t_num_rhs> exp = {{{0}}};
+    std::array<VectorType, t_num_rhs> rhs = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        UST idx_data = i % exp_data.size();
+        UST scale    = i / exp_data.size() + 1;
+        for (UST j = 0; j < 2; ++j)
+        {
+            exp.at(i).at(j) = exp_data.at(idx_data).at(j) * scale;
+            rhs.at(i).at(j) = rhs_data.at(idx_data).at(j) * scale;
+        }
+    }
+
+    testcases.emplace_back(ST({{1., 3., -2., 5.}}, exp, rhs));
 
     return testcases;
 }

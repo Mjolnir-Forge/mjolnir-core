@@ -77,10 +77,48 @@ TYPED_TEST(SolverTestSuite, cramer_4x4) // NOLINT
 
 // --------------------------------------------------------------------------------------------------------------------
 
-TYPED_TEST(SolverTestSuite, cramer_multiple_rhs_2x2) // NOLINT
+// multiple sizes of the right-hand side are tested to cover all branches
+
+TYPED_TEST(SolverTestSuite, cramer_multiple_rhs_2x2_8) // NOLINT
 {
     UST tc_idx = 0;
-    for (const auto& tc : get_solver_testcases_multiple_rhs_2x2<TypeParam>())
+    for (const auto& tc : get_solver_testcases_multiple_rhs_2x2<TypeParam, 8>())
+    {
+        auto result = Cramer::solve_multiple_rhs(tc.mat(), tc.rhs());
+        tc.check_result_testcase(result, tc_idx);
+        ++tc_idx;
+    }
+}
+
+
+TYPED_TEST(SolverTestSuite, cramer_multiple_rhs_2x2_9) // NOLINT
+{
+    UST tc_idx = 0;
+    for (const auto& tc : get_solver_testcases_multiple_rhs_2x2<TypeParam, 9>())
+    {
+        auto result = Cramer::solve_multiple_rhs(tc.mat(), tc.rhs());
+        tc.check_result_testcase(result, tc_idx);
+        ++tc_idx;
+    }
+}
+
+
+TYPED_TEST(SolverTestSuite, cramer_multiple_rhs_2x2_10) // NOLINT
+{
+    UST tc_idx = 0;
+    for (const auto& tc : get_solver_testcases_multiple_rhs_2x2<TypeParam, 10>())
+    {
+        auto result = Cramer::solve_multiple_rhs(tc.mat(), tc.rhs());
+        tc.check_result_testcase(result, tc_idx);
+        ++tc_idx;
+    }
+}
+
+
+TYPED_TEST(SolverTestSuite, cramer_multiple_rhs_2x2_11) // NOLINT
+{
+    UST tc_idx = 0;
+    for (const auto& tc : get_solver_testcases_multiple_rhs_2x2<TypeParam, 11>())
     {
         auto result = Cramer::solve_multiple_rhs(tc.mat(), tc.rhs());
         tc.check_result_testcase(result, tc_idx);
