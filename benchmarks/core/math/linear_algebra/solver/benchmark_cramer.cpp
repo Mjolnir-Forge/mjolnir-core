@@ -67,46 +67,29 @@ template <FloatVectorRegister T_RegisterType, UST t_size>
 }
 
 
-template <Number T_Type, UST t_size>
+template <Number T_Type, UST t_size, UST t_num_rhs>
 // NOLINTNEXTLINE(readability-magic-numbers)
-[[nodiscard]] constexpr auto get_multiple_rhs() noexcept -> std::array<std::array<T_Type, t_size>, 19>
+[[nodiscard]] constexpr auto get_multiple_rhs() noexcept -> std::array<std::array<T_Type, t_size>, t_num_rhs>
 {
-    if constexpr (t_size == 2)
-        return std::array<std::array<T_Type, 2>, 19>{{{{4., 3.}},
-                                                      {{2., 5.}},
-                                                      {{7., -3.}},
-                                                      {{1., 1.}},
-                                                      {{-1., 2.}},
-                                                      {{4., 3.}},
-                                                      {{2., 5.}},
-                                                      {{7., -3.}},
-                                                      {{1., 1.}},
-                                                      {{-1., 2.}},
-                                                      {{4., 3.}},
-                                                      {{2., 5.}},
-                                                      {{7., -3.}},
-                                                      {{1., 1.}},
-                                                      {{-1., 2.}},
-                                                      {{4., 3.}},
-                                                      {{2., 5.}},
-                                                      {{7., -3.}},
-                                                      {{1., 1.}}}}; // NOLINT(readability-magic-numbers)
-    // else if constexpr (t_size == 3)
-    //    return std::array<T_Type, 3>{{1., 2., 3.}}; // NOLINT(readability-magic-numbers)
-    // else
-    //    return std::array<T_Type, 4>{{1., 2., 3., 4.}}; // NOLINT(readability-magic-numbers)
+    std::array<std::array<T_Type, t_size>, t_num_rhs> rhs = {{{{0}}}}; // NOLINT(readability-magic-numbers)
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+        for (UST j = 0; j < t_size; ++j)
+            rhs.at(i).at(j) = static_cast<T_Type>((j + 1) * (i + 1));
+
+    return rhs;
 }
 
 
-template <FloatVectorRegister T_RegisterType, UST t_size>
-[[nodiscard]] inline auto get_multiple_rhs() noexcept -> std::array<T_RegisterType, 19>
+template <FloatVectorRegister T_RegisterType, UST t_size, UST t_num_rhs>
+[[nodiscard]] inline auto get_multiple_rhs() noexcept -> std::array<T_RegisterType, t_num_rhs>
 {
-    auto rhs_vals = get_multiple_rhs<ElementType<T_RegisterType>, t_size>();
-    auto rhs      = std::array<T_RegisterType, 19>{{{0}}};
+    auto rhs_vals = get_multiple_rhs<ElementType<T_RegisterType>, t_size, t_num_rhs>();
+    auto rhs      = std::array<T_RegisterType, t_num_rhs>{{{0}}};
 
-    for (UST i = 0; i < 19; ++i)
+    for (UST i = 0; i < t_num_rhs; ++i)
         for (UST j = 0; j < t_size; ++j)
-            set(rhs[i], j, rhs_vals.at(i).at(j));
+            set(rhs.at(i), j, rhs_vals.at(i).at(j));
 
     return rhs;
 }
@@ -133,7 +116,7 @@ static void bm_solver(benchmark::State& state)
     benchmark::DoNotOptimize(rhs);
 }
 
-/*
+
 BENCHMARK(bm_solver<F32, 2>)->Name("2x2 - F32");       // NOLINT
 BENCHMARK(bm_solver<__m128, 2>)->Name("2x2 - m128");   // NOLINT
 BENCHMARK(bm_solver<__m256, 2>)->Name("2x2 - m256");   // NOLINT
@@ -150,13 +133,15 @@ BENCHMARK(bm_solver<F64, 3>)->Name("3x3 - F64");       // NOLINT
 BENCHMARK(bm_solver<__m256d, 3>)->Name("3x3 - m256d"); // NOLINT
 BENCHMARK(bm_solver<F64, 4>)->Name("4x4 - F64");       // NOLINT
 BENCHMARK(bm_solver<__m256d, 4>)->Name("4x4 - m256d"); // NOLINT
-*/
+
+
+// --------------------------------------------------------------------------------------------------------------------
 
 template <typename T_Type, UST t_size>
 static void bm_solver_multiple_rhs(benchmark::State& state)
 {
     auto mat = get_matrix<T_Type, t_size>();
-    auto rhs = get_multiple_rhs<T_Type, t_size>();
+    auto rhs = get_multiple_rhs<T_Type, t_size, 20>(); // NOLINT(readability-magic-numbers)
 
     benchmark::DoNotOptimize(mat);
 
@@ -170,11 +155,14 @@ static void bm_solver_multiple_rhs(benchmark::State& state)
     benchmark::DoNotOptimize(rhs);
 }
 
-BENCHMARK(bm_solver_multiple_rhs<F32, 2>)->Name("2x2 - 5x RHS - F32");       // NOLINT
-BENCHMARK(bm_solver_multiple_rhs<__m128, 2>)->Name("2x2 - 5x RHS - m128");   // NOLINT
-BENCHMARK(bm_solver_multiple_rhs<__m256, 2>)->Name("2x2 - 5x RHS - m256");   // NOLINT
-BENCHMARK(bm_solver_multiple_rhs<F64, 2>)->Name("2x2 - 5x RHS - F64");       // NOLINT
-BENCHMARK(bm_solver_multiple_rhs<__m128d, 2>)->Name("2x2 - 5x RHS - m128d"); // NOLINT
-BENCHMARK(bm_solver_multiple_rhs<__m256d, 2>)->Name("2x2 - 5x RHS - m256d"); // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<F32, 2>)->Name("2x2 - 20x RHS - F32");       // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m128, 2>)->Name("2x2 - 20x RHS - m128");   // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m256, 2>)->Name("2x2 - 20x RHS - m256");   // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<F64, 2>)->Name("2x2 - 20x RHS - F64");       // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m128d, 2>)->Name("2x2 - 20x RHS - m128d"); // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m256d, 2>)->Name("2x2 - 20x RHS - m256d"); // NOLINT
+
+
+// --------------------------------------------------------------------------------------------------------------------
 
 BENCHMARK_MAIN(); // NOLINT

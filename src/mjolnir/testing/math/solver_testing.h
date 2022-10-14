@@ -609,7 +609,9 @@ template <typename T_Type, UST t_num_rhs>
 
     std::vector<ST> testcases = {};
 
+    // NOLINTNEXTLINE(readability-magic-numbers)
     std::array<VectorType, 5> exp_data = {{{{1., 2.}}, {{4., -5.}}, {{3., 1.}}, {{6., 6.}}, {{2., -3.}}}};
+    // NOLINTNEXTLINE(readability-magic-numbers)
     std::array<VectorType, 5> rhs_data = {{{{-3., 13.}}, {{14., -13.}}, {{1., 14.}}, {{-6., 48.}}, {{8., -9.}}}};
 
     std::array<VectorType, t_num_rhs> exp = {{{0}}};

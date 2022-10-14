@@ -57,7 +57,7 @@ public:
     //!
     //! @tparam T_RegisterType:
     //! The register type that stores the columns of a matrix/vector
-    //! @tparam t_size
+    //! @tparam t_size:
     //! Size of the system
     //!
     //! @param[in] mat:
@@ -72,6 +72,23 @@ public:
             -> T_RegisterType;
 
 
+    //! @brief
+    //! Solve a linear system of equations with multiple right-hand sides.
+    //!
+    //! @tparam T_Type:
+    //! The basic type of a matrix/vector element
+    //! @tparam t_size:
+    //! Size of the system
+    //! @tparam t_num_rhs:
+    //! Number of right-hand sides
+    //!
+    //! @param[in] mat:
+    //! The matrix of the system of equations. The data has to be provided in column major format
+    //! @param[in] rhs:
+    //! The right-hand side vectors of the system
+    //!
+    //! @return
+    //! Solution vectors
     template <Number T_Type, UST t_size, UST t_num_rhs>
     [[nodiscard]] static constexpr auto
     solve_multiple_rhs(const std::array<T_Type, t_size * t_size>&               mat,
@@ -79,6 +96,23 @@ public:
             -> std::array<std::array<T_Type, t_size>, t_num_rhs>;
 
 
+    //! @brief
+    //! Solve a linear system of equations with multiple right-hand sides.
+    //!
+    //! @tparam T_RegisterType:
+    //! The register type that stores the columns of a matrix/vector
+    //! @tparam t_size:
+    //! Size of the system
+    //! @tparam t_num_rhs:
+    //! Number of right-hand sides
+    //!
+    //! @param[in] mat:
+    //! The matrix of the system of equations. The data has to be provided in column major format
+    //! @param[in] rhs:
+    //! The right-hand side vectors of the system
+    //!
+    //! @return
+    //! Solution vectors
     template <x86::FloatVectorRegister T_RegisterType, UST t_size, UST t_num_rhs>
     [[nodiscard]] static auto solve_multiple_rhs(const std::array<T_RegisterType, t_size>&    mat,
                                                  const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
