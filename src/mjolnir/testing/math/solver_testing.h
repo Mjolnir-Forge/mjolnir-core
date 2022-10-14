@@ -272,10 +272,16 @@ template <typename T_Type>
 //! @brief
 //! Get a vector of testcases for 2x2 solvers with multiple right-hand sides.
 //!
+//! @tparam T_Type:
+//! The type that stores the matrix and vector data
+//! @tparam t_num_rhs:
+//! Number of right-hand sides
+//!
 //! @return
 //! Vector of testcases for 2x2 solvers with multiple right-hand sides
-template <typename T_Type>
-[[nodiscard]] auto get_solver_testcases_multiple_rhs_2x2() -> std::vector<SolverTestcaseMultipleRHS<T_Type, 2, 5>>;
+template <typename T_Type, UST t_num_rhs>
+[[nodiscard]] auto get_solver_testcases_multiple_rhs_2x2()
+        -> std::vector<SolverTestcaseMultipleRHS<T_Type, 2, t_num_rhs>>;
 
 //! @}
 } // namespace mjolnir
@@ -455,7 +461,7 @@ SolverTestcaseMultipleRHS<T_Type, t_size, t_num_rhs>::check_result(const std::ar
     {
         for (UST i = 0; i < t_num_rhs; ++i)
             for (UST j = 0; j < t_size; ++j)
-                EXPECT_DOUBLE_EQ(get(result[i], j), get(m_exp[i], j))
+                EXPECT_DOUBLE_EQ(get(result.at(i), j), get(m_exp.at(i), j))
                         << message_prefix << "rhs index: " << i << " --- value index: " << j << "\n";
     }
     else
@@ -627,7 +633,7 @@ template <typename T_Type, UST t_num_rhs>
             rhs.at(i).at(j) = rhs_data.at(idx_data).at(j) * scale;
         }
     }
-
+    // NOLINTNEXTLINE(readability-magic-numbers)
     testcases.emplace_back(ST({{1., 3., -2., 5.}}, exp, rhs));
 
     return testcases;

@@ -698,8 +698,8 @@ template <>
 
 
     // sum up all elements to get the determinant of the unmodified matrix
-    products_abcd = blend_above<5>(products_abcd, mm_setzero<__m256>());
-    auto det_mat  = broadcast_element_sum(products_abcd); // NOLINT(readability-magic-numbers)
+    products_abcd = blend_above<5>(products_abcd, mm_setzero<__m256>()); // NOLINT(readability-magic-numbers)
+    auto det_mat  = broadcast_element_sum(products_abcd);                // NOLINT(readability-magic-numbers)
 
 
     // todo: replace code below with multi register version of `element_sum` function once it is implemented
@@ -748,11 +748,11 @@ Cramer::solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                     
 
     for (UST i = 0; i < t_num_rhs; ++i)
     {
-        auto r_0 = std::array<T_Type, 4>{rhs[i][0], rhs[i][1], mat[2], mat[3]};
-        auto r_1 = std::array<T_Type, 4>{mat[0], mat[1], rhs[i][0], rhs[i][1]};
+        auto r_0 = std::array<T_Type, 4>{rhs[i][0], rhs[i][1], mat[2], mat[3]}; // NOLINT
+        auto r_1 = std::array<T_Type, 4>{mat[0], mat[1], rhs[i][0], rhs[i][1]}; // NOLINT
 
-        result[i][0] = determinant_2x2(r_0) / det_mat;
-        result[i][1] = determinant_2x2(r_1) / det_mat;
+        result[i][0] = determinant_2x2(r_0) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[i][1] = determinant_2x2(r_1) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     }
 
     return result;
@@ -786,24 +786,25 @@ template <UST t_num_rhs>
     for (UST i = 0; i < num_loops; ++i)
     {
         auto idx = 2 * i;
-        auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
-        auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
 
-        result[idx]     = mm_mul(r10, b0a1);
-        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
-        result[idx]     = mm_div(result[idx], det_mat);
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
+        auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]); // NOLINT
+        auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
+
+        result[idx]     = mm_mul(r10, b0a1);                // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx]     = mm_fmsub(r01, b1a0, result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx]     = mm_div(result[idx], det_mat);     // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     }
     if constexpr (rest > 0)
     {
         constexpr UST idx = t_num_rhs - 1;
-        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]);
+        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-        result[idx] = mm_mul(r10, b0a1);
-        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]);
-        result[idx] = mm_div(result[idx], det_mat);
+        result[idx] = mm_mul(r10, b0a1);                     // NOLINT
+        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]); // NOLINT
+        result[idx] = mm_div(result[idx], det_mat);          // NOLINT
     }
-    return result;
+    return result; // NOLINT(readability-misleading-indentation)
 }
 
 
@@ -831,11 +832,11 @@ template <UST t_num_rhs>
 
     for (UST i = 0; i < t_num_rhs; ++i)
     {
-        auto r10 = permute<1, 0>(rhs[i]);
+        auto r10 = permute<1, 0>(rhs[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-        result[i] = mm_mul(rhs[i], b1a0);
-        result[i] = mm_fnmadd(r10, b0a1, result[i]);
-        result[i] = mm_div(result[i], det_mat);
+        result[i] = mm_mul(rhs[i], b1a0);            // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[i] = mm_fnmadd(r10, b0a1, result[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[i] = mm_div(result[i], det_mat);      // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     }
 
     return result;
@@ -870,57 +871,58 @@ template <UST t_num_rhs>
 
     for (UST i = 0; i < num_loops; ++i)
     {
-        auto idx       = 4 * i;
-        auto r01_tmp_0 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
-        auto r10_tmp_0 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
-        auto r01_tmp_1 = shuffle<0, 1, 0, 1>(rhs[idx + 2], rhs[idx + 3]);
-        auto r10_tmp_1 = shuffle<1, 0, 1, 0>(rhs[idx + 2], rhs[idx + 3]);
+        auto idx = 4 * i;
+
+        auto r01_tmp_0 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);     // NOLINT
+        auto r10_tmp_0 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);     // NOLINT
+        auto r01_tmp_1 = shuffle<0, 1, 0, 1>(rhs[idx + 2], rhs[idx + 3]); // NOLINT
+        auto r10_tmp_1 = shuffle<1, 0, 1, 0>(rhs[idx + 2], rhs[idx + 3]); // NOLINT
         auto r01       = shuffle_lanes<0, 0, 1, 0>(r01_tmp_0, r01_tmp_1);
         auto r10       = shuffle_lanes<0, 0, 1, 0>(r10_tmp_0, r10_tmp_1);
 
-        result[idx]     = mm_mul(r10, b0a1);
-        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
-        result[idx]     = mm_div(result[idx], det_mat);
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
-        result[idx + 2] = swap_lanes(result[idx]);
-        result[idx + 3] = permute<2, 3, 0, 1>(result[idx + 2]);
+        result[idx]     = mm_mul(r10, b0a1);                    // NOLINT
+        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);     // NOLINT
+        result[idx]     = mm_div(result[idx], det_mat);         // NOLINT
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);     // NOLINT
+        result[idx + 2] = swap_lanes(result[idx]);              // NOLINT
+        result[idx + 3] = permute<2, 3, 0, 1>(result[idx + 2]); // NOLINT
     }
 
 
     if constexpr (rest == 1)
     {
         constexpr UST idx = t_num_rhs - 1;
-        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]);
+        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-        result[idx] = mm_mul(r10, b0a1);
-        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]);
-        result[idx] = mm_div(result[idx], det_mat);
+        result[idx] = mm_mul(r10, b0a1);                     // NOLINT
+        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]); // NOLINT
+        result[idx] = mm_div(result[idx], det_mat);          // NOLINT
     }
     else if constexpr (rest == 2)
     {
         auto idx = t_num_rhs - 2;
-        auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
-        auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
+        auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]); // NOLINT
+        auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
 
-        result[idx]     = mm_mul(r10, b0a1);
-        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
-        result[idx]     = mm_div(result[idx], det_mat);
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
+        result[idx]     = mm_mul(r10, b0a1);                // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx]     = mm_fmsub(r01, b1a0, result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx]     = mm_div(result[idx], det_mat);     // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     }
     else if constexpr (rest == 3)
     {
         auto idx   = t_num_rhs - 3;
-        auto r01   = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
-        auto r10   = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
-        auto r10_2 = permute<1, 0, 1, 0>(rhs[idx + 2]);
+        auto r01   = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]); // NOLINT
+        auto r10   = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
+        auto r10_2 = permute<1, 0, 1, 0>(rhs[idx + 2]);           // NOLINT
 
-        result[idx]     = mm_mul(r10, b0a1);
-        result[idx + 2] = mm_mul(r10_2, b0a1);
-        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
-        result[idx + 2] = mm_fmsub(rhs[idx + 2], b1a0, result[idx + 2]);
-        result[idx]     = mm_div(result[idx], det_mat);
-        result[idx + 2] = mm_div(result[idx + 2], det_mat);
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
+        result[idx]     = mm_mul(r10, b0a1);                             // NOLINT
+        result[idx + 2] = mm_mul(r10_2, b0a1);                           // NOLINT
+        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);              // NOLINT
+        result[idx + 2] = mm_fmsub(rhs[idx + 2], b1a0, result[idx + 2]); // NOLINT
+        result[idx]     = mm_div(result[idx], det_mat);                  // NOLINT
+        result[idx + 2] = mm_div(result[idx + 2], det_mat);              // NOLINT
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);              // NOLINT
     }
 
 
@@ -957,24 +959,24 @@ template <UST t_num_rhs>
     for (UST i = 0; i < num_loops; ++i)
     {
         auto idx = 2 * i;
-        auto r01 = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
+        auto r01 = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
         auto r10 = permute<1, 0, 1, 0>(r01);
 
-        result[idx]     = mm_mul(r01, b1a0);
-        result[idx]     = mm_fnmadd(r10, b0a1, result[idx]);
-        result[idx]     = mm_div(result[idx], det_mat);
-        result[idx + 1] = swap_lanes(result[idx]);
+        result[idx] = mm_mul(r01, b1a0);                 // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx] = mm_fnmadd(r10, b0a1, result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx] = mm_div(result[idx], det_mat);      // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx + 1] = swap_lanes(result[idx]);       // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     }
     if constexpr (rest > 0)
     {
         constexpr UST idx = t_num_rhs - 1;
-        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]);
+        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-        result[idx] = mm_mul(r10, b0a1);
-        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]);
-        result[idx] = mm_div(result[idx], det_mat);
+        result[idx] = mm_mul(r10, b0a1);                     // NOLINT
+        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]); // NOLINT
+        result[idx] = mm_div(result[idx], det_mat);          // NOLINT
     }
-    return result;
+    return result; // NOLINT(readability-misleading-indentation)
 }
 
 
