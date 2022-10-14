@@ -132,11 +132,32 @@ private:
             -> std::array<std::array<T_Type, 2>, t_num_rhs>;
 
 
-    //! Solver implementation for 2x2 systems with multiple right-hand sides (not vectorized).
-    template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
-    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
-                                                     const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
-            -> std::array<T_RegisterType, t_num_rhs>;
+    //! Solver implementation for 2x2 systems with multiple right-hand sides (__m128).
+    template <UST t_num_rhs>
+    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<__m128, 2>&         mat,
+                                                     const std::array<__m128, t_num_rhs>& rhs) noexcept
+            -> std::array<__m128, t_num_rhs>;
+
+
+    //! Solver implementation for 2x2 systems with multiple right-hand sides (__m128d).
+    template <UST t_num_rhs>
+    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<__m128d, 2>&         mat,
+                                                     const std::array<__m128d, t_num_rhs>& rhs) noexcept
+            -> std::array<__m128d, t_num_rhs>;
+
+
+    //! Solver implementation for 2x2 systems with multiple right-hand sides (__m256).
+    template <UST t_num_rhs>
+    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<__m256, 2>&         mat,
+                                                     const std::array<__m256, t_num_rhs>& rhs) noexcept
+            -> std::array<__m256, t_num_rhs>;
+
+
+    //! Solver implementation for 2x2 systems with multiple right-hand sides (__m256).
+    template <UST t_num_rhs>
+    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<__m256d, 2>&         mat,
+                                                     const std::array<__m256d, t_num_rhs>& rhs) noexcept
+            -> std::array<__m256d, t_num_rhs>;
 };
 
 //! @}
@@ -706,186 +727,220 @@ Cramer::solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                     
 
 // --------------------------------------------------------------------------------------------------------------------
 
-
-template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
-[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
-                                                         const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
-        -> std::array<T_RegisterType, t_num_rhs>
+template <UST t_num_rhs>
+[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<__m128, 2>&         mat,
+                                                         const std::array<__m128, t_num_rhs>& rhs) noexcept
+        -> std::array<__m128, t_num_rhs>
 {
     using namespace x86;
-    using ArrayType = std::array<T_RegisterType, t_num_rhs>;
 
-    if constexpr (is_m128d<T_RegisterType>)
+
+    auto mat_data = shuffle<0, 1, 0, 1>(mat[0], mat[1]);
+
+    auto b0a1 = permute<2, 1, 2, 1>(mat_data);
+    auto a0b1 = permute<0, 3, 0, 3>(mat_data);
+    auto b1a0 = permute<3, 0, 3, 0>(mat_data);
+    auto a1b0 = permute<1, 2, 1, 2>(mat_data);
+
+    auto prod_mat = mm_mul(a1b0, b0a1);
+    auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
+
+    constexpr UST num_loops = t_num_rhs / 2;
+    constexpr UST rest      = t_num_rhs % 2;
+
+    std::array<__m128, t_num_rhs> result = {{{0}}};
+    for (UST i = 0; i < num_loops; ++i)
     {
-        auto a0b1 = blend_at<1>(mat[0], mat[1]);
-        auto b0a1 = blend_at<0>(mat[0], mat[1]);
-        auto a1b0 = shuffle<1, 0>(mat[0], mat[1]);
-        auto b1a0 = shuffle<1, 0>(mat[1], mat[0]);
+        auto idx = 2 * i;
+        auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
+        auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
 
-
-        auto prod_mat = mm_mul(a1b0, b0a1);
-        auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
-
-        ArrayType result = {{{0}}};
-        for (UST i = 0; i < t_num_rhs; ++i)
-        {
-            auto r10 = permute<1, 0>(rhs[i]);
-
-            result[i] = mm_mul(rhs[i], b1a0);
-            result[i] = mm_fnmadd(r10, b0a1, result[i]);
-            result[i] = mm_div(result[i], det_mat);
-        }
-        return result;
+        result[idx]     = mm_mul(r10, b0a1);
+        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
+        result[idx]     = mm_div(result[idx], det_mat);
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
     }
-    else if constexpr (is_m128<T_RegisterType>)
+    if constexpr (rest > 0)
     {
-        auto mat_data = shuffle<0, 1, 0, 1>(mat[0], mat[1]);
+        constexpr UST idx = t_num_rhs - 1;
+        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]);
 
-        auto b0a1 = permute<2, 1, 2, 1>(mat_data);
-        auto a0b1 = permute<0, 3, 0, 3>(mat_data);
-        auto b1a0 = permute<3, 0, 3, 0>(mat_data);
-        auto a1b0 = permute<1, 2, 1, 2>(mat_data);
-
-        auto prod_mat = mm_mul(a1b0, b0a1);
-        auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
-
-        constexpr UST num_loops = t_num_rhs / 2;
-        constexpr UST rest      = t_num_rhs % 2;
-
-        ArrayType result = {{{0}}};
-        for (UST i = 0; i < num_loops; ++i)
-        {
-            auto idx = 2 * i;
-            auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
-            auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
-
-            result[idx]     = mm_mul(r10, b0a1);
-            result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
-            result[idx]     = mm_div(result[idx], det_mat);
-            result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
-        }
-        if constexpr (rest > 0)
-        {
-            constexpr UST idx = t_num_rhs - 1;
-            auto          r10 = permute<1, 0, 1, 0>(rhs[idx]);
-
-            result[idx] = mm_mul(r10, b0a1);
-            result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]);
-            result[idx] = mm_div(result[idx], det_mat);
-        }
-        return result;
+        result[idx] = mm_mul(r10, b0a1);
+        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]);
+        result[idx] = mm_div(result[idx], det_mat);
     }
-    else if (is_m256d<T_RegisterType>)
+    return result;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_rhs>
+[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<__m128d, 2>&         mat,
+                                                         const std::array<__m128d, t_num_rhs>& rhs) noexcept
+        -> std::array<__m128d, t_num_rhs>
+{
+    using namespace x86;
+
+
+    auto a0b1 = blend_at<1>(mat[0], mat[1]);
+    auto b0a1 = blend_at<0>(mat[0], mat[1]);
+    auto a1b0 = shuffle<1, 0>(mat[0], mat[1]);
+    auto b1a0 = shuffle<1, 0>(mat[1], mat[0]);
+
+
+    auto prod_mat = mm_mul(a1b0, b0a1);
+    auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
+
+
+    std::array<__m128d, t_num_rhs> result = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
     {
-        auto a0a1 = permute_lanes<0, 0>(mat[0]);
-        auto b0b1 = permute_lanes<0, 0>(mat[1]);
+        auto r10 = permute<1, 0>(rhs[i]);
 
-        auto a0b1 = shuffle<0, 1, 0, 1>(a0a1, b0b1);
-        auto a1b0 = shuffle<1, 0, 1, 0>(a0a1, b0b1);
-        auto b0a1 = shuffle<0, 1, 0, 1>(b0b1, a0a1);
-        auto b1a0 = shuffle<1, 0, 1, 0>(b0b1, a0a1);
-
-
-        auto prod_mat = mm_mul(a1b0, b0a1);
-        auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
-
-        constexpr UST num_loops = t_num_rhs / 2;
-        constexpr UST rest      = t_num_rhs % 2;
-
-        ArrayType result = {{{0}}};
-        for (UST i = 0; i < num_loops; ++i)
-        {
-            auto idx = 2 * i;
-            auto r01 = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
-            auto r10 = permute<1, 0, 1, 0>(r01);
-
-            result[idx]     = mm_mul(r01, b1a0);
-            result[idx]     = mm_fnmadd(r10, b0a1, result[idx]);
-            result[idx]     = mm_div(result[idx], det_mat);
-            result[idx + 1] = swap_lanes(result[idx]);
-        }
-        if constexpr (rest > 0)
-        {
-            constexpr UST idx = t_num_rhs - 1;
-            auto          r10 = permute<1, 0, 1, 0>(rhs[idx]);
-
-            result[idx] = mm_mul(r10, b0a1);
-            result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]);
-            result[idx] = mm_div(result[idx], det_mat);
-        }
-        return result;
+        result[i] = mm_mul(rhs[i], b1a0);
+        result[i] = mm_fnmadd(r10, b0a1, result[i]);
+        result[i] = mm_div(result[i], det_mat);
     }
-    else if constexpr (is_m256<T_RegisterType>)
+
+    return result;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_rhs>
+[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<__m256, 2>&         mat,
+                                                         const std::array<__m256, t_num_rhs>& rhs) noexcept
+        -> std::array<__m256, t_num_rhs>
+{
+    using namespace x86;
+
+
+    auto mat_data = shuffle<0, 1, 0, 1>(mat[0], mat[1]);
+    mat_data      = permute_lanes<0, 0>(mat_data);
+
+    auto b0a1 = permute<2, 1, 2, 1>(mat_data);
+    auto a0b1 = permute<0, 3, 0, 3>(mat_data);
+    auto b1a0 = permute<3, 0, 3, 0>(mat_data);
+    auto a1b0 = permute<1, 2, 1, 2>(mat_data);
+
+    auto prod_mat = mm_mul(a1b0, b0a1);
+    auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
+
+    constexpr UST num_loops = t_num_rhs / 4;
+    constexpr UST rest      = t_num_rhs % 4;
+
+    std::array<__m256, t_num_rhs> result = {{{0}}};
+
+    for (UST i = 0; i < num_loops; ++i)
     {
-        auto mat_data = shuffle<0, 1, 0, 1>(mat[0], mat[1]);
-        mat_data      = permute_lanes<0, 0>(mat_data);
+        auto idx       = 4 * i;
+        auto r01_tmp_0 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
+        auto r10_tmp_0 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
+        auto r01_tmp_1 = shuffle<0, 1, 0, 1>(rhs[idx + 2], rhs[idx + 3]);
+        auto r10_tmp_1 = shuffle<1, 0, 1, 0>(rhs[idx + 2], rhs[idx + 3]);
+        auto r01       = shuffle_lanes<0, 0, 1, 0>(r01_tmp_0, r01_tmp_1);
+        auto r10       = shuffle_lanes<0, 0, 1, 0>(r10_tmp_0, r10_tmp_1);
 
-        auto b0a1 = permute<2, 1, 2, 1>(mat_data);
-        auto a0b1 = permute<0, 3, 0, 3>(mat_data);
-        auto b1a0 = permute<3, 0, 3, 0>(mat_data);
-        auto a1b0 = permute<1, 2, 1, 2>(mat_data);
-
-        auto prod_mat = mm_mul(a1b0, b0a1);
-        auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
-
-        constexpr UST num_loops = t_num_rhs / 4;
-        constexpr UST rest      = t_num_rhs % 4;
-
-        ArrayType result = {{{0}}};
-        for (UST i = 0; i < num_loops; ++i)
-        {
-            auto idx       = 4 * i;
-            auto r01_tmp_0 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
-            auto r10_tmp_0 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
-            auto r01_tmp_1 = shuffle<0, 1, 0, 1>(rhs[idx + 2], rhs[idx + 3]);
-            auto r10_tmp_1 = shuffle<1, 0, 1, 0>(rhs[idx + 2], rhs[idx + 3]);
-            auto r01       = shuffle_lanes<0, 0, 1, 0>(r01_tmp_0, r01_tmp_1);
-            auto r10       = shuffle_lanes<0, 0, 1, 0>(r10_tmp_0, r10_tmp_1);
-
-            result[idx]     = mm_mul(r10, b0a1);
-            result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
-            result[idx]     = mm_div(result[idx], det_mat);
-            result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
-            result[idx + 2] = swap_lanes(result[idx]);
-            result[idx + 3] = permute<2, 3, 0, 1>(result[idx + 2]);
-        }
-        if constexpr (rest == 1)
-        {
-            constexpr UST idx = t_num_rhs - 1;
-            auto          r10 = permute<1, 0, 1, 0>(rhs[idx]);
-
-            result[idx] = mm_mul(r10, b0a1);
-            result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]);
-            result[idx] = mm_div(result[idx], det_mat);
-        }
-        else if constexpr (rest == 2)
-        {
-            auto idx = t_num_rhs - 2;
-            auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
-            auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
-
-            result[idx]     = mm_mul(r10, b0a1);
-            result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
-            result[idx]     = mm_div(result[idx], det_mat);
-            result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
-        }
-        else if constexpr (rest == 3)
-        {
-            auto idx   = t_num_rhs - 3;
-            auto r01   = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
-            auto r10   = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
-            auto r10_2 = permute<1, 0, 1, 0>(rhs[idx + 2]);
-
-            result[idx]     = mm_mul(r10, b0a1);
-            result[idx + 2] = mm_mul(r10_2, b0a1);
-            result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
-            result[idx + 2] = mm_fmsub(rhs[idx + 2], b1a0, result[idx + 2]);
-            result[idx]     = mm_div(result[idx], det_mat);
-            result[idx + 2] = mm_div(result[idx + 2], det_mat);
-            result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
-        }
-        return result;
+        result[idx]     = mm_mul(r10, b0a1);
+        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
+        result[idx]     = mm_div(result[idx], det_mat);
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
+        result[idx + 2] = swap_lanes(result[idx]);
+        result[idx + 3] = permute<2, 3, 0, 1>(result[idx + 2]);
     }
+
+
+    if constexpr (rest == 1)
+    {
+        constexpr UST idx = t_num_rhs - 1;
+        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]);
+
+        result[idx] = mm_mul(r10, b0a1);
+        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]);
+        result[idx] = mm_div(result[idx], det_mat);
+    }
+    else if constexpr (rest == 2)
+    {
+        auto idx = t_num_rhs - 2;
+        auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
+        auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
+
+        result[idx]     = mm_mul(r10, b0a1);
+        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
+        result[idx]     = mm_div(result[idx], det_mat);
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
+    }
+    else if constexpr (rest == 3)
+    {
+        auto idx   = t_num_rhs - 3;
+        auto r01   = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);
+        auto r10   = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
+        auto r10_2 = permute<1, 0, 1, 0>(rhs[idx + 2]);
+
+        result[idx]     = mm_mul(r10, b0a1);
+        result[idx + 2] = mm_mul(r10_2, b0a1);
+        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);
+        result[idx + 2] = mm_fmsub(rhs[idx + 2], b1a0, result[idx + 2]);
+        result[idx]     = mm_div(result[idx], det_mat);
+        result[idx + 2] = mm_div(result[idx + 2], det_mat);
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);
+    }
+
+
+    return result;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_rhs>
+[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<__m256d, 2>&         mat,
+                                                         const std::array<__m256d, t_num_rhs>& rhs) noexcept
+        -> std::array<__m256d, t_num_rhs>
+{
+    using namespace x86;
+
+
+    auto a0a1 = permute_lanes<0, 0>(mat[0]);
+    auto b0b1 = permute_lanes<0, 0>(mat[1]);
+
+    auto a0b1 = shuffle<0, 1, 0, 1>(a0a1, b0b1);
+    auto a1b0 = shuffle<1, 0, 1, 0>(a0a1, b0b1);
+    auto b0a1 = shuffle<0, 1, 0, 1>(b0b1, a0a1);
+    auto b1a0 = shuffle<1, 0, 1, 0>(b0b1, a0a1);
+
+
+    auto prod_mat = mm_mul(a1b0, b0a1);
+    auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
+
+    constexpr UST num_loops = t_num_rhs / 2;
+    constexpr UST rest      = t_num_rhs % 2;
+
+    std::array<__m256d, t_num_rhs> result = {{{0}}};
+    for (UST i = 0; i < num_loops; ++i)
+    {
+        auto idx = 2 * i;
+        auto r01 = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
+        auto r10 = permute<1, 0, 1, 0>(r01);
+
+        result[idx]     = mm_mul(r01, b1a0);
+        result[idx]     = mm_fnmadd(r10, b0a1, result[idx]);
+        result[idx]     = mm_div(result[idx], det_mat);
+        result[idx + 1] = swap_lanes(result[idx]);
+    }
+    if constexpr (rest > 0)
+    {
+        constexpr UST idx = t_num_rhs - 1;
+        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]);
+
+        result[idx] = mm_mul(r10, b0a1);
+        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]);
+        result[idx] = mm_div(result[idx], det_mat);
+    }
+    return result;
 }
 
 
