@@ -1148,9 +1148,9 @@ template <UST t_num_rhs>
         auto r_120 = permute<1, 2, 0, 3>(rhs_in);
         auto r_201 = permute<2, 0, 1, 3>(rhs_in);
 
-        auto a_r12 = blend<1, 0, 0, 0, 1, 0, 0, 0>(mat_pl[0], rhs_in);
-        auto a_r20 = blend<1, 0, 0, 0, 1, 0, 0, 0>(a_120, r_120);
-        auto a_r01 = blend<1, 0, 0, 0, 1, 0, 0, 0>(a_201, r_201);
+        auto a_r12 = blend_per_lane_at<0>(mat_pl[0], rhs_in);
+        auto a_r20 = blend_per_lane_at<0>(a_120, r_120);
+        auto a_r01 = blend_per_lane_at<0>(a_201, r_201);
 
 
         // calculate all necessary cross product components
