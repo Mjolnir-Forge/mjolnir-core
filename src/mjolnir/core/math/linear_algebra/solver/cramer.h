@@ -203,8 +203,8 @@ private:
             -> std::array<std::array<T_Type, 3>, t_num_rhs>;
 
 
-    //! Calculates the result for 1 or 2 right-hand sides for 3x3 systems. The meaning of the input values can be found
-    //! in the code of `solve_multiple_rhs_3x3`.
+    //! Calculates the result for 1 or 2 (__m256) right-hand sides of a 3x3 system. The meaning of the input values can
+    //! be found in the code of `solve_multiple_rhs_3x3`.
     template <x86::FloatVectorRegister T_RegisterType>
     [[nodiscard]] static auto calculate_result_3x3(const std::array<T_RegisterType, 3>& mat,
                                                    const std::array<T_RegisterType, 3>& mat_120,
