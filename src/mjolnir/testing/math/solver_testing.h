@@ -283,6 +283,22 @@ template <typename T_Type, UST t_num_rhs>
 [[nodiscard]] auto get_solver_testcases_multiple_rhs_2x2()
         -> std::vector<SolverTestcaseMultipleRHS<T_Type, 2, t_num_rhs>>;
 
+
+//! @brief
+//! Get a vector of testcases for 3x3 solvers with multiple right-hand sides.
+//!
+//! @tparam T_Type:
+//! The type that stores the matrix and vector data
+//! @tparam t_num_rhs:
+//! Number of right-hand sides
+//!
+//! @return
+//! Vector of testcases for 3x3 solvers with multiple right-hand sides
+template <typename T_Type, UST t_num_rhs>
+[[nodiscard]] auto get_solver_testcases_multiple_rhs_3x3()
+        -> std::vector<SolverTestcaseMultipleRHS<T_Type, 3, t_num_rhs>>;
+
+
 //! @}
 } // namespace mjolnir
 
@@ -638,5 +654,45 @@ template <typename T_Type, UST t_num_rhs>
 
     return testcases;
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, UST t_num_rhs>
+[[nodiscard]] inline auto get_solver_testcases_multiple_rhs_3x3()
+        -> std::vector<SolverTestcaseMultipleRHS<T_Type, 3, t_num_rhs>>
+{
+    using ST         = SolverTestcaseMultipleRHS<T_Type, 3, t_num_rhs>;
+    using ScalarType = typename std::conditional_t<x86::is_float_register<T_Type>, F64, T_Type>;
+    using VectorType = std::array<ScalarType, 3>;
+
+    std::vector<ST> testcases = {};
+
+    // NOLINTNEXTLINE(readability-magic-numbers)
+    std::array<VectorType, 5> exp_data = {
+            {{{1., 2., 3.}}, {{-2., 1., 1.}}, {{3., 3., 3.}}, {{-4., 1., -5.}}, {{2., -8., -4.}}}};
+    // NOLINTNEXTLINE(readability-magic-numbers)
+    std::array<VectorType, 5> rhs_data = {
+            {{{-13., -10., 7.}}, {{-13., -3., 12.}}, {{-3., -18., 0.}}, {{21., -7., 2.}}, {{20., 42., -28.}}}};
+
+    std::array<VectorType, t_num_rhs> exp = {{{0}}};
+    std::array<VectorType, t_num_rhs> rhs = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        UST idx_data = i % exp_data.size();
+        UST scale    = i / exp_data.size() + 1;
+        for (UST j = 0; j < 3; ++j)
+        {
+            exp.at(i).at(j) = exp_data.at(idx_data).at(j) * scale;
+            rhs.at(i).at(j) = rhs_data.at(idx_data).at(j) * scale;
+        }
+    }
+    // NOLINTNEXTLINE(readability-magic-numbers)
+    testcases.emplace_back(ST({{4., -1., -4., 2., -6., 1., -7., 1., 3}}, exp, rhs));
+
+    return testcases;
+}
+
 
 } // namespace mjolnir

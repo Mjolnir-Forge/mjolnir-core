@@ -192,6 +192,28 @@ private:
     [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<__m256d, 2>&         mat,
                                                      const std::array<__m256d, t_num_rhs>& rhs) noexcept
             -> std::array<__m256d, t_num_rhs>;
+
+
+    //! Solver implementation for 3x3 systems with multiple right-hand sides (not vectorized).
+    template <Number T_Type, UST t_num_rhs>
+    [[nodiscard]] static constexpr auto
+    solve_multiple_rhs_3x3(const std::array<T_Type, 9>&                        mat,
+                           const std::array<std::array<T_Type, 3>, t_num_rhs>& rhs) noexcept
+            -> std::array<std::array<T_Type, 3>, t_num_rhs>;
+
+
+    //! Solver implementation for 3x3 systems with multiple right-hand sides (vectorized).
+    template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
+    [[nodiscard]] static auto solve_multiple_rhs_3x3(const std::array<T_RegisterType, 3>&         mat,
+                                                     const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
+            -> std::array<T_RegisterType, t_num_rhs>;
+
+
+    //! Solver implementation for 3x3 systems with multiple right-hand sides (__m256).
+    template <UST t_num_rhs>
+    [[nodiscard]] static auto solve_multiple_rhs_3x3(const std::array<__m256, 3>&         mat,
+                                                     const std::array<__m256, t_num_rhs>& rhs) noexcept
+            -> std::array<__m256, t_num_rhs>;
 };
 
 //! @}
@@ -248,6 +270,8 @@ Cramer::solve_multiple_rhs(const std::array<T_Type, t_size * t_size>&           
 
     if constexpr (t_size == 2)
         return solve_multiple_rhs_2x2(mat, rhs);
+    else if constexpr (t_size == 3)
+        return solve_multiple_rhs_3x3(mat, rhs);
 }
 
 
@@ -264,6 +288,8 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_size, UST t_num_rhs>
 
     if constexpr (t_size == 2)
         return solve_multiple_rhs_2x2(mat, rhs);
+    else if constexpr (t_size == 3)
+        return solve_multiple_rhs_3x3(mat, rhs);
 }
 
 
@@ -977,6 +1003,205 @@ template <UST t_num_rhs>
         result[idx] = mm_div(result[idx], det_mat);          // NOLINT
     }
     return result; // NOLINT(readability-misleading-indentation)
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <Number T_Type, UST t_num_rhs>
+[[nodiscard]] constexpr auto
+Cramer::solve_multiple_rhs_3x3(const std::array<T_Type, 9>&                        mat,
+                               const std::array<std::array<T_Type, 3>, t_num_rhs>& rhs) noexcept
+        -> std::array<std::array<T_Type, 3>, t_num_rhs>
+{
+    T_Type det_mat = determinant_3x3(mat);
+
+    std::array<std::array<T_Type, 3>, t_num_rhs> result = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        auto r_0 =
+                std::array<T_Type, 9>{rhs[i][0], rhs[i][1], rhs[i][2], mat[3], mat[4], mat[5], mat[6], mat[7], mat[8]};
+        auto r_1 =
+                std::array<T_Type, 9>{mat[0], mat[1], mat[2], rhs[i][0], rhs[i][1], rhs[i][2], mat[6], mat[7], mat[8]};
+        auto r_2 =
+                std::array<T_Type, 9>{mat[0], mat[1], mat[2], mat[3], mat[4], mat[5], rhs[i][0], rhs[i][1], rhs[i][2]};
+        result[i][0] = determinant_3x3(r_0) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[i][1] = determinant_3x3(r_1) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[i][2] = determinant_3x3(r_2) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    }
+
+    return result;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
+[[nodiscard]] inline auto Cramer::solve_multiple_rhs_3x3(const std::array<T_RegisterType, 3>&         mat,
+                                                         const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
+        -> std::array<T_RegisterType, t_num_rhs>
+{
+    using namespace x86;
+
+    // create all necessary permutations
+    auto c_120 = permute<1, 2, 0, 3>(mat[2]);
+    auto b_120 = permute<1, 2, 0, 3>(mat[1]);
+    auto a_120 = permute<1, 2, 0, 3>(mat[0]);
+
+    auto a_201 = permute<2, 0, 1, 3>(mat[0]);
+
+
+    // calculate all necessary cross product components of the matrix determinant
+    auto prod_bc      = mm_mul(b_120, mat[2]);
+    auto cross_bc_201 = mm_fmsub(mat[1], c_120, prod_bc);
+
+
+    // calculate the matrix determinant
+    auto det_mat_terms = mm_mul(a_201, cross_bc_201);
+    det_mat_terms      = blend_above<2>(det_mat_terms, mm_setzero<T_RegisterType>());
+
+    auto det_mat = broadcast_element_sum(det_mat_terms);
+
+
+    std::array<T_RegisterType, t_num_rhs> result = {{{0.}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        // create all necessary permutations
+        auto r_120 = permute<1, 2, 0, 3>(rhs[i]);
+        auto r_201 = permute<2, 0, 1, 3>(rhs[i]);
+
+        auto a_r12 = blend_at<0>(mat[0], rhs[i]);
+        auto a_r20 = blend_at<0>(a_120, r_120);
+        auto a_r01 = blend_at<0>(a_201, r_201);
+
+
+        // calculate all necessary cross product components
+        auto prod_rc = mm_mul(r_120, mat[2]);
+        auto prod_br = mm_mul(b_120, rhs[i]);
+
+        auto cross_rc_201 = mm_fmsub(rhs[i], c_120, prod_rc);
+        auto cross_br_201 = mm_fmsub(mat[1], r_120, prod_br);
+
+
+        // shuffle all cross product terms as needed
+        auto tmp_shf_cross_0 = shuffle<1, 2, 2, 0>(cross_bc_201, cross_rc_201);
+        auto tmp_shf_cross_1 = shuffle<0, 0, 1, 0>(cross_bc_201, cross_rc_201);
+
+        auto terms_012 = shuffle<0, 2, 0, 0>(tmp_shf_cross_0, cross_br_201);
+        auto terms_120 = shuffle<1, 3, 1, 0>(tmp_shf_cross_0, cross_br_201);
+        auto terms_201 = shuffle<0, 2, 2, 0>(tmp_shf_cross_1, cross_br_201);
+
+
+        // calculate all necessary determinants
+        auto sum_0_r = mm_mul(a_r12, terms_012);
+        auto sum_1_r = mm_fmadd(a_r20, terms_120, sum_0_r);
+        auto dets_r  = mm_fmadd(a_r01, terms_201, sum_1_r);
+
+        result[i] = mm_div(dets_r, det_mat);
+    }
+
+
+    return result;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_rhs>
+[[nodiscard]] inline auto Cramer::solve_multiple_rhs_3x3(const std::array<__m256, 3>&         mat,
+                                                         const std::array<__m256, t_num_rhs>& rhs) noexcept
+        -> std::array<__m256, t_num_rhs>
+{
+    using namespace x86;
+
+    // broadcast first lane of matrix data
+    const std::array<__m256, 3> mat_pl = {
+            {permute_lanes<0, 0>(mat[0]), permute_lanes<0, 0>(mat[1]), permute_lanes<0, 0>(mat[2])}};
+
+
+    // create all necessary permutations
+    auto c_120 = permute<1, 2, 0, 3>(mat_pl[2]);
+    auto b_120 = permute<1, 2, 0, 3>(mat_pl[1]);
+    auto a_120 = permute<1, 2, 0, 3>(mat_pl[0]);
+
+    auto a_201 = permute<2, 0, 1, 3>(mat_pl[0]);
+
+
+    // calculate all necessary cross product components of the matrix determinant
+    auto prod_bc      = mm_mul(b_120, mat_pl[2]);
+    auto cross_bc_201 = mm_fmsub(mat_pl[1], c_120, prod_bc);
+
+
+    // calculate the matrix determinant
+    auto det_mat_terms = mm_mul(a_201, cross_bc_201);
+    det_mat_terms      = blend_above<2>(det_mat_terms, mm_setzero<__m256>());
+
+    auto det_mat = broadcast_element_sum(det_mat_terms);
+
+
+    // define lambda that can calculate 2 results at once
+    auto calculate_result = [&](const auto rhs_in) -> __m256
+    {
+        // create all necessary permutations
+        auto r_120 = permute<1, 2, 0, 3>(rhs_in);
+        auto r_201 = permute<2, 0, 1, 3>(rhs_in);
+
+        auto a_r12 = blend<1, 0, 0, 0, 1, 0, 0, 0>(mat_pl[0], rhs_in);
+        auto a_r20 = blend<1, 0, 0, 0, 1, 0, 0, 0>(a_120, r_120);
+        auto a_r01 = blend<1, 0, 0, 0, 1, 0, 0, 0>(a_201, r_201);
+
+
+        // calculate all necessary cross product components
+        auto prod_rc = mm_mul(r_120, mat_pl[2]);
+        auto prod_br = mm_mul(b_120, rhs_in);
+
+        auto cross_rc_201 = mm_fmsub(rhs_in, c_120, prod_rc);
+        auto cross_br_201 = mm_fmsub(mat_pl[1], r_120, prod_br);
+
+
+        // shuffle all cross product terms as needed
+        auto tmp_shf_cross_0 = shuffle<1, 2, 2, 0>(cross_bc_201, cross_rc_201);
+        auto tmp_shf_cross_1 = shuffle<0, 0, 1, 0>(cross_bc_201, cross_rc_201);
+
+        auto terms_012 = shuffle<0, 2, 0, 0>(tmp_shf_cross_0, cross_br_201);
+        auto terms_120 = shuffle<1, 3, 1, 0>(tmp_shf_cross_0, cross_br_201);
+        auto terms_201 = shuffle<0, 2, 2, 0>(tmp_shf_cross_1, cross_br_201);
+
+
+        // calculate all necessary determinants
+        auto sum_0_r = mm_mul(a_r12, terms_012);
+        auto sum_1_r = mm_fmadd(a_r20, terms_120, sum_0_r);
+        auto dets_r  = mm_fmadd(a_r01, terms_201, sum_1_r);
+
+        return mm_div(dets_r, det_mat);
+    };
+
+
+    // calculate results
+    constexpr UST num_loops = t_num_rhs / 2;
+    constexpr UST rest      = t_num_rhs % 2;
+
+    std::array<__m256, t_num_rhs> result = {{{0.}}};
+
+    for (UST i = 0; i < num_loops; ++i)
+    {
+        UST  idx   = 2 * i;
+        auto rhs_p = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
+
+        result[idx]     = calculate_result(rhs_p);
+        result[idx + 1] = swap_lanes(result[idx]);
+    }
+
+    if constexpr (rest == 1)
+    {
+        UST idx     = t_num_rhs - 1;
+        result[idx] = calculate_result(rhs[idx]);
+    }
+
+
+    return result;
 }
 
 
