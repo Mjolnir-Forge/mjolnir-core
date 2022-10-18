@@ -586,19 +586,15 @@ template <UST t_index, FloatVectorRegister T_RegisterType>
 
     static_assert(t_index < n_le, "`t_index` exceeds number of lane elements.");
 
-    if constexpr (n_l == 1)
-        return blend_at<t_index>(src_0, src_1);
-    else
+
+    constexpr auto get_mask = [](UST index)
     {
-        constexpr auto get_mask = [n_l, n_le](UST index)
-        {
-            UST mask = 0;
-            for (UST i = 0; i < n_l; ++i)
-                set_bit(mask, index + i * n_le);
-            return mask;
-        };
-        return mm_blend<get_mask(t_index)>(src_0, src_1);
-    }
+        UST mask = 0;
+        for (UST i = 0; i < n_l; ++i)
+            set_bit(mask, index + i * n_le);
+        return mask;
+    };
+    return mm_blend<get_mask(t_index)>(src_0, src_1);
 }
 
 

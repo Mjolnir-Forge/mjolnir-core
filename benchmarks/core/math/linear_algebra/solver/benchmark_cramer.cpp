@@ -116,7 +116,7 @@ static void bm_solver(benchmark::State& state)
     benchmark::DoNotOptimize(rhs);
 }
 
-
+/*
 BENCHMARK(bm_solver<F32, 2>)->Name("2x2 - F32");       // NOLINT
 BENCHMARK(bm_solver<__m128, 2>)->Name("2x2 - m128");   // NOLINT
 BENCHMARK(bm_solver<__m256, 2>)->Name("2x2 - m256");   // NOLINT
@@ -133,7 +133,7 @@ BENCHMARK(bm_solver<F64, 3>)->Name("3x3 - F64");       // NOLINT
 BENCHMARK(bm_solver<__m256d, 3>)->Name("3x3 - m256d"); // NOLINT
 BENCHMARK(bm_solver<F64, 4>)->Name("4x4 - F64");       // NOLINT
 BENCHMARK(bm_solver<__m256d, 4>)->Name("4x4 - m256d"); // NOLINT
-
+*/
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -155,19 +155,21 @@ static void bm_solver_multiple_rhs(benchmark::State& state)
     benchmark::DoNotOptimize(rhs);
 }
 
-
+/*
 BENCHMARK(bm_solver_multiple_rhs<F32, 2>)->Name("2x2 - 20x RHS - F32");       // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<__m128, 2>)->Name("2x2 - 20x RHS - m128");   // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<__m256, 2>)->Name("2x2 - 20x RHS - m256");   // NOLINT
-BENCHMARK(bm_solver_multiple_rhs<F32, 3>)->Name("3x3 - 20x RHS - F32");       // NOLINT
-BENCHMARK(bm_solver_multiple_rhs<__m128, 3>)->Name("3x3 - 20x RHS - m128");   // NOLINT
-BENCHMARK(bm_solver_multiple_rhs<__m256, 3>)->Name("3x3 - 20x RHS - m256");   // NOLINT
+*/
+BENCHMARK(bm_solver_multiple_rhs<F32, 3>)->Name("3x3 - 20x RHS - F32");     // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m128, 3>)->Name("3x3 - 20x RHS - m128"); // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m256, 3>)->Name("3x3 - 20x RHS - m256"); // NOLINT
+/*
 BENCHMARK(bm_solver_multiple_rhs<F64, 2>)->Name("2x2 - 20x RHS - F64");       // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<__m128d, 2>)->Name("2x2 - 20x RHS - m128d"); // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<__m256d, 2>)->Name("2x2 - 20x RHS - m256d"); // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<F64, 3>)->Name("3x3 - 20x RHS - F64");       // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<__m256d, 3>)->Name("3x3 - 20x RHS - m256d"); // NOLINT
-
+*/
 
 // --------------------------------------------------------------------------------------------------------------------
 
