@@ -148,7 +148,7 @@ TYPED_TEST(SolverTestSuite, cramer_multiple_rhs_3x3_8) // NOLINT
 
 TYPED_TEST(SolverTestSuite, cramer_multiple_rhs_3x3_9) // NOLINT
 {
-    if constexpr (! x86::is_m128d<TypeParam> && ! x86::is_m256d<TypeParam>)
+    if constexpr (! x86::is_m128d<TypeParam>)
     {
         UST tc_idx = 0;
         for (const auto& tc : get_solver_testcases_multiple_rhs_3x3<TypeParam, 9>())

@@ -1043,76 +1043,13 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
         -> std::array<T_RegisterType, t_num_rhs>
 {
     using namespace x86;
-    /*
-        // create all necessary permutations
-        auto c_120 = permute<1, 2, 0, 3>(mat[2]);
-        auto b_120 = permute<1, 2, 0, 3>(mat[1]);
-        auto a_120 = permute<1, 2, 0, 3>(mat[0]);
 
-        auto a_201 = permute<2, 0, 1, 3>(mat[0]);
-
-
-        // calculate all necessary cross product components of the matrix determinant
-        auto prod_bc      = mm_mul(b_120, mat[2]);
-        auto cross_bc_201 = mm_fmsub(mat[1], c_120, prod_bc);
-
-
-        // calculate the matrix determinant
-        auto det_mat_terms = mm_mul(a_201, cross_bc_201);
-        det_mat_terms      = blend_above<2>(det_mat_terms, mm_setzero<T_RegisterType>());
-
-        auto det_mat = broadcast_element_sum(det_mat_terms);
-
-
-        std::array<T_RegisterType, t_num_rhs> result = {{{0.}}};
-
-        for (UST i = 0; i < t_num_rhs; ++i)
-        {
-            // create all necessary permutations
-            auto r_120 = permute<1, 2, 0, 3>(rhs[i]);
-            auto r_201 = permute<2, 0, 1, 3>(rhs[i]);
-
-            auto a_r12 = blend_at<0>(mat[0], rhs[i]);
-            auto a_r20 = blend_at<0>(a_120, r_120);
-            auto a_r01 = blend_at<0>(a_201, r_201);
-
-
-            // calculate all necessary cross product components
-            auto prod_rc = mm_mul(r_120, mat[2]);
-            auto prod_br = mm_mul(b_120, rhs[i]);
-
-            auto cross_rc_201 = mm_fmsub(rhs[i], c_120, prod_rc);
-            auto cross_br_201 = mm_fmsub(mat[1], r_120, prod_br);
-
-
-            // shuffle all cross product terms as needed
-            auto tmp_shf_cross_0 = shuffle<1, 2, 2, 0>(cross_bc_201, cross_rc_201);
-            auto tmp_shf_cross_1 = shuffle<0, 0, 1, 0>(cross_bc_201, cross_rc_201);
-
-            auto terms_012 = shuffle<0, 2, 0, 0>(tmp_shf_cross_0, cross_br_201);
-            auto terms_120 = shuffle<1, 3, 1, 0>(tmp_shf_cross_0, cross_br_201);
-            auto terms_201 = shuffle<0, 2, 2, 0>(tmp_shf_cross_1, cross_br_201);
-
-
-            // calculate all necessary determinants
-            auto sum_0_r = mm_mul(a_r12, terms_012);
-            auto sum_1_r = mm_fmadd(a_r20, terms_120, sum_0_r);
-            auto dets_r  = mm_fmadd(a_r01, terms_201, sum_1_r);
-
-            result[i] = mm_div(dets_r, det_mat);
-        }
-
-
-        return result;
-    */
-
-
-    constexpr UST nl = num_lanes<T_RegisterType>;
+    constexpr UST n_l = num_lanes<T_RegisterType>;
 
     // broadcast first lane of matrix data for multi-lane registers
     std::array<T_RegisterType, 3> mat_pl = {{{0}}};
 
-    if constexpr (nl > 1)
+    if constexpr (n_l > 1)
     {
         mat_pl[0] = permute_lanes<0, 0>(mat[0]);
         mat_pl[1] = permute_lanes<0, 0>(mat[1]);
@@ -1183,19 +1120,19 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
     // calculate results
     std::array<T_RegisterType, t_num_rhs> result = {{{0.}}};
 
-    if constexpr (nl == 1)
+    if constexpr (n_l == 1)
     {
         for (UST i = 0; i < t_num_rhs; ++i)
             result[i] = calculate_result(rhs[i]);
     }
     else
     {
-        constexpr UST num_loops = t_num_rhs / nl;
-        constexpr UST rest      = t_num_rhs % nl;
+        constexpr UST num_loops = t_num_rhs / n_l;
+        constexpr UST rest      = t_num_rhs % n_l;
 
         for (UST i = 0; i < num_loops; ++i)
         {
-            UST  idx   = nl * i;
+            UST  idx   = n_l * i;
             auto rhs_p = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
 
             result[idx]     = calculate_result(rhs_p);
@@ -1222,6 +1159,73 @@ template <UST t_num_rhs>
         -> std::array<__m256d, t_num_rhs>
 {
     using namespace x86;
+
+    // create all necessary permutations
+    auto c_120 = permute_across_lanes<1, 2, 0, 3>(mat[2]);
+    auto b_120 = permute_across_lanes<1, 2, 0, 3>(mat[1]);
+    auto a_120 = permute_across_lanes<1, 2, 0, 3>(mat[0]);
+
+    auto a_201 = permute_across_lanes<2, 0, 1, 3>(mat[0]);
+
+
+    // calculate all necessary cross product components
+    auto prod_bc = mm_mul(b_120, mat[2]);
+
+    auto cross_bc_201 = mm_fmsub(mat[1], c_120, prod_bc);
+
+
+    // calculate the matrix determinant
+    auto det_mat_terms = mm_mul(a_201, cross_bc_201);
+    det_mat_terms      = blend_above<2>(det_mat_terms, mm_setzero<__m256d>());
+
+    auto det_mat = broadcast_element_sum(det_mat_terms);
+
+
+    // calculate results
+    std::array<__m256d, t_num_rhs> result = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        // create all necessary permutations
+        auto r_120 = permute_across_lanes<1, 2, 0, 3>(rhs[i]);
+        auto r_201 = permute_across_lanes<2, 0, 1, 3>(rhs[i]);
+
+        auto a_r12 = blend_at<0>(mat[0], rhs[i]);
+        auto a_r20 = blend_at<0>(a_120, r_120);
+        auto a_r01 = blend_at<0>(a_201, r_201);
+
+
+        // calculate all necessary cross product components
+
+        auto prod_rc = mm_mul(r_120, mat[2]);
+        auto prod_br = mm_mul(b_120, rhs[i]);
+
+        auto cross_rc_201 = mm_fmsub(rhs[i], c_120, prod_rc);
+        auto cross_br_201 = mm_fmsub(mat[1], r_120, prod_br);
+
+
+        // shuffle all cross product terms as needed
+        auto tmp_blend_cross_0 = blend_at<1>(cross_bc_201, cross_rc_201);
+        auto tmp_blend_cross_1 = blend_at<1>(cross_rc_201, cross_br_201);
+        auto tmp_blend_cross_2 = blend_at<1>(cross_br_201, cross_bc_201);
+
+        auto terms_201        = blend_at<2>(tmp_blend_cross_0, cross_br_201);
+        auto tmp_perm_cross_1 = blend_at<2>(tmp_blend_cross_1, cross_bc_201);
+        auto tmp_perm_cross_2 = blend_at<2>(tmp_blend_cross_2, cross_rc_201);
+
+        auto terms_120 = permute_across_lanes<2, 0, 1, 0>(tmp_perm_cross_1);
+        auto terms_012 = permute_across_lanes<1, 2, 0, 0>(tmp_perm_cross_2);
+
+
+        // calculate all necessary determinants
+        auto sum_0_r = mm_mul(a_r01, terms_201);
+        auto sum_1_r = mm_fmadd(a_r20, terms_120, sum_0_r);
+        auto dets_r  = mm_fmadd(a_r12, terms_012, sum_1_r);
+
+        result[i] = mm_div(dets_r, det_mat);
+    }
+
+    return result;
 }
 
 

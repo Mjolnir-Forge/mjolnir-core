@@ -581,20 +581,20 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
 template <UST t_index, FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto blend_per_lane_at(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType
 {
-    constexpr UST nl  = num_lanes<T_RegisterType>;
-    constexpr UST nle = num_lane_elements<T_RegisterType>;
+    constexpr UST n_l  = num_lanes<T_RegisterType>;
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
 
-    static_assert(t_index < nle, "`t_index` exceeds number of lane elements.");
+    static_assert(t_index < n_le, "`t_index` exceeds number of lane elements.");
 
-    if constexpr (nl == 1)
+    if constexpr (n_l == 1)
         return blend_at<t_index>(src_0, src_1);
     else
     {
-        constexpr auto get_mask = [nl, nle](UST index)
+        constexpr auto get_mask = [n_l, n_le](UST index)
         {
             UST mask = 0;
-            for (UST i = 0; i < nl; ++i)
-                set_bit(mask, index + i * nle);
+            for (UST i = 0; i < n_l; ++i)
+                set_bit(mask, index + i * n_le);
             return mask;
         };
         return mm_blend<get_mask(t_index)>(src_0, src_1);
