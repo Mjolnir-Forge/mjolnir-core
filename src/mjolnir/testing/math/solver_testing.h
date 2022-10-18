@@ -668,12 +668,15 @@ template <typename T_Type, UST t_num_rhs>
 
     std::vector<ST> testcases = {};
 
-    // NOLINTNEXTLINE(readability-magic-numbers)
-    std::array<VectorType, 5> exp_data = {
-            {{{1., 2., 3.}}, {{-2., 1., 1.}}, {{3., 3., 3.}}, {{-4., 1., -5.}}, {{2., -8., -4.}}}};
-    // NOLINTNEXTLINE(readability-magic-numbers)
-    std::array<VectorType, 5> rhs_data = {
-            {{{-13., -10., 7.}}, {{-13., -3., 12.}}, {{-3., -18., 0.}}, {{21., -7., 2.}}, {{20., 42., -28.}}}};
+    // clang-format off
+    std::array<VectorType, 5> exp_data = {{{{1., 2., 3.}}, {{-2., 1., 1.}},     // NOLINT(readability-magic-numbers)
+                                           {{3., 3., 3.}}, {{-4., 1., -5.}},    // NOLINT(readability-magic-numbers)
+                                           {{2., -8., -4.}}}};                  // NOLINT(readability-magic-numbers)
+
+    std::array<VectorType, 5> rhs_data = {{{{-13., -10., 7.}}, {{-13., -3., 12.}},  // NOLINT(readability-magic-numbers)
+                                           {{-3., -18., 0.}} , {{21., -7., 2.}},    // NOLINT(readability-magic-numbers)
+                                           {{20., 42., -28.}}}};                    // NOLINT(readability-magic-numbers)
+    // clang-format on
 
     std::array<VectorType, t_num_rhs> exp = {{{0}}};
     std::array<VectorType, t_num_rhs> rhs = {{{0}}};

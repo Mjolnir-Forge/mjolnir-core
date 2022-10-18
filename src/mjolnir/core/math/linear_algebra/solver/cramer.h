@@ -197,6 +197,7 @@ private:
     //! Solver implementation for 3x3 systems with multiple right-hand sides (not vectorized).
     template <Number T_Type, UST t_num_rhs>
     [[nodiscard]] static constexpr auto
+    // NOLINTNEXTLINE(readability-magic-numbers)
     solve_multiple_rhs_3x3(const std::array<T_Type, 9>&                        mat,
                            const std::array<std::array<T_Type, 3>, t_num_rhs>& rhs) noexcept
             -> std::array<std::array<T_Type, 3>, t_num_rhs>;
@@ -1010,22 +1011,31 @@ template <UST t_num_rhs>
 
 template <Number T_Type, UST t_num_rhs>
 [[nodiscard]] constexpr auto
+// NOLINTNEXTLINE(readability-magic-numbers)
 Cramer::solve_multiple_rhs_3x3(const std::array<T_Type, 9>&                        mat,
                                const std::array<std::array<T_Type, 3>, t_num_rhs>& rhs) noexcept
         -> std::array<std::array<T_Type, 3>, t_num_rhs>
 {
+    using MatrixType = std::array<T_Type, 9>; // NOLINT(readability-magic-numbers)
+
     T_Type det_mat = determinant_3x3(mat);
 
     std::array<std::array<T_Type, 3>, t_num_rhs> result = {{{0}}};
 
     for (UST i = 0; i < t_num_rhs; ++i)
     {
-        auto r_0 =
-                std::array<T_Type, 9>{rhs[i][0], rhs[i][1], rhs[i][2], mat[3], mat[4], mat[5], mat[6], mat[7], mat[8]};
-        auto r_1 =
-                std::array<T_Type, 9>{mat[0], mat[1], mat[2], rhs[i][0], rhs[i][1], rhs[i][2], mat[6], mat[7], mat[8]};
-        auto r_2 =
-                std::array<T_Type, 9>{mat[0], mat[1], mat[2], mat[3], mat[4], mat[5], rhs[i][0], rhs[i][1], rhs[i][2]};
+        // clang-format off
+        auto r_0 = MatrixType{rhs[i][0], rhs[i][1], rhs[i][2],  // NOLINT
+                                 mat[3],    mat[4],    mat[5],  // NOLINT(readability-magic-numbers)
+                                 mat[6],    mat[7],    mat[8]}; // NOLINT(readability-magic-numbers)
+        auto r_1 = MatrixType{   mat[0],    mat[1],    mat[2],
+                              rhs[i][0], rhs[i][1], rhs[i][2],  // NOLINT
+                                 mat[6],    mat[7],    mat[8]}; // NOLINT(readability-magic-numbers)
+        auto r_2 = MatrixType{   mat[0],    mat[1],    mat[2],
+                                 mat[3],    mat[4],    mat[5],  // NOLINT(readability-magic-numbers)
+                              rhs[i][0], rhs[i][1], rhs[i][2]}; // NOLINT
+        // clang-format on
+
         result[i][0] = determinant_3x3(r_0) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         result[i][1] = determinant_3x3(r_1) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         result[i][2] = determinant_3x3(r_2) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
@@ -1123,7 +1133,7 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
     if constexpr (n_l == 1)
     {
         for (UST i = 0; i < t_num_rhs; ++i)
-            result[i] = calculate_result(rhs[i]);
+            result[i] = calculate_result(rhs[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     }
     else
     {
@@ -1133,17 +1143,14 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
         for (UST i = 0; i < num_loops; ++i)
         {
             UST  idx   = n_l * i;
-            auto rhs_p = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]);
+            auto rhs_p = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
 
-            result[idx]     = calculate_result(rhs_p);
-            result[idx + 1] = swap_lanes(result[idx]);
+            result[idx]     = calculate_result(rhs_p); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+            result[idx + 1] = swap_lanes(result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         }
 
         if constexpr (rest == 1)
-        {
-            UST idx     = t_num_rhs - 1;
-            result[idx] = calculate_result(rhs[idx]);
-        }
+            result[t_num_rhs - 1] = calculate_result(rhs[t_num_rhs - 1]);
     }
 
 
@@ -1187,10 +1194,10 @@ template <UST t_num_rhs>
     for (UST i = 0; i < t_num_rhs; ++i)
     {
         // create all necessary permutations
-        auto r_120 = permute_across_lanes<1, 2, 0, 3>(rhs[i]);
-        auto r_201 = permute_across_lanes<2, 0, 1, 3>(rhs[i]);
+        auto r_120 = permute_across_lanes<1, 2, 0, 3>(rhs[i]); // NOLINT
+        auto r_201 = permute_across_lanes<2, 0, 1, 3>(rhs[i]); // NOLINT
 
-        auto a_r12 = blend_at<0>(mat[0], rhs[i]);
+        auto a_r12 = blend_at<0>(mat[0], rhs[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         auto a_r20 = blend_at<0>(a_120, r_120);
         auto a_r01 = blend_at<0>(a_201, r_201);
 
@@ -1198,9 +1205,9 @@ template <UST t_num_rhs>
         // calculate all necessary cross product components
 
         auto prod_rc = mm_mul(r_120, mat[2]);
-        auto prod_br = mm_mul(b_120, rhs[i]);
+        auto prod_br = mm_mul(b_120, rhs[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-        auto cross_rc_201 = mm_fmsub(rhs[i], c_120, prod_rc);
+        auto cross_rc_201 = mm_fmsub(rhs[i], c_120, prod_rc); // NOLINT
         auto cross_br_201 = mm_fmsub(mat[1], r_120, prod_br);
 
 
@@ -1222,7 +1229,7 @@ template <UST t_num_rhs>
         auto sum_1_r = mm_fmadd(a_r20, terms_120, sum_0_r);
         auto dets_r  = mm_fmadd(a_r12, terms_012, sum_1_r);
 
-        result[i] = mm_div(dets_r, det_mat);
+        result[i] = mm_div(dets_r, det_mat); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     }
 
     return result;
