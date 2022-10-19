@@ -159,3 +159,22 @@ TYPED_TEST(SolverTestSuite, cramer_multiple_rhs_3x3_9) // NOLINT
         }
     }
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// multiple sizes of the right-hand side are tested to cover all branches
+
+TYPED_TEST(SolverTestSuite, cramer_multiple_rhs_4x4_8) // NOLINT
+{
+    if constexpr (! x86::is_vector_register<TypeParam>)
+    {
+        UST tc_idx = 0;
+        for (const auto& tc : get_solver_testcases_multiple_rhs_4x4<TypeParam, 8>())
+        {
+            auto result = Cramer::solve_multiple_rhs(tc.mat(), tc.rhs());
+            tc.check_result_testcase(result, tc_idx);
+            ++tc_idx;
+        }
+    }
+}

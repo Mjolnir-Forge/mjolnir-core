@@ -299,6 +299,21 @@ template <typename T_Type, UST t_num_rhs>
         -> std::vector<SolverTestcaseMultipleRHS<T_Type, 3, t_num_rhs>>;
 
 
+//! @brief
+//! Get a vector of testcases for 3x3 solvers with multiple right-hand sides.
+//!
+//! @tparam T_Type:
+//! The type that stores the matrix and vector data
+//! @tparam t_num_rhs:
+//! Number of right-hand sides
+//!
+//! @return
+//! Vector of testcases for 4x4 solvers with multiple right-hand sides
+template <typename T_Type, UST t_num_rhs>
+[[nodiscard]] auto get_solver_testcases_multiple_rhs_4x4()
+        -> std::vector<SolverTestcaseMultipleRHS<T_Type, 4, t_num_rhs>>;
+
+
 //! @}
 } // namespace mjolnir
 
@@ -693,6 +708,50 @@ template <typename T_Type, UST t_num_rhs>
     }
     // NOLINTNEXTLINE(readability-magic-numbers)
     testcases.emplace_back(ST({{4., -1., -4., 2., -6., 1., -7., 1., 3}}, exp, rhs));
+
+    return testcases;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, UST t_num_rhs>
+[[nodiscard]] inline auto get_solver_testcases_multiple_rhs_4x4()
+        -> std::vector<SolverTestcaseMultipleRHS<T_Type, 4, t_num_rhs>>
+{
+    using ST         = SolverTestcaseMultipleRHS<T_Type, 4, t_num_rhs>;
+    using ScalarType = typename std::conditional_t<x86::is_float_register<T_Type>, F64, T_Type>;
+    using VectorType = std::array<ScalarType, 4>;
+
+    std::vector<ST> testcases = {};
+
+    std::array<VectorType, 5> exp_data = {{{{1., 2., 3., 4}},
+                                           {{4., 1., 3., 2.}},
+                                           {{5., -1., -9., 3.}},
+                                           {{-4., -1., 0., 2.}},
+                                           {{12., -8., -4., -15}}}};
+
+    std::array<VectorType, 5> rhs_data = {{{{17., 7., -11., 22.}},
+                                           {{14., 3., 13., 4.}},
+                                           {{30., -29., -10., 87.}},
+                                           {{-1., -1., -16., 7.}},
+                                           {{-40., -29., 129., -120.}}}};
+
+    std::array<VectorType, t_num_rhs> exp = {{{0}}};
+    std::array<VectorType, t_num_rhs> rhs = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        UST idx_data = i % exp_data.size();
+        UST scale    = i / exp_data.size() + 1;
+        for (UST j = 0; j < 4; ++j)
+        {
+            exp.at(i).at(j) = exp_data.at(idx_data).at(j) * scale;
+            rhs.at(i).at(j) = rhs_data.at(idx_data).at(j) * scale;
+        }
+    }
+    // NOLINTNEXTLINE(readability-magic-numbers)
+    testcases.emplace_back(ST({{2., -1., 4., 1., 1., 3., -6., 5., -1., 2., 3., -7., 4., -1., -3., 8.}}, exp, rhs));
 
     return testcases;
 }

@@ -226,6 +226,15 @@ private:
     [[nodiscard]] static auto solve_multiple_rhs_3x3(const std::array<__m256d, 3>&         mat,
                                                      const std::array<__m256d, t_num_rhs>& rhs) noexcept
             -> std::array<__m256d, t_num_rhs>;
+
+
+    //! Solver implementation for 4x4 systems with multiple right-hand sides (not vectorized).
+    template <Number T_Type, UST t_num_rhs>
+    [[nodiscard]] static constexpr auto
+    // NOLINTNEXTLINE(readability-magic-numbers)
+    solve_multiple_rhs_4x4(const std::array<T_Type, 16>&                       mat,
+                           const std::array<std::array<T_Type, 4>, t_num_rhs>& rhs) noexcept
+            -> std::array<std::array<T_Type, 4>, t_num_rhs>;
 };
 
 //! @}
@@ -284,6 +293,8 @@ Cramer::solve_multiple_rhs(const std::array<T_Type, t_size * t_size>&           
         return solve_multiple_rhs_2x2(mat, rhs);
     else if constexpr (t_size == 3)
         return solve_multiple_rhs_3x3(mat, rhs);
+    else if constexpr (t_size == 4)
+        return solve_multiple_rhs_4x4(mat, rhs);
 }
 
 
@@ -1257,5 +1268,54 @@ template <UST t_num_rhs>
     return result;
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <Number T_Type, UST t_num_rhs>
+[[nodiscard]] constexpr auto
+// NOLINTNEXTLINE(readability-magic-numbers)
+Cramer::solve_multiple_rhs_4x4(const std::array<T_Type, 16>&                       mat,
+                               const std::array<std::array<T_Type, 4>, t_num_rhs>& rhs) noexcept
+        -> std::array<std::array<T_Type, 4>, t_num_rhs>
+{
+    using MatrixType = std::array<T_Type, 16>; // NOLINT(readability-magic-numbers)
+
+    T_Type det_mat = determinant_4x4(mat);
+
+    std::array<std::array<T_Type, 4>, t_num_rhs> result = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        // clang-format off
+                auto r_0 = MatrixType{
+                        rhs[i][0], rhs[i][1], rhs[i][2], rhs[i][3],     // NOLINT
+                           mat[4],    mat[5],    mat[6],    mat[7],     // NOLINT(readability-magic-numbers)
+                           mat[8],    mat[9],   mat[10],   mat[11],     // NOLINT(readability-magic-numbers)
+                          mat[12],   mat[13],   mat[14],   mat[15]};    // NOLINT(readability-magic-numbers)
+                auto r_1 = MatrixType{
+                           mat[0],    mat[1],    mat[2],    mat[3],
+                        rhs[i][0], rhs[i][1], rhs[i][2], rhs[i][3],     // NOLINT
+                           mat[8],    mat[9],   mat[10],   mat[11],     // NOLINT(readability-magic-numbers)
+                          mat[12],   mat[13],   mat[14],   mat[15]};    // NOLINT(readability-magic-numbers)
+                auto r_2 = MatrixType{
+                           mat[0],    mat[1],    mat[2],    mat[3],
+                           mat[4],    mat[5],    mat[6],    mat[7],     // NOLINT(readability-magic-numbers)
+                        rhs[i][0], rhs[i][1], rhs[i][2], rhs[i][3],     // NOLINT
+                          mat[12],   mat[13],   mat[14],   mat[15]};    // NOLINT(readability-magic-numbers)
+                auto r_3 = MatrixType{
+                           mat[0],    mat[1],    mat[2],    mat[3],
+                           mat[4],    mat[5],    mat[6],    mat[7],     // NOLINT(readability-magic-numbers)
+                           mat[8],    mat[9],   mat[10],   mat[11],     // NOLINT(readability-magic-numbers)
+                        rhs[i][0], rhs[i][1], rhs[i][2], rhs[i][3]};     // NOLINT
+        // clang-format on
+
+        result[i][0] = determinant_4x4(r_0) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[i][1] = determinant_4x4(r_1) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[i][2] = determinant_4x4(r_2) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[i][3] = determinant_4x4(r_3) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    }
+
+    return result;
+}
 
 } // namespace mjolnir
