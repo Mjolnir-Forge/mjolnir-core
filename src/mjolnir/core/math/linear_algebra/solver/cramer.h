@@ -242,6 +242,13 @@ private:
     [[nodiscard]] static auto solve_multiple_rhs_4x4(const std::array<T_RegisterType, 4>&         mat,
                                                      const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
             -> std::array<T_RegisterType, t_num_rhs>;
+
+
+    //! Solver implementation for 4x4 systems with multiple right-hand sides (__m256).
+    template <UST t_num_rhs>
+    [[nodiscard]] static auto solve_multiple_rhs_4x4(const std::array<__m256, 4>&         mat,
+                                                     const std::array<__m256, t_num_rhs>& rhs) noexcept
+            -> std::array<__m256, t_num_rhs>;
 };
 
 //! @}
@@ -1499,5 +1506,106 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
 
     return result;
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_rhs>
+[[nodiscard]] inline auto Cramer::solve_multiple_rhs_4x4(const std::array<__m256, 4>&         mat,
+                                                         const std::array<__m256, t_num_rhs>& rhs) noexcept
+        -> std::array<__m256, t_num_rhs>
+{
+    using namespace x86;
+
+    // necessary permutations (last 2 elements are unused)
+    auto a_0 = permute_across_lanes<0, 1, 2, 3, 0, 1, 0, 0>(mat[0]);
+    auto a_1 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(mat[0]);
+    auto b_0 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(mat[1]);
+    auto b_1 = permute_across_lanes<0, 1, 2, 3, 0, 1, 0, 0>(mat[1]);
+    auto c_0 = permute_across_lanes<2, 0, 0, 2, 3, 2, 0, 0>(mat[2]);
+    auto c_1 = permute_across_lanes<3, 3, 1, 1, 1, 0, 0, 0>(mat[2]);
+    auto d_0 = permute_across_lanes<3, 3, 1, 1, 1, 0, 0, 0>(mat[3]);
+    auto d_1 = permute_across_lanes<2, 0, 0, 2, 3, 2, 0, 0>(mat[3]);
+
+
+    // calculate all twelve 2x2 determinants
+    auto prod_ab_0 = mm_mul(a_0, b_0);
+    auto prod_cd_0 = mm_mul(c_0, d_0);
+
+    auto prod_ab = mm_fmsub(a_1, b_1, prod_ab_0);
+    auto prod_cd = mm_fmsub(c_1, d_1, prod_cd_0);
+
+
+    // multiply the 2x2 determinants
+    auto products_abcd = mm_mul(prod_ab, prod_cd);
+
+
+    // sum up all elements to get the determinant of the unmodified matrix
+    products_abcd = blend_above<5>(products_abcd, mm_setzero<__m256>()); // NOLINT(readability-magic-numbers)
+    auto det_mat  = broadcast_element_sum(products_abcd);                // NOLINT(readability-magic-numbers)
+
+
+    std::array<__m256, t_num_rhs> result = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        // necessary permutations (last 2 elements are unused)
+        auto r_00 = permute_across_lanes<0, 1, 2, 3, 0, 1, 0, 0>(rhs[i]);
+        auto r_01 = permute_across_lanes<1, 2, 3, 0, 2, 3, 0, 0>(rhs[i]);
+        auto r_10 = permute_across_lanes<3, 3, 1, 1, 1, 0, 0, 0>(rhs[i]);
+        auto r_11 = permute_across_lanes<2, 0, 0, 2, 3, 2, 0, 0>(rhs[i]);
+
+
+        // calculate all twelve 2x2 determinants
+        auto prod_rb_0 = mm_mul(r_00, b_0);
+        auto prod_ar_0 = mm_mul(a_0, r_01);
+        auto prod_rd_0 = mm_mul(r_11, d_0);
+        auto prod_cr_0 = mm_mul(c_0, r_10);
+
+        auto prod_rb = mm_fmsub(r_01, b_1, prod_rb_0);
+        auto prod_ar = mm_fmsub(a_1, r_00, prod_ar_0);
+        auto prod_rd = mm_fmsub(r_10, d_1, prod_rd_0);
+        auto prod_cr = mm_fmsub(c_1, r_11, prod_cr_0);
+
+
+        // multiply the 2x2 determinants
+        auto products_rbcd = mm_mul(prod_rb, prod_cd);
+        auto products_arcd = mm_mul(prod_ar, prod_cd);
+        auto products_abrd = mm_mul(prod_ab, prod_rd);
+        auto products_abcr = mm_mul(prod_ab, prod_cr);
+
+
+        // todo: replace code below with multi register version of `element_sum` function once it is implemented
+        // transpose data to sum everything up
+        auto tmp_0 = shuffle<0, 1, 0, 1>(products_rbcd, products_arcd);
+        auto tmp_1 = shuffle<2, 3, 2, 3>(products_rbcd, products_arcd);
+        auto tmp_2 = shuffle<0, 1, 0, 1>(products_abrd, products_abcr);
+        auto tmp_3 = shuffle<2, 3, 2, 3>(products_abrd, products_abcr);
+
+        auto term_0 = shuffle<0, 2, 0, 2>(tmp_0, tmp_2);
+        auto term_1 = shuffle<1, 3, 1, 3>(tmp_0, tmp_2);
+        auto term_2 = shuffle<0, 2, 0, 2>(tmp_1, tmp_3);
+        auto term_3 = shuffle<1, 3, 1, 3>(tmp_1, tmp_3);
+        auto term_4 = swap_lanes(term_0);
+        auto term_5 = swap_lanes(term_1);
+
+
+        // calculate determinants
+        auto sum_01 = mm_add(term_0, term_1);
+        auto sum_23 = mm_add(term_2, term_3);
+        auto sum_45 = mm_add(term_4, term_5);
+
+        auto sum_0123 = mm_add(sum_01, sum_23);
+
+        auto dets = mm_add(sum_0123, sum_45);
+
+
+        // return result
+        result[i] = mm_div(dets, det_mat);
+    }
+
+    return result;
+}
+
 
 } // namespace mjolnir
