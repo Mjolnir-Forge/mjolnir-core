@@ -163,13 +163,14 @@ BENCHMARK(bm_solver_multiple_rhs<F32, 3>)->Name("3x3 - 20x RHS - F32");       //
 BENCHMARK(bm_solver_multiple_rhs<__m128, 3>)->Name("3x3 - 20x RHS - m128");   // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<__m256, 3>)->Name("3x3 - 20x RHS - m256");   // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<F32, 4>)->Name("4x4 - 20x RHS - F32");       // NOLINT
+BENCHMARK(bm_solver_multiple_rhs<__m128, 4>)->Name("4x4 - 20x RHS - m128");   // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<F64, 2>)->Name("2x2 - 20x RHS - F64");       // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<__m128d, 2>)->Name("2x2 - 20x RHS - m128d"); // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<__m256d, 2>)->Name("2x2 - 20x RHS - m256d"); // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<F64, 3>)->Name("3x3 - 20x RHS - F64");       // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<__m256d, 3>)->Name("3x3 - 20x RHS - m256d"); // NOLINT
 BENCHMARK(bm_solver_multiple_rhs<F64, 4>)->Name("4x4 - 20x RHS - F64");       // NOLINT
-
+BENCHMARK(bm_solver_multiple_rhs<__m256d, 4>)->Name("4x4 - 20x RHS - m256d"); // NOLINT
 
 // --------------------------------------------------------------------------------------------------------------------
 
