@@ -263,14 +263,8 @@ template <Number T_Type, UST t_size>
 [[nodiscard]] constexpr auto Cramer::solve(const std::array<T_Type, t_size * t_size>& mat,
                                            const std::array<T_Type, t_size>& rhs) noexcept -> std::array<T_Type, t_size>
 {
-    static_assert(4 >= t_size && 1 < t_size, "Only sizes 2-4 are supported.");
-
-    if constexpr (t_size == 2)
-        return solve_2x2(mat, rhs);
-    else if constexpr (t_size == 3)
-        return solve_3x3(mat, rhs);
-    else
-        return solve_4x4(mat, rhs);
+    std::array<std::array<T_Type, t_size>, 1> rhs_array = {rhs};
+    return solve_multiple_rhs<T_Type, t_size, 1>(mat, rhs_array)[0];
 }
 
 
@@ -282,14 +276,9 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_size>
 {
     using namespace x86;
     static_assert(4 >= t_size && 1 < t_size, "Only sizes 2-4 are supported.");
-    static_assert(num_elements<T_RegisterType> >= t_size, "Registers size must be equal or larger than system size.");
 
-    if constexpr (t_size == 2)
-        return solve_2x2(mat, rhs);
-    else if constexpr (t_size == 3)
-        return solve_3x3(mat, rhs);
-    else
-        return solve_4x4(mat, rhs);
+    std::array<T_RegisterType, 1> rhs_array = {rhs};
+    return solve_multiple_rhs<T_RegisterType, t_size, 1>(mat, rhs_array)[0];
 }
 
 
