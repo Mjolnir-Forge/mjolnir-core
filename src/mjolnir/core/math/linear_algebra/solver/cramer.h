@@ -120,6 +120,15 @@ public:
 
 
 private:
+    //! Function that calculates multiple solution vectors for 2x2 systems
+    template <x86::FloatVectorRegister T_RegisterType>
+    [[nodiscard]] static auto calc_solution_vectors_2x2(T_RegisterType r01,
+                                                        T_RegisterType r10,
+                                                        T_RegisterType b0a1,
+                                                        T_RegisterType b1a0,
+                                                        T_RegisterType det_mat) noexcept;
+
+
     //! Solver implementation for 2x2 systems with multiple right-hand sides (not vectorized).
     template <Number T_Type, UST t_num_rhs>
     [[nodiscard]] static constexpr auto
@@ -287,6 +296,23 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_size, UST t_num_rhs>
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <x86::FloatVectorRegister T_RegisterType>
+[[nodiscard]] auto Cramer::calc_solution_vectors_2x2(T_RegisterType r01,
+                                                     T_RegisterType r10,
+                                                     T_RegisterType b0a1,
+                                                     T_RegisterType b1a0,
+                                                     T_RegisterType det_mat) noexcept
+{
+    using namespace x86;
+
+    auto result = mm_mul(r10, b0a1);
+    result      = mm_fmsub(r01, b1a0, result);
+    return mm_div(result, det_mat);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <Number T_Type, UST t_num_rhs>
 [[nodiscard]] constexpr auto
 Cramer::solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                        mat,
@@ -319,7 +345,7 @@ template <UST t_num_rhs>
 {
     using namespace x86;
 
-
+    // --- Calculate matrix determinant
     auto mat_data = shuffle<0, 1, 0, 1>(mat[0], mat[1]);
 
     auto b0a1 = permute<2, 1, 2, 1>(mat_data);
@@ -330,6 +356,8 @@ template <UST t_num_rhs>
     auto prod_mat = mm_mul(a1b0, b0a1);
     auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
 
+
+    // --- Calculate all solution vectors
     constexpr UST num_loops = t_num_rhs / 2;
     constexpr UST rest      = t_num_rhs % 2;
 
@@ -341,20 +369,19 @@ template <UST t_num_rhs>
         auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]); // NOLINT
         auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
 
-        result[idx]     = mm_mul(r10, b0a1);                // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[idx]     = mm_fmsub(r01, b1a0, result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[idx]     = mm_div(result[idx], det_mat);     // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx]     = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);                         // NOLINT
     }
+
+    // --- Calculate remaining solutions
     if constexpr (rest > 0)
     {
         constexpr UST idx = t_num_rhs - 1;
         auto          r10 = permute<1, 0, 1, 0>(rhs[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-        result[idx] = mm_mul(r10, b0a1);                     // NOLINT
-        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]); // NOLINT
-        result[idx] = mm_div(result[idx], det_mat);          // NOLINT
+        result[idx] = calc_solution_vectors_2x2(rhs[idx], r10, b0a1, b1a0, det_mat); // NOLINT
     }
+
     return result; // NOLINT(readability-misleading-indentation)
 }
 
@@ -368,7 +395,7 @@ template <UST t_num_rhs>
 {
     using namespace x86;
 
-
+    // --- Calculate matrix determinant
     auto a0b1 = blend_at<1>(mat[0], mat[1]);
     auto b0a1 = blend_at<0>(mat[0], mat[1]);
     auto a1b0 = shuffle<1, 0>(mat[0], mat[1]);
@@ -379,15 +406,14 @@ template <UST t_num_rhs>
     auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
 
 
+    // --- Calculate all solution vectors
     std::array<__m128d, t_num_rhs> result = {{{0}}};
 
     for (UST i = 0; i < t_num_rhs; ++i)
     {
         auto r10 = permute<1, 0>(rhs[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-        result[i] = mm_mul(rhs[i], b1a0);            // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[i] = mm_fnmadd(r10, b0a1, result[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[i] = mm_div(result[i], det_mat);      // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[i] = calc_solution_vectors_2x2(rhs[i], r10, b0a1, b1a0, det_mat); // NOLINT
     }
 
     return result;
@@ -403,7 +429,7 @@ template <UST t_num_rhs>
 {
     using namespace x86;
 
-
+    // --- Calculate matrix determinant
     auto mat_data = shuffle<0, 1, 0, 1>(mat[0], mat[1]);
     mat_data      = permute_lanes<0, 0>(mat_data);
 
@@ -415,6 +441,8 @@ template <UST t_num_rhs>
     auto prod_mat = mm_mul(a1b0, b0a1);
     auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
 
+
+    // --- Calculate all solution vectors
     constexpr UST num_loops = t_num_rhs / 4;
     constexpr UST rest      = t_num_rhs % 4;
 
@@ -424,6 +452,7 @@ template <UST t_num_rhs>
     {
         auto idx = 4 * i;
 
+        // todo: check if transpose 4x2 function can be used once implemented
         auto r01_tmp_0 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);     // NOLINT
         auto r10_tmp_0 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);     // NOLINT
         auto r01_tmp_1 = shuffle<0, 1, 0, 1>(rhs[idx + 2], rhs[idx + 3]); // NOLINT
@@ -431,49 +460,40 @@ template <UST t_num_rhs>
         auto r01       = shuffle_lanes<0, 0, 1, 0>(r01_tmp_0, r01_tmp_1);
         auto r10       = shuffle_lanes<0, 0, 1, 0>(r10_tmp_0, r10_tmp_1);
 
-        result[idx]     = mm_mul(r10, b0a1);                    // NOLINT
-        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);     // NOLINT
-        result[idx]     = mm_div(result[idx], det_mat);         // NOLINT
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);     // NOLINT
-        result[idx + 2] = swap_lanes(result[idx]);              // NOLINT
-        result[idx + 3] = permute<2, 3, 0, 1>(result[idx + 2]); // NOLINT
+        result[idx]     = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);                         // NOLINT
+        result[idx + 2] = swap_lanes(result[idx]);                                  // NOLINT
+        result[idx + 3] = permute<2, 3, 0, 1>(result[idx + 2]);                     // NOLINT
     }
 
 
-    if constexpr (rest == 1)
+    // --- Calculate remaining solutions
+    if constexpr (rest > 0 && rest <= 3)
     {
-        constexpr UST idx = t_num_rhs - 1;
-        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        constexpr UST idx = t_num_rhs - rest;
 
-        result[idx] = mm_mul(r10, b0a1);                     // NOLINT
-        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]); // NOLINT
-        result[idx] = mm_div(result[idx], det_mat);          // NOLINT
-    }
-    else if constexpr (rest == 2)
-    {
-        auto idx = t_num_rhs - 2;
-        auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]); // NOLINT
-        auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
+        if constexpr (rest == 1)
+        {
+            auto r01    = rhs[idx];
+            auto r10    = permute<1, 0, 1, 0>(rhs[idx]);
+            result[idx] = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
+        }
+        else
+        {
+            auto r01    = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);              // NOLINT
+            auto r10    = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);              // NOLINT
+            result[idx] = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
+        }
 
-        result[idx]     = mm_mul(r10, b0a1);                // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[idx]     = mm_fmsub(r01, b1a0, result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[idx]     = mm_div(result[idx], det_mat);     // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-    }
-    else if constexpr (rest == 3)
-    {
-        auto idx   = t_num_rhs - 3;
-        auto r01   = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]); // NOLINT
-        auto r10   = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
-        auto r10_2 = permute<1, 0, 1, 0>(rhs[idx + 2]);           // NOLINT
 
-        result[idx]     = mm_mul(r10, b0a1);                             // NOLINT
-        result[idx + 2] = mm_mul(r10_2, b0a1);                           // NOLINT
-        result[idx]     = mm_fmsub(r01, b1a0, result[idx]);              // NOLINT
-        result[idx + 2] = mm_fmsub(rhs[idx + 2], b1a0, result[idx + 2]); // NOLINT
-        result[idx]     = mm_div(result[idx], det_mat);                  // NOLINT
-        result[idx + 2] = mm_div(result[idx + 2], det_mat);              // NOLINT
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);              // NOLINT
+        if constexpr (rest >= 2)
+            result[idx + 1] = permute<2, 3, 0, 1>(result[idx]); // NOLINT
+
+        if constexpr (rest == 3)
+        {
+            auto r10_2      = permute<1, 0, 1, 0>(rhs[idx + 2]);                                   // NOLINT
+            result[idx + 2] = calc_solution_vectors_2x2(rhs[idx + 2], r10_2, b0a1, b1a0, det_mat); // NOLINT
+        }
     }
 
 
