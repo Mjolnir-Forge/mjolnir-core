@@ -128,6 +128,14 @@ private:
                                                         T_RegisterType b1a0,
                                                         T_RegisterType det_mat) noexcept;
 
+    template <UST t_num_updates, x86::SinglePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
+    static void update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
+                                   const std::array<T_RegisterType, t_num_rhs>& rhs,
+                                   T_RegisterType                               b0a1,
+                                   T_RegisterType                               b1a0,
+                                   T_RegisterType                               det_mat,
+                                   [[maybe_unused]] UST                         index = 0) noexcept;
+
 
     //! Solver implementation for 2x2 systems with multiple right-hand sides (not vectorized).
     template <Number T_Type, UST t_num_rhs>
@@ -313,6 +321,59 @@ template <x86::FloatVectorRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
+template <UST t_num_updates, x86::SinglePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
+inline void Cramer::update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
+                                       const std::array<T_RegisterType, t_num_rhs>& rhs,
+                                       T_RegisterType                               b0a1,
+                                       T_RegisterType                               b1a0,
+                                       T_RegisterType                               det_mat,
+                                       [[maybe_unused]] UST                         index) noexcept
+{
+    using namespace x86;
+
+    UST idx = index;
+    if constexpr (t_num_updates < num_elements<T_RegisterType> / 2)
+        idx = t_num_rhs - t_num_updates;
+
+    if constexpr (t_num_updates == 1)
+    {
+        auto r01    = rhs[idx];
+        auto r10    = permute<1, 0, 1, 0>(rhs[idx]);
+        result[idx] = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
+    }
+    else
+    {
+        auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]); // NOLINT
+        auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
+
+        if constexpr (t_num_updates == 4)
+        {
+            auto r01_tmp_1 = shuffle<0, 1, 0, 1>(rhs[idx + 2], rhs[idx + 3]); // NOLINT
+            auto r10_tmp_1 = shuffle<1, 0, 1, 0>(rhs[idx + 2], rhs[idx + 3]); // NOLINT
+            r01            = shuffle_lanes<0, 0, 1, 0>(r01, r01_tmp_1);
+            r10            = shuffle_lanes<0, 0, 1, 0>(r10, r10_tmp_1);
+        }
+
+
+        result[idx]     = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);                         // NOLINT
+
+        if constexpr (t_num_updates == 3)
+        {
+            auto r10_2      = permute<1, 0, 1, 0>(rhs[idx + 2]);                                   // NOLINT
+            result[idx + 2] = calc_solution_vectors_2x2(rhs[idx + 2], r10_2, b0a1, b1a0, det_mat); // NOLINT
+        }
+        else if constexpr (t_num_updates == 4)
+        {
+            result[idx + 2] = swap_lanes(result[idx]);              // NOLINT
+            result[idx + 3] = permute<2, 3, 0, 1>(result[idx + 2]); // NOLINT
+        }
+    }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
 template <Number T_Type, UST t_num_rhs>
 [[nodiscard]] constexpr auto
 Cramer::solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                        mat,
@@ -443,58 +504,16 @@ template <UST t_num_rhs>
 
 
     // --- Calculate all solution vectors
+    std::array<__m256, t_num_rhs> result = {{{0}}};
+
     constexpr UST num_loops = t_num_rhs / 4;
     constexpr UST rest      = t_num_rhs % 4;
 
-    std::array<__m256, t_num_rhs> result = {{{0}}};
-
     for (UST i = 0; i < num_loops; ++i)
-    {
-        auto idx = 4 * i;
+        update_results_2x2<4>(result, rhs, b0a1, b1a0, det_mat, 4 * i);
 
-        // todo: check if transpose 4x2 function can be used once implemented
-        auto r01_tmp_0 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);     // NOLINT
-        auto r10_tmp_0 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);     // NOLINT
-        auto r01_tmp_1 = shuffle<0, 1, 0, 1>(rhs[idx + 2], rhs[idx + 3]); // NOLINT
-        auto r10_tmp_1 = shuffle<1, 0, 1, 0>(rhs[idx + 2], rhs[idx + 3]); // NOLINT
-        auto r01       = shuffle_lanes<0, 0, 1, 0>(r01_tmp_0, r01_tmp_1);
-        auto r10       = shuffle_lanes<0, 0, 1, 0>(r10_tmp_0, r10_tmp_1);
-
-        result[idx]     = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);                         // NOLINT
-        result[idx + 2] = swap_lanes(result[idx]);                                  // NOLINT
-        result[idx + 3] = permute<2, 3, 0, 1>(result[idx + 2]);                     // NOLINT
-    }
-
-
-    // --- Calculate remaining solutions
     if constexpr (rest > 0 && rest <= 3)
-    {
-        constexpr UST idx = t_num_rhs - rest;
-
-        if constexpr (rest == 1)
-        {
-            auto r01    = rhs[idx];
-            auto r10    = permute<1, 0, 1, 0>(rhs[idx]);
-            result[idx] = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
-        }
-        else
-        {
-            auto r01    = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]);              // NOLINT
-            auto r10    = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]);              // NOLINT
-            result[idx] = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
-        }
-
-
-        if constexpr (rest >= 2)
-            result[idx + 1] = permute<2, 3, 0, 1>(result[idx]); // NOLINT
-
-        if constexpr (rest == 3)
-        {
-            auto r10_2      = permute<1, 0, 1, 0>(rhs[idx + 2]);                                   // NOLINT
-            result[idx + 2] = calc_solution_vectors_2x2(rhs[idx + 2], r10_2, b0a1, b1a0, det_mat); // NOLINT
-        }
-    }
+        update_results_2x2<rest>(result, rhs, b0a1, b1a0, det_mat);
 
 
     return result;
@@ -533,19 +552,15 @@ template <UST t_num_rhs>
         auto r01 = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
         auto r10 = permute<1, 0, 1, 0>(r01);
 
-        result[idx] = mm_mul(r01, b1a0);                 // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[idx] = mm_fnmadd(r10, b0a1, result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[idx] = mm_div(result[idx], det_mat);      // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[idx + 1] = swap_lanes(result[idx]);       // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        result[idx]     = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
+        result[idx + 1] = swap_lanes(result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     }
     if constexpr (rest > 0)
     {
         constexpr UST idx = t_num_rhs - 1;
         auto          r10 = permute<1, 0, 1, 0>(rhs[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
-        result[idx] = mm_mul(r10, b0a1);                     // NOLINT
-        result[idx] = mm_fmsub(rhs[idx], b1a0, result[idx]); // NOLINT
-        result[idx] = mm_div(result[idx], det_mat);          // NOLINT
+        result[idx] = calc_solution_vectors_2x2(rhs[idx], r10, b0a1, b1a0, det_mat); // NOLINT
     }
     return result; // NOLINT(readability-misleading-indentation)
 }
