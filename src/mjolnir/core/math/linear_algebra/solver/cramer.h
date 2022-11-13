@@ -45,7 +45,7 @@ public:
     //! The right-hand side vector of the system
     //!
     //! @return
-    //! Solution vector
+    //! Result vector
     template <Number T_Type, UST t_size>
     [[nodiscard]] static constexpr auto solve(const std::array<T_Type, t_size * t_size>& mat,
                                               const std::array<T_Type, t_size>&          rhs) noexcept
@@ -66,7 +66,7 @@ public:
     //! The right-hand side vector of the system
     //!
     //! @return
-    //! Solution vector
+    //! Result vector
     template <x86::FloatVectorRegister T_RegisterType, UST t_size>
     [[nodiscard]] static auto solve(const std::array<T_RegisterType, t_size>& mat, T_RegisterType rhs) noexcept
             -> T_RegisterType;
@@ -88,7 +88,7 @@ public:
     //! The right-hand side vectors of the system
     //!
     //! @return
-    //! Solution vectors
+    //! Result vectors
     template <Number T_Type, UST t_size, UST t_num_rhs>
     [[nodiscard]] static constexpr auto
     solve_multiple_rhs(const std::array<T_Type, t_size * t_size>&               mat,
@@ -112,7 +112,7 @@ public:
     //! The right-hand side vectors of the system
     //!
     //! @return
-    //! Solution vectors
+    //! Result vectors
     template <x86::FloatVectorRegister T_RegisterType, UST t_size, UST t_num_rhs>
     [[nodiscard]] static auto solve_multiple_rhs(const std::array<T_RegisterType, t_size>&    mat,
                                                  const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
@@ -120,14 +120,15 @@ public:
 
 
 private:
-    //! Function that calculates multiple solution vectors for 2x2 systems
+    //! Calculates one or more result vectors for 2x2 systems
     template <x86::FloatVectorRegister T_RegisterType>
-    [[nodiscard]] static auto calc_solution_vectors_2x2(T_RegisterType r01,
-                                                        T_RegisterType r10,
-                                                        T_RegisterType b0a1,
-                                                        T_RegisterType b1a0,
-                                                        T_RegisterType det_mat) noexcept;
+    [[nodiscard]] static auto calc_result_vectors_2x2(T_RegisterType r01,
+                                                      T_RegisterType r10,
+                                                      T_RegisterType b0a1,
+                                                      T_RegisterType b1a0,
+                                                      T_RegisterType det_mat) noexcept;
 
+    //! Calculate one or more results and write it to the result array (single-precision)
     template <UST t_num_updates, x86::SinglePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
     static void update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
                                    const std::array<T_RegisterType, t_num_rhs>& rhs,
@@ -135,6 +136,23 @@ private:
                                    T_RegisterType                               b1a0,
                                    T_RegisterType                               det_mat,
                                    [[maybe_unused]] UST                         index = 0) noexcept;
+
+    //! Calculate one or more results and write it to the result array (double-precision)
+    template <UST t_num_updates, x86::DoublePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
+    static void update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
+                                   const std::array<T_RegisterType, t_num_rhs>& rhs,
+                                   T_RegisterType                               b0a1,
+                                   T_RegisterType                               b1a0,
+                                   T_RegisterType                               det_mat,
+                                   [[maybe_unused]] UST                         index = 0) noexcept;
+
+
+    //! Calculte all results
+    template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
+    static auto calc_results_2x2(const std::array<T_RegisterType, t_num_rhs>& rhs,
+                                 T_RegisterType                               b0a1,
+                                 T_RegisterType                               b1a0,
+                                 T_RegisterType det_mat) noexcept -> std::array<T_RegisterType, t_num_rhs>;
 
 
     //! Solver implementation for 2x2 systems with multiple right-hand sides (not vectorized).
@@ -145,32 +163,18 @@ private:
             -> std::array<std::array<T_Type, 2>, t_num_rhs>;
 
 
-    //! Solver implementation for 2x2 systems with multiple right-hand sides (__m128).
-    template <UST t_num_rhs>
-    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<__m128, 2>&         mat,
-                                                     const std::array<__m128, t_num_rhs>& rhs) noexcept
-            -> std::array<__m128, t_num_rhs>;
+    //! Solver implementation for 2x2 systems with multiple right-hand sides (single precision registers).
+    template <UST t_num_rhs, x86::SinglePrecisionVectorRegister T_RegisterType>
+    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
+                                                     const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
+            -> std::array<T_RegisterType, t_num_rhs>;
 
 
-    //! Solver implementation for 2x2 systems with multiple right-hand sides (__m128d).
-    template <UST t_num_rhs>
-    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<__m128d, 2>&         mat,
-                                                     const std::array<__m128d, t_num_rhs>& rhs) noexcept
-            -> std::array<__m128d, t_num_rhs>;
-
-
-    //! Solver implementation for 2x2 systems with multiple right-hand sides (__m256).
-    template <UST t_num_rhs>
-    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<__m256, 2>&         mat,
-                                                     const std::array<__m256, t_num_rhs>& rhs) noexcept
-            -> std::array<__m256, t_num_rhs>;
-
-
-    //! Solver implementation for 2x2 systems with multiple right-hand sides (__m256).
-    template <UST t_num_rhs>
-    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<__m256d, 2>&         mat,
-                                                     const std::array<__m256d, t_num_rhs>& rhs) noexcept
-            -> std::array<__m256d, t_num_rhs>;
+    //! Solver implementation for 2x2 systems with multiple right-hand sides (double precision registers).
+    template <UST t_num_rhs, x86::DoublePrecisionVectorRegister T_RegisterType>
+    [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
+                                                     const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
+            -> std::array<T_RegisterType, t_num_rhs>;
 
 
     //! Solver implementation for 3x3 systems with multiple right-hand sides (not vectorized).
@@ -305,11 +309,11 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_size, UST t_num_rhs>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] auto Cramer::calc_solution_vectors_2x2(T_RegisterType r01,
-                                                     T_RegisterType r10,
-                                                     T_RegisterType b0a1,
-                                                     T_RegisterType b1a0,
-                                                     T_RegisterType det_mat) noexcept
+[[nodiscard]] auto Cramer::calc_result_vectors_2x2(T_RegisterType r01,
+                                                   T_RegisterType r10,
+                                                   T_RegisterType b0a1,
+                                                   T_RegisterType b1a0,
+                                                   T_RegisterType det_mat) noexcept
 {
     using namespace x86;
 
@@ -330,16 +334,20 @@ inline void Cramer::update_results_2x2(std::array<T_RegisterType, t_num_rhs>&   
                                        [[maybe_unused]] UST                         index) noexcept
 {
     using namespace x86;
+    constexpr UST max_num_results = num_elements<T_RegisterType> / 2;
+
+    static_assert(t_num_updates > 0 && t_num_updates <= max_num_results,
+                  "t_num_updates must be in the range [1, num_elements/2]");
 
     UST idx = index;
-    if constexpr (t_num_updates < num_elements<T_RegisterType> / 2)
+    if constexpr (t_num_updates < max_num_results)
         idx = t_num_rhs - t_num_updates;
 
     if constexpr (t_num_updates == 1)
     {
         auto r01    = rhs[idx];
         auto r10    = permute<1, 0, 1, 0>(rhs[idx]);
-        result[idx] = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
+        result[idx] = calc_result_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
     }
     else
     {
@@ -355,13 +363,13 @@ inline void Cramer::update_results_2x2(std::array<T_RegisterType, t_num_rhs>&   
         }
 
 
-        result[idx]     = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);                         // NOLINT
+        result[idx]     = calc_result_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
+        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);                       // NOLINT
 
         if constexpr (t_num_updates == 3)
         {
-            auto r10_2      = permute<1, 0, 1, 0>(rhs[idx + 2]);                                   // NOLINT
-            result[idx + 2] = calc_solution_vectors_2x2(rhs[idx + 2], r10_2, b0a1, b1a0, det_mat); // NOLINT
+            auto r10_2      = permute<1, 0, 1, 0>(rhs[idx + 2]);                                 // NOLINT
+            result[idx + 2] = calc_result_vectors_2x2(rhs[idx + 2], r10_2, b0a1, b1a0, det_mat); // NOLINT
         }
         else if constexpr (t_num_updates == 4)
         {
@@ -369,6 +377,64 @@ inline void Cramer::update_results_2x2(std::array<T_RegisterType, t_num_rhs>&   
             result[idx + 3] = permute<2, 3, 0, 1>(result[idx + 2]); // NOLINT
         }
     }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_num_updates, x86::DoublePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
+inline void Cramer::update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
+                                       const std::array<T_RegisterType, t_num_rhs>& rhs,
+                                       T_RegisterType                               b0a1,
+                                       T_RegisterType                               b1a0,
+                                       T_RegisterType                               det_mat,
+                                       [[maybe_unused]] UST                         index) noexcept
+{
+    using namespace x86;
+    constexpr UST max_num_results = num_elements<T_RegisterType> / 2;
+
+    static_assert(t_num_updates > 0 && t_num_updates <= max_num_results,
+                  "t_num_updates must be in the range [1, num_elements/2]");
+
+    UST idx = index;
+    if constexpr (t_num_updates < max_num_results)
+        idx = t_num_rhs - t_num_updates;
+
+    auto r01 = rhs[idx];
+    if constexpr (t_num_updates > 1)
+        r01 = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
+    auto r10 = permute<1, 0>(r01); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+
+    result[idx] = calc_result_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
+    if constexpr (t_num_updates > 1)
+        result[idx + 1] = swap_lanes(result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
+inline auto Cramer::calc_results_2x2(const std::array<T_RegisterType, t_num_rhs>& rhs,
+                                     T_RegisterType                               b0a1,
+                                     T_RegisterType                               b1a0,
+                                     T_RegisterType det_mat) noexcept -> std::array<T_RegisterType, t_num_rhs>
+{
+    using namespace x86;
+
+    std::array<T_RegisterType, t_num_rhs> result = {{{0}}};
+
+    constexpr UST max_num_results = num_elements<T_RegisterType> / 2;
+    constexpr UST num_loops       = t_num_rhs / max_num_results;
+    constexpr UST rest            = t_num_rhs % max_num_results;
+
+    for (UST i = 0; i < num_loops; ++i)
+        update_results_2x2<max_num_results>(result, rhs, b0a1, b1a0, det_mat, max_num_results * i);
+
+    if constexpr (rest > 0)
+        update_results_2x2<rest>(result, rhs, b0a1, b1a0, det_mat);
+
+
+    return result;
 }
 
 
@@ -399,15 +465,17 @@ Cramer::solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                     
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <UST t_num_rhs>
-[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<__m128, 2>&         mat,
-                                                         const std::array<__m128, t_num_rhs>& rhs) noexcept
-        -> std::array<__m128, t_num_rhs>
+template <UST t_num_rhs, x86::SinglePrecisionVectorRegister T_RegisterType>
+[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
+                                                         const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
+        -> std::array<T_RegisterType, t_num_rhs>
 {
     using namespace x86;
 
     // --- Calculate matrix determinant
     auto mat_data = shuffle<0, 1, 0, 1>(mat[0], mat[1]);
+    if constexpr (is_m256<T_RegisterType>)
+        mat_data = permute_lanes<0, 0>(mat_data);
 
     auto b0a1 = permute<2, 1, 2, 1>(mat_data);
     auto a0b1 = permute<0, 3, 0, 3>(mat_data);
@@ -418,151 +486,38 @@ template <UST t_num_rhs>
     auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
 
 
-    // --- Calculate all solution vectors
-    constexpr UST num_loops = t_num_rhs / 2;
-    constexpr UST rest      = t_num_rhs % 2;
-
-    std::array<__m128, t_num_rhs> result = {{{0}}};
-    for (UST i = 0; i < num_loops; ++i)
-    {
-        auto idx = 2 * i;
-
-        auto r01 = shuffle<0, 1, 0, 1>(rhs[idx], rhs[idx + 1]); // NOLINT
-        auto r10 = shuffle<1, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
-
-        result[idx]     = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
-        result[idx + 1] = permute<2, 3, 0, 1>(result[idx]);                         // NOLINT
-    }
-
-    // --- Calculate remaining solutions
-    if constexpr (rest > 0)
-    {
-        constexpr UST idx = t_num_rhs - 1;
-        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-
-        result[idx] = calc_solution_vectors_2x2(rhs[idx], r10, b0a1, b1a0, det_mat); // NOLINT
-    }
-
-    return result; // NOLINT(readability-misleading-indentation)
+    return calc_results_2x2(rhs, b0a1, b1a0, det_mat);
 }
 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <UST t_num_rhs>
-[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<__m128d, 2>&         mat,
-                                                         const std::array<__m128d, t_num_rhs>& rhs) noexcept
-        -> std::array<__m128d, t_num_rhs>
+template <UST t_num_rhs, x86::DoublePrecisionVectorRegister T_RegisterType>
+[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
+                                                         const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
+        -> std::array<T_RegisterType, t_num_rhs>
 {
     using namespace x86;
 
-    // --- Calculate matrix determinant
-    auto a0b1 = blend_at<1>(mat[0], mat[1]);
-    auto b0a1 = blend_at<0>(mat[0], mat[1]);
-    auto a1b0 = shuffle<1, 0>(mat[0], mat[1]);
-    auto b1a0 = shuffle<1, 0>(mat[1], mat[0]);
 
+    auto a0a1 = mat[0];
+    auto b0b1 = mat[1];
+    if constexpr (is_m256d<T_RegisterType>)
+    {
+        a0a1 = permute_lanes<0, 0>(mat[0]);
+        b0b1 = permute_lanes<0, 0>(mat[1]);
+    }
+
+    auto a0b1 = shuffle<0, 1>(a0a1, b0b1);
+    auto a1b0 = shuffle<1, 0>(a0a1, b0b1);
+    auto b0a1 = shuffle<0, 1>(b0b1, a0a1);
+    auto b1a0 = shuffle<1, 0>(b0b1, a0a1);
 
     auto prod_mat = mm_mul(a1b0, b0a1);
     auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
 
 
-    // --- Calculate all solution vectors
-    std::array<__m128d, t_num_rhs> result = {{{0}}};
-
-    for (UST i = 0; i < t_num_rhs; ++i)
-    {
-        auto r10 = permute<1, 0>(rhs[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-
-        result[i] = calc_solution_vectors_2x2(rhs[i], r10, b0a1, b1a0, det_mat); // NOLINT
-    }
-
-    return result;
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <UST t_num_rhs>
-[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<__m256, 2>&         mat,
-                                                         const std::array<__m256, t_num_rhs>& rhs) noexcept
-        -> std::array<__m256, t_num_rhs>
-{
-    using namespace x86;
-
-    // --- Calculate matrix determinant
-    auto mat_data = shuffle<0, 1, 0, 1>(mat[0], mat[1]);
-    mat_data      = permute_lanes<0, 0>(mat_data);
-
-    auto b0a1 = permute<2, 1, 2, 1>(mat_data);
-    auto a0b1 = permute<0, 3, 0, 3>(mat_data);
-    auto b1a0 = permute<3, 0, 3, 0>(mat_data);
-    auto a1b0 = permute<1, 2, 1, 2>(mat_data);
-
-    auto prod_mat = mm_mul(a1b0, b0a1);
-    auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
-
-
-    // --- Calculate all solution vectors
-    std::array<__m256, t_num_rhs> result = {{{0}}};
-
-    constexpr UST num_loops = t_num_rhs / 4;
-    constexpr UST rest      = t_num_rhs % 4;
-
-    for (UST i = 0; i < num_loops; ++i)
-        update_results_2x2<4>(result, rhs, b0a1, b1a0, det_mat, 4 * i);
-
-    if constexpr (rest > 0 && rest <= 3)
-        update_results_2x2<rest>(result, rhs, b0a1, b1a0, det_mat);
-
-
-    return result;
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <UST t_num_rhs>
-[[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<__m256d, 2>&         mat,
-                                                         const std::array<__m256d, t_num_rhs>& rhs) noexcept
-        -> std::array<__m256d, t_num_rhs>
-{
-    using namespace x86;
-
-
-    auto a0a1 = permute_lanes<0, 0>(mat[0]);
-    auto b0b1 = permute_lanes<0, 0>(mat[1]);
-
-    auto a0b1 = shuffle<0, 1, 0, 1>(a0a1, b0b1);
-    auto a1b0 = shuffle<1, 0, 1, 0>(a0a1, b0b1);
-    auto b0a1 = shuffle<0, 1, 0, 1>(b0b1, a0a1);
-    auto b1a0 = shuffle<1, 0, 1, 0>(b0b1, a0a1);
-
-
-    auto prod_mat = mm_mul(a1b0, b0a1);
-    auto det_mat  = mm_fmsub(a0b1, b1a0, prod_mat);
-
-    constexpr UST num_loops = t_num_rhs / 2;
-    constexpr UST rest      = t_num_rhs % 2;
-
-    std::array<__m256d, t_num_rhs> result = {{{0}}};
-    for (UST i = 0; i < num_loops; ++i)
-    {
-        auto idx = 2 * i;
-        auto r01 = shuffle_lanes<0, 0, 1, 0>(rhs[idx], rhs[idx + 1]); // NOLINT
-        auto r10 = permute<1, 0, 1, 0>(r01);
-
-        result[idx]     = calc_solution_vectors_2x2(r01, r10, b0a1, b1a0, det_mat); // NOLINT
-        result[idx + 1] = swap_lanes(result[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-    }
-    if constexpr (rest > 0)
-    {
-        constexpr UST idx = t_num_rhs - 1;
-        auto          r10 = permute<1, 0, 1, 0>(rhs[idx]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-
-        result[idx] = calc_solution_vectors_2x2(rhs[idx], r10, b0a1, b1a0, det_mat); // NOLINT
-    }
-    return result; // NOLINT(readability-misleading-indentation)
+    return calc_results_2x2(rhs, b0a1, b1a0, det_mat);
 }
 
 
