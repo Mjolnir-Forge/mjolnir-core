@@ -155,14 +155,6 @@ private:
                                  T_RegisterType det_mat) noexcept -> std::array<T_RegisterType, t_num_rhs>;
 
 
-    //! Solver implementation for 2x2 systems with multiple right-hand sides (not vectorized).
-    template <Number T_Type, UST t_num_rhs>
-    [[nodiscard]] static constexpr auto
-    solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                        mat,
-                           const std::array<std::array<T_Type, 2>, t_num_rhs>& rhs) noexcept
-            -> std::array<std::array<T_Type, 2>, t_num_rhs>;
-
-
     //! Solver implementation for 2x2 systems with multiple right-hand sides (single precision registers).
     template <UST t_num_rhs, x86::SinglePrecisionVectorRegister T_RegisterType>
     [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
@@ -175,15 +167,6 @@ private:
     [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
                                                      const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
             -> std::array<T_RegisterType, t_num_rhs>;
-
-
-    //! Solver implementation for 3x3 systems with multiple right-hand sides (not vectorized).
-    template <Number T_Type, UST t_num_rhs>
-    [[nodiscard]] static constexpr auto
-    // NOLINTNEXTLINE(readability-magic-numbers)
-    solve_multiple_rhs_3x3(const std::array<T_Type, 9>&                        mat,
-                           const std::array<std::array<T_Type, 3>, t_num_rhs>& rhs) noexcept
-            -> std::array<std::array<T_Type, 3>, t_num_rhs>;
 
 
     //! Calculates the result for 1 or 2 (__m256) right-hand sides of a 3x3 system. The meaning of the input values can
@@ -209,15 +192,6 @@ private:
     [[nodiscard]] static auto solve_multiple_rhs_3x3(const std::array<__m256d, 3>&         mat,
                                                      const std::array<__m256d, t_num_rhs>& rhs) noexcept
             -> std::array<__m256d, t_num_rhs>;
-
-
-    //! Solver implementation for 4x4 systems with multiple right-hand sides (not vectorized).
-    template <Number T_Type, UST t_num_rhs>
-    [[nodiscard]] static constexpr auto
-    // NOLINTNEXTLINE(readability-magic-numbers)
-    solve_multiple_rhs_4x4(const std::array<T_Type, 16>&                       mat,
-                           const std::array<std::array<T_Type, 4>, t_num_rhs>& rhs) noexcept
-            -> std::array<std::array<T_Type, 4>, t_num_rhs>;
 
 
     //! Solver implementation for 4x4 systems with multiple right-hand sides (vectorized).
@@ -275,14 +249,45 @@ Cramer::solve_multiple_rhs(const std::array<T_Type, t_size * t_size>&           
                            const std::array<std::array<T_Type, t_size>, t_num_rhs>& rhs) noexcept
         -> std::array<std::array<T_Type, t_size>, t_num_rhs>
 {
+    // During development, a separate function for each system size was used. This delivered better benchmark results.
+    // GCC builds were more affected than clang builds. However, the gains for the 2x2 and 3x3 versions were small.
+    // The 4x4 builds suffered a huge performance loss with this generalized version. Because they are already
+    // extremely slow due to cache misses, other solvers should be preferred anyways.
+
     static_assert(4 >= t_size && 1 < t_size, "Only sizes 2-4 are supported.");
 
-    if constexpr (t_size == 2)
-        return solve_multiple_rhs_2x2(mat, rhs);
-    else if constexpr (t_size == 3)
-        return solve_multiple_rhs_3x3(mat, rhs);
-    else if constexpr (t_size == 4)
-        return solve_multiple_rhs_4x4(mat, rhs);
+    // todo: move to determinant header as new function
+    auto determinant = [](const std::array<T_Type, t_size * t_size>& mat) constexpr
+    {
+        if constexpr (t_size == 2)
+            return determinant_2x2(mat);
+        else if constexpr (t_size == 3)
+            return determinant_3x3(mat);
+        else
+            return determinant_4x4(mat);
+    };
+
+
+    T_Type det_mat = determinant(mat);
+
+    std::array<std::array<T_Type, t_size>, t_num_rhs> result = {{{0}}};
+
+    for (UST i = 0; i < t_num_rhs; ++i)
+    {
+        for (UST j = 0; j < t_size; ++j)
+        {
+            std::array<T_Type, t_size* t_size> mat_r = mat;
+
+            UST idx_mat_start = j * t_size;
+            for (UST k = 0; k < t_size; ++k)
+                mat_r[idx_mat_start + k] = rhs[i][k];
+
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
+            result[i][j] = determinant(mat_r) / det_mat;
+        }
+    }
+
+    return result;
 }
 
 
@@ -440,31 +445,6 @@ inline auto Cramer::calc_results_2x2(const std::array<T_RegisterType, t_num_rhs>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <Number T_Type, UST t_num_rhs>
-[[nodiscard]] constexpr auto
-Cramer::solve_multiple_rhs_2x2(const std::array<T_Type, 4>&                        mat,
-                               const std::array<std::array<T_Type, 2>, t_num_rhs>& rhs) noexcept
-        -> std::array<std::array<T_Type, 2>, t_num_rhs>
-{
-    T_Type det_mat = determinant_2x2(mat);
-
-    std::array<std::array<T_Type, 2>, t_num_rhs> result = {{{0}}};
-
-    for (UST i = 0; i < t_num_rhs; ++i)
-    {
-        auto r_0 = std::array<T_Type, 4>{rhs[i][0], rhs[i][1], mat[2], mat[3]}; // NOLINT
-        auto r_1 = std::array<T_Type, 4>{mat[0], mat[1], rhs[i][0], rhs[i][1]}; // NOLINT
-
-        result[i][0] = determinant_2x2(r_0) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[i][1] = determinant_2x2(r_1) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-    }
-
-    return result;
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
 template <UST t_num_rhs, x86::SinglePrecisionVectorRegister T_RegisterType>
 [[nodiscard]] inline auto Cramer::solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
                                                          const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
@@ -518,44 +498,6 @@ template <UST t_num_rhs, x86::DoublePrecisionVectorRegister T_RegisterType>
 
 
     return calc_results_2x2(rhs, b0a1, b1a0, det_mat);
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <Number T_Type, UST t_num_rhs>
-[[nodiscard]] constexpr auto
-// NOLINTNEXTLINE(readability-magic-numbers)
-Cramer::solve_multiple_rhs_3x3(const std::array<T_Type, 9>&                        mat,
-                               const std::array<std::array<T_Type, 3>, t_num_rhs>& rhs) noexcept
-        -> std::array<std::array<T_Type, 3>, t_num_rhs>
-{
-    using MatrixType = std::array<T_Type, 9>; // NOLINT(readability-magic-numbers)
-
-    T_Type det_mat = determinant_3x3(mat);
-
-    std::array<std::array<T_Type, 3>, t_num_rhs> result = {{{0}}};
-
-    for (UST i = 0; i < t_num_rhs; ++i)
-    {
-        // clang-format off
-        auto r_0 = MatrixType{rhs[i][0], rhs[i][1], rhs[i][2],  // NOLINT
-                                 mat[3],    mat[4],    mat[5],  // NOLINT(readability-magic-numbers)
-                                 mat[6],    mat[7],    mat[8]}; // NOLINT(readability-magic-numbers)
-        auto r_1 = MatrixType{   mat[0],    mat[1],    mat[2],
-                              rhs[i][0], rhs[i][1], rhs[i][2],  // NOLINT
-                                 mat[6],    mat[7],    mat[8]}; // NOLINT(readability-magic-numbers)
-        auto r_2 = MatrixType{   mat[0],    mat[1],    mat[2],
-                                 mat[3],    mat[4],    mat[5],  // NOLINT(readability-magic-numbers)
-                              rhs[i][0], rhs[i][1], rhs[i][2]}; // NOLINT
-        // clang-format on
-
-        result[i][0] = determinant_3x3(r_0) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[i][1] = determinant_3x3(r_1) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[i][2] = determinant_3x3(r_2) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-    }
-
-    return result;
 }
 
 
@@ -755,56 +697,6 @@ template <UST t_num_rhs>
         auto dets_r  = mm_fmadd(a_r12, terms_012, sum_1_r);
 
         result[i] = mm_div(dets_r, det_mat); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-    }
-
-    return result;
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <Number T_Type, UST t_num_rhs>
-[[nodiscard]] constexpr auto
-// NOLINTNEXTLINE(readability-magic-numbers)
-Cramer::solve_multiple_rhs_4x4(const std::array<T_Type, 16>&                       mat,
-                               const std::array<std::array<T_Type, 4>, t_num_rhs>& rhs) noexcept
-        -> std::array<std::array<T_Type, 4>, t_num_rhs>
-{
-    using MatrixType = std::array<T_Type, 16>; // NOLINT(readability-magic-numbers)
-
-    T_Type det_mat = determinant_4x4(mat);
-
-    std::array<std::array<T_Type, 4>, t_num_rhs> result = {{{0}}};
-
-    for (UST i = 0; i < t_num_rhs; ++i)
-    {
-        // clang-format off
-        auto r_0 = MatrixType{
-                rhs[i][0], rhs[i][1], rhs[i][2], rhs[i][3],     // NOLINT
-                   mat[4],    mat[5],    mat[6],    mat[7],     // NOLINT(readability-magic-numbers)
-                   mat[8],    mat[9],   mat[10],   mat[11],     // NOLINT(readability-magic-numbers)
-                  mat[12],   mat[13],   mat[14],   mat[15]};    // NOLINT(readability-magic-numbers)
-        auto r_1 = MatrixType{
-                   mat[0],    mat[1],    mat[2],    mat[3],
-                rhs[i][0], rhs[i][1], rhs[i][2], rhs[i][3],     // NOLINT
-                   mat[8],    mat[9],   mat[10],   mat[11],     // NOLINT(readability-magic-numbers)
-                  mat[12],   mat[13],   mat[14],   mat[15]};    // NOLINT(readability-magic-numbers)
-        auto r_2 = MatrixType{
-                   mat[0],    mat[1],    mat[2],    mat[3],
-                   mat[4],    mat[5],    mat[6],    mat[7],     // NOLINT(readability-magic-numbers)
-                rhs[i][0], rhs[i][1], rhs[i][2], rhs[i][3],     // NOLINT
-                  mat[12],   mat[13],   mat[14],   mat[15]};    // NOLINT(readability-magic-numbers)
-        auto r_3 = MatrixType{
-                   mat[0],    mat[1],    mat[2],    mat[3],
-                   mat[4],    mat[5],    mat[6],    mat[7],     // NOLINT(readability-magic-numbers)
-                   mat[8],    mat[9],   mat[10],   mat[11],     // NOLINT(readability-magic-numbers)
-                rhs[i][0], rhs[i][1], rhs[i][2], rhs[i][3]};    // NOLINT
-        // clang-format on
-
-        result[i][0] = determinant_4x4(r_0) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[i][1] = determinant_4x4(r_1) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[i][2] = determinant_4x4(r_2) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        result[i][3] = determinant_4x4(r_3) / det_mat; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     }
 
     return result;
