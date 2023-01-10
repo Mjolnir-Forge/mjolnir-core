@@ -177,19 +177,19 @@ TYPED_TEST(AllocatorTestSuite, std_vector) // NOLINT
 
     COUNT_NEW_AND_DELETE;
 
-    auto allocator = MemorySystemAllocator<F32, TypeParam>(mem);
-    auto vec       = std::vector<F32, MemorySystemAllocator<F32, TypeParam>>(0, allocator);
-    // UST  exp_memory_size = mem.get_free_memory_size();
+    auto allocator       = MemorySystemAllocator<F32, TypeParam>(mem);
+    auto vec             = std::vector<F32, MemorySystemAllocator<F32, TypeParam>>(0, allocator);
+    UST  exp_memory_size = mem.get_free_memory_size();
 
     vec.reserve(1);
     vec.push_back(1.F);
 
-    /*
     exp_memory_size -= sizeof(F32);
 
     EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
     EXPECT_EQ(vec[0], 1.F);
 
+    /*
     vec.reserve(3);
     vec.push_back(2.F); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     vec.push_back(3.F); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
