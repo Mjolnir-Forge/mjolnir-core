@@ -179,10 +179,10 @@ TYPED_TEST(AllocatorTestSuite, std_vector) // NOLINT
 
     auto allocator = MemorySystemAllocator<F32, TypeParam>(mem);
     auto vec       = std::vector<F32, MemorySystemAllocator<F32, TypeParam>>(0, allocator);
-    /*
-    UST exp_memory_size = mem.get_free_memory_size();
+    // UST  exp_memory_size = mem.get_free_memory_size();
 
     vec.reserve(1);
+    /*
     vec.push_back(1.F);
 
     exp_memory_size -= sizeof(F32);
