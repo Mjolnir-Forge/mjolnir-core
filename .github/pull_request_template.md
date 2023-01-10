@@ -17,7 +17,7 @@ Closes # (add issue numbers)
 
 ### Cpp
 
-- [ ] add the following keywords and attributes to functions if it makes sense: 
+- [ ] add the following keywords and attributes to functions if they make sense: 
       `[[nodiscard]]`, `inline`, `constexpr`, `const`, `noexcept`
 
 ### Doxygen
