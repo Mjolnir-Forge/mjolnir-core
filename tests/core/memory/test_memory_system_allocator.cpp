@@ -189,13 +189,13 @@ TYPED_TEST(AllocatorTestSuite, std_vector) // NOLINT
     EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
     EXPECT_EQ(vec[0], 1.F);
 
-    /*
     vec.reserve(3);
     vec.push_back(2.F); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     vec.push_back(3.F); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     exp_memory_size -= 3 * sizeof(F32);
 
     EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
+    /*
     EXPECT_EQ(vec[0], 1.F);
     EXPECT_EQ(vec[1], 2.F);
     EXPECT_EQ(vec[2], 3.F);
