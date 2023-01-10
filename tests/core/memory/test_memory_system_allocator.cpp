@@ -200,8 +200,8 @@ TYPED_TEST(AllocatorTestSuite, std_vector) // NOLINT
     EXPECT_EQ(vec[2], 3.F);
 
     vec.clear();
-    vec.shrink_to_fit();
     /*
+    vec.shrink_to_fit(); <--- This line causes a clang error on github. Investigate!
 
     EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
     */
