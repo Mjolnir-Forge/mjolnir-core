@@ -195,11 +195,11 @@ TYPED_TEST(AllocatorTestSuite, std_vector) // NOLINT
     exp_memory_size -= 3 * sizeof(F32);
 
     EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
-    /*
     EXPECT_EQ(vec[0], 1.F);
     EXPECT_EQ(vec[1], 2.F);
     EXPECT_EQ(vec[2], 3.F);
 
+    /*
     vec.clear();
     vec.shrink_to_fit();
 
