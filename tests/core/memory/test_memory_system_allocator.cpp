@@ -47,7 +47,7 @@ TYPED_TEST(AllocatorTestSuite, constructor) // NOLINT
 
 
 // --- test constructor (other value type) ----------------------------------------------------------------------------
-/*
+
 TYPED_TEST(AllocatorTestSuite, constructor_allocator_other_value_type) // NOLINT
 {
     constexpr UST num_bytes = 1024;
@@ -168,6 +168,7 @@ TYPED_TEST(AllocatorTestSuite, deallocate) // NOLINT
 
 // --- test std::vector -----------------------------------------------------------------------------------------------
 
+/*
 TYPED_TEST(AllocatorTestSuite, std_vector) // NOLINT
 {
     constexpr UST num_bytes = 1024;
@@ -232,7 +233,7 @@ TYPED_TEST(AllocatorTestSuite, std_vector_aligned_object) // NOLINT
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
-
+*/
 
 // --- test std::map --------------------------------------------------------------------------------------------------
 
@@ -330,4 +331,3 @@ TYPED_TEST(AllocatorTestSuite, std_shared_ptr) // NOLINT
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
-*/
