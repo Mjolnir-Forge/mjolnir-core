@@ -182,9 +182,9 @@ TYPED_TEST(AllocatorTestSuite, std_vector) // NOLINT
     // UST  exp_memory_size = mem.get_free_memory_size();
 
     vec.reserve(1);
-    /*
     vec.push_back(1.F);
 
+    /*
     exp_memory_size -= sizeof(F32);
 
     EXPECT_EQ(mem.get_free_memory_size(), exp_memory_size);
