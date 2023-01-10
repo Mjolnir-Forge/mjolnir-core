@@ -168,7 +168,6 @@ TYPED_TEST(AllocatorTestSuite, deallocate) // NOLINT
 
 // --- test std::vector -----------------------------------------------------------------------------------------------
 
-/*
 TYPED_TEST(AllocatorTestSuite, std_vector) // NOLINT
 {
     constexpr UST num_bytes = 1024;
@@ -210,7 +209,6 @@ TYPED_TEST(AllocatorTestSuite, std_vector) // NOLINT
 }
 
 
-*/
 // --- test std::vector with aligned object ---------------------------------------------------------------------------
 
 TYPED_TEST(AllocatorTestSuite, std_vector_aligned_object) // NOLINT
