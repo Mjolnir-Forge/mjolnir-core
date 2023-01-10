@@ -210,6 +210,7 @@ TYPED_TEST(AllocatorTestSuite, std_vector) // NOLINT
 }
 
 
+*/
 // --- test std::vector with aligned object ---------------------------------------------------------------------------
 
 TYPED_TEST(AllocatorTestSuite, std_vector_aligned_object) // NOLINT
@@ -233,7 +234,6 @@ TYPED_TEST(AllocatorTestSuite, std_vector_aligned_object) // NOLINT
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
-*/
 
 // --- test std::map --------------------------------------------------------------------------------------------------
 
