@@ -127,20 +127,13 @@ private:
 
 
 template <typename T_Type, typename T_OtherType, MemorySystem T_MemorySystem>
-constexpr bool operator==(const MemorySystemAllocator<T_Type, T_MemorySystem>&,
-                          const MemorySystemAllocator<T_OtherType, T_MemorySystem>&) noexcept
-{
-    return true;
-}
+[[nodiscard]] constexpr auto operator==(const MemorySystemAllocator<T_Type, T_MemorySystem>&,
+                                        const MemorySystemAllocator<T_OtherType, T_MemorySystem>&) noexcept -> bool;
 
 
 template <typename T_Type, typename T_OtherType, MemorySystem T_MemorySystem>
-constexpr bool operator!=(const MemorySystemAllocator<T_Type, T_MemorySystem>&,
-                          const MemorySystemAllocator<T_OtherType, T_MemorySystem>&) noexcept
-{
-    return false;
-}
-
+[[nodiscard]] constexpr auto operator!=(const MemorySystemAllocator<T_Type, T_MemorySystem>&,
+                                        const MemorySystemAllocator<T_OtherType, T_MemorySystem>&) noexcept -> bool;
 
 //! @}
 } // namespace mjolnir
@@ -208,5 +201,26 @@ template <typename T_Type, MemorySystem T_MemorySystem>
     return m_memory;
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, typename T_OtherType, MemorySystem T_MemorySystem>
+[[nodiscard]] inline constexpr auto operator==(const MemorySystemAllocator<T_Type, T_MemorySystem>&,
+                                               const MemorySystemAllocator<T_OtherType, T_MemorySystem>&) noexcept
+        -> bool
+{
+    return true;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <typename T_Type, typename T_OtherType, MemorySystem T_MemorySystem>
+[[nodiscard]] inline constexpr auto operator!=(const MemorySystemAllocator<T_Type, T_MemorySystem>&,
+                                               const MemorySystemAllocator<T_OtherType, T_MemorySystem>&) noexcept
+        -> bool
+{
+    return false;
+}
 
 } // namespace mjolnir
