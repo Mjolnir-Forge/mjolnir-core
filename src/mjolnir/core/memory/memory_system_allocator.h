@@ -126,6 +126,22 @@ private:
 };
 
 
+template <typename T_Type, typename T_OtherType, MemorySystem T_MemorySystem>
+constexpr bool operator==(const MemorySystemAllocator<T_Type, T_MemorySystem>&,
+                          const MemorySystemAllocator<T_OtherType, T_MemorySystem>&) noexcept
+{
+    return true;
+}
+
+
+template <typename T_Type, typename T_OtherType, MemorySystem T_MemorySystem>
+constexpr bool operator!=(const MemorySystemAllocator<T_Type, T_MemorySystem>&,
+                          const MemorySystemAllocator<T_OtherType, T_MemorySystem>&) noexcept
+{
+    return false;
+}
+
+
 //! @}
 } // namespace mjolnir
 
