@@ -328,3 +328,50 @@ TYPED_TEST(AllocatorTestSuite, std_shared_ptr) // NOLINT
 
     ASSERT_NUM_NEW_AND_DELETE_EQ(0, 0);
 }
+
+
+// --- comparison operators -------------------------------------------------------------------------------------------
+
+TYPED_TEST(AllocatorTestSuite, comparison_operators) // NOLINT
+{
+    constexpr UST num_bytes = 1024;
+
+    auto mem_0 = TypeParam();
+    auto mem_1 = TypeParam();
+
+    mem_0.initialize(num_bytes);
+    mem_1.initialize(num_bytes);
+
+    COUNT_NEW_AND_DELETE;
+
+    // Create allocator instances
+    auto allocator_float_0_mem_0 = MemorySystemAllocator<F32, TypeParam>(mem_0);
+    auto allocator_float_1_mem_0 = MemorySystemAllocator<F32, TypeParam>(mem_0);
+    auto allocator_int_mem_0     = MemorySystemAllocator<I32, TypeParam>(mem_0);
+    auto allocator_float_0_mem_1 = MemorySystemAllocator<F32, TypeParam>(mem_1);
+
+    // same allocator instances
+    EXPECT_TRUE(allocator_float_0_mem_0 == allocator_float_0_mem_0);
+    EXPECT_FALSE(allocator_float_0_mem_0 != allocator_float_0_mem_0);
+
+    // different allocator instances of same type and memory system
+    EXPECT_TRUE(allocator_float_0_mem_0 == allocator_float_1_mem_0);
+    EXPECT_FALSE(allocator_float_0_mem_0 != allocator_float_1_mem_0);
+
+    // different types, same memory system instance
+    EXPECT_TRUE(allocator_float_0_mem_0 == allocator_int_mem_0);
+    EXPECT_FALSE(allocator_float_0_mem_0 != allocator_int_mem_0);
+    EXPECT_TRUE(allocator_float_0_mem_0 == allocator_float_0_mem_0.template as_type<U8>());
+    EXPECT_FALSE(allocator_float_0_mem_0 != allocator_float_0_mem_0.template as_type<U8>());
+
+    // same types, different memory system instance
+    EXPECT_FALSE(allocator_float_0_mem_0 == allocator_float_0_mem_1);
+    EXPECT_TRUE(allocator_float_0_mem_0 != allocator_float_0_mem_1);
+
+    // different types, different memory system instance
+    EXPECT_FALSE(allocator_float_0_mem_1 == allocator_int_mem_0);
+    EXPECT_TRUE(allocator_float_0_mem_1 != allocator_int_mem_0);
+
+
+    //! todo: test comparison of different memory system types (as soon as there are more memory systems available)
+}
