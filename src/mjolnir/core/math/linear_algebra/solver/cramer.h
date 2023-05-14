@@ -2,7 +2,7 @@
 //! math/linear_algebra/solver/cramer.h
 //!
 //! @brief
-//! Solvers based on cramers rule for dense matrices of different size.
+//! Solvers based on Cramer's rule for dense matrices of different size.
 
 
 #pragma once
@@ -30,6 +30,7 @@ namespace mjolnir
 //! Provides multiple methods to solve linear systems using Cramer's Rule.
 class Cramer
 {
+    // --- public methods ---------------------------------------------------------------------------------------------
 public:
     //! @brief
     //! Solve a linear system of equations.
@@ -119,35 +120,121 @@ public:
             -> std::array<T_RegisterType, t_num_rhs>;
 
 
+    // --- private methods --------------------------------------------------------------------------------------------
 private:
-    //! Calculates one or more result vectors for 2x2 systems
+    //! @brief
+    //! Calculates up to 4 (`__m256`) result vectors of a 2x2 system.
+    //!
+    //! @details
+    //! The result vectors are stored sequentially inside the returned register
+    //!
+    //! @tparam T_RegisterType:
+    //! The register type
+    //!
+    //! @param[in] r01:
+    //! Register that contains the unmodified right-hand side vectors in sequential order.
+    //! @param[in] r10:
+    //! Register that contains the permuted right-hand side vectors (second value before first value) in sequential
+    //! order.
+    //! @param[in] b0a1:
+    //! Register containing one or multiple sequences (depending on size) of the matrix's first value from the second
+    //! column and the second value from the first column.
+    //! @param[in] b1a0:
+    //! Register containing one or multiple sequences (depending on size) of the matrix's second value from the second
+    //! column and the first value from the first column.
+    //! @param[in] det_mat:
+    //! Register with all values set to the matrix's determinant
+    //!
+    //! @return
+    //! Register containing the result vectors.
     template <x86::FloatVectorRegister T_RegisterType>
     [[nodiscard]] static auto calc_result_vectors_2x2(T_RegisterType r01,
                                                       T_RegisterType r10,
                                                       T_RegisterType b0a1,
                                                       T_RegisterType b1a0,
-                                                      T_RegisterType det_mat) noexcept;
+                                                      T_RegisterType det_mat) noexcept -> T_RegisterType;
 
-    //! Calculate one or more results and write it to the result array (single-precision)
+
+    //! Write the 2x2 results to the first `t_num_updates` entries of the result vector array starting at index `index`.
+    //!
+    //! @tparam t_num_updates:
+    //! Number of entries that should be updated
+    //! @tparam T_RegisterType:
+    //! The register type
+    //! @tparam t_num_rhs:
+    //! Number of right-hand side vectors
+    //!
+    //! @param[in,out] result:
+    //! Array of result vectors that should be updated
+    //! @param[in] rhs:
+    //! Array of right-hand sides
+    //! @param[in] b0a1:
+    //! Register containing one or multiple sequences (depending on size) of the matrix's first value from the second
+    //! column and the second value from the first column.
+    //! @param[in] b1a0:
+    //! Register containing one or multiple sequences (depending on size) of the matrix's second value from the second
+    //! column and the first value from the first column.
+    //! @param[in] det_mat:
+    //! Register with all values set to the matrix's determinant
+    //! @param[in] index:
+    //! Index of the first entry that should be modified
     template <UST t_num_updates, x86::SinglePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
-    static void update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
+    static auto update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
                                    const std::array<T_RegisterType, t_num_rhs>& rhs,
                                    T_RegisterType                               b0a1,
                                    T_RegisterType                               b1a0,
                                    T_RegisterType                               det_mat,
-                                   [[maybe_unused]] UST                         index = 0) noexcept;
+                                   [[maybe_unused]] UST                         index = 0) noexcept -> void;
 
-    //! Calculate one or more results and write it to the result array (double-precision)
+
+    //! Write the 2x2 results to the first `t_num_updates` entries of the result vector array starting at index `index`.
+    //!
+    //! @tparam t_num_updates:
+    //! Number of entries that should be updated
+    //! @tparam T_RegisterType:
+    //! The register type
+    //! @tparam t_num_rhs:
+    //! Number of right-hand side vectors
+    //!
+    //! @param[in,out] result:
+    //! Array of result vectors that should be updated
+    //! @param[in] rhs:
+    //! Array of right-hand sides
+    //! @param[in] b0a1:
+    //! Register containing one or multiple sequences (depending on size) of the matrix's first value from the second
+    //! column and the second value from the first column.
+    //! @param[in] b1a0:
+    //! Register containing one or multiple sequences (depending on size) of the matrix's second value from the second
+    //! column and the first value from the first column.
+    //! @param[in] det_mat:
+    //! Register with all values set to the matrix's determinant
+    //! @param[in] index:
+    //! Index of the first entry that should be modified
     template <UST t_num_updates, x86::DoublePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
-    static void update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
+    static auto update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
                                    const std::array<T_RegisterType, t_num_rhs>& rhs,
                                    T_RegisterType                               b0a1,
                                    T_RegisterType                               b1a0,
                                    T_RegisterType                               det_mat,
-                                   [[maybe_unused]] UST                         index = 0) noexcept;
+                                   [[maybe_unused]] UST                         index = 0) noexcept -> void;
 
 
-    //! Calculte all results
+    //! @brief
+    //! Calculate all result vectors from pre-calculated values.
+    //!
+    //! @param[in] rhs:
+    //! Array of right-hand side vectors
+    //! @param[in] b0a1:
+    //! Register containing one or multiple sequences (depending on size) of the matrix's first value from the second
+    //! column and the second value from the first column.
+    //! @param[in] b1a0:
+    //! Register containing one or multiple sequences (depending on size) of the matrix's second value from the second
+    //! column and the first value from the first column.
+    //! @param[in] det_mat:
+    //! Register with all values set to the matrix's determinant
+    //!
+    //! @return
+    //! Array of result vectors
     template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
     static auto calc_results_2x2(const std::array<T_RegisterType, t_num_rhs>& rhs,
                                  T_RegisterType                               b0a1,
@@ -155,53 +242,155 @@ private:
                                  T_RegisterType det_mat) noexcept -> std::array<T_RegisterType, t_num_rhs>;
 
 
-    //! Solver implementation for 2x2 systems with multiple right-hand sides (single precision registers).
+    //! @brief
+    //! Multiple right-hand side solver implementation for 2x2 systems consisting of `__m128` or `__m256` registers.
+    //!
+    //! @tparam t_num_rhs:
+    //! Number of right-hand side vectors
+    //! @tparam T_RegisterType:
+    //! The register type
+    //!
+    //! @param[in] mat:
+    //! The matrix
+    //! @param[in] rhs:
+    //! Array of right-hand side vectors
+    //!
+    //! @return
+    //! Array of result vectors
     template <UST t_num_rhs, x86::SinglePrecisionVectorRegister T_RegisterType>
     [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
                                                      const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
             -> std::array<T_RegisterType, t_num_rhs>;
 
 
-    //! Solver implementation for 2x2 systems with multiple right-hand sides (double precision registers).
+    //! @brief
+    //! Multiple right-hand side solver implementation for 2x2 systems consisting of `__m128d` or `__m256d` registers.
+    //!
+    //! @tparam t_num_rhs:
+    //! Number of right-hand side vectors
+    //! @tparam T_RegisterType:
+    //! The register type
+    //!
+    //! @param[in] mat:
+    //! The matrix
+    //! @param[in] rhs:
+    //! Array of right-hand side vectors
+    //!
+    //! @return
+    //! Array of result vectors
     template <UST t_num_rhs, x86::DoublePrecisionVectorRegister T_RegisterType>
     [[nodiscard]] static auto solve_multiple_rhs_2x2(const std::array<T_RegisterType, 2>&         mat,
                                                      const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
             -> std::array<T_RegisterType, t_num_rhs>;
 
 
-    //! Calculates the result for 1 or 2 (__m256) right-hand sides of a 3x3 system. The meaning of the input values can
-    //! be found in the code of `solve_multiple_rhs_3x3`.
+    //! @brief
+    //! Calculate 1 (`__m128`) or 2 (`__m256`) result vectors of a 3x3 system.
+    //!
+    //! @details
+    //! In case of the `__m256` register, the second result vector is stored in the second register lane
+    //!
+    //! @tparam T_RegisterType:
+    //! The register type
+    //!
+    //! @param[in] mat:
+    //! The original matrix
+    //! @param[in] mat_120:
+    //! Matrix with permuted register values (permutation index order 1, 2, 0)
+    //! @param[in] rhs:
+    //! The right-hand side vector(s)
+    //! @param[in] a_201:
+    //! Permuted first column of the matrix (permutation index order 2, 0, 1)
+    //! @param[in] cross_bc_201:
+    //! Permuted cross product of the second and last matrix column (permutation index order 2, 0, 1)
+    //! @param[in] det_mat:
+    //! Register with all values set to the matrix's determinant
+    //!
+    //! @return
+    //! Register with result vector(s)
     template <x86::FloatVectorRegister T_RegisterType>
     [[nodiscard]] static auto calculate_result_3x3(const std::array<T_RegisterType, 3>& mat,
                                                    const std::array<T_RegisterType, 3>& mat_120,
                                                    T_RegisterType                       rhs,
                                                    T_RegisterType                       a_201,
                                                    T_RegisterType                       cross_bc_201,
-                                                   T_RegisterType                       det_mat) noexcept;
+                                                   T_RegisterType det_mat) noexcept -> T_RegisterType;
 
 
-    //! Solver implementation for 3x3 systems with multiple right-hand sides (vectorized).
-    template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
+    //! @brief
+    //! Multiple right-hand side solver implementation for 3x3 systems consisting of `__m128` or `__m256` registers.
+    //!
+    //! @tparam T_RegisterType:
+    //! The register type
+    //! @tparam t_num_rhs:
+    //! Number of right-hand side vectors
+    //!
+    //! @param[in] mat:
+    //! The matrix
+    //! @param[in] rhs:
+    //! Array of right-hand side vectors
+    //!
+    //! @return
+    //! Array of result vectors
+    template <x86::SinglePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
     [[nodiscard]] static auto solve_multiple_rhs_3x3(const std::array<T_RegisterType, 3>&         mat,
                                                      const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
             -> std::array<T_RegisterType, t_num_rhs>;
 
 
-    //! Solver implementation for 3x3 systems with multiple right-hand sides (__m256d).
+    //! @brief
+    //! Multiple right-hand side solver implementation for 3x3 systems consisting of `__m256d` registers.
+    //!
+    //! @tparam t_num_rhs:
+    //! Number of right-hand side vectors
+    //!
+    //! @param[in] mat:
+    //! The matrix
+    //! @param[in] rhs:
+    //! Array of right-hand side vectors
+    //!
+    //! @return
+    //! Array of result vectors
     template <UST t_num_rhs>
     [[nodiscard]] static auto solve_multiple_rhs_3x3(const std::array<__m256d, 3>&         mat,
                                                      const std::array<__m256d, t_num_rhs>& rhs) noexcept
             -> std::array<__m256d, t_num_rhs>;
 
 
-    //! Solver implementation for 4x4 systems with multiple right-hand sides (vectorized).
+    //! @brief
+    //! Multiple right-hand side solver implementation for 4x4 systems consisting of `__m128` or `__m256d` registers.
+    //!
+    //! @tparam T_RegisterType:
+    //! The register type
+    //! @tparam t_num_rhs:
+    //! Number of right-hand side vectors
+    //!
+    //! @param[in] mat:
+    //! The matrix
+    //! @param[in] rhs:
+    //! Array of right-hand side vectors
+    //!
+    //! @return
+    //! Array of result vectors
     template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
     [[nodiscard]] static auto solve_multiple_rhs_4x4(const std::array<T_RegisterType, 4>&         mat,
                                                      const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
             -> std::array<T_RegisterType, t_num_rhs>;
 
 
-    //! Solver implementation for 4x4 systems with multiple right-hand sides (__m256).
+    //! @brief
+    //! Multiple right-hand side solver implementation for 4x4 systems consisting of `__m256` registers.
+    //!
+    //! @tparam t_num_rhs:
+    //! Number of right-hand side vectors
+    //!
+    //! @param[in] mat:
+    //! The matrix
+    //! @param[in] rhs:
+    //! Array of right-hand side vectors
+    //!
+    //! @return
+    //! Array of result vectors
     template <UST t_num_rhs>
     [[nodiscard]] static auto solve_multiple_rhs_4x4(const std::array<__m256, 4>&         mat,
                                                      const std::array<__m256, t_num_rhs>& rhs) noexcept
@@ -216,6 +405,8 @@ private:
 
 namespace mjolnir
 {
+
+
 template <Number T_Type, UST t_size>
 [[nodiscard]] constexpr auto Cramer::solve(const std::array<T_Type, t_size * t_size>& mat,
                                            const std::array<T_Type, t_size>& rhs) noexcept -> std::array<T_Type, t_size>
@@ -318,7 +509,7 @@ template <x86::FloatVectorRegister T_RegisterType>
                                                    T_RegisterType r10,
                                                    T_RegisterType b0a1,
                                                    T_RegisterType b1a0,
-                                                   T_RegisterType det_mat) noexcept
+                                                   T_RegisterType det_mat) noexcept -> T_RegisterType
 {
     using namespace x86;
 
@@ -331,12 +522,12 @@ template <x86::FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_num_updates, x86::SinglePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
-inline void Cramer::update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
+inline auto Cramer::update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
                                        const std::array<T_RegisterType, t_num_rhs>& rhs,
                                        T_RegisterType                               b0a1,
                                        T_RegisterType                               b1a0,
                                        T_RegisterType                               det_mat,
-                                       [[maybe_unused]] UST                         index) noexcept
+                                       [[maybe_unused]] UST                         index) noexcept -> void
 {
     using namespace x86;
     constexpr UST max_num_results = num_elements<T_RegisterType> / 2;
@@ -388,12 +579,12 @@ inline void Cramer::update_results_2x2(std::array<T_RegisterType, t_num_rhs>&   
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_num_updates, x86::DoublePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
-inline void Cramer::update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
+inline auto Cramer::update_results_2x2(std::array<T_RegisterType, t_num_rhs>&       result,
                                        const std::array<T_RegisterType, t_num_rhs>& rhs,
                                        T_RegisterType                               b0a1,
                                        T_RegisterType                               b1a0,
                                        T_RegisterType                               det_mat,
-                                       [[maybe_unused]] UST                         index) noexcept
+                                       [[maybe_unused]] UST                         index) noexcept -> void
 {
     using namespace x86;
     constexpr UST max_num_results = num_elements<T_RegisterType> / 2;
@@ -503,7 +694,54 @@ template <UST t_num_rhs, x86::DoublePrecisionVectorRegister T_RegisterType>
 
 // --------------------------------------------------------------------------------------------------------------------
 
-template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
+template <x86::FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto Cramer::calculate_result_3x3(const std::array<T_RegisterType, 3>& mat,
+                                                       const std::array<T_RegisterType, 3>& mat_120,
+                                                       T_RegisterType                       rhs,
+                                                       T_RegisterType                       a_201,
+                                                       T_RegisterType                       cross_bc_201,
+                                                       T_RegisterType det_mat) noexcept -> T_RegisterType
+{
+    using namespace x86;
+
+    // create all necessary permutations
+    auto r_120 = permute<1, 2, 0, 3>(rhs);
+    auto r_201 = permute<2, 0, 1, 3>(rhs);
+
+    auto a_r12 = blend_per_lane_at<0>(mat[0], rhs);
+    auto a_r20 = blend_per_lane_at<0>(mat_120[0], r_120);
+    auto a_r01 = blend_per_lane_at<0>(a_201, r_201);
+
+
+    // calculate all necessary cross product components
+    auto prod_rc = mm_mul(r_120, mat[2]);
+    auto prod_br = mm_mul(mat_120[1], rhs);
+
+    auto cross_rc_201 = mm_fmsub(rhs, mat_120[2], prod_rc);
+    auto cross_br_201 = mm_fmsub(mat[1], r_120, prod_br);
+
+
+    // shuffle all cross product terms as needed
+    auto tmp_shf_cross_0 = shuffle<1, 2, 2, 0>(cross_bc_201, cross_rc_201);
+    auto tmp_shf_cross_1 = shuffle<0, 0, 1, 0>(cross_bc_201, cross_rc_201);
+
+    auto terms_012 = shuffle<0, 2, 0, 0>(tmp_shf_cross_0, cross_br_201);
+    auto terms_120 = shuffle<1, 3, 1, 0>(tmp_shf_cross_0, cross_br_201);
+    auto terms_201 = shuffle<0, 2, 2, 0>(tmp_shf_cross_1, cross_br_201);
+
+
+    // calculate all necessary determinants
+    auto sum_0_r = mm_mul(a_r12, terms_012);
+    auto sum_1_r = mm_fmadd(a_r20, terms_120, sum_0_r);
+    auto dets_r  = mm_fmadd(a_r01, terms_201, sum_1_r);
+
+    return mm_div(dets_r, det_mat);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <x86::SinglePrecisionVectorRegister T_RegisterType, UST t_num_rhs>
 [[nodiscard]] inline auto Cramer::solve_multiple_rhs_3x3(const std::array<T_RegisterType, 3>&         mat,
                                                          const std::array<T_RegisterType, t_num_rhs>& rhs) noexcept
         -> std::array<T_RegisterType, t_num_rhs>
@@ -575,53 +813,6 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
 
 
     return result;
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-
-template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto Cramer::calculate_result_3x3(const std::array<T_RegisterType, 3>& mat,
-                                                       const std::array<T_RegisterType, 3>& mat_120,
-                                                       T_RegisterType                       rhs,
-                                                       T_RegisterType                       a_201,
-                                                       T_RegisterType                       cross_bc_201,
-                                                       T_RegisterType                       det_mat) noexcept
-{
-    using namespace x86;
-
-    // create all necessary permutations
-    auto r_120 = permute<1, 2, 0, 3>(rhs);
-    auto r_201 = permute<2, 0, 1, 3>(rhs);
-
-    auto a_r12 = blend_per_lane_at<0>(mat[0], rhs);
-    auto a_r20 = blend_per_lane_at<0>(mat_120[0], r_120);
-    auto a_r01 = blend_per_lane_at<0>(a_201, r_201);
-
-
-    // calculate all necessary cross product components
-    auto prod_rc = mm_mul(r_120, mat[2]);
-    auto prod_br = mm_mul(mat_120[1], rhs);
-
-    auto cross_rc_201 = mm_fmsub(rhs, mat_120[2], prod_rc);
-    auto cross_br_201 = mm_fmsub(mat[1], r_120, prod_br);
-
-
-    // shuffle all cross product terms as needed
-    auto tmp_shf_cross_0 = shuffle<1, 2, 2, 0>(cross_bc_201, cross_rc_201);
-    auto tmp_shf_cross_1 = shuffle<0, 0, 1, 0>(cross_bc_201, cross_rc_201);
-
-    auto terms_012 = shuffle<0, 2, 0, 0>(tmp_shf_cross_0, cross_br_201);
-    auto terms_120 = shuffle<1, 3, 1, 0>(tmp_shf_cross_0, cross_br_201);
-    auto terms_201 = shuffle<0, 2, 2, 0>(tmp_shf_cross_1, cross_br_201);
-
-
-    // calculate all necessary determinants
-    auto sum_0_r = mm_mul(a_r12, terms_012);
-    auto sum_1_r = mm_fmadd(a_r20, terms_120, sum_0_r);
-    auto dets_r  = mm_fmadd(a_r01, terms_201, sum_1_r);
-
-    return mm_div(dets_r, det_mat);
 }
 
 
@@ -743,7 +934,7 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
     auto products_45_abcd = mm_mul(abcd_45, abcd_45_3210);
     auto products_03_abcd = mm_mul(ab_03, cd_03_2301_neg);
 
-    // set redundant elements to zero and and add both products
+    // set redundant elements to zero and add both products
     products_45_abcd = blend<0, 0, 1, 1>(products_45_abcd, mm_setzero<T_RegisterType>());
 
     auto tmp_sum_abcd = mm_add(products_03_abcd, products_45_abcd);
@@ -815,7 +1006,7 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
         auto products_03_abrd = mm_mul(ab_03, rd_03_2301_neg);
         auto products_03_abcr = mm_mul(ab_03, cr_03_2301_neg);
 
-        // set redundant elements to zero and and add both products
+        // set redundant elements to zero and add both products
         products_45_rbcd = blend<0, 0, 1, 1>(products_45_rbcd, mm_setzero<T_RegisterType>());
         products_45_arcd = blend<0, 0, 1, 1>(products_45_arcd, mm_setzero<T_RegisterType>());
         products_45_abrd = blend<0, 0, 1, 1>(products_45_abrd, mm_setzero<T_RegisterType>());
@@ -835,7 +1026,7 @@ template <x86::FloatVectorRegister T_RegisterType, UST t_num_rhs>
         T_RegisterType out_2 = {0};
         T_RegisterType out_3 = {0};
 
-        // todo: Replace this branch with 4x4 matrix transpositon once it is implemented
+        // todo: Replace this branch with 4x4 matrix transposition once it is implemented
         if constexpr (is_m128<T_RegisterType>)
         {
             auto tmp_0 = shuffle<0, 1, 0, 1>(tmp_sum_rbcd, tmp_sum_arcd);
