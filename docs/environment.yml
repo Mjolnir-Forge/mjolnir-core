@@ -6,3 +6,5 @@ dependencies:
   - python=3.8
   - doxygen=1.9.1
   - graphviz
+  - pydata-sphinx-theme
+  - myst-parser

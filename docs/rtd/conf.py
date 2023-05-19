@@ -31,8 +31,13 @@ author = "Mjolnir-Forge"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "myst_parser",
+    "sphinx.ext.mathjax",
     #    "breathe",
 ]
+
+
+myst_enable_extensions = ["dollarmath", "amsmath"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = []
@@ -48,7 +53,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "pydata_sphinx_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -63,16 +68,21 @@ html_static_path = []
 # read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
 
-wd = os.getcwd()
-os.chdir("../..")
+# wd = os.getcwd()
+# os.chdir("../..")
 
-subprocess.run(["doxygen", "-v"])  # nosec
-r = subprocess.run(["doxygen", ".doxyfile"])  # nosec
-if r.returncode:
-    raise RuntimeError("The doxygen build failed")
+# subprocess.run(["doxygen", "-v"])  # nosec
+# r = subprocess.run(["doxygen", ".doxyfile"])  # nosec
+# if r.returncode:
+#    raise RuntimeError("The doxygen build failed")
 
-os.chdir(wd)
+# os.chdir(wd)
 
-html_extra_path = ["../build/html"]
+# html_extra_path = ["../build/html"]
 
 # sphinx-build source build_sphinx -b html
+# source_suffix = {
+#    ".rst": "restructuredtext",
+# }
+
+source_suffix = [".rst", ".md"]
