@@ -4,8 +4,13 @@ version: 2
 
 # available images:
 # https://github.com/readthedocs/readthedocs-docker-images
+# build:
+#  image: latest
+
 build:
-  image: latest
+  os: ubuntu-20.04  # <- add this line
+  tools:
+    python: "3.10"
 
 # Build from the docs/ directory with Sphinx
 sphinx:
@@ -15,6 +20,6 @@ conda:
   environment: docs/environment.yml
 
 # Explicitly set the version of Python and its requirements
-python:
-  version: 3.8
+#python:
+#  version: 3.8
 
