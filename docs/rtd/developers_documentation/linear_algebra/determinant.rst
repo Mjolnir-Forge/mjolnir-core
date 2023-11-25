@@ -20,22 +20,10 @@ A good tutorial about determinants can be found `here`_.
 .. _here: https://www.youtube.com/watch?v=Ip3X9LOh2dk&t=13s
 
 
-Properties
-----------
-
-.. math::
-
-    \mathrm{det} \left( \mathbf{A} \right)
-    =
-    \mathrm{det} \left( \mathbf{A^T} \right)
 
 
-.. math::
 
-    \mathrm{det} \left( \mathbf{AB} \right)
-    =
-    \mathrm{det} \left( \mathbf{A} \right) \cdot
-    \mathrm{det} \left( \mathbf{B} \right)
+
 
 
 
@@ -157,4 +145,45 @@ This can be rearranged to the following equation:
     &+ \left( {a_0b_2 - a_2b_0} \right) \left( {c_3d_1 - c_1d_3} \right) \\
     &+ \left( {a_1b_3 - a_3b_1} \right) \left( {c_2d_0 - c_0d_2} \right)
     \end{matrix}
+
+
+
+
+Graphical explanation:
+----------------------
+
+A matrix represents transformation between two coordinate systems.
+Its columns are the coordinate axis vectors of the current system inside the system the matrix transforms to.
+
+.. plot::
+
+   import matplotlib.pyplot as plt
+   import numpy as np
+
+   plt.arrow(0, 0, 2, 0, length_includes_head=True, head_width=0.08, head_length=0.2, color="g")
+   plt.arrow(0, 0, 1, 3, length_includes_head=True, head_width=0.08, head_length=0.2, color="r")
+   plt.xlim([-1, 3])
+   plt.ylim([-1, 3])
+   plt.grid()
+
+
+Properties
+----------
+
+.. math::
+
+    \mathrm{det} \left( \mathbf{A} \right)
+    =
+    \mathrm{det} \left( \mathbf{A^T} \right)
+
+
+.. math::
+
+    \mathrm{det} \left( \mathbf{AB} \right)
+    =
+    \mathrm{det} \left( \mathbf{A} \right) \cdot
+    \mathrm{det} \left( \mathbf{B} \right)
+
+
+
 
