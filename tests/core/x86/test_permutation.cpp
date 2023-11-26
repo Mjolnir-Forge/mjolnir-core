@@ -219,6 +219,30 @@ TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_blend_from_to) // NOLINT
 }
 
 
+// --- test_blend_per_lane_at -----------------------------------------------------------------------------------------
+
+template <typename T_RegisterType, UST t_index>
+void test_blend_per_lane_at_test_case(T_RegisterType a, T_RegisterType b)
+{
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+    constexpr UST n_e  = num_elements<T_RegisterType>;
+
+    T_RegisterType c = blend_per_lane_at<t_index>(a, b);
+
+    for (UST i = 0; i < n_e; ++i)
+    {
+        auto exp = ((i % n_le) == t_index) ? get(b, i) : get(a, i);
+        EXPECT_DOUBLE_EQ(get(c, i), exp);
+    }
+}
+
+
+TYPED_TEST(FloatingPointVectorRegisterTestSuite, test_blend_per_lane_at) // NOLINT
+{
+    TYPED_TEST_SERIES(test_blend_per_lane_at_test_case, num_lane_elements<TypeParam>);
+}
+
+
 // --- test broadcast -------------------------------------------------------------------------------------------------
 
 template <typename T_RegisterType, UST t_test_case_index>

@@ -1,6 +1,6 @@
 # mjolnir-core
 
-Consists core functionalities that are used by all other modules
+Contains core functionalities that are used by all other modules
 
 ## Status
 

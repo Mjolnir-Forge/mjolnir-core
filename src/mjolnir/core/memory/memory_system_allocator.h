@@ -126,6 +126,62 @@ private:
 };
 
 
+//! @brief
+//! Comparison operator `==` for two `MemorySystemAllocator` instances.
+//!
+//! @details
+//! The function returns `true` if both allocators use the same memory system instance and `false` otherwise.
+//!
+//! @tparam T_TypeLHS:
+//! Value type of the allocator on the operators left-hand side.
+//! @tparam T_TypeRHS:
+//! Value type of the allocator on the operators right-hand side.
+//! @tparam T_MemorySystemLHS:
+//! The memory system type of the allocator on the operators left-hand side.
+//! @tparam T_MemorySystemRHS:
+//! The memory system type of the allocator on the operators right-hand side.
+//!
+//! @param[in] lhs:
+//! Allocator on the left-hand side of the operator
+//! @param[in] rhs:
+//! Allocator on the right-hand side of the operator
+//!
+//! @return
+//! `true` or `false`
+template <typename T_TypeLHS, typename T_TypeRHS, MemorySystem T_MemorySystemLHS, MemorySystem T_MemorySystemRHS>
+[[nodiscard]] constexpr auto
+operator==([[maybe_unused]] const MemorySystemAllocator<T_TypeLHS, T_MemorySystemLHS>& lhs,
+           [[maybe_unused]] const MemorySystemAllocator<T_TypeRHS, T_MemorySystemRHS>& rhs) noexcept -> bool;
+
+
+//! @brief
+//! Comparison operator `!=` for two `MemorySystemAllocator` instances.
+//!
+//! @details
+//! The function returns `false` if both allocators use the same memory system instance and `true` otherwise.
+//!
+//! @tparam T_TypeLHS:
+//! Value type of the allocator on the operators left-hand side.
+//! @tparam T_TypeRHS:
+//! Value type of the allocator on the operators right-hand side.
+//! @tparam T_MemorySystemLHS:
+//! The memory system type of the allocator on the operators left-hand side.
+//! @tparam T_MemorySystemRHS:
+//! The memory system type of the allocator on the operators right-hand side.
+//!
+//! @param[in] lhs:
+//! Allocator on the left-hand side of the operator
+//! @param[in] rhs:
+//! Allocator on the right-hand side of the operator
+//!
+//! @return
+//! `true` or `false`
+template <typename T_TypeLHS, typename T_TypeRHS, MemorySystem T_MemorySystemLHS, MemorySystem T_MemorySystemRHS>
+[[nodiscard]] constexpr auto
+operator!=([[maybe_unused]] const MemorySystemAllocator<T_TypeLHS, T_MemorySystemLHS>& lhs,
+           [[maybe_unused]] const MemorySystemAllocator<T_TypeRHS, T_MemorySystemRHS>& rhs) noexcept -> bool;
+
+
 //! @}
 } // namespace mjolnir
 
@@ -192,5 +248,31 @@ template <typename T_Type, MemorySystem T_MemorySystem>
     return m_memory;
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+
+template <typename T_TypeLHS, typename T_TypeRHS, MemorySystem T_MemorySystemLHS, MemorySystem T_MemorySystemRHS>
+[[nodiscard]] constexpr auto
+operator==([[maybe_unused]] const MemorySystemAllocator<T_TypeLHS, T_MemorySystemLHS>& lhs,
+           [[maybe_unused]] const MemorySystemAllocator<T_TypeRHS, T_MemorySystemRHS>& rhs) noexcept -> bool
+{
+    if constexpr (std::is_same_v<T_MemorySystemLHS, T_MemorySystemRHS>)
+        return &(lhs.get_memory_system()) == &(rhs.get_memory_system());
+    else
+        return false;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+
+template <typename T_TypeLHS, typename T_TypeRHS, MemorySystem T_MemorySystemLHS, MemorySystem T_MemorySystemRHS>
+[[nodiscard]] constexpr auto
+operator!=([[maybe_unused]] const MemorySystemAllocator<T_TypeLHS, T_MemorySystemLHS>& lhs,
+           [[maybe_unused]] const MemorySystemAllocator<T_TypeRHS, T_MemorySystemRHS>& rhs) noexcept -> bool
+{
+    return ! (lhs == rhs);
+}
 
 } // namespace mjolnir

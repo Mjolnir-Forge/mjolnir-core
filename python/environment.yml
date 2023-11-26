@@ -7,8 +7,10 @@ dependencies:
   - black
   - flake8
   - isort
+  - myst-parser
   - pydocstyle
   - pyyaml
   - pip
+  - pydata-sphinx-theme
   - pip:
     - cmakelang

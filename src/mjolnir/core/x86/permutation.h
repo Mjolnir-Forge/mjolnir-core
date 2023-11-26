@@ -143,6 +143,25 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
 
 
 //! @brief
+//! Get a new register where the elements with lane index `t_index` are taken from `src_1` and the rest from `src_0`
+//!
+//! @tparam t_index:
+//! Index that specifies the index of the lane element that is taken from `src_1`
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] src_0:
+//! First source register
+//! @param[in] src_1:
+//! Second source register
+//!
+//! @return
+//! New register with blended values
+template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto blend_per_lane_at(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Broadcast a register element per lane selected by `t_index`.
 //!
 //! @details
@@ -556,6 +575,29 @@ template <UST t_index_first, UST t_index_last, FloatVectorRegister T_RegisterTyp
     }
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <UST t_index, FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto blend_per_lane_at(T_RegisterType src_0, T_RegisterType src_1) noexcept -> T_RegisterType
+{
+    constexpr UST n_l  = num_lanes<T_RegisterType>;
+    constexpr UST n_le = num_lane_elements<T_RegisterType>;
+
+    static_assert(t_index < n_le, "`t_index` exceeds number of lane elements.");
+
+
+    constexpr auto get_mask = [](UST index)
+    {
+        UST mask = 0;
+        for (UST i = 0; i < n_l; ++i)
+            set_bit(mask, index + i * n_le);
+        return mask;
+    };
+    return mm_blend<get_mask(t_index)>(src_0, src_1);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 
 template <UST t_index, FloatVectorRegister T_RegisterType>
@@ -823,11 +865,11 @@ template <UST t_idx_0, UST t_idx_1, FloatVectorRegister T_RegisterType>
         for (UST i = 0; i < n_e; ++i)
         {
             if (t_idx_0 == i)
-                a[i] = t_idx_1 % n_le;
+                a[i] = t_idx_1 % n_le; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             else if (t_idx_1 == i)
-                a[i] = t_idx_0 % n_le;
+                a[i] = t_idx_0 % n_le; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             else
-                a[i] = i % n_le;
+                a[i] = i % n_le; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         }
         return a;
     };
