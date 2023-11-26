@@ -58,6 +58,12 @@ templates_path = []
 exclude_patterns = []
 
 
+# -- plot directive options --------------------------------------------------
+
+plot_html_show_formats = False
+plot_html_show_source_link = False
+
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
