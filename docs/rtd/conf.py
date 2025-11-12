@@ -4,6 +4,9 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+
+# run: sphinx-build -W -n -b html -d build/doctrees docs/rtd docs/build/html --keep-going
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -31,8 +34,20 @@ author = "Mjolnir-Forge"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    #    "breathe",
+    'matplotlib.sphinxext.mathmpl',
+    'matplotlib.sphinxext.plot_directive',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.inheritance_diagram',
+    'numpydoc',
+    "myst_parser",
+    "sphinx.ext.mathjax",
 ]
+
+
+myst_enable_extensions = ["dollarmath", "amsmath"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = []
@@ -43,12 +58,18 @@ templates_path = []
 exclude_patterns = []
 
 
+# -- plot directive options --------------------------------------------------
+
+plot_html_show_formats = False
+plot_html_show_source_link = False
+
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "pydata_sphinx_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -63,16 +84,21 @@ html_static_path = []
 # read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
 
-wd = os.getcwd()
-os.chdir("../..")
+# wd = os.getcwd()
+# os.chdir("../..")
 
-subprocess.run(["doxygen", "-v"])  # nosec
-r = subprocess.run(["doxygen", ".doxyfile"])  # nosec
-if r.returncode:
-    raise RuntimeError("The doxygen build failed")
+# subprocess.run(["doxygen", "-v"])  # nosec
+# r = subprocess.run(["doxygen", ".doxyfile"])  # nosec
+# if r.returncode:
+#    raise RuntimeError("The doxygen build failed")
 
-os.chdir(wd)
+# os.chdir(wd)
 
-html_extra_path = ["../build/html"]
+# html_extra_path = ["../build/html"]
 
 # sphinx-build source build_sphinx -b html
+# source_suffix = {
+#    ".rst": "restructuredtext",
+# }
+
+source_suffix = [".rst", ".md"]

@@ -268,6 +268,23 @@ template <FloatVectorRegister T_RegisterType>
 
 
 //! @brief
+//! Perform an element-wise division of `lhs` by `rhs` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] lhs:
+//! The register left of the operator
+//! @param[in] rhs:
+//! The register right of the operator
+//!
+//! @return
+//! Results of the element-wise division.
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_div(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
+
+
+//! @brief
 //! Perform an element-wise multiplication of `a` and `b`, add `c` and return the result.
 //!
 //! @tparam T_RegisterType:
@@ -303,6 +320,25 @@ template <FloatVectorRegister T_RegisterType>
 //! Results of the element-wise multiplication with subsequent subtraction
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_fmsub(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Perform an element-wise multiplication of `a` and `b`, negate it, add `c` and return the result.
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param[in] a:
+//! The register left of the multiplication operator
+//! @param[in] b:
+//! The register right of the multiplication operator
+//! @param[in] c:
+//! The register that will be added after the multiplication
+//!
+//! @return
+//! Results of the element-wise negated multiplication with subsequent addition
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_fnmadd(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType;
 
 
 //! @brief
@@ -504,6 +540,46 @@ inline void mm_store(ElementType<T_RegisterType>* ptr, T_RegisterType reg) noexc
 //! Results of the element-wise subtraction.
 template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_sub(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Store the higher elements of `a` and `b` alternately in a new register and return it.
+//!
+//! @details
+//! The first element is taken from `a`
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] a:
+//! First register
+//! @param [in] b:
+//! Second register
+//!
+//! @return
+//! Higher elements of `a` and `b` in alternating order
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_unpackhi(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
+
+
+//! @brief
+//! Store the lower elements of `a` and `b` alternately in a new register and return it.
+//!
+//! @details
+//! The first element is taken from `a`
+//!
+//! @tparam T_RegisterType:
+//! The register type
+//!
+//! @param [in] a:
+//! First register
+//! @param [in] b:
+//! Second register
+//!
+//! @return
+//! Lower elements of `a` and `b` in alternating order
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_unpacklo(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType;
 
 
 //! @brief
@@ -752,6 +828,22 @@ template <FloatVectorRegister T_RegisterType>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_div(T_RegisterType lhs, T_RegisterType rhs) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_div_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_div_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_div_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+    else
+        return _mm256_div_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
 [[nodiscard]] inline auto mm_fmadd(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType
 {
     if constexpr (is_m128<T_RegisterType>)
@@ -778,6 +870,22 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_fmsub_ps(a, b, c);
     else
         return _mm256_fmsub_pd(a, b, c);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_fnmadd(T_RegisterType a, T_RegisterType b, T_RegisterType c) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_fnmadd_ps(a, b, c);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_fnmadd_pd(a, b, c);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_fnmadd_ps(a, b, c);
+    else
+        return _mm256_fnmadd_pd(a, b, c);
 }
 
 
@@ -968,6 +1076,38 @@ template <FloatVectorRegister T_RegisterType>
         return _mm256_sub_ps(lhs, rhs); // NOLINT(portability-simd-intrinsics)
     else
         return _mm256_sub_pd(lhs, rhs); // NOLINT(portability-simd-intrinsics)
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_unpackhi(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_unpackhi_ps(a, b);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_unpackhi_pd(a, b);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_unpackhi_ps(a, b);
+    else
+        return _mm256_unpackhi_pd(a, b);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template <FloatVectorRegister T_RegisterType>
+[[nodiscard]] inline auto mm_unpacklo(T_RegisterType a, T_RegisterType b) noexcept -> T_RegisterType
+{
+    if constexpr (is_m128<T_RegisterType>)
+        return _mm_unpacklo_ps(a, b);
+    else if constexpr (is_m128d<T_RegisterType>)
+        return _mm_unpacklo_pd(a, b);
+    else if constexpr (is_m256<T_RegisterType>)
+        return _mm256_unpacklo_ps(a, b);
+    else
+        return _mm256_unpacklo_pd(a, b);
 }
 
 
