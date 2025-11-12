@@ -27,7 +27,7 @@ namespace mjolnir
 //! @brief
 //! Calculate the determinant of a 2x2 matrix.
 //!
-//! @tparam T_Type
+//! @tparam T_Type:
 //! The type of the matrix elements and the returned value
 //!
 //! @param[in] mat:
@@ -42,7 +42,7 @@ template <Number T_Type>
 //! @brief
 //! Calculate the determinant of a 2x2 matrix.
 //!
-//! @tparam T_RegisterType
+//! @tparam T_RegisterType:
 //! Vector register type that represents a row or column of the matrix
 //!
 //! @param[in] mat:
@@ -51,14 +51,14 @@ template <Number T_Type>
 //! @return
 //! Determinant of the matrix
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto determinant_2x2(const std::array<T_RegisterType, 2>& mat) noexcept
-        -> x86::ElementType<T_RegisterType>;
+[[nodiscard]] inline auto
+determinant_2x2(const std::array<T_RegisterType, 2>& mat) noexcept -> x86::ElementType<T_RegisterType>;
 
 
 //! @brief
 //! Calculate the determinant of a 3x3 matrix.
 //!
-//! @tparam T_Type
+//! @tparam T_Type:
 //! The type of the matrix elements and the returned value
 //!
 //! @param[in] mat:
@@ -74,7 +74,7 @@ template <Number T_Type>
 //! @brief
 //! Calculate the determinant of a 3x3 matrix.
 //!
-//! @tparam T_RegisterType
+//! @tparam T_RegisterType:
 //! Vector register type that represents a row or column of the matrix
 //!
 //! @param[in] mat:
@@ -83,14 +83,14 @@ template <Number T_Type>
 //! @return
 //! Determinant of the matrix
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto determinant_3x3(const std::array<T_RegisterType, 3>& mat) noexcept
-        -> x86::ElementType<T_RegisterType>;
+[[nodiscard]] inline auto
+determinant_3x3(const std::array<T_RegisterType, 3>& mat) noexcept -> x86::ElementType<T_RegisterType>;
 
 
 //! @brief
 //! Calculate the determinant of a 4x4 matrix.
 //!
-//! @tparam T_Type
+//! @tparam T_Type:
 //! The type of the matrix elements and the returned value
 //!
 //! @param[in] mat:
@@ -106,7 +106,7 @@ template <Number T_Type>
 //! @brief
 //! Calculate the determinant of a 4x4 matrix.
 //!
-//! @tparam T_RegisterType
+//! @tparam T_RegisterType:
 //! Vector register type that represents a row or column of the matrix
 //!
 //! @param[in] mat:
@@ -115,8 +115,8 @@ template <Number T_Type>
 //! @return
 //! Determinant of the matrix
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto determinant_4x4(const std::array<T_RegisterType, 4>& mat) noexcept
-        -> x86::ElementType<T_RegisterType>;
+[[nodiscard]] inline auto
+determinant_4x4(const std::array<T_RegisterType, 4>& mat) noexcept -> x86::ElementType<T_RegisterType>;
 
 
 //! @}
@@ -140,8 +140,8 @@ template <Number T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto determinant_2x2(const std::array<T_RegisterType, 2>& mat) noexcept
-        -> x86::ElementType<T_RegisterType>
+[[nodiscard]] inline auto
+determinant_2x2(const std::array<T_RegisterType, 2>& mat) noexcept -> x86::ElementType<T_RegisterType>
 {
     using namespace x86;
 
@@ -177,8 +177,8 @@ template <Number T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto determinant_3x3(const std::array<T_RegisterType, 3>& mat) noexcept
-        -> x86::ElementType<T_RegisterType>
+[[nodiscard]] inline auto
+determinant_3x3(const std::array<T_RegisterType, 3>& mat) noexcept -> x86::ElementType<T_RegisterType>
 {
     return scalar_triple_product(mat[0], mat[1], mat[2]);
 }
@@ -214,8 +214,8 @@ template <Number T_Type>
 // --------------------------------------------------------------------------------------------------------------------
 
 template <x86::FloatVectorRegister T_RegisterType>
-[[nodiscard]] inline auto determinant_4x4(const std::array<T_RegisterType, 4>& mat) noexcept
-        -> x86::ElementType<T_RegisterType>
+[[nodiscard]] inline auto
+determinant_4x4(const std::array<T_RegisterType, 4>& mat) noexcept -> x86::ElementType<T_RegisterType>
 {
     using namespace x86;
 
